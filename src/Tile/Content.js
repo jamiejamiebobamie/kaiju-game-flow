@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 
 const ContentWrapper = styled.div`
@@ -31,7 +31,10 @@ const Image = styled.div`
   height: 100%;
   background-repeat: no-repeat;
   background-position: 50%;
-  /* background-image: url(http://placekitten.com/241/241); */
+  ${props =>
+    props.isHighlighted
+      ? "background-image: url(http://placekitten.com/241/241);"
+      : null}
   visibility: visible;
   -webkit-transform: rotate(-60deg);
   -moz-transform: rotate(-60deg);
@@ -42,11 +45,11 @@ const Image = styled.div`
     background-image: url(http://placekitten.com/242/242);
   }
 `;
-export const Content = ({ isHighlighted = false, url = "" }) => {
+export const Content = ({ isHighlighted = false, url = "", onClick }) => {
   return (
     <ContentWrapper>
       <ImageWrapper>
-        <Image url={url} />
+        <Image onClick={onClick} url={url} isHighlighted={isHighlighted} />
       </ImageWrapper>
     </ContentWrapper>
   );
