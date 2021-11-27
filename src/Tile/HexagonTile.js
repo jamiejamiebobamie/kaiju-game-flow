@@ -5,13 +5,18 @@ import { Border } from "./Border";
 
 const Hexagon = styled.div`
   ${props =>
-    `transform: translate(${(props.i === 0
-      ? props.i * 45 - 25
-      : props.i % 2
-      ? props.i * 45 + 25 * (props.i - 1)
-      : props.i * 45 + 25 * (props.i - 1)) * props.scale}px, ${(props.i % 2
-      ? props.j * 80 + 40
-      : props.j * 80) * props.scale}px) scale(${props.scale});`};
+    `transform: translate(${
+      (props.i === 0
+        ? props.i * 45 - 25
+        : props.i % 2
+        ? props.i * 45 + 25 * (props.i - 1)
+        : props.i * 45 + 25 * (props.i - 1)) * props.scale
+
+      // - 25 / props.scale // modifer to shift tiles to the left
+    }px, ${
+      (props.i % 2 ? props.j * 80 + 40 : props.j * 80) * props.scale
+      // - 40 / props.scale // modifer to shift tiles to the up
+    }px) scale(${props.scale});`};
   z-index: ${props => props.rowLength * props.i + props.j + 1};
 `;
 export const HexagonTile = ({

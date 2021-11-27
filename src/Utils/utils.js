@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
+export const IS_NAN = NaN;
+
 export const getRandomIntInRange = ({ min = 0, max }) => {
   const _min = Math.ceil(min);
   const _max = Math.floor(max + 1);
@@ -8,7 +10,7 @@ export const getRandomIntInRange = ({ min = 0, max }) => {
 };
 
 export const moveTo = ({
-  curr_location,
+  currentLocation,
   moveFromLocation,
   moveToLocation,
   moveSpeed,
@@ -19,7 +21,16 @@ export const moveTo = ({
   const y_To = moveToLocation.y;
   const x_From = moveFromLocation.x;
   const y_From = moveFromLocation.y;
-  const { x, y } = curr_location;
+  const { x, y } = currentLocation;
+  if ([x_To, y_To, x_From, y_From, x, y].some(val => val === IS_NAN))
+    console.log({
+      x_To,
+      y_To,
+      x_From,
+      y_From,
+      x,
+      y
+    });
   const distanceFromStart = Math.sqrt(
     (x_From - x) * (x_From - x) + (y_From - y) * (y_From - y)
   );
