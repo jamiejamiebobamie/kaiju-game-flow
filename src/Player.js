@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
+import { moveTo, getRandomIntInRange, useInterval } from "./Utils/utils";
+import { Kaiju } from "./Utils/gameState";
 
 const Character = styled.div`
   position: absolute;
-  z-index: 1001;
+  z-index: 20001;
   left: ${props => `${props.x}px`};
   top: ${props => `${props.y}px`};
   width: 10px;
@@ -11,31 +13,49 @@ const Character = styled.div`
   background-color: ${props => props.color};
   border-radius: 30px;
 `;
-export const Player = ({ startingX = 0, startingY = 0, color = "blue" }) => {
+export const Player = ({
+  startingX = 0,
+  startingY = 0,
+  color = "blue",
+  moveSpeed = 15
+}) => {
+  const [kaiju, setKaiju] = useState([]);
+  const [accessory, setAccessory] = useState({});
   const [location, setLocation] = useState({ x: startingX, y: startingY });
   const [moveToLocation, setMoveToLocation] = useState({
-    x: startingX + 100,
-    y: startingY + 100
+    x: startingX + 300,
+    y: startingY + 300
+  });
+  const [moveFromLocation, setMoveFromLocation] = useState({
+    x: startingX,
+    y: startingY
   });
   const [isThere, setIsThere] = useState(false);
+  useInterval(
+    () =>
+      moveTo({
+        curr_location: location,
+        moveFromLocation,
+        moveToLocation,
+        moveSpeed,
+        setLocation,
+        setHasArrived: setIsThere
+      }),
+    500
+  );
   useEffect(() => {
-    // setInterval(moveTo, 5000);
+    const randInt = getRandomIntInRange({ max: Kaiju.length - 1 });
+    const startingKaiju = { name: Kaiju[randInt], i: randInt, lvl: 1 };
+    console.log(startingKaiju);
+    setAccessory({});
+    setKaiju([startingKaiju]);
   }, []);
   useEffect(() => {
     if (isThere) {
-      setMoveToLocation({ x: startingX, y: startingY });
+      setMoveToLocation({ x: moveFromLocation.x, y: moveFromLocation.y });
+      setMoveFromLocation({ x: moveToLocation.x, y: moveToLocation.y });
       setIsThere(false);
     }
   }, [isThere]);
-  const moveTo = () => {
-    const x_to = moveToLocation.x;
-    const y_to = moveToLocation.y;
-    const { x, y } = location;
-    const distance = Math.sqrt(Math.exp(x_to - x, 2) + Math.exp(y_to - y, 2));
-    if (distance < 10) setIsThere(true);
-    const x_dir = Math.sqrt(Math.exp(x_to - x, 2));
-    const y_dir = Math.sqrt(Math.exp(y_to - y, 2));
-    setLocation({ x: x + x_dir, y: y + y_dir });
-  };
   return <Character x={location.x} y={location.y} color={color} />;
 };

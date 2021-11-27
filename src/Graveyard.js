@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { getRandomIntInRange } from "./Utils/utils";
 
 const GraveYardDot = styled.div`
   position: absolute;
-  z-index: 1001;
+  z-index: 10001;
   left: ${props => `${props.x}px`};
   top: ${props => `${props.y}px`};
   width: 10px;
@@ -19,14 +20,12 @@ const GraveYardDot = styled.div`
 export const Graveyard = ({ x, y, isEndgame }) => {
   const [gravestones, setGravestones] = useState(0);
   useEffect(() => {
-    setGravestones(Math.ceil(Math.random() * (3 - 2)) + 2);
+    const randomInt = getRandomIntInRange({ max: 3, min: 2 });
+    setGravestones(randomInt);
   }, []);
   const decrementGravestones = () => {
     setGravestones(count => count - 1);
   };
-  useEffect(() => {
-    console.log("hey", gravestones);
-  }, [gravestones]);
   return (
     <GraveYardDot
       x={x}
