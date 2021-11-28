@@ -8,12 +8,12 @@ import {
   getTileIAndJFromCharXAndY,
   getCharXAndY,
   getRandomAdjacentLocation
-} from "./Utils/utils";
+} from "../Utils/utils";
 import {
   STARTING_KAIJU_CHOICES,
   ACCESSORIES,
   PENINSULA_TILE_LOOKUP
-} from "./Utils/gameState";
+} from "../Utils/gameState";
 
 const Character = styled.div`
   position: absolute;
@@ -90,5 +90,9 @@ export const Player = ({
       setIsThere(false);
     }
   }, [isThere]);
-  return <Character x={location.x} y={location.y} color={color} />;
+  return (
+    <Character x={location.x} y={location.y} color={color}>
+      1
+    </Character>
+  );
 };

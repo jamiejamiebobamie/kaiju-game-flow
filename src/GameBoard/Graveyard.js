@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { getRandomIntInRange } from "./Utils/utils";
+import { getRandomIntInRange } from "./../Utils/utils";
 
 const GraveYardDot = styled.div`
   position: absolute;

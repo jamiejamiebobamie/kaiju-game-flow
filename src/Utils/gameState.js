@@ -41,7 +41,7 @@ export const ACCESSORIES = {
     name: "Unicorn",
     effect: ({ setStats }) => {
       setStats(stats => {
-        return { ...stats, moveSpeed: stats.moveSpeed + 15 };
+        return { ...stats, moveSpeed: stats.moveSpeed + 7 };
       });
     },
     description: `Player starts with a ridable Pegasus mount that confers a

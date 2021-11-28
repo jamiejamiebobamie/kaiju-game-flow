@@ -45,6 +45,10 @@ export const getCharXAndY = ({ i, j, scale }) => {
   const y = (i % 2 ? j * 80 + 40 : j * 80) * scale + 42.5 * scale;
   return { x, y };
 };
+// Canvas has a different x and y scale
+export const getManaWellXAndY = ({ i, j, scale }) => {
+  return { x: (i * 42 + 20) * scale, y: (j * 15 - 5) * scale };
+};
 export const getTileIAndJFromCharXAndY = (xToFind, yToFind, scale) => {
   return Object.values(PENINSULA_TILE_LOOKUP).find(tile => {
     const { i, j } = tile;
@@ -207,4 +211,11 @@ export const aStar = (start, goal) => {
     //console.log("Visited nodes: " + visited);
     //console.log("Currently lowest distances: " + distances);
   }
+};
+export const getRandomCharacterLocation = scale => {
+  const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
+  const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
+  const { i, j } = tileIndices[randomInt];
+  const { x, y } = getCharXAndY({ i, j, scale });
+  return { x, y };
 };

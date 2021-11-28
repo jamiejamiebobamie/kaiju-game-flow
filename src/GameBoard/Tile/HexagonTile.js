@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Content } from "./Content";
 import { Border } from "./Border";
-import { getTileXAndY } from "../Utils/utils";
+import { getTileXAndY } from "../../Utils/utils";
 
 const Hexagon = styled.div`
   ${props =>
     `transform: translate(${props.x}px, ${props.y}px) scale(${props.scale});`};
   zindex: ${props => props.zIndex};
+  /* pointer-events: none; */
 `;
 export const HexagonTile = ({
   rowLength = 1,
