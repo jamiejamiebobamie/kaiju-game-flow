@@ -10,12 +10,15 @@ const GraveYardDot = styled.div`
   width: 10px;
   height: 10px;
   background-color: ${props => (props.isEndgame ? "yellow" : "transparent")};
+  /* opacity: ${props => (props.isEndgame ? 0.7 : 1)}; */
+
   border-radius: 30px;
   border-style: solid;
   border-width: medium;
-  border-color: ${props => (props.isEndgame ? "red" : "black")};
+  border-color: ${props => (props.isEndgame ? "grey" : "lightgrey")};
   display: ${props =>
     props.isEndgame || props.gravestoneCount > 0 ? "block" : "none"};
+  pointer-events: none;
 `;
 export const Graveyard = ({ x, y, isEndgame }) => {
   const [gravestones, setGravestones] = useState(0);

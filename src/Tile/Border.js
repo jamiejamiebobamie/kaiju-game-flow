@@ -35,6 +35,7 @@ const HexagonHalf = styled.div`
 `;
 const Line = styled.div`
   position: absolute;
+  opacity: 0.1;
   background-color: lightgrey;
   width: 5px;
   height: 50px;

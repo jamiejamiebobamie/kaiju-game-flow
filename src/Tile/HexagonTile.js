@@ -2,22 +2,12 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Content } from "./Content";
 import { Border } from "./Border";
+import { getTileXAndY } from "../Utils/utils";
 
 const Hexagon = styled.div`
   ${props =>
-    `transform: translate(${
-      (props.i === 0
-        ? props.i * 45 - 25
-        : props.i % 2
-        ? props.i * 45 + 25 * (props.i - 1)
-        : props.i * 45 + 25 * (props.i - 1)) * props.scale
-
-      // - 25 / props.scale // modifer to shift tiles to the left
-    }px, ${
-      (props.i % 2 ? props.j * 80 + 40 : props.j * 80) * props.scale
-      // - 40 / props.scale // modifer to shift tiles to the up
-    }px) scale(${props.scale});`};
-  z-index: ${props => props.rowLength * props.i + props.j + 1};
+    `transform: translate(${props.x}px, ${props.y}px) scale(${props.scale});`};
+  zindex: ${props => props.zIndex};
 `;
 export const HexagonTile = ({
   rowLength = 1,
@@ -30,10 +20,22 @@ export const HexagonTile = ({
   const [state, setState] = useState({
     url: null
   });
+  const { x, y } = getTileXAndY({ i, j, scale });
+  const zIndex = rowLength * i + j + 1;
   return (
-    <Hexagon rowLength={rowLength} scale={scale} i={i} j={j}>
+    <Hexagon
+      zIndex={zIndex}
+      rowLength={rowLength}
+      scale={scale}
+      x={x}
+      y={y}
+      i={i}
+      j={j}
+    >
       <Content
-        onClick={() => setClickedIndex({ i, j })}
+        onClick={() => {
+          setClickedIndex({ i, j, x, y });
+        }}
         isHighlighted={isHighlighted}
         url=""
       />

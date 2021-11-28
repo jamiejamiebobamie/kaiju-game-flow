@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { moveTo, getRandomIntInRange, useInterval } from "./Utils/utils";
-import { STARTING_KAIJU_CHOICES, ACCESSORIES } from "./Utils/gameState";
+import {
+  moveTo,
+  getRandomIntInRange,
+  useInterval,
+  isAdjacent,
+  getTileIAndJFromCharXAndY,
+  getCharXAndY,
+  getRandomAdjacentLocation
+} from "./Utils/utils";
+import {
+  STARTING_KAIJU_CHOICES,
+  ACCESSORIES,
+  PENINSULA_TILE_LOOKUP
+} from "./Utils/gameState";
 
 const Character = styled.div`
   position: absolute;
@@ -17,27 +29,28 @@ export const Player = ({
   startingX = 0,
   startingY = 0,
   color = "blue",
-  chosenAccessory = ACCESSORIES
+  chosenAccessory = ACCESSORIES,
+  scale = 0.3
 }) => {
   const [stats, setStats] = useState({
     dmg: 5,
     lives: 0,
-    moveSpeed: 15
+    moveSpeed: 3
   });
   const [kaiju, setKaiju] = useState([]);
   const [accessory, setAccessory] = useState({});
   const [location, setLocation] = useState({ x: startingX, y: startingY });
-  const [moveToLocation, setMoveToLocation] = useState({
-    x: startingX + 300,
-    y: startingY + 300
-  });
+  const [moveToLocation, setMoveToLocation] = useState(
+    getRandomAdjacentLocation({ x: startingX, y: startingY }, scale)
+  );
   const [moveFromLocation, setMoveFromLocation] = useState({
     x: startingX,
     y: startingY
   });
   const [isThere, setIsThere] = useState(false);
-  useInterval(
-    () =>
+  const [init, setInit] = useState(false);
+  useInterval(() => {
+    if (location && moveFromLocation && moveToLocation && !isThere)
       moveTo({
         currentLocation: location,
         moveFromLocation,
@@ -45,16 +58,14 @@ export const Player = ({
         moveSpeed: stats.moveSpeed,
         setLocation,
         setHasArrived: setIsThere
-      }),
-    500
-  );
+      });
+  }, 500);
   useEffect(() => {
     const randInt1 = getRandomIntInRange({
       max: STARTING_KAIJU_CHOICES.length - 1
     });
     const startingKaiju = STARTING_KAIJU_CHOICES[randInt1];
     setKaiju([startingKaiju]);
-
     // TESTING
     const accessoryKeys = Object.keys(ACCESSORIES);
     const randInt2 = getRandomIntInRange({
@@ -70,21 +81,11 @@ export const Player = ({
     //   ? setAccessory({ Compass, [chosenAccessory.key]: chosenAccessory })
     //   : setAccessory({ Compass });
     // chosenAccessory && chosenAccessory.effect({ Kaiju: kaiju, setStats });
-    setTimeout(
-      () =>
-        console.log({
-          color,
-          startingKaiju,
-          randAccessory,
-          kaiju,
-          accessory
-        }),
-      1000
-    );
   }, []);
   useEffect(() => {
     if (isThere) {
-      setMoveToLocation({ x: moveFromLocation.x, y: moveFromLocation.y });
+      const newLocation = getRandomAdjacentLocation(moveToLocation, scale);
+      setMoveToLocation({ x: newLocation.x, y: newLocation.y });
       setMoveFromLocation({ x: moveToLocation.x, y: moveToLocation.y });
       setIsThere(false);
     }
