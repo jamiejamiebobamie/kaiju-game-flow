@@ -7,7 +7,9 @@ import {
   isAdjacent,
   getTileIAndJFromCharXAndY,
   getCharXAndY,
-  getRandomAdjacentLocation
+  getRandomAdjacentLocation,
+  isLocatonInsidePolygon,
+  getIAndJFromManaWellXAndY
 } from "../Utils/utils";
 import {
   STARTING_KAIJU_CHOICES,
@@ -24,21 +26,33 @@ const Character = styled.div`
   height: 10px;
   background-color: ${props => props.color};
   border-radius: 30px;
+  font-size: 10px;
+  ${props => props.isInManaPool && "animation: blinkingText 5s infinite;"}
+}
+@keyframes blinkingText{
+  0%		{ background-color: #10c018;}
+  25%		{ background-color: #1056c0;}
+  50%		{ background-color: #ef0a1a;}
+  75%		{ background-color: #254878;}
+  100%	{ background-color: #04a1d5;}
+}
 `;
 export const Player = ({
   startingX = 0,
   startingY = 0,
   color = "blue",
-  chosenAccessory = ACCESSORIES,
-  scale = 0.3
+  scale = 0.3,
+  number = 0,
+  manaPools = []
 }) => {
+  const [isInManaPool, setIsInManaPool] = useState(false);
   const [stats, setStats] = useState({
     dmg: 5,
     lives: 0,
     moveSpeed: 3
   });
   const [kaiju, setKaiju] = useState([]);
-  const [accessory, setAccessory] = useState({});
+  const [accessory, setAccessory] = useState([]);
   const [location, setLocation] = useState({ x: startingX, y: startingY });
   const [moveToLocation, setMoveToLocation] = useState(
     getRandomAdjacentLocation({ x: startingX, y: startingY }, scale)
@@ -48,7 +62,6 @@ export const Player = ({
     y: startingY
   });
   const [isThere, setIsThere] = useState(false);
-  const [init, setInit] = useState(false);
   useInterval(() => {
     if (location && moveFromLocation && moveToLocation && !isThere)
       moveTo({
@@ -60,6 +73,11 @@ export const Player = ({
         setHasArrived: setIsThere
       });
   }, 500);
+
+  useInterval(() => {
+    if (manaPools && manaPools.length > 2)
+      setIsInManaPool(isLocatonInsidePolygon(manaPools, location));
+  }, 3000);
   useEffect(() => {
     const randInt1 = getRandomIntInRange({
       max: STARTING_KAIJU_CHOICES.length - 1
@@ -74,8 +92,10 @@ export const Player = ({
     const randKey = accessoryKeys[randInt2];
     const randAccessory = ACCESSORIES[randKey];
     const { Compass } = ACCESSORIES;
-    setAccessory({ Compass, [randAccessory.key]: randAccessory });
-    randAccessory && randAccessory.effect({ Kaiju: kaiju, setStats, setKaiju });
+    setAccessory([Compass, randAccessory]);
+    randAccessory &&
+      randAccessory.onStart &&
+      randAccessory.onStart({ kaiju: [startingKaiju], setStats, setKaiju });
     // NORMAL CODE -- Player will choose their accessory.
     // chosenAccessory
     //   ? setAccessory({ Compass, [chosenAccessory.key]: chosenAccessory })
@@ -90,9 +110,28 @@ export const Player = ({
       setIsThere(false);
     }
   }, [isThere]);
+  // useEffect(() => {
+  //   if (accessory.length && kaiju.length)
+  //     console.log(number, stats, accessory, kaiju);
+  // }, [stats, accessory, kaiju]);
+  // useEffect(() => {
+  //   console.log("isInManaPool", manaPools);
+  // }, [manaPools]);
   return (
-    <Character x={location.x} y={location.y} color={color}>
-      1
+    <Character
+      x={location.x}
+      y={location.y}
+      color={color}
+      isInManaPool={isInManaPool}
+    >
+      <div
+        style={{
+          marginLeft: "2px",
+          marginTop: "-2px"
+        }}
+      >
+        {number}
+      </div>
     </Character>
   );
 };

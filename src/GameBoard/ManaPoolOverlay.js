@@ -4,28 +4,11 @@ import styled from "styled-components";
 const Overlay = styled.canvas`
   width: 500px;
   height: 800px;
-
-  /* height: 800px; */
   position: absolute;
-  /* z-index: 1000; */
   opacity: 0.5;
 `;
-
-export const ManaPoolOverlay = ({ manaPools, testRandom = null }) => {
+export const ManaPoolOverlay = ({ testRandom = null }) => {
   const canvasRef = useRef(null);
-  const drawManaPools = ctx => {
-    return manaPools.map(({ manaWells, color }, i) => {
-      ctx.beginPath();
-      manaWells.forEach(({ x, y }, i) => {
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      });
-      ctx.fillStyle = color;
-      ctx.fill();
-    });
-  };
-  // ctx.lineTo(${testRandom[0].x}, ${testRandom[0].y})
-  // ctx.lineTo(${testRandom[1].x}, ${testRandom[1].y})
-  // ctx.lineTo(${testRandom[2].x}, ${testRandom[2].y})
   const verts =
     testRandom && testRandom.length > 2
       ? testRandom.reduce(
@@ -36,56 +19,50 @@ export const ManaPoolOverlay = ({ manaPools, testRandom = null }) => {
           ""
         )
       : "";
-  const verts2 =
-    testRandom && testRandom.length > 2
-      ? testRandom.reduce(
-          (acc, item, i) =>
-            i === 0
-              ? `ctx.moveTo(${item.y},${item.x});`
-              : `${acc}ctx.lineTo(${item.y},${item.x});`,
-          ""
-        )
-      : "";
-
+  // const verts2 =
+  //   testRandom && testRandom.length > 2
+  //     ? testRandom.reduce(
+  //         (acc, item, i) =>
+  //           i === 0
+  //             ? `ctx.moveTo(${item.y},${item.x});`
+  //             : `${acc}ctx.lineTo(${item.y},${item.x});`,
+  //         ""
+  //       )
+  //     : "";
   const my_string = `
           ctx.beginPath();
           ${verts}
           ctx.fillStyle = "rgba(1, 12, 255, 0.5)";
           ctx.fill();
           `;
-  const my_string2 = `
-                  ctx.beginPath();
-                  ${verts2}
-                  ctx.fillStyle = "rgba(23, 54, 33, 0.5)";
-                  ctx.fill();
-                  `;
-
+  // const my_string2 = `
+  //                 ctx.beginPath();
+  //                 ${verts2}
+  //                 ctx.fillStyle = "rgba(23, 54, 33, 0.5)";
+  //                 ctx.fill();
+  //                 `;
   const draw = (ctx, frameCount) => {
     // drawManaPools(ctx);
     eval(my_string);
-    eval(my_string2);
+    // eval(my_string2);
   };
-
   function getCursorPosition(canvas, event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     console.log("x: " + x + " y: " + y);
   }
-
   useEffect(() => {
     if (canvasRef && canvasRef.current)
       canvasRef.current.addEventListener("mousedown", function(e) {
         getCursorPosition(canvasRef.current, e);
       });
   }, [canvasRef]);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     let frameCount = 0;
     let animationFrameId;
-
     //Our draw came here
     const render = () => {
       frameCount++;
@@ -93,7 +70,6 @@ export const ManaPoolOverlay = ({ manaPools, testRandom = null }) => {
       animationFrameId = window.requestAnimationFrame(render);
     };
     render();
-
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     };

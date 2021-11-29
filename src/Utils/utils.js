@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { PENINSULA_TILE_LOOKUP } from "./gameState";
 
-export const IS_NAN = NaN; // not working?
-
 export const getRandomIntInRange = ({ min = 0, max }) => {
   const _min = Math.ceil(min);
   const _max = Math.floor(max + 1);
@@ -10,12 +8,7 @@ export const getRandomIntInRange = ({ min = 0, max }) => {
   return randomInt;
 };
 export const getTileXAndY = ({ i, j, scale }) => {
-  const x =
-    (i === 0
-      ? i * 45 - 25
-      : i % 2
-      ? i * 45 + 25 * (i - 1)
-      : i * 45 + 25 * (i - 1)) * scale;
+  const x = (i === 0 ? i * 45 - 25 : i * 45 + 25 * (i - 1)) * scale;
   const y = (i % 2 ? j * 80 + 40 : j * 80) * scale;
   return { x, y };
 };
@@ -35,19 +28,16 @@ export const getRandomAdjacentLocation = (location, scale) => {
 // x and y shifted to position character on tile.
 export const getCharXAndY = ({ i, j, scale }) => {
   const x =
-    (i === 0
-      ? i * 45 - 25
-      : i % 2
-      ? i * 45 + 25 * (i - 1)
-      : i * 45 + 25 * (i - 1)) *
-      scale +
-    52.5 * scale;
+    (i === 0 ? i * 45 - 25 : i * 45 + 25 * (i - 1)) * scale + 52.5 * scale;
   const y = (i % 2 ? j * 80 + 40 : j * 80) * scale + 42.5 * scale;
   return { x, y };
 };
 // Canvas has a different x and y scale
 export const getManaWellXAndY = ({ i, j, scale }) => {
   return { x: (i * 42 + 20) * scale, y: (j * 15 - 5) * scale };
+};
+export const getIAndJFromManaWellXAndY = ({ x, y, scale }) => {
+  return { i: (x / scale - 20) / 42, j: (y / scale + 5) / 15 };
 };
 export const getTileIAndJFromCharXAndY = (xToFind, yToFind, scale) => {
   return Object.values(PENINSULA_TILE_LOOKUP).find(tile => {
@@ -80,10 +70,7 @@ export const moveTo = ({
   const x_dir = (x_To - x) / distanceToFinish;
   const y_dir = (y_To - y) / distanceToFinish;
   setLocation(({ x, y }) => {
-    return {
-      x: x + x_dir * moveSpeed,
-      y: y + y_dir * moveSpeed
-    };
+    return { x: x + x_dir * moveSpeed, y: y + y_dir * moveSpeed };
   });
 };
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
@@ -127,6 +114,46 @@ export const isAdjacent = (tile1, tile2) => {
         !(tile1.i - 1 === tile2.i && tile1.j + 1 === tile2.j) &&
         !(tile1.i + 1 === tile2.i && tile1.j + 1 === tile2.j)
     : false;
+};
+export const getRandomCharacterLocation = scale => {
+  const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
+  const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
+  const { i, j } = tileIndices[randomInt];
+  const { x, y } = getCharXAndY({ i, j, scale });
+  return { x, y };
+};
+export const isLocatonInsidePolygon = (polygon, p) => {
+  var isInside = false;
+  var minX = polygon[0].x,
+    maxX = polygon[0].x;
+  var minY = polygon[0].y,
+    maxY = polygon[0].y;
+  for (var n = 1; n < polygon.length; n++) {
+    var q = polygon[n];
+    minX = Math.min(q.x, minX);
+    maxX = Math.max(q.x, maxX);
+    minY = Math.min(q.y, minY);
+    maxY = Math.max(q.y, maxY);
+  }
+
+  if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) {
+    return false;
+  }
+
+  var i = 0,
+    j = polygon.length - 1;
+  for (i, j; i < polygon.length; j = i++) {
+    if (
+      polygon[i].y > p.y != polygon[j].y > p.y &&
+      p.x <
+        ((polygon[j].x - polygon[i].x) * (p.y - polygon[i].y)) /
+          (polygon[j].y - polygon[i].y) +
+          polygon[i].x
+    ) {
+      isInside = !isInside;
+    }
+  }
+  return isInside;
 };
 // https://www.algorithms-and-technologies.com/a_star/javascript
 export const aStar = (start, goal) => {
@@ -211,11 +238,4 @@ export const aStar = (start, goal) => {
     //console.log("Visited nodes: " + visited);
     //console.log("Currently lowest distances: " + distances);
   }
-};
-export const getRandomCharacterLocation = scale => {
-  const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
-  const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
-  const { i, j } = tileIndices[randomInt];
-  const { x, y } = getCharXAndY({ i, j, scale });
-  return { x, y };
 };

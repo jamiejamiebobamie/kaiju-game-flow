@@ -10,22 +10,24 @@ export const STARTING_KAIJU_CHOICES = [
 
 /*
 EFFECT CALLBACKS:
-onAttack
-onStart
-onDeath
+    onAttack
+    onManaWellGain
+    onManaWellLose
+    onStart
+    onDeath
 */
 export const ACCESSORIES = {
   Compass: {
     key: "Compass",
     name: "Compass",
-    effect: () => {},
+    onStart: () => {},
     description: `All players start with this. The compass will point in the
                     direction of the closest mana well.`
   },
   Cigarette: {
     key: "Cigarette",
     name: "Cigarette",
-    effect: ({ setStats, setKaiju }) => {
+    onStart: ({ setStats, setKaiju }) => {
       setKaiju([{ element: "Fire", name: "Salamander", i: 1, lvl: 1 }]);
       setStats(stats => {
         return { ...stats, dmg: stats.dmg + 1 };
@@ -39,9 +41,23 @@ export const ACCESSORIES = {
   Unicorn: {
     key: "Unicorn",
     name: "Unicorn",
-    effect: ({ setStats }) => {
+    onStart: ({ setStats }) => {
       setStats(stats => {
         return { ...stats, moveSpeed: stats.moveSpeed + 7 };
+      });
+    },
+    onAttack: ({ setAccessory }) => {
+      setAccessory(accessories => {
+        if (accessories.includes(accessory => accessory.key === "Unicorn")) {
+          const _accessories = [...accessories];
+          const i = accessories.indexOf(
+            accessory => accessory.key === "Unicorn"
+          );
+          _accessories.splice(i, 0); // need to test.
+          return _accessories;
+        } else {
+          return accessories;
+        }
       });
     },
     description: `Player starts with a ridable Pegasus mount that confers a
@@ -52,16 +68,18 @@ export const ACCESSORIES = {
   CoolJacket: {
     key: "CoolJacket",
     name: "Cool Jacket",
-    effect: () => {},
+    onStart: () => {},
     description: `Just a really cool jacket.`
   },
   MetalBat: {
     key: "MetalBat",
     name: "Metal Bat",
-    effect: ({ setStats, Kaiju }) => {
+    onAttack: ({ setStats, kaiju }) => {
       setStats(stats => {
+        // set stats to what they were originally after attack is over.
+        setTimeout(() => setStats(stats), 2000); // needs to be tested.
         let modifier =
-          Kaiju.filter(
+          kaiju.filter(
             k =>
               k.element == "Lightning" ||
               k.element == "Fire" ||
@@ -88,22 +106,84 @@ export const ACCESSORIES = {
   WingedNikes: {
     key: "WingedNikes",
     name: "Winged Nikes",
-    effect: ({ setStats }) => {
+    onStart: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element === "Lightning") ? 5 : 0;
+      console.log("modifier", modifier, kaiju);
       setStats(stats => {
-        return { ...stats, moveSpeed: stats.moveSpeed + 7 };
+        return stats.WingedNikes && modifier === 5
+          ? stats
+          : {
+              ...stats,
+              WingedNikes: !stats.WingedNikes && modifier === 5,
+              moveSpeed: stats.moveSpeed + modifier
+            };
+      });
+    },
+    onManaWellGain: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Lightning") ? 5 : 0;
+      setStats(stats => {
+        return stats.WingedNikes && modifier === 5
+          ? stats
+          : {
+              ...stats,
+              WingedNikes: !stats.WingedNikes && modifier === 5,
+              moveSpeed: stats.moveSpeed + modifier
+            };
+      });
+    },
+    onManaWellLose: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Lightning") ? 5 : 0;
+      setStats(stats => {
+        return stats.WingedNikes && modifier === 5
+          ? stats
+          : {
+              ...stats,
+              WingedNikes: !(stats.WingedNikes && modifier === 0),
+              moveSpeed: stats.moveSpeed + modifier
+            };
       });
     },
     description: `If player has Lightning Kaiju, his moveSpeed increases a
-                  a moderate amount (and permanently). In game, the speed
-                  increase will only be applied with Lightning passive enabled.`
+                  a moderate amount. In "real" game, the speed increase will
+                  only be applied with Lightning passive enabled.`
   },
   MagicBeans: {
     key: "MagicBeans",
     name: "5 Magic Beans",
-    effect: ({ setStats, Kaiju }) => {
+    onStart: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Wood") ? 4 : 0;
       setStats(stats => {
-        let modifier = Kaiju.find(k => k.element == "Wood") ? 4 : 0;
-        return { ...stats, dmg: stats.dmg + modifier };
+        return stats.MagicBeans && modifier === 4
+          ? stats
+          : {
+              ...stats,
+              MagicBeans: !stats.MagicBeans && modifier === 4,
+              dmg: stats.dmg + modifier
+            };
+      });
+    },
+    onManaWellGain: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Wood") ? 4 : 0;
+      setStats(stats => {
+        return stats.MagicBeans && modifier === 4
+          ? stats
+          : {
+              ...stats,
+              MagicBeans: !stats.MagicBeans && modifier === 4,
+              dmg: stats.dmg + modifier
+            };
+      });
+    },
+    onManaWellLose: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Wood") ? 4 : 0;
+      setStats(stats => {
+        return stats.MagicBeans && modifier === 4
+          ? stats
+          : {
+              ...stats,
+              MagicBeans: !(stats.MagicBeans && modifier === 0),
+              dmg: stats.dmg + modifier
+            };
       });
     },
     description: `Plant one of these to create an ivy-tree. Enemies around an
@@ -114,19 +194,20 @@ export const ACCESSORIES = {
   SkullRing: {
     key: "SkullRing",
     name: "Skull Ring",
-    effect: ({ setStats }) => {
+    onDeath: ({ setStats }) => {
       setStats(stats => {
         const modifier = Math.random() > 0.8 ? 1 : 0;
         return { ...stats, lives: stats.lives + modifier };
       });
-    }, // needs to be called everytime on player respawn
+    },
     description: `Small chance of conferring one wraith on respawn.`
   },
   Revolver: {
     key: "Revolver",
     name: "Revolver",
-    effect: ({ setStats }) => {
+    onAttack: ({ setStats }) => {
       setStats(stats => {
+        setTimeout(() => setStats(stats), 2000); // needs to be tested.
         const modifier = Math.random() > 0.5 ? 5 : 0;
         return { ...stats, dmg: stats.dmg + modifier };
       });
@@ -138,8 +219,9 @@ export const ACCESSORIES = {
   SemiAutomatic: {
     key: "SemiAutomatic",
     name: "Semi-automatic",
-    effect: ({ setStats }) => {
+    onAttack: ({ setStats }) => {
       setStats(stats => {
+        setTimeout(() => setStats(stats), 2000); // needs to be tested.
         const modifier = Math.random() > 0.7 ? 7 : 0;
         return { ...stats, dmg: stats.dmg + modifier };
       });

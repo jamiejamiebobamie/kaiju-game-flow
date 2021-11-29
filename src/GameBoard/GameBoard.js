@@ -4,7 +4,11 @@ import { HexagonTile } from "./Tile/HexagonTile";
 import { Graveyard } from "./Graveyard";
 import { Player } from "./Player";
 import { ManaPoolOverlay } from "./ManaPoolOverlay";
-import { PENINSULA_TILE_LOOKUP } from "../Utils/gameState";
+import {
+  STARTING_KAIJU_CHOICES,
+  ACCESSORIES,
+  PENINSULA_TILE_LOOKUP
+} from "../Utils/gameState";
 import {
   getCharXAndY,
   getManaWellXAndY,
@@ -14,7 +18,9 @@ import {
   getIndicesFromFlattenedArrayIndex,
   getFlattenedArrayIndex,
   getRandomCharacterLocation,
-  useInterval
+  useInterval,
+  moveTo,
+  getRandomAdjacentLocation
 } from "../Utils/utils";
 
 const Board = styled.div`
@@ -51,9 +57,12 @@ export const GameBoard = () => {
   const [endGamePoint, setEndGamePoint] = useState(null);
   const [tiles, setTiles] = useState([]);
   const [graveyards, setGraveyards] = useState([]);
-  const [players, setPlayers] = useState([]);
+  // const [players, setPlayers] = useState([]);
   const [manaPools, setManaPools] = useState();
   const [testRandom, setTestRandom] = useState([]);
+  const [startingPlayerStats, setStartingPlayerStats] = useState([]);
+  const [manaPoolLocations, setManaPoolLocations] = useState([]);
+
   // FOR TESTING:
   // var width =
   //   window.innerWidth ||
@@ -99,26 +108,85 @@ export const GameBoard = () => {
     // }
     // setGraveyards(_graveyards);
     const _players = [];
-    const colors = [];
-    for (let i = 0; i < 2; i++) {
+    // const colors = [];
+    for (let k = 0; k < 3; k++) {
       const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
-      const randomInt = getRandomIntInRange({ max: tileIndices.length });
-      const { i, j } = tileIndices[randomInt];
-      const { x, y } = getCharXAndY({ i, j, scale });
       const color = `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`;
-      colors.push(color);
-      _players.push(
-        <Player
-          key={`${x} ${y}`}
-          startingX={x}
-          startingY={y}
-          color={color}
-          scale={scale}
-        />
-      );
+      // colors.push(color);
+      // const stats = {
+      //   dmg: 5,
+      //   lives: 0,
+      //   moveSpeed: 3
+      // };
+      const number = k + 1;
+      const randomInt = getRandomIntInRange({ max: tileIndices.length });
+      const { i, j } = tileIndices[randomInt];
+      const location = getCharXAndY({ i, j, scale });
+
+      // const moveToLocation = getRandomAdjacentLocation(
+      //   { x: location.x, y: location.y },
+      //   scale
+      // );
+      // const moveFromLocation = location;
+      // const isThere = false;
+      // const randInt1 = getRandomIntInRange({
+      //   max: STARTING_KAIJU_CHOICES.length - 1
+      // });
+      // const startingKaiju = STARTING_KAIJU_CHOICES[randInt1];
+      // const kaiju = [startingKaiju];
+      // const accessoryKeys = Object.keys(ACCESSORIES);
+      // const randInt2 = getRandomIntInRange({
+      //   max: accessoryKeys.length - 1
+      // });
+      // const randKey = accessoryKeys[randInt2];
+      // const randAccessory = ACCESSORIES[randKey];
+      // const { Compass } = ACCESSORIES;
+      // const accessory = [Compass, randAccessory];
+      // randAccessory &&
+      //   randAccessory.onStart &&
+      //   randAccessory.onStart({ kaiju: [startingKaiju], setStats, setKaiju });
+      // const _player = {
+      //   color,
+      //   location,
+      //   moveToLocation,
+      //   moveFromLocation,
+      //   isThere,
+      //   kaiju,
+      //   accessory,
+      //   number
+      // };
+      //   _players.push(
+      //     <Player
+      //       key={number}
+      //       startingX={location.x}
+      //       startingY={location.y}
+      //       color={color}
+      //       scale={scale}
+      //       number={number}
+      //       getManaPools={getManaPools}
+      //     />
+      //   );
+
+      //   _players.push(
+      //     <Player
+      //       key={number}
+      //       startingX={location.x}
+      //       startingY={location.y}
+      //       color={color}
+      //       scale={scale}
+      //       number={number}
+      //       getManaPools={getManaPools}
+      //     />
+      //   );
+      _players.push({
+        color,
+        location
+      });
     }
-    setPlayers(_players);
+    // setPlayers(_players);
+    setStartingPlayerStats(_players);
+
     // const manaWells = [];
     // for (let i = 0; i < 6; i++) {
     //   const { x, y } = getRandomCharacterLocation(scale);
@@ -136,7 +204,7 @@ export const GameBoard = () => {
   useEffect(() => {
     const { i, j } = clickedTile;
     if (i !== -1) {
-      console.log(clickedTile);
+      // console.log(clickedTile);
       // let _includedHexes;
       // if (includedHexes[`${i} ${j}`]) {
       //   _includedHexes = { ...includedHexes };
@@ -150,6 +218,11 @@ export const GameBoard = () => {
       // console.log(highlightedTiles);
 
       const newXAndY = getManaWellXAndY({ i, j, scale });
+
+      setManaPoolLocations(_manaPoolLocations => [
+        ..._manaPoolLocations,
+        getCharXAndY({ i, j, scale })
+      ]);
 
       const _test = [...testRandom, newXAndY];
       setTestRandom(_test);
@@ -220,6 +293,59 @@ export const GameBoard = () => {
   //     />
   //   );
   // }, 3000);
+  // useInterval(() => {
+  //   players.forEach((player, i) => {
+  //     if (
+  //       player.location &&
+  //       player.moveFromLocation &&
+  //       player.moveToLocation &&
+  //       !player.isThere
+  //     )
+  //       moveTo({
+  //         currentLocation: player.location,
+  //         moveFromLocation: player.moveFromLocation,
+  //         moveToLocation: player.moveToLocation,
+  //         moveSpeed:
+  //           player.stats && player.stats.moveSpeed ? player.stats.moveSpeed : 0,
+  //         setLocation: location => {
+  //           setPlayers(_players => {
+  //             const ps = [..._players];
+  //             console.log(location);
+  //             ps[i].location = location;
+  //             return ps;
+  //           });
+  //         },
+  //         setHasArrived: isThere => {
+  //           setPlayers(_players => {
+  //             const ps = [..._players];
+  //             ps[i].isThere = isThere;
+  //             return ps;
+  //           });
+  //         }
+  //       });
+  //   });
+  // }, 2000);
+  // const playerComponents = players.map(player => (
+  //   <Player
+  //     key={player.number}
+  //     location={player.location}
+  //     color={player.color}
+  //     number={player.number}
+  //   />
+  // ));
+  // useInterval(() => {}, 5000);
+
+  const players = startingPlayerStats.map((p, i) => (
+    <Player
+      key={i}
+      number={i + 1}
+      startingX={p.location.x}
+      startingY={p.location.y}
+      color={p.color}
+      scale={scale}
+      manaPools={manaPoolLocations}
+    />
+  ));
   return (
     <Board width={width} height={height}>
       {manaPools}
