@@ -563,7 +563,7 @@ export const PENINSULA_TILE_LOOKUP = {
   "3 27": { i: 3, j: 27 }
 };
 
-const BRIDGE_TILES = {
+export const BRIDGE_TILES = {
   "6 4": { i: 6, j: 4 },
   "6 3": { i: 6, j: 3 },
   "7 3": { i: 7, j: 3 },

@@ -7,11 +7,11 @@ const Overlay = styled.canvas`
   position: absolute;
   opacity: 0.5;
 `;
-export const ManaPoolOverlay = ({ testRandom = null }) => {
+export const ManaPoolOverlay = ({ manaWellLocations = null }) => {
   const canvasRef = useRef(null);
   const verts =
-    testRandom && testRandom.length > 2
-      ? testRandom.reduce(
+    manaWellLocations && manaWellLocations.length > 2
+      ? manaWellLocations.reduce(
           (acc, item, i) =>
             i === 0
               ? `ctx.moveTo(${item.x},${item.y});`
@@ -19,32 +19,32 @@ export const ManaPoolOverlay = ({ testRandom = null }) => {
           ""
         )
       : "";
-  // const verts2 =
-  //   testRandom && testRandom.length > 2
-  //     ? testRandom.reduce(
-  //         (acc, item, i) =>
-  //           i === 0
-  //             ? `ctx.moveTo(${item.y},${item.x});`
-  //             : `${acc}ctx.lineTo(${item.y},${item.x});`,
-  //         ""
-  //       )
-  //     : "";
+  const verts2 =
+    manaWellLocations && manaWellLocations.length > 2
+      ? manaWellLocations.reduce(
+          (acc, item, i) =>
+            i === 0
+              ? `ctx.moveTo(${item.y},${item.x});`
+              : `${acc}ctx.lineTo(${item.y},${item.x});`,
+          ""
+        )
+      : "";
   const my_string = `
           ctx.beginPath();
           ${verts}
           ctx.fillStyle = "rgba(1, 12, 255, 0.5)";
           ctx.fill();
           `;
-  // const my_string2 = `
-  //                 ctx.beginPath();
-  //                 ${verts2}
-  //                 ctx.fillStyle = "rgba(23, 54, 33, 0.5)";
-  //                 ctx.fill();
-  //                 `;
+  const my_string2 = `
+                  ctx.beginPath();
+                  ${verts2}
+                  ctx.fillStyle = "rgba(23, 54, 33, 0.5)";
+                  ctx.fill();
+                  `;
   const draw = (ctx, frameCount) => {
     // drawManaPools(ctx);
     eval(my_string);
-    // eval(my_string2);
+    eval(my_string2);
   };
   function getCursorPosition(canvas, event) {
     const rect = canvas.getBoundingClientRect();

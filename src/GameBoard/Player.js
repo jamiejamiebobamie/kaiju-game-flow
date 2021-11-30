@@ -38,14 +38,13 @@ const Character = styled.div`
 }
 `;
 export const Player = ({
-  startingX = 0,
-  startingY = 0,
+  charLocation,
   color = "blue",
   scale = 0.3,
-  number = 0,
-  manaPools = []
+  i = 0,
+  isInManaPool
 }) => {
-  const [isInManaPool, setIsInManaPool] = useState(false);
+  // const [isInManaPool, setIsInManaPool] = useState(false);
   const [stats, setStats] = useState({
     dmg: 5,
     lives: 0,
@@ -53,13 +52,16 @@ export const Player = ({
   });
   const [kaiju, setKaiju] = useState([]);
   const [accessory, setAccessory] = useState([]);
-  const [location, setLocation] = useState({ x: startingX, y: startingY });
+  const [location, setLocation] = useState({
+    x: charLocation.x,
+    y: charLocation.y
+  });
   const [moveToLocation, setMoveToLocation] = useState(
-    getRandomAdjacentLocation({ x: startingX, y: startingY }, scale)
+    getRandomAdjacentLocation({ x: charLocation.x, y: charLocation.y }, scale)
   );
   const [moveFromLocation, setMoveFromLocation] = useState({
-    x: startingX,
-    y: startingY
+    x: charLocation.x,
+    y: charLocation.y
   });
   const [isThere, setIsThere] = useState(false);
   useInterval(() => {
@@ -73,11 +75,10 @@ export const Player = ({
         setHasArrived: setIsThere
       });
   }, 500);
-
-  useInterval(() => {
-    if (manaPools && manaPools.length > 2)
-      setIsInManaPool(isLocatonInsidePolygon(manaPools, location));
-  }, 3000);
+  // useInterval(() => {
+  //   if (manaPools && manaPools.length > 2)
+  //     setIsInManaPool(isLocatonInsidePolygon(manaPools, location));
+  // }, 3000);
   useEffect(() => {
     const randInt1 = getRandomIntInRange({
       max: STARTING_KAIJU_CHOICES.length - 1
@@ -130,7 +131,7 @@ export const Player = ({
           marginTop: "-2px"
         }}
       >
-        {number}
+        {i}
       </div>
     </Character>
   );
