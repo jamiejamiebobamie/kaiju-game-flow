@@ -12,6 +12,15 @@ export const getTileXAndY = ({ i, j, scale }) => {
   const y = (i % 2 ? j * 80 + 40 : j * 80) * scale;
   return { x, y };
 };
+export const getRandAdjacentTile = ({ i, j }) => {
+  let newTile = { i: -1, j: -1 };
+  while (!PENINSULA_TILE_LOOKUP[`${newTile.i} ${newTile.j}`])
+    newTile = {
+      i: Math.random() > 0.66 ? i + 1 : Math.random() > 0.33 ? i : i - 1,
+      j: Math.random() > 0.66 ? j + 1 : Math.random() > 0.33 ? j : j - 1
+    };
+  return newTile;
+};
 export const getRandomAdjacentLocation = (location, scale) => {
   const tile = getTileIAndJFromCharXAndY(location.x, location.y, scale);
   if (tile) {
@@ -72,6 +81,57 @@ export const moveTo = ({
   setLocation(({ x, y }) => {
     return { x: x + x_dir * moveSpeed, y: y + y_dir * moveSpeed };
   });
+};
+export const movePiece = (data, setData, scale) => {
+  const _data = [...data];
+  const canvas = [];
+  for (let i = 0; i < _data.length; i++) {
+    if (
+      _data[i].charLocation &&
+      _data[i].moveFromLocation &&
+      _data[i].moveToLocation
+    ) {
+      const { newLocation, hasArrived } = moveTo2({
+        currentLocation: _data[i].charLocation,
+        moveFromLocation: _data[i].moveFromLocation,
+        moveToLocation: _data[i].moveToLocation,
+        moveSpeed: 3
+      });
+      _data[i].charLocation = newLocation;
+      _data[i].isThere = hasArrived;
+      if (hasArrived) {
+        _data[i].moveFromLocation = _data[i].charLocation;
+        _data[i].tile = getRandAdjacentTile({
+          i: _data[i].tile.i,
+          j: _data[i].tile.j
+        });
+        _data[i].moveToLocation = getCharXAndY({
+          ..._data[i].tile,
+          scale
+        });
+      }
+    }
+  }
+  setData(_data);
+};
+export const moveTo2 = ({
+  currentLocation,
+  moveFromLocation,
+  moveToLocation,
+  moveSpeed
+}) => {
+  const distanceFromStart = getDistance(moveFromLocation, currentLocation);
+  const distanceToFinish = getDistance(moveToLocation, currentLocation);
+  const totalDistance = getDistance(moveFromLocation, moveToLocation);
+  const x_To = moveToLocation.x;
+  const y_To = moveToLocation.y;
+  const { x, y } = currentLocation;
+  const x_dir = (x_To - x) / distanceToFinish;
+  const y_dir = (y_To - y) / distanceToFinish;
+  return {
+    newLocation: { x: x + x_dir * moveSpeed, y: y + y_dir * moveSpeed },
+    hasArrived: distanceToFinish < 5 || distanceFromStart > totalDistance
+  };
 };
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 export const useInterval = (callback, delay) => {

@@ -12,6 +12,7 @@ import {
   BRIDGE_TILES
 } from "../Utils/gameState";
 import {
+  getRandAdjacentTile,
   getCharXAndY,
   getManaWellXAndY,
   getRandomIntInRange,
@@ -21,8 +22,9 @@ import {
   getFlattenedArrayIndex,
   getRandomCharacterLocation,
   useInterval,
-  moveTo,
-  getRandomAdjacentLocation
+  moveTo2,
+  getRandomAdjacentLocation,
+  movePiece
 } from "../Utils/utils";
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -55,6 +57,8 @@ export const GameBoard = () => {
   const [playerData, setPlayerData] = useState([]);
   const [graveyardData, setGraveyardData] = useState([]);
   const [kaijuAndManaWellData, setKaijuAndManaWellData] = useState([]);
+  const [canvasLocations, setCanvasLocations] = useState([]);
+
   useEffect(() => {
     redrawTiles([]);
     const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
@@ -80,12 +84,20 @@ export const GameBoard = () => {
       const storeItem = tileIndices.length - k;
       tileIndices[tileIndices.length - k] = tileIndices[randomInt];
       tileIndices[randomInt] = storeItem;
+      const location = getCharXAndY({ i, j, scale });
       _players.push({
         accessoryAndFamiliars: [],
         color: `rgb(${Math.random() * 255},${Math.random() *
           255},${Math.random() * 255})`,
-        charLocation: getCharXAndY({ i, j, scale }),
-        i: k
+        charLocation: location,
+        moveFromLocation: location,
+        moveToLocation: getCharXAndY({
+          ...getRandAdjacentTile({ i, j }),
+          scale
+        }),
+        tile: { i, j },
+        i: k,
+        isThere: false
       });
     }
     setPlayerData(_players);
@@ -119,7 +131,7 @@ export const GameBoard = () => {
       tileIndices[randomInt] = storeItem;
       _graveyards.push({
         charLocation: getCharXAndY({ i, j, scale }),
-        tileIndices: { i, j },
+        tile: { i, j },
         isUnused: true
       });
     }
@@ -127,6 +139,8 @@ export const GameBoard = () => {
     // GRAVEYARDS - - - - - - - - - - - -
     // KAIJUANDMANAWELLS - - - - - - - - - - - -
     const _kaijuAndManaWells = [];
+    const _canvasLocations = [];
+
     for (let k = 0; k < 3; k++) {
       // kaijuAndManaWells:
       // [
@@ -146,15 +160,21 @@ export const GameBoard = () => {
       const storeItem = tileIndices.length - k;
       tileIndices[tileIndices.length - k] = tileIndices[randomInt];
       tileIndices[randomInt] = storeItem;
+      const canvasLoc = getManaWellXAndY({ i, j, scale });
+      _canvasLocations.push(canvasLoc);
       _kaijuAndManaWells.push({
         charLocation: getCharXAndY({ i, j, scale }),
-        canvasLocation: getManaWellXAndY({ i, j, scale }),
-        tileIndices: { i, j },
+        canvasLocation: canvasLoc,
+        // tileIndices: { i, j },
+        tile: { i, j },
         element: undefined,
         owner: undefined
       });
     }
     setKaijuAndManaWellData(_kaijuAndManaWells);
+    setCanvasLocations(
+      <ManaPoolOverlay manaWellLocations={_canvasLocations} />
+    );
     // KAIJUANDMANAWELLS - - - - - - - - - - - -
   }, []);
   useEffect(() => {
@@ -169,6 +189,25 @@ export const GameBoard = () => {
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
+  useInterval(() => {
+    movePiece(playerData, setPlayerData, scale);
+    movePiece(
+      kaijuAndManaWellData,
+      setKaijuAndManaWellData,
+      scale,
+      setCanvasLocations
+    );
+  }, 2000);
+  useInterval(() => {
+    const locs = kaijuAndManaWellData.map(char =>
+      getManaWellXAndY({
+        i: char.i,
+        j: char.j,
+        scale
+      })
+    );
+    setCanvasLocations(<ManaPoolOverlay manaWellLocations={locs} />);
+  }, 2000);
   const redrawTiles = highlightedTiles => {
     const rowLength = Math.ceil(width / (70 * scale));
     const colLength = Math.ceil(height / (75 * scale));
@@ -213,14 +252,15 @@ export const GameBoard = () => {
       scale={scale}
       element={kmw.element}
       owner={kmw.owner}
-      tileIndices={kmw.tileIndices}
+      // tileIndices={kmw.tileIndices}
+      tile={kmw.tile}
     />
   ));
   const graveyards = graveyardData.map((g, i) => (
     <Graveyard
       key={i}
       charLocation={g.charLocation}
-      tileIndices={g.tileIndices}
+      tile={g.tile}
       isUnused={g.isUnused}
     />
   ));
@@ -237,13 +277,11 @@ export const GameBoard = () => {
   ));
   return (
     <Board width={width} height={height}>
-      <ManaPoolOverlay
-        manaWellLocations={kaijuAndManaWellData.map(kmw => kmw.canvasLocation)}
-      />
+      {canvasLocations}
       <ShiftContentOver scale={scale}>
         {tiles}
-        {kaijuAndManaWells}
         {graveyards}
+        {kaijuAndManaWells}
         {players}
       </ShiftContentOver>
       <BackgroundImage src={"test_map.png"} />

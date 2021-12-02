@@ -27,16 +27,43 @@ export const ACCESSORIES = {
   Cigarette: {
     key: "Cigarette",
     name: "Cigarette",
-    onStart: ({ setStats, setKaiju }) => {
-      setKaiju([{ element: "Fire", name: "Salamander", i: 1, lvl: 1 }]);
+    onStart: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Fire") ? 4 : 0;
       setStats(stats => {
-        return { ...stats, dmg: stats.dmg + 1 };
+        return stats.Cigarette && modifier === 4
+          ? stats
+          : {
+              ...stats,
+              Cigarette: !stats.Cigarette && modifier === 4,
+              dmg: stats.dmg + modifier
+            };
       });
     },
-    description: `Overrides the random starting Kaiju and sets the starting
-                Kaiju to Fire. In real game, Kaiju will set fires randomly and
-                cigarette will act as a fire starter for power, but here it
-                will just give an attack modifier.`
+    onManaWellGain: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Fire") ? 4 : 0;
+      setStats(stats => {
+        return stats.Cigarette && modifier === 4
+          ? stats
+          : {
+              ...stats,
+              Cigarette: !stats.Cigarette && modifier === 4,
+              dmg: stats.dmg + modifier
+            };
+      });
+    },
+    onManaWellLose: ({ kaiju, setStats }) => {
+      let modifier = kaiju.find(k => k.element == "Fire") ? 4 : 0;
+      setStats(stats => {
+        return stats.Cigarette && modifier === 4
+          ? stats
+          : {
+              ...stats,
+              Cigarette: !(stats.Cigarette && modifier === 0),
+              dmg: stats.dmg + modifier
+            };
+      });
+    },
+    description: `Increased fire damage.`
   },
   Unicorn: {
     key: "Unicorn",
@@ -215,21 +242,21 @@ export const ACCESSORIES = {
     description: `In game, player starts with a revolver with six bullets. Ammo
                   is found on ocassion. Here, a damage modifier is randomly
                   applied.`
-  },
-  SemiAutomatic: {
-    key: "SemiAutomatic",
-    name: "Semi-automatic",
-    onAttack: ({ setStats }) => {
-      setStats(stats => {
-        setTimeout(() => setStats(stats), 2000); // needs to be tested.
-        const modifier = Math.random() > 0.7 ? 7 : 0;
-        return { ...stats, dmg: stats.dmg + modifier };
-      });
-    },
-    description: `In game, player starts with a one-handed Semi Automatic
-                  weapon with 50 bullets. Ammo is found rarely. Here, a damage
-                  modifier is randomly applied.`
   }
+  // SemiAutomatic: {
+  //   key: "SemiAutomatic",
+  //   name: "Semi-automatic",
+  //   onAttack: ({ setStats }) => {
+  //     setStats(stats => {
+  //       setTimeout(() => setStats(stats), 2000); // needs to be tested.
+  //       const modifier = Math.random() > 0.7 ? 7 : 0;
+  //       return { ...stats, dmg: stats.dmg + modifier };
+  //     });
+  //   },
+  //   description: `In game, player starts with a one-handed Semi Automatic
+  //                 weapon with 50 bullets. Ammo is found rarely. Here, a damage
+  //                 modifier is randomly applied.`
+  // }
 };
 
 export const PENINSULA_TILE_LOOKUP = {

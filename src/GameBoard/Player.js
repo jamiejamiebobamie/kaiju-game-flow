@@ -52,65 +52,65 @@ export const Player = ({
   });
   const [kaiju, setKaiju] = useState([]);
   const [accessory, setAccessory] = useState([]);
-  const [location, setLocation] = useState({
-    x: charLocation.x,
-    y: charLocation.y
-  });
-  const [moveToLocation, setMoveToLocation] = useState(
-    getRandomAdjacentLocation({ x: charLocation.x, y: charLocation.y }, scale)
-  );
-  const [moveFromLocation, setMoveFromLocation] = useState({
-    x: charLocation.x,
-    y: charLocation.y
-  });
-  const [isThere, setIsThere] = useState(false);
-  useInterval(() => {
-    if (location && moveFromLocation && moveToLocation && !isThere)
-      moveTo({
-        currentLocation: location,
-        moveFromLocation,
-        moveToLocation,
-        moveSpeed: stats.moveSpeed,
-        setLocation,
-        setHasArrived: setIsThere
-      });
-  }, 500);
+  // const [location, setLocation] = useState({
+  //   x: charLocation.x,
+  //   y: charLocation.y
+  // });
+  // const [moveToLocation, setMoveToLocation] = useState(
+  //   getRandomAdjacentLocation({ x: charLocation.x, y: charLocation.y }, scale)
+  // );
+  // const [moveFromLocation, setMoveFromLocation] = useState({
+  //   x: charLocation.x,
+  //   y: charLocation.y
+  // });
+  // const [isThere, setIsThere] = useState(false);
+  // useInterval(() => {
+  //   if (location && moveFromLocation && moveToLocation && !isThere)
+  //     moveTo({
+  //       currentLocation: location,
+  //       moveFromLocation,
+  //       moveToLocation,
+  //       moveSpeed: stats.moveSpeed,
+  //       setLocation,
+  //       setHasArrived: setIsThere
+  //     });
+  // }, 500);
   // useInterval(() => {
   //   if (manaPools && manaPools.length > 2)
   //     setIsInManaPool(isLocatonInsidePolygon(manaPools, location));
   // }, 3000);
-  useEffect(() => {
-    const randInt1 = getRandomIntInRange({
-      max: STARTING_KAIJU_CHOICES.length - 1
-    });
-    const startingKaiju = STARTING_KAIJU_CHOICES[randInt1];
-    setKaiju([startingKaiju]);
-    // TESTING
-    const accessoryKeys = Object.keys(ACCESSORIES);
-    const randInt2 = getRandomIntInRange({
-      max: accessoryKeys.length - 1
-    });
-    const randKey = accessoryKeys[randInt2];
-    const randAccessory = ACCESSORIES[randKey];
-    const { Compass } = ACCESSORIES;
-    setAccessory([Compass, randAccessory]);
-    randAccessory &&
-      randAccessory.onStart &&
-      randAccessory.onStart({ kaiju: [startingKaiju], setStats, setKaiju });
-    // NORMAL CODE -- Player will choose their accessory.
-    // chosenAccessory
-    //   ? setAccessory({ Compass, [chosenAccessory.key]: chosenAccessory })
-    //   : setAccessory({ Compass });
-    // chosenAccessory && chosenAccessory.effect({ Kaiju: kaiju, setStats });
-  }, []);
-  useEffect(() => {
-    if (isThere) {
-      const newLocation = getRandomAdjacentLocation(moveToLocation, scale);
-      setMoveToLocation({ x: newLocation.x, y: newLocation.y });
-      setMoveFromLocation({ x: moveToLocation.x, y: moveToLocation.y });
-      setIsThere(false);
-    }
-  }, [isThere]);
+  // useEffect(() => {
+  //   const randInt1 = getRandomIntInRange({
+  //     max: STARTING_KAIJU_CHOICES.length - 1
+  //   });
+  //   const startingKaiju = STARTING_KAIJU_CHOICES[randInt1];
+  //   setKaiju([startingKaiju]);
+  //   // TESTING
+  //   const accessoryKeys = Object.keys(ACCESSORIES);
+  //   const randInt2 = getRandomIntInRange({
+  //     max: accessoryKeys.length - 1
+  //   });
+  //   const randKey = accessoryKeys[randInt2];
+  //   const randAccessory = ACCESSORIES[randKey];
+  //   const { Compass } = ACCESSORIES;
+  //   setAccessory([Compass, randAccessory]);
+  //   randAccessory &&
+  //     randAccessory.onStart &&
+  //     randAccessory.onStart({ kaiju: [startingKaiju], setStats, setKaiju });
+  // NORMAL CODE -- Player will choose their accessory.
+  // chosenAccessory
+  //   ? setAccessory({ Compass, [chosenAccessory.key]: chosenAccessory })
+  //   : setAccessory({ Compass });
+  // chosenAccessory && chosenAccessory.effect({ Kaiju: kaiju, setStats });
+  // }, []);
+  // useEffect(() => {
+  //   if (isThere) {
+  //     const newLocation = getRandomAdjacentLocation(moveToLocation, scale);
+  //     setMoveToLocation({ x: newLocation.x, y: newLocation.y });
+  //     setMoveFromLocation({ x: moveToLocation.x, y: moveToLocation.y });
+  //     setIsThere(false);
+  //   }
+  // }, [isThere]);
   // useEffect(() => {
   //   if (accessory.length && kaiju.length)
   //     console.log(number, stats, accessory, kaiju);
@@ -120,8 +120,8 @@ export const Player = ({
   // }, [manaPools]);
   return (
     <Character
-      x={location.x}
-      y={location.y}
+      x={charLocation.x}
+      y={charLocation.y}
       color={color}
       isInManaPool={isInManaPool}
     >
