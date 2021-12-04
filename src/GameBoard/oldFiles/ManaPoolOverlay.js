@@ -28,7 +28,7 @@ export const ManaPoolOverlay = ({ manaWellLocations = null }) => {
               : `${acc}ctx.lineTo(${item.y},${item.x});`,
           ""
         )
-      : "";
+      : `ctx.moveTo(0,0); ctx.lineTo(0,0);`;
   const my_string = `
           ctx.beginPath();
           ${verts}

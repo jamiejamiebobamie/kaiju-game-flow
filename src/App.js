@@ -4,18 +4,24 @@ import "./App.css";
 
 const App = () => {
   /*
-        make a single event tick with useInterval at GameBoard level.
-        hexagon pathing, a*
-            player and a.i. movement direction (toward other player or closest mana well?)
-                a.i. Kaiju choices (random)
-                placement of Kaiju on board adjacent to player / newly-acquired mana well.
-            player conflict winner
-                player respawn from graveyard choices (top 5 farthest graveyards from end game point. of the 5, the farthest from the enemy player)
-        final battleground vertex / "end game point"
-            graveyard placement, breadth first search
-        hexagons that are mana wells (random, but not adjacent to another mana well)
-        mana wells / kaiju need to be sorted so that they form a non convex hull
+        1. kaijus only move if clicked on, and then stop moving when they get to the next tile.
+                do not allow Kaiju to move to tiles that are adjacent to other Kaiju
+        2. hexagon pathing, a*
+                player and a.i. movement direction (toward other player or closest mana well?)
+                    a.i. Kaiju choices (random)
+                    placement of Kaiju on board adjacent to player / newly-acquired mana well.
+                player conflict winner
+                    player respawn from graveyard choices (top 5 farthest graveyards from end game point. of the 5, the farthest from the enemy player)
+        3. object placement, breadth first search
+                final battleground vertex / "end game point"
+                    graveyard placement
+                do not place mana wells adjacent to one another
+        4. mana pool non-convex hulls
+            new method to sort kaiju locations to create a non-convex hull (current method only works with 3 vertices)
+        5. fix issue with NaN location values.
 
+        - make a single event tick with useInterval at GameBoard level.
+        - mana wells / kaiju need to be sorted so that they form a non convex hull
         - x,y coords of peninsula (whether or not something is on peninsula)
         - hexagons need x,y coords
         - player start vertices

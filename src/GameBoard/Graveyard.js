@@ -4,8 +4,8 @@ import styled from "styled-components";
 const GraveYardDot = styled.div`
   position: absolute;
   z-index: 10001;
-  left: ${props => `${props.x}px`};
-  top: ${props => `${props.y}px`};
+  left: ${props => `${props.charLocation.x}px`};
+  top: ${props => `${props.charLocation.y}px`};
   width: 10px;
   height: 10px;
   background-color: "lightgrey";
@@ -17,6 +17,6 @@ const GraveYardDot = styled.div`
   border-color: "lightgrey";
   pointer-events: none;
 `;
-export const Graveyard = ({ charLocation, tileIndices, isUnused }) => {
-  return isUnused && <GraveYardDot x={charLocation.x} y={charLocation.y} />;
+export const Graveyard = ({ charLocation, isUsed }) => {
+  return !isUsed && <GraveYardDot charLocation={charLocation} />;
 };

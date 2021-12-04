@@ -8,37 +8,33 @@ const Hexagon = styled.div`
   ${props =>
     `transform: translate(${props.x}px, ${props.y}px) scale(${props.scale});`};
   zindex: ${props => props.zIndex};
-  /* pointer-events: none; */
 `;
 export const HexagonTile = ({
+  tileLocation,
   rowLength = 1,
   scale = 1,
   i = 0,
   j = 0,
   setClickedIndex = () => {},
-  isHighlighted = false
+  isHighlighted,
+  isOnFire,
+  isWooded
 }) => {
-  const [state, setState] = useState({
-    url: null
-  });
-  const { x, y } = getTileXAndY({ i, j, scale });
   const zIndex = rowLength * i + j + 1;
   return (
     <Hexagon
       zIndex={zIndex}
-      rowLength={rowLength}
       scale={scale}
-      x={x}
-      y={y}
-      i={i}
-      j={j}
+      x={tileLocation.x}
+      y={tileLocation.y}
     >
       <Content
-        onClick={() => {
-          setClickedIndex({ i, j, x, y });
-        }}
+        onClick={() =>
+          setClickedIndex({ i, j, x: tileLocation.x, y: tileLocation.y })
+        }
         isHighlighted={isHighlighted}
-        url=""
+        isWooded={!isOnFire && isWooded}
+        isOnFire={isOnFire}
       />
       <Border />
     </Hexagon>

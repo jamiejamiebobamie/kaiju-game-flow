@@ -39,7 +39,7 @@ export const getCharXAndY = ({ i, j, scale }) => {
   const x =
     (i === 0 ? i * 45 - 25 : i * 45 + 25 * (i - 1)) * scale + 52.5 * scale;
   const y = (i % 2 ? j * 80 + 40 : j * 80) * scale + 42.5 * scale;
-  return { x, y };
+  return { x: Math.trunc(x), y: Math.trunc(y) };
 };
 // Canvas has a different x and y scale
 export const getManaWellXAndY = ({ i, j, scale }) => {
@@ -60,29 +60,7 @@ const getDistance = (to, from) => {
     (to.x - from.x) * (to.x - from.x) + (to.y - from.y) * (to.y - from.y)
   );
 };
-export const moveTo = ({
-  currentLocation,
-  moveFromLocation,
-  moveToLocation,
-  moveSpeed,
-  setLocation,
-  setHasArrived
-}) => {
-  const distanceFromStart = getDistance(moveFromLocation, currentLocation);
-  const distanceToFinish = getDistance(moveToLocation, currentLocation);
-  const totalDistance = getDistance(moveFromLocation, moveToLocation);
-  if (distanceToFinish < 5 || distanceFromStart > totalDistance)
-    setHasArrived(true);
-  const x_To = moveToLocation.x;
-  const y_To = moveToLocation.y;
-  const { x, y } = currentLocation;
-  const x_dir = (x_To - x) / distanceToFinish;
-  const y_dir = (y_To - y) / distanceToFinish;
-  setLocation(({ x, y }) => {
-    return { x: x + x_dir * moveSpeed, y: y + y_dir * moveSpeed };
-  });
-};
-export const movePiece = (data, setData, scale) => {
+export const movePiece = (data, setData, scale, isKaiju) => {
   const _data = [...data];
   const canvas = [];
   for (let i = 0; i < _data.length; i++) {
@@ -91,11 +69,11 @@ export const movePiece = (data, setData, scale) => {
       _data[i].moveFromLocation &&
       _data[i].moveToLocation
     ) {
-      const { newLocation, hasArrived } = moveTo2({
+      const { newLocation, hasArrived } = moveTo({
         currentLocation: _data[i].charLocation,
         moveFromLocation: _data[i].moveFromLocation,
         moveToLocation: _data[i].moveToLocation,
-        moveSpeed: 3
+        moveSpeed: 7
       });
       _data[i].charLocation = newLocation;
       _data[i].isThere = hasArrived;
@@ -112,9 +90,15 @@ export const movePiece = (data, setData, scale) => {
       }
     }
   }
-  setData(_data);
+  setData(
+    isKaiju
+      ? _data.sort(
+          (item1, item2) => item1.charLocation.x - item2.charLocation.x
+        )
+      : _data
+  );
 };
-export const moveTo2 = ({
+export const moveTo = ({
   currentLocation,
   moveFromLocation,
   moveToLocation,
@@ -129,7 +113,10 @@ export const moveTo2 = ({
   const x_dir = (x_To - x) / distanceToFinish;
   const y_dir = (y_To - y) / distanceToFinish;
   return {
-    newLocation: { x: x + x_dir * moveSpeed, y: y + y_dir * moveSpeed },
+    newLocation: {
+      x: Math.trunc(x + x_dir * moveSpeed),
+      y: Math.trunc(y + y_dir * moveSpeed)
+    },
     hasArrived: distanceToFinish < 5 || distanceFromStart > totalDistance
   };
 };
@@ -181,6 +168,25 @@ export const getRandomCharacterLocation = scale => {
   const { i, j } = tileIndices[randomInt];
   const { x, y } = getCharXAndY({ i, j, scale });
   return { x, y };
+};
+export const checkIsInManaPool = ({
+  setPlayerData,
+  kaiju2Data,
+  kaiju1Data
+}) => {
+  setPlayerData(_playerData =>
+    _playerData.map((p, i) => {
+      return {
+        ...p,
+        isInManaPool: isLocatonInsidePolygon(
+          i
+            ? kaiju2Data.map(k => k.charLocation)
+            : kaiju1Data.map(k => k.charLocation),
+          p.charLocation
+        )
+      };
+    })
+  );
 };
 export const isLocatonInsidePolygon = (polygon, p) => {
   var isInside = false;

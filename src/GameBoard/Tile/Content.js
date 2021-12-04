@@ -31,9 +31,10 @@ const Image = styled.div`
   height: 100%;
   background-repeat: no-repeat;
   background-position: 50%;
+  ${props => (props.isWooded ? "background-image: url(ivy_icon.png);" : null)}
   ${props =>
-    props.isHighlighted
-      ? "background-image: url(http://placekitten.com/241/241);"
+    props.isOnFire
+      ? "background-image: url(fire_icon.png);"
       : null}
   visibility: visible;
   -webkit-transform: rotate(-60deg);
@@ -41,16 +42,30 @@ const Image = styled.div`
   -ms-transform: rotate(-60deg);
   -o-transform: rotate(-60deg);
   transform: rotate(-60deg);
+  ${props =>
+    props.isHighlighted ? "background-color: red;opacity: 0.3;" : null}
   &:hover {
-    background-image: url(http://placekitten.com/242/242);
+    background-color: red;
+    opacity: 0.3;
   }
 `;
-export const Content = ({ isHighlighted = false, url = "", onClick }) => {
+export const Content = ({
+  isHighlighted = false,
+  onClick,
+  isOnFire,
+  isWooded
+}) => {
   return (
     <ContentWrapper>
       <ImageWrapper>
-        <Image onClick={onClick} url={url} isHighlighted={isHighlighted} />
+        <Image
+          onClick={onClick}
+          isHighlighted={isHighlighted}
+          isOnFire={isOnFire}
+          isWooded={isWooded}
+        />
       </ImageWrapper>
     </ContentWrapper>
   );
 };
+// isHighlighted: for highlighting adjacent tiles of a clicked Kaiju.

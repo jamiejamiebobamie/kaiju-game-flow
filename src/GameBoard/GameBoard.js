@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { HexagonTile } from "./Tile/HexagonTile";
 import { Graveyard } from "./Graveyard";
 import { Player } from "./Player";
-import { ManaWell } from "./ManaWell";
-import { ManaPoolOverlay } from "./ManaPoolOverlay";
+import { Kaiju } from "./Kaiju";
+import { ManaPool } from "./ManaPool";
 import {
   STARTING_KAIJU_CHOICES,
   ACCESSORIES,
@@ -14,17 +14,12 @@ import {
 import {
   getRandAdjacentTile,
   getCharXAndY,
-  getManaWellXAndY,
+  getTileXAndY,
   getRandomIntInRange,
-  aStar,
-  isAdjacent,
-  getIndicesFromFlattenedArrayIndex,
-  getFlattenedArrayIndex,
-  getRandomCharacterLocation,
   useInterval,
-  moveTo2,
-  getRandomAdjacentLocation,
-  movePiece
+  movePiece,
+  isLocatonInsidePolygon,
+  checkIsInManaPool
 } from "../Utils/utils";
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -35,6 +30,7 @@ const Board = styled.div`
   border-radius: 10px;
   margin-left: 100px;
   margin-top: 100px;
+  margin-bottom: 100px;
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;
@@ -56,9 +52,38 @@ export const GameBoard = () => {
   const [tiles, setTiles] = useState([]);
   const [playerData, setPlayerData] = useState([]);
   const [graveyardData, setGraveyardData] = useState([]);
-  const [kaijuAndManaWellData, setKaijuAndManaWellData] = useState([]);
-  const [canvasLocations, setCanvasLocations] = useState([]);
-
+  const [kaiju1Data, setKaiju1Data] = useState([]);
+  const [kaiju2Data, setKaiju2Data] = useState([]);
+  const redrawTiles = highlightedTiles => {
+    const rowLength = Math.ceil(width / (70 * scale));
+    const colLength = Math.ceil(height / (75 * scale));
+    const _tiles = [];
+    for (let i = 0; i < rowLength; i++) {
+      for (let j = 0; j < colLength; j++) {
+        const key = `${i} ${j}`;
+        if (PENINSULA_TILE_LOOKUP[key]) {
+          const tileLocation = getTileXAndY({ i, j, scale });
+          _tiles.push(
+            <HexagonTile
+              key={key}
+              rowLength={rowLength}
+              i={i}
+              j={j}
+              scale={scale}
+              setClickedIndex={setClickedTile}
+              tileLocation={tileLocation}
+              // isHighlighted={highlightedTiles.some(
+              //   ({ h_i, h_j }) => h_i === i && h_j === j
+              // )}
+              isWooded={false}
+              isOnFire={false}
+            />
+          );
+        }
+      }
+    }
+    setTiles(_tiles);
+  };
   useEffect(() => {
     redrawTiles([]);
     const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
@@ -66,16 +91,6 @@ export const GameBoard = () => {
     const _players = [];
     let _max = tileIndices.length - 1;
     for (let k = 0; k < 2; k++) {
-      // players:
-      // [
-      // {
-      //   charLocation: {x,y},
-      //   accessoryAndFamiliars:[{}],
-      //   color:"",
-      //   i:0,
-      //   isInManaPool: false
-      // }
-      // ]
       _max -= k;
       const randomInt = getRandomIntInRange({
         max: _max
@@ -86,9 +101,8 @@ export const GameBoard = () => {
       tileIndices[randomInt] = storeItem;
       const location = getCharXAndY({ i, j, scale });
       _players.push({
-        accessoryAndFamiliars: [],
-        color: `rgb(${Math.random() * 255},${Math.random() *
-          255},${Math.random() * 255})`,
+        isInManaPool: false,
+        color: k ? "salmon" : "blue",
         charLocation: location,
         moveFromLocation: location,
         moveToLocation: getCharXAndY({
@@ -105,14 +119,6 @@ export const GameBoard = () => {
     // GRAVEYARDS - - - - - - - - - - - -
     const _graveyards = [];
     for (let k = 0; k < 15; k++) {
-      // graveyards:
-      // [
-      //  {
-      //     charLocation: {x,y},
-      //     tileIndices: {i,j},
-      //     isUnused: false
-      //  }
-      // ]
       _max -= k;
       const bridgeTiles = Object.values(BRIDGE_TILES);
       const bridgeTile = bridgeTiles[bridgeTiles.length - 1];
@@ -129,140 +135,99 @@ export const GameBoard = () => {
       const storeItem = tileIndices.length - k;
       tileIndices[tileIndices.length - k] = tileIndices[randomInt];
       tileIndices[randomInt] = storeItem;
+      const charLocation = getCharXAndY({ i, j, scale });
+      const { x, y } = charLocation;
+      console.log(charLocation, randTile, randomInt);
       _graveyards.push({
-        charLocation: getCharXAndY({ i, j, scale }),
+        charLocation,
         tile: { i, j },
-        isUnused: true
+        isUsed: false
       });
     }
     setGraveyardData(_graveyards);
     // GRAVEYARDS - - - - - - - - - - - -
-    // KAIJUANDMANAWELLS - - - - - - - - - - - -
-    const _kaijuAndManaWells = [];
+    // KAIJU - - - - - - - - - - - -
+    const _kaiju = [];
     const _canvasLocations = [];
-
-    for (let k = 0; k < 3; k++) {
-      // kaijuAndManaWells:
-      // [
-      //  {
-      //     charLocation: {x,y},
-      //     tileIndices: {i,j},
-      //     canvasLocation: {x,y},
-      //     element: "Fire" /// undefined or string, dictates if it moves and gif/png used
-      //     owner: 0, // undefined or index into players array
-      //  }
-      // ]
+    for (let k = 0; k < 6; k++) {
       _max -= k;
       const randomInt = getRandomIntInRange({
         max: _max
       });
       const { i, j } = tileIndices[randomInt];
       const storeItem = tileIndices.length - k;
+      const location = getCharXAndY({ i, j, scale });
       tileIndices[tileIndices.length - k] = tileIndices[randomInt];
       tileIndices[randomInt] = storeItem;
-      const canvasLoc = getManaWellXAndY({ i, j, scale });
-      _canvasLocations.push(canvasLoc);
-      _kaijuAndManaWells.push({
+      _kaiju.push({
         charLocation: getCharXAndY({ i, j, scale }),
-        canvasLocation: canvasLoc,
-        // tileIndices: { i, j },
+        moveFromLocation: location,
+        moveToLocation: getCharXAndY({
+          ...getRandAdjacentTile({ i, j }),
+          scale
+        }),
         tile: { i, j },
         element: undefined,
-        owner: undefined
+        owner: k < 3 ? _players[0] : _players[1],
+        color: k < 3 ? _players[0].color : _players[1].color
       });
     }
-    setKaijuAndManaWellData(_kaijuAndManaWells);
-    setCanvasLocations(
-      <ManaPoolOverlay manaWellLocations={_canvasLocations} />
-    );
-    // KAIJUANDMANAWELLS - - - - - - - - - - - -
+    setKaiju1Data(_kaiju.filter(k => k.owner === _players[0]));
+    setKaiju2Data(_kaiju.filter(k => k.owner === _players[1]));
+    // KAIJU - - - - - - - - - - - -
   }, []);
   useEffect(() => {
     const { i, j } = clickedTile;
     if (i !== -1) {
-      const _clickedTiles = [...clickedTiles, { i, j }];
-      setClickedTiles(_clickedTiles);
-      const highlightedTiles = Object.entries(_clickedTiles).map(([k, v]) => {
-        return { h_i: v.i, h_j: v.j };
-      });
-      redrawTiles(highlightedTiles);
+      if (clickedTiles.find(tile => tile.i === i && tile.j === j)) {
+        const item = clickedTiles.find(tile => tile.i === i && tile.j === j);
+        const index = clickedTiles.indexOf(item);
+        console.log(index);
+        const _clickedTiles = [...clickedTiles];
+        console.log(_clickedTiles);
+        _clickedTiles.splice(index, 1);
+        console.log(_clickedTiles);
+        setClickedTiles(_clickedTiles);
+        const highlightedTiles = Object.entries(_clickedTiles).map(([k, v]) => {
+          return { h_i: v.i, h_j: v.j };
+        });
+        redrawTiles(highlightedTiles);
+      } else {
+        const _clickedTiles = [...clickedTiles, { i, j }];
+        setClickedTiles(_clickedTiles);
+        const highlightedTiles = Object.entries(_clickedTiles).map(([k, v]) => {
+          return { h_i: v.i, h_j: v.j };
+        });
+        redrawTiles(highlightedTiles);
+      }
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
   useInterval(() => {
     movePiece(playerData, setPlayerData, scale);
-    movePiece(
-      kaijuAndManaWellData,
-      setKaijuAndManaWellData,
-      scale,
-      setCanvasLocations
-    );
-  }, 2000);
-  useInterval(() => {
-    const locs = kaijuAndManaWellData.map(char =>
-      getManaWellXAndY({
-        i: char.i,
-        j: char.j,
-        scale
-      })
-    );
-    setCanvasLocations(<ManaPoolOverlay manaWellLocations={locs} />);
-  }, 2000);
-  const redrawTiles = highlightedTiles => {
-    const rowLength = Math.ceil(width / (70 * scale));
-    const colLength = Math.ceil(height / (75 * scale));
-    const _tiles = [];
-    for (let i = 0; i < rowLength; i++) {
-      for (let j = 0; j < colLength; j++) {
-        const key = `${i} ${j}`;
-        if (PENINSULA_TILE_LOOKUP[key])
-          _tiles.push(
-            <HexagonTile
-              key={key}
-              rowLength={rowLength}
-              i={i}
-              j={j}
-              scale={scale}
-              setClickedIndex={setClickedTile}
-              isHighlighted={highlightedTiles.some(
-                ({ h_i, h_j }) => h_i === i && h_j === j
-              )}
-            />
-          );
-      }
-    }
-    setTiles(_tiles);
-  };
-  const manaPools = playerData.map(p => (
-    <Player
-      key={p.i}
-      i={p.i}
-      charLocation={p.charLocation}
-      accessoryAndFamiliars={[]}
-      color={p.color}
-      scale={scale}
-      isInManaPool={p.isInManaPool}
+    const isKaiju = true;
+    movePiece(kaiju1Data, setKaiju1Data, scale, isKaiju);
+    movePiece(kaiju2Data, setKaiju2Data, scale, isKaiju);
+    checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
+  }, 1000);
+  const kaiju1 = kaiju1Data.map((k, i) => (
+    <Kaiju
+      key={i}
+      charLocation={k.charLocation}
+      element={k.element}
+      color={k.color}
     />
   ));
-  const kaijuAndManaWells = kaijuAndManaWellData.map((kmw, i) => (
-    <ManaWell
+  const kaiju2 = kaiju2Data.map((k, i) => (
+    <Kaiju
       key={i}
-      charLocation={kmw.charLocation}
-      canvasLocation={kmw.canvasLocation}
-      scale={scale}
-      element={kmw.element}
-      owner={kmw.owner}
-      // tileIndices={kmw.tileIndices}
-      tile={kmw.tile}
+      charLocation={k.charLocation}
+      element={k.element}
+      color={k.color}
     />
   ));
   const graveyards = graveyardData.map((g, i) => (
-    <Graveyard
-      key={i}
-      charLocation={g.charLocation}
-      tile={g.tile}
-      isUnused={g.isUnused}
-    />
+    <Graveyard key={i} charLocation={g.charLocation} isUsed={g.isUsed} />
   ));
   const players = playerData.map(p => (
     <Player
@@ -277,11 +242,23 @@ export const GameBoard = () => {
   ));
   return (
     <Board width={width} height={height}>
-      {canvasLocations}
+      <ManaPool
+        width={width}
+        height={height}
+        kaijuData={kaiju1Data}
+        color={playerData[0] && playerData[0].color}
+      />
+      <ManaPool
+        width={width}
+        height={height}
+        kaijuData={kaiju2Data}
+        color={playerData[1] && playerData[1].color}
+      />
       <ShiftContentOver scale={scale}>
         {tiles}
         {graveyards}
-        {kaijuAndManaWells}
+        {kaiju1}
+        {kaiju2}
         {players}
       </ShiftContentOver>
       <BackgroundImage src={"test_map.png"} />
