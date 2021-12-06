@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { moveTo, useInterval, getRandomAdjacentLocation } from "../Utils/utils";
 
 export const ManaPool = ({ kaijuData, width, height, color }) => {
   return (
@@ -17,7 +16,8 @@ export const ManaPool = ({ kaijuData, width, height, color }) => {
     >
       <polygon
         style={{
-          opacity: ".4"
+          opacity: ".4",
+          pointerEvents: "none"
         }}
         fill={color}
         points={kaijuData.reduce(

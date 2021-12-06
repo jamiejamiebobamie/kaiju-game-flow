@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { GameBoard } from "./GameBoard/GameBoard";
+import { UI } from "./UI/UI";
 import "./App.css";
 
 const App = () => {
@@ -35,9 +36,26 @@ const App = () => {
         - pull up Player functional state and store in 'players' state variable at GameBoard level.
             - pass down state to Player component
     */
+
+  const gameBoardStandIn = (
+    <div
+      style={{
+        width: "500px",
+        height: "800px",
+        minWidth: "500px",
+        borderStyle: "solid",
+        borderThickness: "thin",
+        borderRadius: "10px"
+      }}
+    ></div>
+  );
+  // {gameBoardStandIn}
+
   return (
     <div className="App">
       <GameBoard />
+
+      <UI />
     </div>
   );
 };

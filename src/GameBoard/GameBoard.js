@@ -23,14 +23,13 @@ import {
 } from "../Utils/utils";
 const Board = styled.div`
   width: ${props => props.width}px;
+  min-width: ${props => props.width}px;
   height: ${props => props.height}px;
+  minwidth: ${props => props.width}px;
   overflow: hidden;
   border-style: solid;
   border-thickness: medium;
   border-radius: 10px;
-  margin-left: 100px;
-  margin-top: 100px;
-  margin-bottom: 100px;
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;

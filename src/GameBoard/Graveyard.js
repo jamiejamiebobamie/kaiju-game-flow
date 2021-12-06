@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
-const GraveYardDot = styled.div`
+const Headstone = styled.div`
   position: absolute;
   z-index: 10001;
   left: ${props => `${props.charLocation.x}px`};
@@ -18,5 +18,5 @@ const GraveYardDot = styled.div`
   pointer-events: none;
 `;
 export const Graveyard = ({ charLocation, isUsed }) => {
-  return !isUsed && <GraveYardDot charLocation={charLocation} />;
+  return !isUsed && <Headstone charLocation={charLocation} />;
 };

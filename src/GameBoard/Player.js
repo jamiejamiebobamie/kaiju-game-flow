@@ -1,58 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import {
-  moveTo,
-  getRandomIntInRange,
-  useInterval,
-  isAdjacent,
-  getTileIAndJFromCharXAndY,
-  getCharXAndY,
-  getRandomAdjacentLocation,
-  isLocatonInsidePolygon,
-  getIAndJFromManaWellXAndY
-} from "../Utils/utils";
-import {
-  STARTING_KAIJU_CHOICES,
-  ACCESSORIES,
-  PENINSULA_TILE_LOOKUP
-} from "../Utils/gameState";
 
-const Character = styled.div`
+const Character = styled.i`
   position: absolute;
   z-index: 20001;
-  left: ${props => `${props.charLocation.x}px`};
+  left: ${props => `${props.charLocation.x + 3.5}px`};
   top: ${props => `${props.charLocation.y}px`};
-  width: 10px;
-  height: 10px;
-  background-color: ${props => props.color};
-  border-radius: 30px;
-  font-size: 10px;
-  ${props => props.isInManaPool && "animation: blinkingText 5s infinite;"}
+  color: ${props => props.color};
+  ${props => props.isInManaPool && "animation: blinking 5s infinite;"}
+  pointer-events: none;
 }
-@keyframes blinkingText{
-  0%		{ background-color: #10c018;}
-  25%		{ background-color: #1056c0;}
-  50%		{ background-color: #ef0a1a;}
-  75%		{ background-color: #254878;}
-  100%	{ background-color: #04a1d5;}
+@keyframes blinking{
+  0%		{color: #10c018;}
+  25%		{color: #1056c0;}
+  50%		{color: #ef0a1a;}
+  75%		{color: #254878;}
+  100%	{color: #04a1d5;}
 }
 `;
 export const Player = ({ charLocation, isInManaPool, color, i = 0 }) => {
   useEffect(() => console.log(isInManaPool, i), [isInManaPool]);
   return (
     <Character
+      className="fa fa-male"
       charLocation={charLocation}
       color={color}
       isInManaPool={isInManaPool}
-    >
-      <div
-        style={{
-          marginLeft: "2px",
-          marginTop: "-2px"
-        }}
-      >
-        {i}
-      </div>
-    </Character>
+    />
   );
 };

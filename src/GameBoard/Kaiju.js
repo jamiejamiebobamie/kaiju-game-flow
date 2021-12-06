@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { moveTo, useInterval, getRandomAdjacentLocation } from "../Utils/utils";
 
 const Ripple = styled.div`
   position: absolute;
@@ -14,6 +13,7 @@ const Ripple = styled.div`
   border-color:transparent;
   border-style:solid;
   animation: lds-ripple 3s linear infinite;
+  pointer-events: none;
 }
 @keyframes lds-ripple {
   0% {
