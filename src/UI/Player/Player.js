@@ -50,13 +50,13 @@ const AccessoryPicture = styled.img`
 export const Player = ({
   isReversed,
   setDisplayString,
-  accessoryImgFile = "fire_icon.png"
+  accessory = {
+    displayLookup: "testAccessoryLookup",
+    accessoryImgFile: "fire_icon.png"
+  }
 }) => {
-  const [hoverRef, isHovered] = useHover();
-  useEffect(
-    () => (isHovered ? setDisplayString("test") : setDisplayString(null)),
-    [isHovered]
-  );
+  const [hoverRef, setHoverRef, hoverLookupString] = useHover();
+  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const playerUI = (
     <Wrapper>
       {isReversed ? (
@@ -78,8 +78,8 @@ export const Player = ({
       <PlayerBorder isReversed={isReversed}>
         <PlayerPicture className="fa fa-user" />
         <AccessoryPicture
-          ref={hoverRef}
-          src={accessoryImgFile}
+          ref={setHoverRef(accessory.displayLookup)}
+          src={accessory.accessoryImgFile}
           isReversed={isReversed}
         />
       </PlayerBorder>

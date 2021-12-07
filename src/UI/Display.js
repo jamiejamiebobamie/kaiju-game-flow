@@ -9,8 +9,10 @@ const Wrapper = styled.div`
   border-thickness: thin;
   border-radius: 10px;
   margin-top: -50px;
+  text-font: 30px;
+  font-alignment: 30px;
+  color: black;
 `;
-
-export const Display = ({ hoveredContent = null }) => {
-  return <Wrapper />;
+export const Display = ({ displayString, hoveredContent = null }) => {
+  return <Wrapper>{displayString}</Wrapper>;
 };

@@ -21,16 +21,26 @@ const KaijuIcon = styled.img`
   border-style: solid;
 `;
 export const Kaiju = ({
-  kaijuArr = [{}, {}, {}, {}, {}, {}, {}],
+  kaijuArr = [
+    { displayLookup: "kaijuGlass" },
+    { displayLookup: "kaijuFire" },
+    { displayLookup: "kaijuWood" },
+    { displayLookup: "kaijuLightning" },
+    { displayLookup: "kaijuDeath" },
+    { displayLookup: "kaijuBubble" },
+    { displayLookup: "kaijuMetal" }
+  ],
   setDisplayString
 }) => {
-  const [hoverRef, isHovered] = useHover();
-  useEffect(
-    () => (isHovered ? setDisplayString("test") : setDisplayString(null)),
-    [isHovered]
-  );
-  const kaijuIcons = kaijuArr.map(abil => (
-    <KaijuIcon src={"fire_icon.png"} title="test" alt="image of test" />
+  const [hoverRef, setHoverRef, hoverLookupString] = useHover();
+  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
+  const kaijuIcons = kaijuArr.map(({ displayLookup }) => (
+    <KaijuIcon
+      src={"fire_icon.png"}
+      ref={setHoverRef(displayLookup)}
+      title="test"
+      alt="image of test"
+    />
   ));
   return <Wrapper>{kaijuIcons}</Wrapper>;
 };

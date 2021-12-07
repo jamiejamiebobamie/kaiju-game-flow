@@ -14,14 +14,13 @@ const Wrapper = styled.div`
   width: 500px;
   height: 800px;
 `;
-
 export const UI = ({ playerData = [{}, {}] }) => {
   const [displayString, setDisplayString] = useState(null);
   useEffect(() => console.log(displayString), [displayString]);
   return (
     <Wrapper>
       <Player setDisplayString={setDisplayString} />
-      <Display />
+      <Display displayString={displayString} />
       <Player setDisplayString={setDisplayString} isReversed={true} />
     </Wrapper>
   );

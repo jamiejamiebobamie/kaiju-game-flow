@@ -138,25 +138,26 @@ export const useInterval = (callback, delay) => {
     }
   }, [delay]);
 };
-// Hook
-export const useHover = (numRefs = 0) => {
-  const [value, setValue] = useState(false);
-  // const [_ref, setRef] = useState(null);
-  const ref = useRef();
-  const handleMouseOver = () => setValue(true);
-  const handleMouseOut = () => setValue(false);
+export const useHover = () => {
+  const [value, setValue] = useState(null);
+  const handleMouseOver = key => setValue(key);
+  const handleMouseOut = () => setValue(null);
+  const ref = useRef({}).current;
+  const saveRef = key => r => {
+    ref[key] = r;
+    r && r.addEventListener("mouseover", () => handleMouseOver(key));
+    r && r.addEventListener("mouseout", handleMouseOut);
+  };
   useEffect(() => {
-    const node = ref.current;
-    if (node) {
-      node.addEventListener("mouseover", handleMouseOver);
-      node.addEventListener("mouseout", handleMouseOut);
-      return () => {
-        node.removeEventListener("mouseover", handleMouseOver);
-        node.removeEventListener("mouseout", handleMouseOut);
-      };
+    if (ref && ref.current) {
+      return () =>
+        Object.values(ref.current).forEach(i => {
+          ref.current[i].removeEventListener("mouseover", handleMouseOver);
+          ref.current[i].removeEventListener("mouseout", handleMouseOut);
+        });
     }
   }, [ref.current]);
-  return [ref, value];
+  return [ref, saveRef, value];
 };
 export const getFlattenedArrayIndex = (i, j, ROW_LENGTH = 33) => {
   return ROW_LENGTH * i + j;

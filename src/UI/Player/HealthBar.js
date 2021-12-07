@@ -12,7 +12,6 @@ const Wrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
 `;
-
 const Bar = styled.div`
   background-color: ${props => (props.isWraith ? "green" : "red")};
   width: 60px;
@@ -23,16 +22,17 @@ const Bar = styled.div`
   align-self: center;
   border-radius: 30px;
 `;
-
 export const HealthBar = ({ setDisplayString, health = 6 }) => {
-  const [hoverRef, isHovered] = useHover();
-  useEffect(
-    () => (isHovered ? setDisplayString("test") : setDisplayString(null)),
-    [isHovered]
-  );
+  const [hoverRef, setHoverRef, hoverLookupString] = useHover();
+  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const bars = [];
   for (let i = 0; i < health; i++) {
-    bars.push(<Bar isWraith={i > 2} />);
+    bars.push(
+      <Bar
+        ref={setHoverRef(i > 2 ? "wraithHealthBar" : undefined)}
+        isWraith={i > 2}
+      />
+    );
   }
   return <Wrapper>{bars}</Wrapper>;
 };

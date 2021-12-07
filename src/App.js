@@ -36,7 +36,6 @@ const App = () => {
         - pull up Player functional state and store in 'players' state variable at GameBoard level.
             - pass down state to Player component
     */
-
   const gameBoardStandIn = (
     <div
       style={{
@@ -49,12 +48,11 @@ const App = () => {
       }}
     ></div>
   );
-  // {gameBoardStandIn}
+  // <GameBoard />;
 
   return (
     <div className="App">
-      <GameBoard />
-
+      {gameBoardStandIn}
       <UI />
     </div>
   );
