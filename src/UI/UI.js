@@ -7,8 +7,8 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction: column;
-  border-style: solid;
-  border-thickness: thin;
+  /* border-style: solid;
+  border-thickness: thin; */
   border-radius: 10px;
   min-width: 500px;
   width: 500px;

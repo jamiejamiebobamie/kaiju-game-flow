@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PENINSULA_TILE_LOOKUP } from "./gameState";
 
 export const getRandomIntInRange = ({ min = 0, max }) => {
@@ -62,7 +62,6 @@ const getDistance = (to, from) => {
 };
 export const movePiece = (data, setData, scale, isKaiju) => {
   const _data = [...data];
-  const canvas = [];
   for (let i = 0; i < _data.length; i++) {
     if (
       _data[i].charLocation &&
@@ -157,7 +156,7 @@ export const useHover = () => {
         });
     }
   }, [ref.current]);
-  return [ref, saveRef, value];
+  return [saveRef, value];
 };
 export const getFlattenedArrayIndex = (i, j, ROW_LENGTH = 33) => {
   return ROW_LENGTH * i + j;

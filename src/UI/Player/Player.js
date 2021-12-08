@@ -23,24 +23,21 @@ const PlayerBorder = styled.div`
   width: 150px;
   zindex: 1;
   height: 150px;
-  border-radius: 10px;
   border-radius: 100%;
-  border-style: solid;
-  border-thickness: thin;
   overflow: hidden;
 `;
 const PlayerPicture = styled.i`
   margin-top: 70px;
   margin-left: 68px;
-  transform: scale(8, 9);
+  transform: scale(10);
 `;
 const AccessoryPicture = styled.img`
   position: absolute;
   right: 20px;
   bottom: 10px;
   z-index: 2;
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
   border-radius: 10px;
   border-radius: 100%;
   border-style: solid;
@@ -55,7 +52,7 @@ export const Player = ({
     accessoryImgFile: "fire_icon.png"
   }
 }) => {
-  const [hoverRef, setHoverRef, hoverLookupString] = useHover();
+  const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const playerUI = (
     <Wrapper>
@@ -76,7 +73,7 @@ export const Player = ({
         </>
       )}
       <PlayerBorder isReversed={isReversed}>
-        <PlayerPicture className="fa fa-user" />
+        <PlayerPicture className="fa fa-user-circle" />
         <AccessoryPicture
           ref={setHoverRef(accessory.displayLookup)}
           src={accessory.accessoryImgFile}

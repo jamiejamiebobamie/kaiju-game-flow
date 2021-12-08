@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Content } from "./Content";
 import { Border } from "./Border";
-import { getTileXAndY } from "../../Utils/utils";
 
 const Hexagon = styled.div`
   ${props =>

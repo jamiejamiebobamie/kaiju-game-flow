@@ -28,7 +28,7 @@ export const ACCESSORIES = {
     key: "Cigarette",
     name: "Cigarette",
     onStart: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Fire") ? 4 : 0;
+      let modifier = kaiju.find(k => k.element === "Fire") ? 4 : 0;
       setStats(stats => {
         return stats.Cigarette && modifier === 4
           ? stats
@@ -40,7 +40,7 @@ export const ACCESSORIES = {
       });
     },
     onManaWellGain: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Fire") ? 4 : 0;
+      let modifier = kaiju.find(k => k.element === "Fire") ? 4 : 0;
       setStats(stats => {
         return stats.Cigarette && modifier === 4
           ? stats
@@ -52,7 +52,7 @@ export const ACCESSORIES = {
       });
     },
     onManaWellLose: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Fire") ? 4 : 0;
+      let modifier = kaiju.find(k => k.element === "Fire") ? 4 : 0;
       setStats(stats => {
         return stats.Cigarette && modifier === 4
           ? stats
@@ -108,9 +108,9 @@ export const ACCESSORIES = {
         let modifier =
           kaiju.filter(
             k =>
-              k.element == "Lightning" ||
-              k.element == "Fire" ||
-              k.element == "Wood"
+              k.element === "Lightning" ||
+              k.element === "Fire" ||
+              k.element === "Wood"
           ).length *
             2 +
           5;
@@ -147,7 +147,7 @@ export const ACCESSORIES = {
       });
     },
     onManaWellGain: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Lightning") ? 5 : 0;
+      let modifier = kaiju.find(k => k.element === "Lightning") ? 5 : 0;
       setStats(stats => {
         return stats.WingedNikes && modifier === 5
           ? stats
@@ -159,7 +159,7 @@ export const ACCESSORIES = {
       });
     },
     onManaWellLose: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Lightning") ? 5 : 0;
+      let modifier = kaiju.find(k => k.element === "Lightning") ? 5 : 0;
       setStats(stats => {
         return stats.WingedNikes && modifier === 5
           ? stats
@@ -178,7 +178,7 @@ export const ACCESSORIES = {
     key: "MagicBeans",
     name: "5 Magic Beans",
     onStart: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Wood") ? 4 : 0;
+      let modifier = kaiju.find(k => k.element === "Wood") ? 4 : 0;
       setStats(stats => {
         return stats.MagicBeans && modifier === 4
           ? stats
@@ -190,7 +190,7 @@ export const ACCESSORIES = {
       });
     },
     onManaWellGain: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Wood") ? 4 : 0;
+      let modifier = kaiju.find(k => k.element === "Wood") ? 4 : 0;
       setStats(stats => {
         return stats.MagicBeans && modifier === 4
           ? stats
@@ -202,7 +202,7 @@ export const ACCESSORIES = {
       });
     },
     onManaWellLose: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element == "Wood") ? 4 : 0;
+      let modifier = kaiju.find(k => k.element === "Wood") ? 4 : 0;
       setStats(stats => {
         return stats.MagicBeans && modifier === 4
           ? stats

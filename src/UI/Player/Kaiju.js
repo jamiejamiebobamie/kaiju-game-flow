@@ -7,8 +7,8 @@ const Wrapper = styled.div`
   width: 70%;
   height: 70px;
   border-radius: 10px;
-  border-style: solid;
-  border-thickness: thin;
+  /* border-style: solid;
+  border-thickness: thin; */
   overflow: scroll;
 `;
 const KaijuIcon = styled.img`
@@ -32,7 +32,7 @@ export const Kaiju = ({
   ],
   setDisplayString
 }) => {
-  const [hoverRef, setHoverRef, hoverLookupString] = useHover();
+  const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const kaijuIcons = kaijuArr.map(({ displayLookup }) => (
     <KaijuIcon
