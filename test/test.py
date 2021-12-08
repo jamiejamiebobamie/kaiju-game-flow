@@ -21,11 +21,11 @@ def describePlayer(elements):
     ELEMENT_LOOKUP = {
     "Glass":["moth swarms highlight nearby glass for ability","use environmental glass as a donkey-kong-cannon","redirect projectiles"],
     "Fire":[ "create fire from nothing and immune to fire", "rebuff wraiths", "shoot a flamethrower that can light ivy and trees on fire (spreads faster than most players can travel)"],
-    "Wood":["invisiblity while on ivy canopy (ivy moves to indicate footsteps)","ignore 3 melee attacks and immune to falling damage", "lay down a canopy of ivy that ensares those who are caught in the attack and those who walk on the canopy later"],
+    "Wood":["invisiblity while on ivy canopy (ivy moves to indicate footsteps)","ignore melee attacks", "lay down a canopy of ivy that ensares those who are caught in the attack and those who walk on the canopy later"],
     "Lightning":["walk on walls", "move with increased speed", "shoot a lightning bolt"],
     "Death":["harvest death: gain wraiths from player deaths", "automatically spend one wraith instead of dying from any killing blow", "send out unspent wraiths as homing missiles that cannot be destroyed by physical attacks and pass through all physical barriers"],
-    "Bubble":["double the jump height", "ignore one hit from an enemy regardless of type and immune to falling damage", "send out a bubble that travels forward and  thenup, capturing / absorbing anything that collides with bubble"],
-    "Metal":["parked cars sound off with their car alarms if an enemy player is approaching","ignore 3 physical ranged attacks", "create indestructible walls that block all attacks (except wraiths) from a single direction"],
+    "Bubble":["ignore one hit from an enemy regardless of type and immune to falling damage", "send out a bubble that travels forward and  thenup, capturing / absorbing anything that collides with bubble"],
+    "Metal":["parked cars sound off with their car alarms if an enemy player is approaching","ignore melee and ranged attacks", "create indestructible walls that block all attacks (except wraiths) from a single direction"],
     }
     abilties = []
     for i, element in enumerate(elements):
@@ -53,13 +53,14 @@ accessory = [
 "Cool Jacket",
 "Metal Bat",
 "Winged Nikes", # choose electricity if present.
-"Magic Beans", # choose wood if present.
+"Fertilizer", # choose wood if present.
 "Cigarette", # choose fire if present.
 "Empty Wine Bottle" # choose glass if present.
 "Skull Ring",
 "Revolver",
 ]
 
+# NOTE: NEED TO RANDOMIZE WHO CHOOSES FIRST!
 player1 = [[],[],[]]
 player2 = [[],[],[]]
 
