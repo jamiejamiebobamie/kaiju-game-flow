@@ -64,6 +64,32 @@ const App = () => {
       }}
     ></div>
   );
+  const uiStandIn = (
+    <div
+      style={{
+        width: "500px",
+        height: "800px",
+        minWidth: "500px",
+        borderStyle: "solid",
+        borderThickness: "thin",
+        borderRadius: "10px"
+      }}
+    ></div>
+  );
+  const testPlayerScale = (
+    <img
+      style={{
+        marginLeft: "180px",
+        marginTop: "193px",
+        width: "50px",
+        height: "75px",
+        position: "absolute",
+        zIndex: 1,
+        opacity: 0.5
+      }}
+      src="test1.png"
+    />
+  );
   const [playerData, setPlayerData] = useState([]);
   const [graveyardData, setGraveyardData] = useState([]);
   const [kaiju1Data, setKaiju1Data] = useState([]);
@@ -169,6 +195,7 @@ const App = () => {
   // }, 1000);
   return (
     <div className="App">
+      {testPlayerScale}
       <GameBoard
         playerData={playerData}
         graveyardData={graveyardData}
@@ -176,7 +203,7 @@ const App = () => {
         kaiju2Data={kaiju2Data}
         scale={scale}
       />
-      <UI />
+      {uiStandIn}
     </div>
   );
 };

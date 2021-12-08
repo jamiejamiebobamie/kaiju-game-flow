@@ -25,7 +25,7 @@ def describePlayer(elements):
     "Lightning":["walk on walls", "move with increased speed", "shoot a lightning bolt"],
     "Death":["harvest death: gain wraiths from player deaths", "automatically spend one wraith instead of dying from any killing blow", "send out unspent wraiths as homing missiles that cannot be destroyed by physical attacks and pass through all physical barriers"],
     "Bubble":["ignore one hit from an enemy regardless of type and immune to falling damage", "send out a bubble that travels forward and  thenup, capturing / absorbing anything that collides with bubble"],
-    "Metal":["parked cars sound off with their car alarms if an enemy player is approaching","ignore melee and ranged attacks", "create indestructible walls that block all attacks (except wraiths) from a single direction"],
+    "Metal":["parked cars sound off with their car alarms if an enemy player is approaching","ignore melee and ranged attacks", "create indestructible walls that block all attacks (except wraiths) from a single direction", "two-handed claymore replaces any weapon you hold", "cannot use offhand magic while passive is active"],
     }
     abilties = []
     for i, element in enumerate(elements):
