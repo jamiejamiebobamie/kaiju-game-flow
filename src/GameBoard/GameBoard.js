@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { HexagonTile } from "./Tile/HexagonTile";
-import { Graveyard } from "./Graveyard";
 import { Player } from "./Player";
 import { Kaiju } from "./Kaiju";
 import { ManaPool } from "./ManaPool";
 import { PENINSULA_TILE_LOOKUP } from "../Utils/gameState";
-import { getTileXAndY } from "../Utils/utils";
+import { getTileXAndY, isAdjacent, findPath } from "../Utils/utils";
 const Board = styled.div`
   width: ${props => props.width}px;
   min-width: ${props => props.width}px;
@@ -16,6 +15,8 @@ const Board = styled.div`
   border-style: solid;
   border-thickness: medium;
   border-radius: 10px;
+  cursor: ${props =>
+    props.kaijuTokenPickedup ? "url(testKaijuTile.png), auto;" : "pointer"};
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;
@@ -32,6 +33,9 @@ export const GameBoard = ({
   playerData,
   graveyardData,
   kaiju1Data,
+  kaijuTokenTiles,
+  setKaijuTokenTiles,
+  setPlayerMoveToTiles,
   kaiju2Data,
   scale
 }) => {
@@ -40,7 +44,10 @@ export const GameBoard = ({
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
   const [clickedTiles, setClickedTiles] = useState([]);
   const [tiles, setTiles] = useState([]);
-  useEffect(() => redrawTiles([]), []);
+  const [kaijuTokenPickedup, setKaijuTokenPickedup] = useState(null);
+  useEffect(() => {
+    redrawTiles([]);
+  }, []);
   const redrawTiles = highlightedTiles => {
     const rowLength = Math.ceil(width / (70 * scale));
     const colLength = Math.ceil(height / (75 * scale));
@@ -59,11 +66,23 @@ export const GameBoard = ({
               scale={scale}
               setClickedIndex={setClickedTile}
               tileLocation={tileLocation}
-              // isHighlighted={highlightedTiles.some(
-              //   ({ h_i, h_j }) => h_i === i && h_j === j
-              // )}
-              isWooded={false}
-              isOnFire={false}
+              isHighlighted={highlightedTiles.some(
+                ({ h_i, h_j }) => h_i === i && h_j === j
+              )}
+              status={{
+                isOnFire: false,
+                isWooded: false,
+                isElectrified: false,
+                isBubble: false,
+                isShielded: false,
+                isGhosted: false,
+                isKaiju: kaijuTokenTiles.find(
+                  ({ tile }) => tile.i == i && tile.j == j
+                ),
+                isGraveyard: graveyardData.find(
+                  ({ tile }) => tile.i == i && tile.j == j
+                )
+              }}
             />
           );
         }
@@ -71,29 +90,39 @@ export const GameBoard = ({
     }
     setTiles(_tiles);
   };
+  useEffect(() => redrawTiles([]), [kaijuTokenTiles]);
   useEffect(() => {
     const { i, j } = clickedTile;
     if (i !== -1) {
-      if (clickedTiles.find(tile => tile.i === i && tile.j === j)) {
-        const item = clickedTiles.find(tile => tile.i === i && tile.j === j);
-        const index = clickedTiles.indexOf(item);
-        console.log(index);
-        const _clickedTiles = [...clickedTiles];
-        console.log(_clickedTiles);
-        _clickedTiles.splice(index, 1);
-        console.log(_clickedTiles);
-        setClickedTiles(_clickedTiles);
-        const highlightedTiles = Object.entries(_clickedTiles).map(([k, v]) => {
-          return { h_i: v.i, h_j: v.j };
-        });
-        redrawTiles(highlightedTiles);
+      // click a board tile vs click a kaiju token
+      // check to see if a kaijuToken is picked up.
+      if (kaijuTokenPickedup) {
+        // if so, put down the token on the tile.
+        if (kaijuTokenTiles.every(({ tile }) => !isAdjacent({ i, j }, tile))) {
+          setKaijuTokenTiles(
+            kaijuTokenTiles.map(data =>
+              data.tile.i === kaijuTokenPickedup.i &&
+              data.tile.j === kaijuTokenPickedup.j
+                ? { ...data, tile: { i, j } }
+                : data
+            )
+          );
+          setKaijuTokenPickedup(null);
+        }
+        // check if the current tile has a kaiju[tile]
+      } else if (
+        kaijuTokenTiles.find(({ tile }) => tile.i === i && tile.j === j)
+      ) {
+        setKaijuTokenPickedup({ i, j });
+        // else move the player to the clicked tile.
       } else {
-        const _clickedTiles = [...clickedTiles, { i, j }];
-        setClickedTiles(_clickedTiles);
-        const highlightedTiles = Object.entries(_clickedTiles).map(([k, v]) => {
-          return { h_i: v.i, h_j: v.j };
+        const path = findPath(playerData[0].tile, { i, j }, scale);
+        setPlayerMoveToTiles(path);
+        const highlightedTiles = path.map(t => {
+          return { h_i: t.i, h_j: t.j };
         });
         redrawTiles(highlightedTiles);
+        // console.log(highlightedTiles);
       }
       setClickedTile({ i: -1, j: -1 });
     }
@@ -114,9 +143,6 @@ export const GameBoard = ({
       color={k.color}
     />
   ));
-  const graveyards = graveyardData.map((g, i) => (
-    <Graveyard key={i} charLocation={g.charLocation} isUsed={g.isUsed} />
-  ));
   const players = playerData.map(p => (
     <Player
       key={p.i}
@@ -129,7 +155,11 @@ export const GameBoard = ({
     />
   ));
   return (
-    <Board width={width} height={height}>
+    <Board
+      kaijuTokenPickedup={kaijuTokenPickedup}
+      width={width}
+      height={height}
+    >
       <ManaPool
         width={width}
         height={height}
@@ -144,7 +174,6 @@ export const GameBoard = ({
       />
       <ShiftContentOver scale={scale}>
         {tiles}
-        {graveyards}
         {kaiju1}
         {kaiju2}
         {players}

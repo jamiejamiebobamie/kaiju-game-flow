@@ -66,24 +66,24 @@ export const movePiece = (data, setData, scale, isKaiju) => {
     if (
       _data[i].charLocation &&
       _data[i].moveFromLocation &&
-      _data[i].moveToLocation
+      _data[i].moveToLocation &&
+      (!_data[i].isThere || _data[i].moveToTiles.length)
     ) {
       const { newLocation, hasArrived } = moveTo({
         currentLocation: _data[i].charLocation,
         moveFromLocation: _data[i].moveFromLocation,
         moveToLocation: _data[i].moveToLocation,
-        moveSpeed: 7
+        moveSpeed: 5
       });
       _data[i].charLocation = newLocation;
       _data[i].isThere = hasArrived;
-      if (hasArrived) {
-        _data[i].moveFromLocation = _data[i].charLocation;
-        _data[i].tile = getRandAdjacentTile({
-          i: _data[i].tile.i,
-          j: _data[i].tile.j
-        });
+      if (_data[i].isThere && _data[i].moveToTiles.length) {
+        const [nextTile, ...tiles] = _data[i].moveToTiles;
+        _data[i].tile = nextTile;
+        _data[i].moveToTiles = tiles;
+        _data[i].moveFromLocation = newLocation;
         _data[i].moveToLocation = getCharXAndY({
-          ..._data[i].tile,
+          ...nextTile,
           scale
         });
       }
@@ -221,11 +221,9 @@ export const isLocatonInsidePolygon = (polygon, p) => {
     minY = Math.min(q.y, minY);
     maxY = Math.max(q.y, maxY);
   }
-
   if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) {
     return false;
   }
-
   var i = 0,
     j = polygon.length - 1;
   for (i, j; i < polygon.length; j = i++) {
@@ -241,87 +239,45 @@ export const isLocatonInsidePolygon = (polygon, p) => {
   }
   return isInside;
 };
-// https://www.algorithms-and-technologies.com/a_star/javascript
-export const aStar = (start, goal) => {
-  const ADJACENCY_MATRIX_LENGTH = 33 * 33 + 33 + 1;
-  const adjacencyMatrix = [];
-  for (let i = 0; i < ADJACENCY_MATRIX_LENGTH + 1; i++) {
-    adjacencyMatrix.push([]);
-    for (let j = 0; j < ADJACENCY_MATRIX_LENGTH + 1; j++) {
-      adjacencyMatrix[i].push(isAdjacent({ j, i }, { i, j }) ? 1 : 0);
+const getAdjacentTiles = tile => {
+  return Object.values(PENINSULA_TILE_LOOKUP).filter(t => isAdjacent(t, tile));
+};
+export const findPath = (start, goal, scale) => {
+  let count = 0;
+  const duplicateLookup = {};
+  return recur(start, [], count).filter(t => {
+    if (!duplicateLookup[`${t.i} ${t.j}`]) {
+      duplicateLookup[`${t.i} ${t.j}`] = t;
+      return t;
     }
-  }
-  console.log(adjacencyMatrix);
-  //This contains the distances from the start node to all other nodes
-  const distances = [];
-  //Initializing with a distance of "Infinity"
-  for (let i = 0; i < ADJACENCY_MATRIX_LENGTH; i++)
-    distances[i] = Number.MAX_VALUE;
-  //The distance from the start node to itself is of course 0
-  distances[start] = 0;
-  //This contains the priorities with which to visit the nodes, calculated using the heuristic.
-  const priorities = [];
-  //Initializing with a priority of "Infinity"
-  for (let i = 0; i < ADJACENCY_MATRIX_LENGTH; i++)
-    priorities[i] = Number.MAX_VALUE;
-  //start node has a priority equal to straight line distance to goal. It will be the first to be expanded.
-  const startXY = getTileXAndY({ i: start.i, j: start.j });
-  const goalXY = getTileXAndY({ i: goal.i, j: goal.j });
-  const distance = getDistance(startXY, goalXY);
-
-  priorities[start] = distance;
-  //This contains whether a node was already visited
-  const visited = [];
-  //While there are nodes left to visit...
-  while (true) {
-    // ... find the node with the currently lowest priority...
-    let lowestPriority = Number.MAX_VALUE;
-    let lowestPriorityIndex = -1;
-    for (let i = 0; i < priorities.length; i++) {
-      //... by going through all nodes that haven't been visited yet
-      if (priorities[i] < lowestPriority && !visited[i]) {
-        lowestPriority = priorities[i];
-        lowestPriorityIndex = i;
+  });
+  function recur(currTile, arr, count) {
+    if ((currTile.i === goal.i && currTile.j === goal.j) || count > 400)
+      return arr;
+    // produce all possible adjacent tile indices to currTile
+    const adjacentTiles = getAdjacentTiles(currTile);
+    // get all charXAndY for each confirmed adjacent tile
+    const goalXY = getCharXAndY({ ...goal, scale });
+    const test = getCharXAndY({ ...adjacentTiles[0], scale });
+    const shortest = {
+      tile: adjacentTiles[0],
+      distance: getDistance(test, goalXY)
+    };
+    adjacentTiles.forEach(t => {
+      const adjXY = getCharXAndY({ ...t, scale });
+      const distance = getDistance(adjXY, goalXY);
+      if (distance < shortest.distance) {
+        shortest.tile = t;
+        shortest.distance = distance;
       }
+    });
+    if (shortest.tile.i === currTile.i && shortest.tile.j === currTile.j) {
+      const randTile = getRandAdjacentTile(currTile);
+      const _arr = [...arr, randTile];
+      return recur(randTile, _arr, count + 1);
+    } else {
+      const _arr = [...arr, shortest.tile];
+      return recur(shortest.tile, _arr, count + 1);
     }
-    if (lowestPriorityIndex === -1) {
-      // There was no node not yet visited --> Node not found
-      return -1;
-    } else if (lowestPriorityIndex === goal) {
-      // Goal node found
-      // console.log("Goal node found!");
-      return distances[lowestPriorityIndex];
-    }
-    // console.log("Visiting node " + lowestPriorityIndex + " with currently lowest priority of " + lowestPriority);
-    //...then, for all neighboring nodes that haven't been visited yet....
-    for (let i = 0; i < ADJACENCY_MATRIX_LENGTH; i++) {
-      if (adjacencyMatrix[lowestPriorityIndex][i] !== 0 && !visited[i]) {
-        //...if the path over this edge is shorter...
-        if (
-          distances[lowestPriorityIndex] +
-            adjacencyMatrix[lowestPriorityIndex][i] <
-          distances[i]
-        ) {
-          //...save this path as new shortest path
-          distances[i] =
-            distances[lowestPriorityIndex] +
-            adjacencyMatrix[lowestPriorityIndex][i];
-          //...and set the priority with which we should continue with this node
-          const tile = getIndicesFromFlattenedArrayIndex(
-            i,
-            ADJACENCY_MATRIX_LENGTH
-          );
-          const startXY = getTileXAndY({ i: tile.i, j: tile.j });
-          const goalXY = getTileXAndY({ i: goal.i, j: goal.j });
-          const distance = getDistance(startXY, goalXY);
-          priorities[i] = distances[i] + distance;
-          // console.log("Updating distance of node " + i + " to " + distances[i] + " and priority to " + priorities[i]);
-        }
-      }
-    }
-    // Lastly, note that we are finished with this node.
-    visited[lowestPriorityIndex] = true;
-    //console.log("Visited nodes: " + visited);
-    //console.log("Currently lowest distances: " + distances);
   }
 };

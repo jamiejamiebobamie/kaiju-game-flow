@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Content } from "./Content";
 import { Border } from "./Border";
+import { Icon } from "./Icon";
 
 const Hexagon = styled.div`
   ${props =>
@@ -16,8 +17,15 @@ export const HexagonTile = ({
   j = 0,
   setClickedIndex = () => {},
   isHighlighted,
-  isOnFire,
-  isWooded
+  status = {
+    isOnFire: false,
+    isWooded: false,
+    isElectrified: false,
+    isBubble: false,
+    isShielded: false,
+    isGhosted: false,
+    isGraveyard: false
+  }
 }) => {
   const zIndex = rowLength * i + j + 1;
   return (
@@ -31,10 +39,11 @@ export const HexagonTile = ({
         onClick={() =>
           setClickedIndex({ i, j, x: tileLocation.x, y: tileLocation.y })
         }
+        isKaiju={status.isKaiju}
         isHighlighted={isHighlighted}
-        isWooded={!isOnFire && isWooded}
-        isOnFire={isOnFire}
+        status={status}
       />
+      <Icon zIndex={zIndex} status={status} />
       <Border />
     </Hexagon>
   );

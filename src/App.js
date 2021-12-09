@@ -21,22 +21,18 @@ import "./App.css";
 
 const App = () => {
   /*
-        1. kaijus only move if clicked on, and then stop moving when they get to the next tile.
-                do not allow Kaiju to move to tiles that are adjacent to other Kaiju
-        2. hexagon pathing, a*
-                player and a.i. movement direction (toward other player or closest mana well?)
-                    a.i. Kaiju choices (random)
-                    placement of Kaiju on board adjacent to player / newly-acquired mana well.
-                player conflict winner
-                    player respawn from graveyard choices (top 5 farthest graveyards from end game point. of the 5, the farthest from the enemy player)
-        3. object placement, breadth first search
+        1. enemy a.i.
+        2. object placement, breadth first search
                 final battleground vertex / "end game point"
                     graveyard placement
                 do not place mana wells adjacent to one another
-        4. mana pool non-convex hulls
+        3. mana pool non-convex hulls
             new method to sort kaiju locations to create a non-convex hull (current method only works with 3 vertices)
-        5. fix issue with NaN location values.
+        4. fix issue with NaN location values.
 
+        - hexagon pathing
+        - kaijus only move if clicked on, and then stop moving when they get to the next tile.
+                - do not allow Kaiju to move to tiles that are adjacent to other Kaiju
         - make a single event tick with useInterval at GameBoard level.
         - mana wells / kaiju need to be sorted so that they form a non convex hull
         - x,y coords of peninsula (whether or not something is on peninsula)
@@ -94,6 +90,8 @@ const App = () => {
   const [graveyardData, setGraveyardData] = useState([]);
   const [kaiju1Data, setKaiju1Data] = useState([]);
   const [kaiju2Data, setKaiju2Data] = useState([]);
+  const [kaijuTokenTiles, setKaijuTokenTiles] = useState([]);
+  const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const scale = 0.3;
   useEffect(() => {
     const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
@@ -115,13 +113,15 @@ const App = () => {
         color: k ? "salmon" : "blue",
         charLocation: location,
         moveFromLocation: location,
+        moveToTiles: [],
         moveToLocation: getCharXAndY({
           ...getRandAdjacentTile({ i, j }),
           scale
         }),
         tile: { i, j },
         i: k,
-        isThere: false
+        isThere: true,
+        moveSpeed: 7
       });
     }
     setPlayerData(_players);
@@ -147,7 +147,7 @@ const App = () => {
       tileIndices[randomInt] = storeItem;
       const charLocation = getCharXAndY({ i, j, scale });
       const { x, y } = charLocation;
-      console.log(charLocation, randTile, randomInt);
+      // console.log(charLocation, randTile, randomInt);
       _graveyards.push({
         charLocation,
         tile: { i, j },
@@ -172,41 +172,90 @@ const App = () => {
       _kaiju.push({
         charLocation: getCharXAndY({ i, j, scale }),
         moveFromLocation: location,
+        moveToTiles: [],
         moveToLocation: getCharXAndY({
           ...getRandAdjacentTile({ i, j }),
           scale
         }),
+        key: `${i} ${j}`,
         tile: { i, j },
+        isThere: true,
         element: undefined,
         owner: k < 3 ? _players[0] : _players[1],
-        color: k < 3 ? _players[0].color : _players[1].color
+        color: k < 3 ? _players[0].color : _players[1].color,
+        moveSpeed: 7
       });
     }
     setKaiju1Data(_kaiju.filter(k => k.owner === _players[0]));
+    setKaijuTokenTiles(
+      _kaiju
+        .filter(k => k.owner === _players[0])
+        .map(({ tile, key }) => {
+          return {
+            key,
+            tile
+          };
+        })
+    );
     setKaiju2Data(_kaiju.filter(k => k.owner === _players[1]));
     // KAIJU - - - - - - - - - - - -
   }, []);
-  // useInterval(() => {
-  //   movePiece(playerData, setPlayerData, scale);
-  //   const isKaiju = true;
-  //   movePiece(kaiju1Data, setKaiju1Data, scale, isKaiju);
-  //   movePiece(kaiju2Data, setKaiju2Data, scale, isKaiju);
-  //   checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
-  // }, 1000);
+  useEffect(() => {
+    if (kaijuTokenTiles && kaijuTokenTiles.length)
+      setKaiju1Data(_kaiju1Data =>
+        _kaiju1Data.map(data => {
+          return {
+            ...data,
+            isThere: false,
+            moveToLocation: getCharXAndY({
+              i: kaijuTokenTiles.find(t => t.key === data.key)
+                ? kaijuTokenTiles.find(t => t.key === data.key).tile.i
+                : 0,
+              j: kaijuTokenTiles.find(t => t.key === data.key)
+                ? kaijuTokenTiles.find(t => t.key === data.key).tile.j
+                : 0,
+              scale
+            })
+          };
+        })
+      );
+  }, [kaijuTokenTiles]);
+  useEffect(() => {
+    if (playerMoveToTiles !== null) {
+      getCharXAndY(playerMoveToTiles);
+      setPlayerData(_playerData =>
+        _playerData.map((p, i) =>
+          i === 0 ? { ...p, moveToTiles: playerMoveToTiles } : p
+        )
+      );
+      setPlayerMoveToTiles(null);
+    }
+  }, [playerMoveToTiles]);
+  useInterval(() => {
+    movePiece(playerData, setPlayerData, scale);
+    const isKaiju = true;
+    movePiece(kaiju1Data, setKaiju1Data, scale, isKaiju);
+    movePiece(kaiju2Data, setKaiju2Data, scale, isKaiju);
+    checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
+  }, 750);
   return (
     <div className="App">
       {testPlayerScale}
       <GameBoard
+        setPlayerMoveToTiles={setPlayerMoveToTiles}
         playerData={playerData}
         graveyardData={graveyardData}
         kaiju1Data={kaiju1Data}
+        kaijuTokenTiles={kaijuTokenTiles}
+        setKaijuTokenTiles={setKaijuTokenTiles}
         kaiju2Data={kaiju2Data}
         scale={scale}
       />
-      {uiStandIn}
+      <UI />
     </div>
   );
 };
 // {gameBoardStandIn}
-// <UI />
+// {uiStandIn}
+
 export default App;
