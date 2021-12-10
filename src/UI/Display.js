@@ -8,7 +8,6 @@ const Wrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
-  margin-top: -50px;
   text-font: 30px;
   font-alignment: 30px;
   color: black;

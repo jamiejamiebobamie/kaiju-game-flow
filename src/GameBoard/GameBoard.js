@@ -24,7 +24,7 @@ const ShiftContentOver = styled.div`
   position: absolute;
 `;
 const BackgroundImage = styled.img`
-  z-index: -2;
+  z-index: -3;
   width: 100%;
   height: 100%;
   background-repeat: no-repeat;
@@ -70,6 +70,7 @@ export const GameBoard = ({
                 ({ h_i, h_j }) => h_i === i && h_j === j
               )}
               status={{
+                isKaijuPickup: false,
                 isOnFire: false,
                 isWooded: false,
                 isElectrified: false,
@@ -94,10 +95,9 @@ export const GameBoard = ({
   useEffect(() => {
     const { i, j } = clickedTile;
     if (i !== -1) {
-      // click a board tile vs click a kaiju token
       // check to see if a kaijuToken is picked up.
       if (kaijuTokenPickedup) {
-        // if so, put down the token on the tile.
+        // if so, put down the token on the tile if not next to another kaiju token tile.
         if (kaijuTokenTiles.every(({ tile }) => !isAdjacent({ i, j }, tile))) {
           setKaijuTokenTiles(
             kaijuTokenTiles.map(data =>
@@ -109,10 +109,11 @@ export const GameBoard = ({
           );
           setKaijuTokenPickedup(null);
         }
-        // check if the current tile has a kaiju[tile]
+        // check if the current tile has a kaiju
       } else if (
         kaijuTokenTiles.find(({ tile }) => tile.i === i && tile.j === j)
       ) {
+        // if so, pick up the tile token.
         setKaijuTokenPickedup({ i, j });
         // else move the player to the clicked tile.
       } else {
@@ -122,7 +123,6 @@ export const GameBoard = ({
           return { h_i: t.i, h_j: t.j };
         });
         redrawTiles(highlightedTiles);
-        // console.log(highlightedTiles);
       }
       setClickedTile({ i: -1, j: -1 });
     }

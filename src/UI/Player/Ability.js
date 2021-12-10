@@ -5,31 +5,38 @@ import { useHover } from "../../Utils/utils";
 const ICON_LOOKUP = {
   glass: {
     passive: "fa-crosshairs",
-    active: "fa-tencent-weibo"
+    active: "fa-tencent-weibo",
+    loader: "fa-spinner"
   },
   fire: {
     passive: "fa-free-code-camp",
-    active: "fa-hand-lizard-o"
+    active: "fa-hand-lizard-o",
+    loader: "fa-spinner"
   },
   wood: {
     passive: "fa-leaf",
-    active: "fa-tree"
+    active: "fa-tree",
+    loader: "fa-spinner"
   },
   lightning: {
     passive: "fa-bug",
-    active: "fa-bolt"
+    active: "fa-bolt",
+    loader: "fa-spinner"
   },
   death: {
     passive: "fa-heartbeat",
-    active: "fa-snapchat-ghost"
+    active: "fa-snapchat-ghost",
+    loader: "fa-spinner"
   },
   bubble: {
     passive: "fa-universal-access",
-    active: "fa-question-circle-o"
+    active: "fa-question-circle-o",
+    loader: "fa-spinner"
   },
   metal: {
     passive: "fa-cutlery",
-    active: "fa-shield"
+    active: "fa-shield",
+    loader: "fa-spinner"
   }
 };
 
@@ -67,7 +74,7 @@ const AbilityIcon = styled.i`
   ${props =>
     props.isCoolDown && "animation: spin linear " + props.cooldownTime + "ms;"}
   @keyframes spin {
-    0% {
+    5% {
       transform: scale(2) rotate(0deg);
     }
     80% {
@@ -109,14 +116,15 @@ export const Ability = ({
         if (!isPassive) {
           setIsPassive(true);
           setIsAnimating(true);
-          setTimeout(() => setIconLookupString("active"), 250);
+          setTimeout(() => setIconLookupString("active"), 200);
         } else if (isPassive && !isActive) {
           setIsActive(true);
           setIsAnimating(true);
-          setTimeout(() => setIconLookupString("passive"), 250);
+          setTimeout(() => setIconLookupString("loader"), 200);
           setTimeout(() => {
             setIsPassive(false);
             setIsActive(false);
+            setIconLookupString("passive");
             console.log("Cooldown is over!");
           }, cooldownTime);
         }
@@ -128,11 +136,7 @@ export const Ability = ({
     >
       <AbilityIcon
         disabled={true}
-        className={`fa ${
-          isPassive && isActive
-            ? "fa-spinner"
-            : ICON_LOOKUP[abilityData.element][iconLookupString]
-        }`}
+        className={`fa ${ICON_LOOKUP[abilityData.element][iconLookupString]}`}
         isCoolDown={isPassive && isActive}
         cooldownTime={cooldownTime}
       />

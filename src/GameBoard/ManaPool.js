@@ -16,7 +16,7 @@ export const ManaPool = ({ kaijuData, width, height, color }) => {
     >
       <polygon
         style={{
-          opacity: ".4",
+          opacity: ".2",
           pointerEvents: "none"
         }}
         fill={color}

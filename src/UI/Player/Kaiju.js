@@ -33,6 +33,7 @@ export const Kaiju = ({
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const kaijuIcons = kaijuArr.map(({ displayLookup }) => (
     <KaijuIcon
+      key={displayLookup}
       src={"testKaijuTile.png"}
       ref={setHoverRef(displayLookup)}
       title="test"

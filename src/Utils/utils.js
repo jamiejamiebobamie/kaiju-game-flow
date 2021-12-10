@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { PENINSULA_TILE_LOOKUP } from "./gameState";
 
+export const returnNotNaN = (num, fallback) => {
+  return num && !Number.isNaN(num) ? num : fallback ? fallback : 0;
+};
 export const getRandomIntInRange = ({ min = 0, max }) => {
   const _min = Math.ceil(min);
   const _max = Math.floor(max + 1);
@@ -39,7 +42,7 @@ export const getCharXAndY = ({ i, j, scale }) => {
   const x =
     (i === 0 ? i * 45 - 25 : i * 45 + 25 * (i - 1)) * scale + 52.5 * scale;
   const y = (i % 2 ? j * 80 + 40 : j * 80) * scale + 42.5 * scale;
-  return { x: Math.trunc(x), y: Math.trunc(y) };
+  return { x, y };
 };
 // Canvas has a different x and y scale
 export const getManaWellXAndY = ({ i, j, scale }) => {
@@ -60,7 +63,7 @@ const getDistance = (to, from) => {
     (to.x - from.x) * (to.x - from.x) + (to.y - from.y) * (to.y - from.y)
   );
 };
-export const movePiece = (data, setData, scale, isKaiju) => {
+export const movePiece = (data, setData, scale) => {
   const _data = [...data];
   for (let i = 0; i < _data.length; i++) {
     if (
@@ -73,7 +76,7 @@ export const movePiece = (data, setData, scale, isKaiju) => {
         currentLocation: _data[i].charLocation,
         moveFromLocation: _data[i].moveFromLocation,
         moveToLocation: _data[i].moveToLocation,
-        moveSpeed: 5
+        moveSpeed: _data[i].moveSpeed
       });
       _data[i].charLocation = newLocation;
       _data[i].isThere = hasArrived;
@@ -89,13 +92,7 @@ export const movePiece = (data, setData, scale, isKaiju) => {
       }
     }
   }
-  setData(
-    isKaiju
-      ? _data.sort(
-          (item1, item2) => item1.charLocation.x - item2.charLocation.x
-        )
-      : _data
-  );
+  setData(_data);
 };
 export const moveTo = ({
   currentLocation,
@@ -109,14 +106,20 @@ export const moveTo = ({
   const x_To = moveToLocation.x;
   const y_To = moveToLocation.y;
   const { x, y } = currentLocation;
-  const x_dir = (x_To - x) / distanceToFinish;
-  const y_dir = (y_To - y) / distanceToFinish;
+  const x_dir = distanceToFinish
+    ? (moveToLocation.x - x) / distanceToFinish
+    : 0;
+  const y_dir = distanceToFinish
+    ? (moveToLocation.y - y) / distanceToFinish
+    : 0;
+  const hasArrived =
+    distanceToFinish < moveSpeed || distanceFromStart > totalDistance;
   return {
     newLocation: {
-      x: Math.trunc(x + x_dir * moveSpeed),
-      y: Math.trunc(y + y_dir * moveSpeed)
+      x: x + x_dir * moveSpeed,
+      y: y + y_dir * moveSpeed
     },
-    hasArrived: distanceToFinish < 5 || distanceFromStart > totalDistance
+    hasArrived
   };
 };
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
@@ -244,13 +247,14 @@ const getAdjacentTiles = tile => {
 };
 export const findPath = (start, goal, scale) => {
   let count = 0;
-  const duplicateLookup = {};
-  return recur(start, [], count).filter(t => {
-    if (!duplicateLookup[`${t.i} ${t.j}`]) {
-      duplicateLookup[`${t.i} ${t.j}`] = t;
-      return t;
-    }
-  });
+  // const duplicateLookup = {};
+  return recur(start, [], count);
+  // .filter(t => {
+  //   if (!duplicateLookup[`${t.i} ${t.j}`]) {
+  //     duplicateLookup[`${t.i} ${t.j}`] = t;
+  //     return t;
+  //   }
+  // });
   function recur(currTile, arr, count) {
     if ((currTile.i === goal.i && currTile.j === goal.j) || count > 400)
       return arr;
@@ -272,7 +276,13 @@ export const findPath = (start, goal, scale) => {
       }
     });
     if (shortest.tile.i === currTile.i && shortest.tile.j === currTile.j) {
-      const randTile = getRandAdjacentTile(currTile);
+      // const randTile = getRandAdjacentTile(currTile);
+      const keyedArr = arr.map(({ i, j }) => `${i} ${j}`);
+      const remainingTiles = adjacentTiles.filter(
+        ({ i, j }) => !keyedArr.includes(`${i} ${j}`)
+      );
+      const randInt = getRandomIntInRange({ max: remainingTiles.length - 1 });
+      const randTile = remainingTiles[randInt];
       const _arr = [...arr, randTile];
       return recur(randTile, _arr, count + 1);
     } else {

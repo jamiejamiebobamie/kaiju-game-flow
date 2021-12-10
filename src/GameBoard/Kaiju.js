@@ -19,7 +19,7 @@ const Ripple = styled.div`
   0% {
     width: 10;
     height: 10;
-    opacity: 1;
+    opacity: .5;
   }
   50% {
       background-color: transparent;
@@ -28,12 +28,12 @@ const Ripple = styled.div`
       margin-top:-2px;
     width: 13px;
     height: 13px;
-    opacity: .3;
+    opacity: .1;
   }
   100% {
     width: 10;
     height: 10;
-    opacity: 1;
+    opacity: .5;
   }
 `;
 export const Kaiju = ({ charLocation, element, color }) => {

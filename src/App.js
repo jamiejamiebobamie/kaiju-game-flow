@@ -80,8 +80,8 @@ const App = () => {
         width: "50px",
         height: "75px",
         position: "absolute",
-        zIndex: 1,
-        opacity: 0.5
+        zIndex: 1
+        // opacity: 0.5
       }}
       src="test1.png"
     />
@@ -113,15 +113,12 @@ const App = () => {
         color: k ? "salmon" : "blue",
         charLocation: location,
         moveFromLocation: location,
+        moveToLocation: location,
         moveToTiles: [],
-        moveToLocation: getCharXAndY({
-          ...getRandAdjacentTile({ i, j }),
-          scale
-        }),
         tile: { i, j },
         i: k,
         isThere: true,
-        moveSpeed: 7
+        moveSpeed: 14
       });
     }
     setPlayerData(_players);
@@ -170,20 +167,17 @@ const App = () => {
       tileIndices[tileIndices.length - k] = tileIndices[randomInt];
       tileIndices[randomInt] = storeItem;
       _kaiju.push({
-        charLocation: getCharXAndY({ i, j, scale }),
+        charLocation: location,
         moveFromLocation: location,
+        moveToLocation: location,
         moveToTiles: [],
-        moveToLocation: getCharXAndY({
-          ...getRandAdjacentTile({ i, j }),
-          scale
-        }),
         key: `${i} ${j}`,
         tile: { i, j },
         isThere: true,
         element: undefined,
         owner: k < 3 ? _players[0] : _players[1],
         color: k < 3 ? _players[0].color : _players[1].color,
-        moveSpeed: 7
+        moveSpeed: 14
       });
     }
     setKaiju1Data(_kaiju.filter(k => k.owner === _players[0]));
@@ -233,14 +227,12 @@ const App = () => {
   }, [playerMoveToTiles]);
   useInterval(() => {
     movePiece(playerData, setPlayerData, scale);
-    const isKaiju = true;
-    movePiece(kaiju1Data, setKaiju1Data, scale, isKaiju);
-    movePiece(kaiju2Data, setKaiju2Data, scale, isKaiju);
+    movePiece(kaiju1Data, setKaiju1Data, scale);
+    movePiece(kaiju2Data, setKaiju2Data, scale);
     checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
-  }, 750);
+  }, 250);
   return (
     <div className="App">
-      {testPlayerScale}
       <GameBoard
         setPlayerMoveToTiles={setPlayerMoveToTiles}
         playerData={playerData}
@@ -255,6 +247,7 @@ const App = () => {
     </div>
   );
 };
+// {testPlayerScale}
 // {gameBoardStandIn}
 // {uiStandIn}
 
