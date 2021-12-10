@@ -45,12 +45,13 @@ const AccessoryPicture = styled.img`
   background-color: white;
 `;
 export const Player = ({
+  playerData = [{}, {}],
   isReversed,
-  setDisplayString,
-  accessory = {
-    displayLookup: "testAccessoryLookup",
-    accessoryImgFile: "fire_icon.png"
-  }
+  setDisplayString
+  // accessory = {
+  //   displayLookup: "testAccessoryLookup",
+  //   accessoryImgFile: "fire_icon.png"
+  // }
 }) => {
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
@@ -59,6 +60,7 @@ export const Player = ({
       {isReversed ? (
         <>
           <Abilities
+            abilities={playerData.abilities}
             setDisplayString={setDisplayString}
             isReversed={isReversed}
           />
@@ -69,14 +71,19 @@ export const Player = ({
         <>
           <Kaiju setDisplayString={setDisplayString} />
           <HealthBar setDisplayString={setDisplayString} />
-          <Abilities setDisplayString={setDisplayString} />
+          <Abilities
+            abilities={playerData.abilities}
+            setDisplayString={setDisplayString}
+          />
         </>
       )}
       <PlayerBorder isReversed={isReversed}>
         <PlayerPicture className="fa fa-user-circle" />
         <AccessoryPicture
-          ref={setHoverRef(accessory.displayLookup)}
-          src={accessory.accessoryImgFile}
+          ref={setHoverRef(
+            playerData.accessory && playerData.accessory.displayLookup
+          )}
+          src={playerData.accessory && playerData.accessory.accessoryImgFile}
           isReversed={isReversed}
         />
       </PlayerBorder>

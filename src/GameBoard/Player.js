@@ -19,8 +19,8 @@ const Wrapper = styled.i`
 }
 `;
 const Character = styled.img`
-    margin-left: -30px;
-    margin-top: -40px;
+    margin-left: -20px;
+    margin-top: -45px;
     width: 50px;
     height: 75px;
     position: absolute;

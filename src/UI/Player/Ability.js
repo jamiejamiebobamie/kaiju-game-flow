@@ -4,8 +4,8 @@ import { useHover } from "../../Utils/utils";
 
 const ICON_LOOKUP = {
   glass: {
-    passive: "fa-crosshairs",
-    active: "fa-tencent-weibo",
+    passive: "fa-tencent-weibo",
+    active: "fa-ravelry",
     loader: "fa-spinner"
   },
   fire: {
@@ -53,6 +53,7 @@ const Wrapper = styled.div`
   min-width: 50px;
   height: 50px;
   ${props => props.isAnimating && "animation: rotation linear .5s;"};
+  cursor: pointer;
   @keyframes rotation {
     0% {
       transform: rotate3d(0, 1, 0, 0deg);
@@ -70,7 +71,6 @@ const AbilityIcon = styled.i`
   justify-self: center;
   align-self: center;
   transform: scale(2);
-  cursor: pointer;
   ${props =>
     props.isCoolDown && "animation: spin linear " + props.cooldownTime + "ms;"}
   @keyframes spin {
@@ -130,8 +130,12 @@ export const Ability = ({
         }
       }}
       isAnimating={isAnimating}
-      ref={setHoverRef(abilityData.displayLookup)}
-      title="test"
+      ref={setHoverRef(
+        `${abilityData.displayLookup}${
+          iconLookupString === "passive" ? "Passive" : "Active"
+        }`
+      )}
+      title={abilityData.displayLookup}
       alt="test desc"
     >
       <AbilityIcon

@@ -39,10 +39,9 @@ const Image = styled.div`
   transform: rotate(-60deg);
   ${props =>
     props.isHighlighted &&
-    "background-color: #FFA836;opacity: 0.3;"} /* &:hover {
-    background-color: red;
-    opacity: 0.3;
-  } */
+    !props.isPlayer &&
+    "background-color: #FEBA4F;opacity: 0.3;"}
+  ${props => props.isPlayer && "background-color: #FFA836;opacity: 0.5;"}
 `;
 export const Content = ({
   isHighlighted = false,
@@ -60,7 +59,8 @@ export const Content = ({
           ref={setHoverRef(`${i} ${j}`)}
           onClick={onClick}
           isKaiju={isKaiju}
-          isHighlighted={isHighlighted || status.isPlayer}
+          isHighlighted={isHighlighted}
+          isPlayer={status.isPlayer}
         />
       </ImageWrapper>
     </ContentWrapper>

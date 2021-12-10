@@ -10,7 +10,9 @@ import {
   isAdjacent,
   findPath,
   useHover,
-  useInterval
+  useInterval,
+  getRandBool,
+  isTileOnGameBoard
 } from "../Utils/utils";
 
 const Board = styled.div`
@@ -55,10 +57,97 @@ export const GameBoard = ({
   const [setHoverRef, hoverLookupString] = useHover();
   const [goalTile, setGoalTile] = useState(null);
   const [tileInterval, setTileInterval] = useState(null);
+  const [tileStatuses, setTileStatuses] = useState(null);
 
   useEffect(() => {
     redrawTiles([]);
+    const status = [];
+    const rowLength = Math.ceil(width / (70 * scale));
+    const colLength = Math.ceil(height / (75 * scale));
+    for (let i = 0; i < rowLength; i++) {
+      const _status = [];
+      for (let j = 0; j < colLength; j++) {
+        _status.push({
+          updateKey: Math.random(),
+          isPlayer: playerData.some(({ tile }) => tile.i === i && tile.j === j),
+          isOnFire: getRandBool() ? { i: -1, j: -1 } : null,
+          isWooded: null, //getRandBool() ? { i: 1, j: 1 } : null,
+          isElectrified: null, //getRandBool() ? { i: 0, j: -1 } : null,
+          isBubble: null, //getRandBool() ? { i: -1, j: -1 } : null,
+          isShielded: null, //getRandBool() ? { i: -1, j: -1 } : null,
+          isGhosted: null, //getRandBool() ? { i: -1, j: -1 } : null,
+          isKaiju: kaijuTokenTiles.find(
+            ({ tile }) => tile.i == i && tile.j == j
+          ),
+          isGraveyard: graveyardData.find(
+            ({ tile }) => tile.i == i && tile.j == j
+          )
+        });
+      }
+      status.push(_status);
+    }
+    setTileStatuses(status);
   }, []);
+
+  const updateTileState = () => {
+    const updateKey = Math.random();
+    if (tileStatuses) {
+      const status = [...tileStatuses];
+      const rowLength = Math.ceil(width / (70 * scale));
+      const colLength = Math.ceil(height / (75 * scale));
+      for (let i = 0; i < rowLength; i++) {
+        for (let j = 0; j < colLength; j++) {
+          let tileStatus = status[i][j];
+          // 1. solve what should be on the tile
+          if (tileStatus.isGraveyard) {
+            tileStatus = { isGraveyard: { i: 0, j: 0 }, updateKey };
+          } else if (tileStatus.isBubble) {
+            tileStatus = { isBubble: status[i][j].isBubble, updateKey };
+          } else if (tileStatus.isGhosted) {
+            tileStatus = { isGhosted: status[i][j].isGhosted, updateKey };
+          } else if (tileStatus.isShielded) {
+            tileStatus = { isShielded: status[i][j].isShielded, updateKey };
+          } else if (tileStatus.isElectrified) {
+            tileStatus = {
+              isElectrified: status[i][j].isElectrified,
+              updateKey
+            };
+          } else if (tileStatus.isOnFire) {
+            tileStatus = { isOnFire: status[i][j].isOnFire, updateKey };
+          } else if (tileStatus.isWooded) {
+            tileStatus = { isWooded: status[i][j].isWooded, updateKey };
+          }
+          const entry = Object.entries(tileStatus).find(
+            ([_k, _v]) => _k !== "updateKey" && _v
+          );
+          if (entry) {
+            // 2. move the tile based on the direction vectors array
+            const [k, v] = entry;
+            if (k !== "isGraveyard" && k !== "isShielded") {
+              const _i = i + v.i;
+              const _j = j + v.j;
+              if (
+                isTileOnGameBoard({
+                  i: _i,
+                  j: _j
+                })
+              )
+                status[_i][_j][k] = {
+                  i: tileStatus[k].i,
+                  j: tileStatus[k].j
+                };
+              // 3. erase current tile's state if not: isElectrified
+              status[i][j][k] =
+                k !== "isElectrified" && status[i][j].updateKey !== updateKey
+                  ? null
+                  : status[i][j][k];
+            }
+          }
+        }
+      }
+      setTileStatuses(status);
+    }
+  };
   // useEffect(() => {
   //   if (hoverLookupString) {
   //     const [i, j] = hoverLookupString.split(" ");
@@ -76,6 +165,7 @@ export const GameBoard = ({
   //   }
   // }, [hoverLookupString]);
   useInterval(() => {
+    let highlightedTiles = [];
     if (hoverLookupString) {
       const [i, j] = hoverLookupString.split(" ");
       if (
@@ -88,74 +178,73 @@ export const GameBoard = ({
           { i: Number(i), j: Number(j) },
           scale
         );
-        const highlightedTiles = path.map(t => {
+        highlightedTiles = path.map(t => {
           return { h_i: t.i, h_j: t.j };
         });
-        redrawTiles(highlightedTiles);
       } else {
-        redrawTiles([{ h_i: Number(i), h_j: Number(j) }]);
+        highlightedTiles = [{ h_i: Number(i), h_j: Number(j) }];
       }
     } else if (goalTile) {
       const path = findPath(playerData[0].tile, goalTile, scale);
-      const highlightedTiles = path.map(t => {
+      highlightedTiles = path.map(t => {
         return { h_i: t.i, h_j: t.j };
       });
-      redrawTiles(highlightedTiles);
       if (!path.length) setGoalTile(null);
     }
-  }, tileInterval);
-  useEffect(() => {
-    if (hoverLookupString || goalTile) setTileInterval(250);
-    else {
-      setTileInterval(null);
-      redrawTiles([]);
-    }
-  }, [hoverLookupString, goalTile]);
+    redrawTiles(highlightedTiles);
+  }, 500);
+  useInterval(() => {
+    updateTileState();
+  }, 2000);
+  // useEffect(() => {
+  //   if (hoverLookupString || goalTile) setTileInterval(250);
+  //   else {
+  //     setTileInterval(2000);
+  //     redrawTiles([]);
+  //   }
+  // }, [hoverLookupString, goalTile]);
   const redrawTiles = highlightedTiles => {
-    const rowLength = Math.ceil(width / (70 * scale));
-    const colLength = Math.ceil(height / (75 * scale));
-    const _tiles = [];
-    for (let i = 0; i < rowLength; i++) {
-      for (let j = 0; j < colLength; j++) {
-        const key = `${i} ${j}`;
-        if (PENINSULA_TILE_LOOKUP[key]) {
-          const tileLocation = getTileXAndY({ i, j, scale });
-          _tiles.push(
-            <HexagonTile
-              key={key}
-              setHoverRef={setHoverRef}
-              rowLength={rowLength}
-              i={i}
-              j={j}
-              scale={scale}
-              setClickedIndex={setClickedTile}
-              tileLocation={tileLocation}
-              isHighlighted={highlightedTiles.some(
-                ({ h_i, h_j }) => h_i === i && h_j === j
-              )}
-              status={{
-                isPlayer: playerData.some(
-                  ({ tile }) => tile.i === i && tile.j === j
-                ),
-                isOnFire: false,
-                isWooded: false,
-                isElectrified: false,
-                isBubble: false,
-                isShielded: false,
-                isGhosted: false,
-                isKaiju: kaijuTokenTiles.find(
-                  ({ tile }) => tile.i == i && tile.j == j
-                ),
-                isGraveyard: graveyardData.find(
-                  ({ tile }) => tile.i == i && tile.j == j
-                )
-              }}
-            />
-          );
+    if (tileStatuses) {
+      const rowLength = Math.ceil(width / (70 * scale));
+      const colLength = Math.ceil(height / (75 * scale));
+      const _tiles = [];
+      for (let i = 0; i < rowLength; i++) {
+        for (let j = 0; j < colLength; j++) {
+          const key = `${i} ${j}`;
+          if (PENINSULA_TILE_LOOKUP[key]) {
+            const tileLocation = getTileXAndY({ i, j, scale });
+            _tiles.push(
+              <HexagonTile
+                key={key}
+                setHoverRef={setHoverRef}
+                rowLength={rowLength}
+                i={i}
+                j={j}
+                scale={scale}
+                setClickedIndex={setClickedTile}
+                tileLocation={tileLocation}
+                isHighlighted={highlightedTiles.some(
+                  ({ h_i, h_j }) => h_i === i && h_j === j
+                )}
+                status={{
+                  ...tileStatuses[i][j],
+                  isPlayer: playerData.some(
+                    ({ tile }) => tile.i === i && tile.j === j
+                  ),
+                  isKaiju: kaijuTokenTiles.find(
+                    ({ tile }) => tile.i == i && tile.j == j
+                  ),
+                  isGraveyard: graveyardData.find(
+                    ({ tile }) => tile.i == i && tile.j == j
+                  )
+                }}
+              />
+            );
+          }
         }
       }
+      setTiles(_tiles);
     }
-    setTiles(_tiles);
   };
   useEffect(() => redrawTiles([]), [kaijuTokenTiles]);
   useEffect(() => {
@@ -186,7 +275,15 @@ export const GameBoard = ({
         const path = findPath(playerData[0].tile, { i, j }, scale);
         setPlayerMoveToTiles(path);
         setGoalTile({ i, j });
-        // redrawTiles([{ h_i: i, h_j: j }]);
+        // const test1 = getNormVecFromTiles(playerData[0].tile, { i, j }, scale);
+        // const test2 = getTileDiff(playerData[0].tile, { i, j });
+        // const test3 = getAdjacentTileFromTile(
+        //   playerData[0].tile,
+        //   { i, j },
+        //   scale
+        // );
+        // console.log(test3);
+        // setGoalTile(test3);
       }
       setClickedTile({ i: -1, j: -1 });
     }

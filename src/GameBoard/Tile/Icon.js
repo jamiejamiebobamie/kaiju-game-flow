@@ -10,6 +10,7 @@ const StyledIcon = styled.i`
     translate(19px, ${props => (props.isGraveyard ? "30px" : "15px")})
     rotate(${props => (props.isGraveyard ? "-90deg" : "0deg")});
   pointer-events: none;
+  color: ${props => props.color};
 `;
 // -webkit-transform: scale(3) translate(20px, 15px);
 // -moz-transform: scale(3) translate(20px, 15px);
@@ -17,13 +18,13 @@ const StyledIcon = styled.i`
 // -o-transform: scale(3) translate(20px, 15px);
 export const Icon = ({ status, zIndex }) => {
   const ICON_LOOKUP = {
-    isOnFire: { className: "fa-free-code-camp", offset: 0 },
-    isWooded: { className: "fa-leaf", offset: 45 },
-    isElectrified: { className: "fa-bolt", offset: 180 },
-    isGhosted: { className: "fa-snapchat-ghost", offset: 0 },
-    isBubble: { className: "fa-question-circle-o", offset: 0 },
-    isShielded: { className: "fa-shield", offset: 0 },
-    isGraveyard: { className: "fa-toggle-off", offset: -90 }
+    isOnFire: { className: "fa-free-code-camp", offset: 0, color: "tomato" },
+    isWooded: { className: "fa-leaf", offset: 45, color: "green" },
+    isElectrified: { className: "fa-bolt", offset: 180, color: "blue" },
+    isGhosted: { className: "fa-snapchat-ghost", offset: 0, color: "white" },
+    isBubble: { className: "fa-question-circle-o", offset: 0, color: "coral" },
+    isShielded: { className: "fa-shield", offset: 0, color: "brown" },
+    isGraveyard: { className: "fa-toggle-off", offset: -90, color: "white" }
   };
   const determineIcon = status => {
     if (status.isGraveyard) {
@@ -44,13 +45,14 @@ export const Icon = ({ status, zIndex }) => {
       return { className: "", offset: 0 };
     }
   };
-  const { className } = determineIcon(status);
+  const { className, color } = determineIcon(status);
   const { isGraveyard } = status;
   return (
     <StyledIcon
       className={`fa ${className}`}
       isGraveyard={isGraveyard}
       zIndex={zIndex + 1}
+      color={color}
     />
   );
 };

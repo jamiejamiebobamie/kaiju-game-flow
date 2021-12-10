@@ -15,17 +15,52 @@ const Wrapper = styled.div`
 export const Abilities = ({
   setDisplayString,
   isReversed,
-  abilityArr = [
-    { displayLookup: "abilityGlass", element: "glass" },
-    { displayLookup: "abilityFire", element: "fire" },
-    { displayLookup: "abilityWood", element: "wood" },
-    { displayLookup: "abilityLightning", element: "lightning" },
-    { displayLookup: "abilityDeath", element: "death" },
-    { displayLookup: "abilityBubble", element: "bubble" },
-    { displayLookup: "abilityMetal", element: "metal" }
+  abilities = [
+    {
+      displayLookup: "abilityGlass",
+      element: "glass",
+      isPassive: false,
+      isActive: false
+    },
+    {
+      displayLookup: "abilityFire",
+      element: "fire",
+      isPassive: false,
+      isActive: false
+    },
+    {
+      displayLookup: "abilityWood",
+      element: "wood",
+      isPassive: false,
+      isActive: false
+    },
+    {
+      displayLookup: "abilityLightning",
+      element: "lightning",
+      isPassive: false,
+      isActive: false
+    },
+    {
+      displayLookup: "abilityDeath",
+      element: "death",
+      isPassive: false,
+      isActive: false
+    },
+    {
+      displayLookup: "abilityBubble",
+      element: "bubble",
+      isPassive: false,
+      isActive: false
+    },
+    {
+      displayLookup: "abilityMetal",
+      element: "metal",
+      isPassive: false,
+      isActive: false
+    }
   ]
 }) => {
-  const abilityButtons = abilityArr.map((abilityData, i) => (
+  const abilityButtons = abilities.map((abilityData, i) => (
     <Ability
       key={i}
       setDisplayString={setDisplayString}

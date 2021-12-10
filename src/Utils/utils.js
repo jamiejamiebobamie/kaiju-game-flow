@@ -1,6 +1,67 @@
 import { useState, useEffect, useRef } from "react";
 import { PENINSULA_TILE_LOOKUP } from "./gameState";
 
+export const isTileOnGameBoard = tile => {
+  return PENINSULA_TILE_LOOKUP
+    ? Object.keys(PENINSULA_TILE_LOOKUP).includes(`${tile.i} ${tile.j}`)
+    : false;
+};
+export const getRandBool = () => {
+  return Math.random() > 0.5;
+};
+export const getAdjacentTileFromTile = (currTile, destTile, scale) => {
+  const normVec = getNormVecFromTiles(currTile, destTile, scale);
+  return getAdjacentTileFromNormVec(currTile, normVec, scale);
+};
+export const getTileDiff = (currTile, destTile) => {
+  return {
+    x: destTile.i - currTile.i,
+    y: destTile.j - currTile.j
+  };
+};
+export const getNormVecFromTiles = (currTile, destTile, scale) => {
+  const currXY = getCharXAndY({ ...currTile, scale });
+  const destXY = getCharXAndY({ ...destTile, scale });
+  const distance = getDistance(currXY, destXY);
+  return (
+    distance && {
+      x: (destXY.x - currXY.x) / distance,
+      y: (destXY.y - currXY.y) / distance
+    }
+  );
+};
+export const getAdjacentTileFromNormVec = (currTile, normVec, scale) => {
+  const tileIndexMapping = [
+    { i: 0, j: -1 },
+    { i: 1, j: -1 },
+    { i: 1, j: 0 },
+    { i: 0, j: 1 },
+    { i: -1, j: 0 },
+    { i: -1, j: -1 }
+  ];
+  const directionMapping = [
+    { x: 0, y: -1 },
+    { x: 0.868, y: -0.496 },
+    { x: 0.868, y: 0.496 },
+    { x: 0, y: 1 },
+    { x: -0.868, y: 0.496 },
+    { x: -0.868, y: -0.496 }
+  ];
+  const distance = getDistance(directionMapping[0], normVec);
+  const closest = directionMapping.reduce(
+    (acc, item, i) => {
+      const distance = getDistance(item, normVec);
+      console.log(acc, item, i);
+      return distance < acc.distance ? { i, coords: item, distance } : acc;
+    },
+    { i: 0, coords: directionMapping[0], distance: distance }
+  );
+  const i = closest.i;
+  return {
+    i: currTile.i + tileIndexMapping[i].i,
+    j: currTile.j + tileIndexMapping[i].j
+  };
+};
 export const returnNotNaN = (num, fallback) => {
   return num && !Number.isNaN(num) ? num : fallback ? fallback : 0;
 };

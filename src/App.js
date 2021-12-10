@@ -21,15 +21,20 @@ import "./App.css";
 
 const App = () => {
   /*
-        1. enemy a.i.
-        2. object placement, breadth first search
+        1. tileStatus updates.
+        2. randomized starting setup for each player.
+        3. kaiju pickups.
+        4. enemy a.i.
+        5. object placement, breadth first search
                 final battleground vertex / "end game point"
                     graveyard placement
                 do not place mana wells adjacent to one another
-        3. mana pool non-convex hulls
-            new method to sort kaiju locations to create a non-convex hull (current method only works with 3 vertices)
-        4. fix issue with NaN location values.
+        6. home screen.
+        7. make character move to the last tile on a path.
+        8. do a circular of icons around profile pic for activated passives
 
+        - hover descriptions.
+        - fix issue with NaN location values.
         - hexagon pathing
         - kaijus only move if clicked on, and then stop moving when they get to the next tile.
                 - do not allow Kaiju to move to tiles that are adjacent to other Kaiju
@@ -118,7 +123,55 @@ const App = () => {
         tile: { i, j },
         i: k,
         isThere: true,
-        moveSpeed: 14
+        moveSpeed: 14,
+        abilities: [
+          {
+            displayLookup: "abilityGlass",
+            element: "glass",
+            isPassive: false,
+            isActive: false
+          },
+          {
+            displayLookup: "abilityFire",
+            element: "fire",
+            isPassive: false,
+            isActive: false
+          },
+          {
+            displayLookup: "abilityWood",
+            element: "wood",
+            isPassive: false,
+            isActive: false
+          },
+          {
+            displayLookup: "abilityLightning",
+            element: "lightning",
+            isPassive: false,
+            isActive: false
+          },
+          {
+            displayLookup: "abilityDeath",
+            element: "death",
+            isPassive: false,
+            isActive: false
+          },
+          {
+            displayLookup: "abilityBubble",
+            element: "bubble",
+            isPassive: false,
+            isActive: false
+          },
+          {
+            displayLookup: "abilityMetal",
+            element: "metal",
+            isPassive: false,
+            isActive: false
+          }
+        ],
+        accessory: {
+          displayLookup: "testAccessoryLookup",
+          accessoryImgFile: "fire_icon.png"
+        }
       });
     }
     setPlayerData(_players);
@@ -243,7 +296,7 @@ const App = () => {
         kaiju2Data={kaiju2Data}
         scale={scale}
       />
-      <UI />
+      <UI playerData={playerData} />
     </div>
   );
 };
