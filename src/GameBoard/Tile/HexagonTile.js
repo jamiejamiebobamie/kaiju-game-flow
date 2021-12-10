@@ -11,6 +11,7 @@ const Hexagon = styled.div`
 `;
 export const HexagonTile = ({
   tileLocation,
+  setHoverRef,
   rowLength = 1,
   scale = 1,
   i = 0,
@@ -39,6 +40,8 @@ export const HexagonTile = ({
         onClick={() =>
           setClickedIndex({ i, j, x: tileLocation.x, y: tileLocation.y })
         }
+        index={{ i, j }}
+        setHoverRef={setHoverRef}
         isKaiju={status.isKaiju}
         isHighlighted={isHighlighted}
         status={status}

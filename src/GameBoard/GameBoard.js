@@ -5,7 +5,14 @@ import { Player } from "./Player";
 import { Kaiju } from "./Kaiju";
 import { ManaPool } from "./ManaPool";
 import { PENINSULA_TILE_LOOKUP } from "../Utils/gameState";
-import { getTileXAndY, isAdjacent, findPath } from "../Utils/utils";
+import {
+  getTileXAndY,
+  isAdjacent,
+  findPath,
+  useHover,
+  useInterval
+} from "../Utils/utils";
+
 const Board = styled.div`
   width: ${props => props.width}px;
   min-width: ${props => props.width}px;
@@ -45,9 +52,65 @@ export const GameBoard = ({
   const [clickedTiles, setClickedTiles] = useState([]);
   const [tiles, setTiles] = useState([]);
   const [kaijuTokenPickedup, setKaijuTokenPickedup] = useState(null);
+  const [setHoverRef, hoverLookupString] = useHover();
+  const [goalTile, setGoalTile] = useState(null);
+  const [tileInterval, setTileInterval] = useState(null);
+
   useEffect(() => {
     redrawTiles([]);
   }, []);
+  // useEffect(() => {
+  //   if (hoverLookupString) {
+  //     const [i, j] = hoverLookupString.split(" ");
+  //     const path = findPath(
+  //       playerData[0].tile,
+  //       { i: Number(i), j: Number(j) },
+  //       scale
+  //     );
+  //     const highlightedTiles = path.map(t => {
+  //       return { h_i: t.i, h_j: t.j };
+  //     });
+  //     redrawTiles(highlightedTiles);
+  //   } else {
+  //     redrawTiles([]);
+  //   }
+  // }, [hoverLookupString]);
+  useInterval(() => {
+    if (hoverLookupString) {
+      const [i, j] = hoverLookupString.split(" ");
+      if (
+        kaiju1Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
+        kaiju2Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
+        !kaijuTokenPickedup
+      ) {
+        const path = findPath(
+          playerData[0].tile,
+          { i: Number(i), j: Number(j) },
+          scale
+        );
+        const highlightedTiles = path.map(t => {
+          return { h_i: t.i, h_j: t.j };
+        });
+        redrawTiles(highlightedTiles);
+      } else {
+        redrawTiles([{ h_i: Number(i), h_j: Number(j) }]);
+      }
+    } else if (goalTile) {
+      const path = findPath(playerData[0].tile, goalTile, scale);
+      const highlightedTiles = path.map(t => {
+        return { h_i: t.i, h_j: t.j };
+      });
+      redrawTiles(highlightedTiles);
+      if (!path.length) setGoalTile(null);
+    }
+  }, tileInterval);
+  useEffect(() => {
+    if (hoverLookupString || goalTile) setTileInterval(250);
+    else {
+      setTileInterval(null);
+      redrawTiles([]);
+    }
+  }, [hoverLookupString, goalTile]);
   const redrawTiles = highlightedTiles => {
     const rowLength = Math.ceil(width / (70 * scale));
     const colLength = Math.ceil(height / (75 * scale));
@@ -60,6 +123,7 @@ export const GameBoard = ({
           _tiles.push(
             <HexagonTile
               key={key}
+              setHoverRef={setHoverRef}
               rowLength={rowLength}
               i={i}
               j={j}
@@ -70,7 +134,9 @@ export const GameBoard = ({
                 ({ h_i, h_j }) => h_i === i && h_j === j
               )}
               status={{
-                isKaijuPickup: false,
+                isPlayer: playerData.some(
+                  ({ tile }) => tile.i === i && tile.j === j
+                ),
                 isOnFire: false,
                 isWooded: false,
                 isElectrified: false,
@@ -119,10 +185,8 @@ export const GameBoard = ({
       } else {
         const path = findPath(playerData[0].tile, { i, j }, scale);
         setPlayerMoveToTiles(path);
-        const highlightedTiles = path.map(t => {
-          return { h_i: t.i, h_j: t.j };
-        });
-        redrawTiles(highlightedTiles);
+        setGoalTile({ i, j });
+        // redrawTiles([{ h_i: i, h_j: j }]);
       }
       setClickedTile({ i: -1, j: -1 });
     }

@@ -156,7 +156,7 @@ const App = () => {
     // KAIJU - - - - - - - - - - - -
     const _kaiju = [];
     const _canvasLocations = [];
-    for (let k = 0; k < 6; k++) {
+    for (let k = 0; k < 7; k++) {
       _max -= k;
       const randomInt = getRandomIntInRange({
         max: _max
@@ -175,8 +175,8 @@ const App = () => {
         tile: { i, j },
         isThere: true,
         element: undefined,
-        owner: k < 3 ? _players[0] : _players[1],
-        color: k < 3 ? _players[0].color : _players[1].color,
+        owner: k < 4 ? _players[0] : _players[1],
+        color: k < 4 ? _players[0].color : _players[1].color,
         moveSpeed: 14
       });
     }

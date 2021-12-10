@@ -116,11 +116,11 @@ export const Ability = ({
         if (!isPassive) {
           setIsPassive(true);
           setIsAnimating(true);
-          setTimeout(() => setIconLookupString("active"), 200);
+          setTimeout(() => setIconLookupString("active"), 250);
         } else if (isPassive && !isActive) {
           setIsActive(true);
           setIsAnimating(true);
-          setTimeout(() => setIconLookupString("loader"), 200);
+          setTimeout(() => setIconLookupString("loader"), 250);
           setTimeout(() => {
             setIsPassive(false);
             setIsActive(false);

@@ -46,7 +46,6 @@ const Character = styled.img`
 //   100%	{color: #04a1d5;}
 // }
 export const Player = ({ charLocation, isInManaPool, color, i = 0 }) => {
-  useEffect(() => console.log(isInManaPool, i), [isInManaPool]);
   return (
     <Wrapper charLocation={charLocation}>
       <Character

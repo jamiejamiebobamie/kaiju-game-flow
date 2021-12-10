@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-/* cursor: pointer; */
 
 const ContentWrapper = styled.div`
   width: 400px;
@@ -38,20 +37,30 @@ const Image = styled.div`
   -ms-transform: rotate(-60deg);
   -o-transform: rotate(-60deg);
   transform: rotate(-60deg);
-  ${props => props.isHighlighted && "background-color: red;opacity: 0.3;"}
-  &:hover {
+  ${props =>
+    props.isHighlighted &&
+    "background-color: #FFA836;opacity: 0.3;"} /* &:hover {
     background-color: red;
     opacity: 0.3;
-  }
+  } */
 `;
-export const Content = ({ isHighlighted = false, isKaiju, onClick }) => {
+export const Content = ({
+  isHighlighted = false,
+  isKaiju,
+  onClick,
+  index,
+  setHoverRef,
+  status
+}) => {
+  const { i, j } = index;
   return (
     <ContentWrapper>
       <ImageWrapper>
         <Image
+          ref={setHoverRef(`${i} ${j}`)}
           onClick={onClick}
           isKaiju={isKaiju}
-          isHighlighted={isHighlighted}
+          isHighlighted={isHighlighted || status.isPlayer}
         />
       </ImageWrapper>
     </ContentWrapper>
