@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useHover } from "../../Utils/utils";
+import { useHover, useKeyPress } from "../../Utils/utils";
 
 const ICON_LOOKUP = {
   glass: {
@@ -89,7 +89,8 @@ const AbilityIcon = styled.i`
 `;
 export const Ability = ({
   abilityData,
-  setDisplayString
+  setDisplayString,
+  keyNum
   // cooldownTime = 9000
   // chargeUpTime = 3000,
   // activatePassive = () => console.log("Passive activated!"),
@@ -102,7 +103,8 @@ export const Ability = ({
     activateActive,
     cooldownTime,
     displayLookup,
-    element
+    element,
+    getPlayerIndex
   } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
@@ -110,6 +112,9 @@ export const Ability = ({
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("passive");
+  useKeyPress(() => {
+    if (getPlayerIndex && getPlayerIndex() === 0) setIsActive(curr => !curr);
+  }, `Digit${keyNum}`);
   useEffect(() => {
     if (isPassive) activatePassive();
   }, [isPassive]);
@@ -119,25 +124,26 @@ export const Ability = ({
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
+  const handleClick = () => {
+    if (!isPassive) {
+      setIsPassive(true);
+      setIsAnimating(true);
+      setTimeout(() => setIconLookupString("active"), 250);
+    } else if (isPassive && !isActive) {
+      setIsActive(true);
+      setIsAnimating(true);
+      setTimeout(() => setIconLookupString("loader"), 250);
+      setTimeout(() => {
+        setIsPassive(false);
+        setIsActive(false);
+        setIconLookupString("passive");
+        console.log("Cooldown is over!");
+      }, cooldownTime);
+    }
+  };
   return (
     <Wrapper
-      onClick={() => {
-        if (!isPassive) {
-          setIsPassive(true);
-          setIsAnimating(true);
-          setTimeout(() => setIconLookupString("active"), 250);
-        } else if (isPassive && !isActive) {
-          setIsActive(true);
-          setIsAnimating(true);
-          setTimeout(() => setIconLookupString("loader"), 250);
-          setTimeout(() => {
-            setIsPassive(false);
-            setIsActive(false);
-            setIconLookupString("passive");
-            console.log("Cooldown is over!");
-          }, cooldownTime);
-        }
-      }}
+      onClick={handleClick}
       isAnimating={isAnimating}
       ref={setHoverRef(
         `${displayLookup}${

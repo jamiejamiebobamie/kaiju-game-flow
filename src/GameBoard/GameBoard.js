@@ -12,9 +12,10 @@ import {
   useHover,
   useInterval,
   getRandBool,
-  isTileOnGameBoard
+  isTileOnGameBoard,
+  solveForStatus,
+  getTileOffsetFromDir
 } from "../Utils/utils";
-
 const Board = styled.div`
   width: ${props => props.width}px;
   min-width: ${props => props.width}px;
@@ -48,6 +49,7 @@ export const GameBoard = ({
   tileStatuses,
   setTileStatuses,
   kaiju2Data,
+  setTestDir,
   scale
 }) => {
   const width = 500;
@@ -91,63 +93,51 @@ export const GameBoard = ({
   }, []);
 
   const updateTileState = () => {
-    const updateKey = Math.random();
-    if (tileStatuses) {
-      const status = [...tileStatuses];
-      const rowLength = Math.ceil(width / (70 * scale));
-      const colLength = Math.ceil(height / (75 * scale));
-      for (let i = 0; i < rowLength; i++) {
-        for (let j = 0; j < colLength; j++) {
-          let tileStatus = status[i][j];
-          // 1. solve what should be on the tile
-          if (tileStatus.isGraveyard) {
-            tileStatus = { isGraveyard: { i: 0, j: 0 }, updateKey };
-          } else if (tileStatus.isBubble) {
-            tileStatus = { isBubble: status[i][j].isBubble, updateKey };
-          } else if (tileStatus.isGhosted) {
-            tileStatus = { isGhosted: status[i][j].isGhosted, updateKey };
-          } else if (tileStatus.isShielded) {
-            tileStatus = { isShielded: status[i][j].isShielded, updateKey };
-          } else if (tileStatus.isElectrified) {
-            tileStatus = {
-              isElectrified: status[i][j].isElectrified,
-              updateKey
-            };
-          } else if (tileStatus.isOnFire) {
-            tileStatus = { isOnFire: status[i][j].isOnFire, updateKey };
-          } else if (tileStatus.isWooded) {
-            tileStatus = { isWooded: status[i][j].isWooded, updateKey };
-          }
-          const entry = Object.entries(tileStatus).find(
-            ([_k, _v]) => _k !== "updateKey" && _v
-          );
-          if (entry) {
-            // 2. move the tile based on the direction vectors array
-            const [k, v] = entry;
-            if (k !== "isGraveyard" && k !== "isShielded") {
-              const _i = i + v.i;
-              const _j = j + v.j;
-              if (
-                isTileOnGameBoard({
-                  i: _i,
-                  j: _j
-                })
-              )
-                status[_i][_j][k] = {
-                  i: tileStatus[k].i,
-                  j: tileStatus[k].j
-                };
-              // 3. erase current tile's state if not: isElectrified
-              status[i][j][k] =
-                k !== "isElectrified" && status[i][j].updateKey !== updateKey
+    setTileStatuses(_statuses => {
+      if (_statuses) {
+        const status = [..._statuses];
+        const rowLength = Math.ceil(width / (70 * scale));
+        const colLength = Math.ceil(height / (75 * scale));
+        const updateKey = Math.random();
+        for (let i = 0; i < rowLength; i++) {
+          for (let j = 0; j < colLength; j++) {
+            // 1. solve what should be on the tile
+            if (status[i][j].updateKey !== updateKey) {
+              let tileStatus = solveForStatus(status[i][j]);
+              const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
+              if (entry) {
+                const [k, dir] = entry;
+                // 2. move the status based on the direction
+                const offset = getTileOffsetFromDir(dir, { i, j });
+                const nextTile = { i: i + offset.i, j: j + offset.j };
+                if (
+                  isTileOnGameBoard({
+                    i: nextTile.i,
+                    j: nextTile.j
+                  })
+                ) {
+                  status[nextTile.i][nextTile.j][k] = dir;
+                  const nextTilesStatus = solveForStatus(
+                    status[nextTile.i][nextTile.j]
+                  );
+                  status[nextTile.i][nextTile.j] = nextTilesStatus;
+                  // status[nextTile.i][nextTile.j].updateKey = updateKey;
+                }
+                // 3. erase current tile's state if not: isElectrified
+                const doNotErase = ["isElectrified", "isShielded", "isWooded"];
+                status[i][j][k] = !doNotErase.includes(k)
                   ? null
-                  : status[i][j][k];
+                  : tileStatus[k];
+                status[i][j].updateKey = updateKey;
+              }
             }
           }
         }
+        return status;
+      } else {
+        return _statuses;
       }
-      setTileStatuses(status);
-    }
+    });
   };
   // useEffect(() => {
   //   if (hoverLookupString) {
@@ -196,7 +186,7 @@ export const GameBoard = ({
   }, 500);
   useInterval(() => {
     updateTileState();
-  }, 2000);
+  }, 500);
   // useEffect(() => {
   //   if (hoverLookupString || goalTile) setTileInterval(250);
   //   else {
@@ -247,7 +237,7 @@ export const GameBoard = ({
       setTiles(_tiles);
     }
   };
-  useEffect(() => redrawTiles([]), [kaijuTokenTiles]);
+  // useEffect(() => redrawTiles([]), [kaijuTokenTiles]);
   useEffect(() => {
     const { i, j } = clickedTile;
     if (i !== -1) {
@@ -273,10 +263,10 @@ export const GameBoard = ({
         setKaijuTokenPickedup({ i, j });
         // else move the player to the clicked tile.
       } else {
-        // const path = findPath(playerData[0].tile, { i, j }, scale);
-        // setPlayerMoveToTiles(path);
-        // setGoalTile({ i, j });
-        console.log(i, j);
+        const path = findPath(playerData[0].tile, { i, j }, scale);
+        setPlayerMoveToTiles(path);
+        setGoalTile({ i, j });
+        // console.log(i, j);
       }
       setClickedTile({ i: -1, j: -1 });
     }
@@ -308,28 +298,36 @@ export const GameBoard = ({
       isInManaPool={p.isInManaPool}
     />
   ));
+  const manaPools = null;
+
+  // (
+  //   <>
+  //     <ManaPool
+  //       width={width}
+  //       height={height}
+  //       kaijuData={kaiju1Data}
+  //       color={playerData[0] && playerData[0].color}
+  //     />
+  //     <ManaPool
+  //       width={width}
+  //       height={height}
+  //       kaijuData={kaiju2Data}
+  //       color={playerData[1] && playerData[1].color}
+  //     />
+  //   </>
+  // );
+  const kaiju = null;
+  // <>kaiju1 kaiju2</>;
   return (
     <Board
       kaijuTokenPickedup={kaijuTokenPickedup}
       width={width}
       height={height}
     >
-      <ManaPool
-        width={width}
-        height={height}
-        kaijuData={kaiju1Data}
-        color={playerData[0] && playerData[0].color}
-      />
-      <ManaPool
-        width={width}
-        height={height}
-        kaijuData={kaiju2Data}
-        color={playerData[1] && playerData[1].color}
-      />
+      {manaPools}
       <ShiftContentOver scale={scale}>
         {tiles}
-        {kaiju1}
-        {kaiju2}
+        {kaiju}
         {players}
       </ShiftContentOver>
       <BackgroundImage src={"test_map.png"} />

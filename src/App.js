@@ -16,7 +16,8 @@ import {
   movePiece,
   isLocatonInsidePolygon,
   checkIsInManaPool,
-  getAdjacentTileFromTile
+  getAdjacentTileFromTile,
+  setTileWithStatus
 } from "./Utils/utils";
 import "./App.css";
 
@@ -99,7 +100,6 @@ const App = () => {
   const [kaijuTokenTiles, setKaijuTokenTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
-
   const scale = 0.3;
   useEffect(() => {
     const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
@@ -178,6 +178,7 @@ const App = () => {
                 4000
               );
             },
+            getPlayerIndex: () => k,
             displayLookup: "abilityGlass",
             element: "glass",
             isPassive: false,
@@ -195,14 +196,30 @@ const App = () => {
               );
             },
             activateActive: () => {
-              console.log("test");
-              setPlayerData(_players =>
-                _players.map(p =>
+              setPlayerData(_players => {
+                _players.forEach(p => {
+                  // cast fire.
+                  if (k === p.i) {
+                    const playerTile = p.tile;
+                    const enemyIndex = p.i === 0 ? 1 : 0;
+                    const enemyTile = _players[enemyIndex].tile;
+                    console.log(playerTile, enemyIndex, enemyTile);
+                    if (playerTile && enemyTile) {
+                      const [tile, dir] = getAdjacentTileFromTile(
+                        playerTile,
+                        enemyTile,
+                        scale
+                      );
+                      setTileWithStatus(setTileStatuses, "isOnFire", tile, dir);
+                    }
+                  }
+                });
+                return _players.map(p =>
                   k === p.i ? { ...p, immuneToGhosts: false } : p
-                )
-              );
-              // cast fire.
+                );
+              });
             },
+            getPlayerIndex: () => k,
             displayLookup: "abilityFire",
             element: "fire",
             isPassive: false,
@@ -220,13 +237,30 @@ const App = () => {
               );
             },
             activateActive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
+              setPlayerData(_players => {
+                _players.forEach(p => {
+                  // cast ivy.
+                  if (k === p.i) {
+                    const playerTile = p.tile;
+                    const enemyIndex = p.i === 0 ? 1 : 0;
+                    const enemyTile = _players[enemyIndex].tile;
+                    console.log(playerTile, enemyIndex, enemyTile);
+                    if (playerTile && enemyTile) {
+                      const [tile, dir] = getAdjacentTileFromTile(
+                        playerTile,
+                        enemyTile,
+                        scale
+                      );
+                      setTileWithStatus(setTileStatuses, "isWooded", tile, dir);
+                    }
+                  }
+                });
+                return _players.map(p =>
                   k === p.i ? { ...p, immuneToMelee: false } : p
-                )
-              );
-              // cast ivy.
+                );
+              });
             },
+            getPlayerIndex: () => k,
             displayLookup: "abilityWood",
             element: "wood",
             isPassive: false,
@@ -253,21 +287,17 @@ const App = () => {
                     const enemyTile = _players[enemyIndex].tile;
                     console.log(playerTile, enemyIndex, enemyTile);
                     if (playerTile && enemyTile) {
-                      const boltTile = getAdjacentTileFromTile(
+                      const [boltTile, boltDir] = getAdjacentTileFromTile(
                         playerTile,
                         enemyTile,
                         scale
                       );
-                      console.log(boltTile);
-                      setTileStatuses(_tiles => {
-                        _tiles[boltTile.i][boltTile.j] = {
-                          isElectrified: {
-                            i: boltTile.i - playerTile.i,
-                            j: boltTile.j - playerTile.j
-                          }
-                        };
-                        return _tiles;
-                      });
+                      setTileWithStatus(
+                        setTileStatuses,
+                        "isElectrified",
+                        boltTile,
+                        boltDir
+                      );
                     }
                   }
                 });
@@ -276,6 +306,7 @@ const App = () => {
                 );
               });
             },
+            getPlayerIndex: () => k,
             displayLookup: "abilityLightning",
             element: "lightning",
             isPassive: false,
@@ -302,21 +333,17 @@ const App = () => {
                     const enemyTile = _players[enemyIndex].tile;
                     console.log(playerTile, enemyIndex, enemyTile);
                     if (playerTile && enemyTile) {
-                      const hauntTile = getAdjacentTileFromTile(
+                      const [tile, dir] = getAdjacentTileFromTile(
                         playerTile,
                         enemyTile,
                         scale
                       );
-                      console.log(hauntTile);
-                      setTileStatuses(_tiles => {
-                        _tiles[hauntTile.i][hauntTile.j] = {
-                          isGhosted: {
-                            i: hauntTile.i - playerTile.i,
-                            j: hauntTile.j - playerTile.j
-                          }
-                        };
-                        return _tiles;
-                      });
+                      setTileWithStatus(
+                        setTileStatuses,
+                        "isGhosted",
+                        tile,
+                        dir
+                      );
                     }
                   }
                 });
@@ -325,6 +352,8 @@ const App = () => {
                 );
               });
             },
+            getPlayerIndex: () => k,
+
             displayLookup: "abilityDeath",
             element: "death",
             isPassive: false,
@@ -351,23 +380,13 @@ const App = () => {
                     const playerTile = p.tile;
                     const enemyIndex = p.i === 0 ? 1 : 0;
                     const enemyTile = _players[enemyIndex].tile;
-                    console.log(playerTile, enemyIndex, enemyTile);
                     if (playerTile && enemyTile) {
-                      const bubbleTile = getAdjacentTileFromTile(
+                      const [tile, dir] = getAdjacentTileFromTile(
                         playerTile,
                         enemyTile,
                         scale
                       );
-                      console.log(bubbleTile);
-                      setTileStatuses(_tiles => {
-                        _tiles[bubbleTile.i][bubbleTile.j] = {
-                          isBubble: {
-                            i: bubbleTile.i - playerTile.i,
-                            j: bubbleTile.j - playerTile.j
-                          }
-                        };
-                        return _tiles;
-                      });
+                      setTileWithStatus(setTileStatuses, "isBubble", tile, dir);
                     }
                   }
                 });
@@ -378,6 +397,7 @@ const App = () => {
                 );
               });
             },
+            getPlayerIndex: () => k,
             displayLookup: "abilityBubble",
             element: "bubble",
             isPassive: false,
@@ -402,20 +422,18 @@ const App = () => {
                     const playerTile = p.tile;
                     const enemyIndex = p.i === 0 ? 1 : 0;
                     const enemyTile = _players[enemyIndex].tile;
-                    console.log(playerTile, enemyIndex, enemyTile);
                     if (playerTile && enemyTile) {
-                      const shieldTile = getAdjacentTileFromTile(
+                      const [tile, dir] = getAdjacentTileFromTile(
                         playerTile,
                         enemyTile,
                         scale
                       );
-                      console.log(shieldTile);
-                      setTileStatuses(_tiles => {
-                        _tiles[shieldTile.i][shieldTile.j] = {
-                          isShielded: { i: 0, j: 0 }
-                        };
-                        return _tiles;
-                      });
+                      setTileWithStatus(
+                        setTileStatuses,
+                        "isShielded",
+                        tile,
+                        ""
+                      );
                     }
                   }
                 });
@@ -424,6 +442,7 @@ const App = () => {
                 );
               });
             },
+            getPlayerIndex: () => k,
             displayLookup: "abilityMetal",
             element: "metal",
             isPassive: false,
@@ -497,39 +516,39 @@ const App = () => {
       });
     }
     setKaiju1Data(_kaiju.filter(k => k.owner === _players[0]));
-    setKaijuTokenTiles(
-      _kaiju
-        .filter(k => k.owner === _players[0])
-        .map(({ tile, key }) => {
-          return {
-            key,
-            tile
-          };
-        })
-    );
+    // setKaijuTokenTiles(
+    //   _kaiju
+    //     .filter(k => k.owner === _players[0])
+    //     .map(({ tile, key }) => {
+    //       return {
+    //         key,
+    //         tile
+    //       };
+    //     })
+    // );
     setKaiju2Data(_kaiju.filter(k => k.owner === _players[1]));
     // KAIJU - - - - - - - - - - - -
   }, []);
-  useEffect(() => {
-    if (kaijuTokenTiles && kaijuTokenTiles.length)
-      setKaiju1Data(_kaiju1Data =>
-        _kaiju1Data.map(data => {
-          return {
-            ...data,
-            isThere: false,
-            moveToLocation: getCharXAndY({
-              i: kaijuTokenTiles.find(t => t.key === data.key)
-                ? kaijuTokenTiles.find(t => t.key === data.key).tile.i
-                : 0,
-              j: kaijuTokenTiles.find(t => t.key === data.key)
-                ? kaijuTokenTiles.find(t => t.key === data.key).tile.j
-                : 0,
-              scale
-            })
-          };
-        })
-      );
-  }, [kaijuTokenTiles]);
+  // useEffect(() => {
+  //   if (kaijuTokenTiles && kaijuTokenTiles.length)
+  //     setKaiju1Data(_kaiju1Data =>
+  //       _kaiju1Data.map(data => {
+  //         return {
+  //           ...data,
+  //           isThere: false,
+  //           moveToLocation: getCharXAndY({
+  //             i: kaijuTokenTiles.find(t => t.key === data.key)
+  //               ? kaijuTokenTiles.find(t => t.key === data.key).tile.i
+  //               : 0,
+  //             j: kaijuTokenTiles.find(t => t.key === data.key)
+  //               ? kaijuTokenTiles.find(t => t.key === data.key).tile.j
+  //               : 0,
+  //             scale
+  //           })
+  //         };
+  //       })
+  //     );
+  // }, [kaijuTokenTiles]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
       getCharXAndY(playerMoveToTiles);

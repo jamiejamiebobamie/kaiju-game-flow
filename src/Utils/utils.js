@@ -6,6 +6,39 @@ export const isTileOnGameBoard = tile => {
     ? Object.keys(PENINSULA_TILE_LOOKUP).includes(`${tile.i} ${tile.j}`)
     : false;
 };
+export const setTileWithStatus = (
+  setTileStatuses,
+  statusName,
+  currTile,
+  dir
+) => {
+  setTileStatuses(_tiles => {
+    _tiles[currTile.i][currTile.j] = {
+      ..._tiles[currTile.i][currTile.j],
+      [statusName]: dir
+    };
+    return _tiles;
+  });
+};
+export const solveForStatus = tile => {
+  if (tile.isGraveyard) {
+    return { isGraveyard: tile.isGraveyard };
+  } else if (tile.isBubble) {
+    return { isBubble: tile.isBubble };
+  } else if (tile.isGhosted) {
+    return { isGhosted: tile.isGhosted };
+  } else if (tile.isShielded) {
+    return { isShielded: tile.isShielded };
+  } else if (tile.isElectrified) {
+    return { isElectrified: tile.isElectrified };
+  } else if (tile.isOnFire) {
+    return { isOnFire: tile.isOnFire };
+  } else if (tile.isWooded) {
+    return { isWooded: tile.isWooded };
+  } else {
+    return {};
+  }
+};
 export const getRandBool = () => {
   return Math.random() > 0.5;
 };
@@ -30,14 +63,46 @@ export const getNormVecFromTiles = (currTile, destTile, scale) => {
     }
   );
 };
+export const getTileOffsetFromDir = (dir, currTile) => {
+  switch (dir) {
+    case "up":
+      return { i: 0, j: -1 }; // up
+      break;
+    case "up right":
+      return { i: 1, j: currTile.i % 2 ? 0 : -1 }; // up right
+      break;
+    case "down right":
+      return { i: 1, j: currTile.i % 2 ? 1 : 0 }; // down right
+      break;
+    case "down":
+      return { i: 0, j: 1 }; // down
+      break;
+    case "down left":
+      return { i: -1, j: currTile.i % 2 ? 0 : +1 }; // down left
+      break;
+    case "up left":
+      return { i: -1, j: currTile.i % 2 ? 0 : -1 }; // up left
+      break;
+    default:
+      return { i: 0, j: 0 };
+  }
+};
 export const getAdjacentTileFromNormVec = (currTile, normVec, scale) => {
   const tileIndexMapping = [
-    { i: 0, j: -1 },
-    { i: 1, j: -1 },
-    { i: 1, j: 0 },
-    { i: 0, j: 1 },
-    { i: -1, j: 0 },
-    { i: -1, j: -1 }
+    { i: 0, j: -1 }, // up
+    { i: 1, j: currTile.i % 2 ? 0 : -1 }, // up right
+    { i: 1, j: currTile.i % 2 ? 1 : 0 }, // down right
+    { i: 0, j: 1 }, // down
+    { i: -1, j: currTile.i % 2 ? 0 : +1 }, // down left
+    { i: -1, j: currTile.i % 2 ? 0 : -1 } // up left
+  ];
+  const tileDirMapping = [
+    "up",
+    "up right",
+    "down right",
+    "down",
+    "down left",
+    "up left"
   ];
   const directionMapping = [
     { x: 0, y: -1 },
@@ -51,16 +116,19 @@ export const getAdjacentTileFromNormVec = (currTile, normVec, scale) => {
   const closest = directionMapping.reduce(
     (acc, item, i) => {
       const distance = getDistance(item, normVec);
-      console.log(acc, item, i);
       return distance < acc.distance ? { i, coords: item, distance } : acc;
     },
     { i: 0, coords: directionMapping[0], distance: distance }
   );
   const i = closest.i;
-  return {
-    i: currTile.i + tileIndexMapping[i].i,
-    j: currTile.j + tileIndexMapping[i].j
-  };
+  return [
+    {
+      i: currTile.i + tileIndexMapping[i].i,
+      j: currTile.j + tileIndexMapping[i].j
+    },
+    tileDirMapping[i]
+  ];
+  // return tileIndexMapping[i];
 };
 export const returnNotNaN = (num, fallback) => {
   return num && !Number.isNaN(num) ? num : fallback ? fallback : 0;
@@ -221,6 +289,19 @@ export const useHover = () => {
     }
   }, [ref.current]);
   return [saveRef, value];
+};
+export const useKeyPress = (callback, keyCode) => {
+  const handler = ({ code }) => {
+    if (keyCode === code) {
+      callback();
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
+  }, []);
 };
 export const getFlattenedArrayIndex = (i, j, ROW_LENGTH = 33) => {
   return ROW_LENGTH * i + j;

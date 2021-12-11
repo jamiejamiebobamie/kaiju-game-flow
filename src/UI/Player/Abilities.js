@@ -65,6 +65,7 @@ export const Abilities = ({
       key={i}
       setDisplayString={setDisplayString}
       abilityData={abilityData}
+      keyNum={i + 1}
     />
   ));
   return <Wrapper isReversed={isReversed}>{abilityButtons}</Wrapper>;
