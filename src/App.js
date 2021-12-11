@@ -15,7 +15,8 @@ import {
   useInterval,
   movePiece,
   isLocatonInsidePolygon,
-  checkIsInManaPool
+  checkIsInManaPool,
+  getAdjacentTileFromTile
 } from "./Utils/utils";
 import "./App.css";
 
@@ -97,6 +98,8 @@ const App = () => {
   const [kaiju2Data, setKaiju2Data] = useState([]);
   const [kaijuTokenTiles, setKaijuTokenTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
+  const [tileStatuses, setTileStatuses] = useState(null);
+
   const scale = 0.3;
   useEffect(() => {
     const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
@@ -124,48 +127,308 @@ const App = () => {
         i: k,
         isThere: true,
         moveSpeed: 14,
+        lives: 3,
         abilities: [
           {
+            passiveName: "Shatter Shot",
+            activeName: "Shatter Travel",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, curveBullets: true } : p
+                )
+              );
+            },
+            activateActive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i
+                    ? {
+                        ...p,
+                        curveBullets: false,
+                        moveSpeed: p.moveSpeed + 20,
+                        moveToLocation: p.moveToTiles.length
+                          ? getCharXAndY({
+                              ...p.moveToTiles[p.moveToTiles.length - 1],
+                              scale
+                            })
+                          : p.moveToLocation,
+                        tile: p.moveToTiles.length
+                          ? p.moveToTiles[p.moveToTiles.length - 1]
+                          : p.tile,
+                        moveFromLocation: p.charLocation,
+                        moveToTiles: [],
+                        isThere: false
+                      }
+                    : p
+                )
+              );
+              setTimeout(
+                () =>
+                  setPlayerData(_players =>
+                    _players.map(p =>
+                      k === p.i
+                        ? {
+                            ...p,
+                            moveSpeed: p.moveSpeed - 20
+                          }
+                        : p
+                    )
+                  ),
+                4000
+              );
+            },
             displayLookup: "abilityGlass",
             element: "glass",
             isPassive: false,
-            isActive: false
+            isActive: false,
+            cooldownTime: 25000
           },
           {
+            passiveName: "Campfire",
+            activeName: "Dragon's Breath",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, immuneToGhosts: true } : p
+                )
+              );
+            },
+            activateActive: () => {
+              console.log("test");
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, immuneToGhosts: false } : p
+                )
+              );
+              // cast fire.
+            },
             displayLookup: "abilityFire",
             element: "fire",
             isPassive: false,
-            isActive: false
+            isActive: false,
+            cooldownTime: 6000
           },
           {
+            passiveName: "Barkskin",
+            activeName: "Overgrowth",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, immuneToMelee: true } : p
+                )
+              );
+            },
+            activateActive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, immuneToMelee: false } : p
+                )
+              );
+              // cast ivy.
+            },
             displayLookup: "abilityWood",
             element: "wood",
             isPassive: false,
-            isActive: false
+            isActive: false,
+            cooldownTime: 6000
           },
           {
+            passiveName: "Charged Step",
+            activeName: "Discharge",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, moveSpeed: p.moveSpeed + 4 } : p
+                )
+              );
+            },
+            activateActive: () => {
+              setPlayerData(_players => {
+                _players.forEach(p => {
+                  // cast discharge
+                  if (k === p.i) {
+                    const playerTile = p.tile;
+                    const enemyIndex = p.i === 0 ? 1 : 0;
+                    const enemyTile = _players[enemyIndex].tile;
+                    console.log(playerTile, enemyIndex, enemyTile);
+                    if (playerTile && enemyTile) {
+                      const boltTile = getAdjacentTileFromTile(
+                        playerTile,
+                        enemyTile,
+                        scale
+                      );
+                      console.log(boltTile);
+                      setTileStatuses(_tiles => {
+                        _tiles[boltTile.i][boltTile.j] = {
+                          isElectrified: {
+                            i: boltTile.i - playerTile.i,
+                            j: boltTile.j - playerTile.j
+                          }
+                        };
+                        return _tiles;
+                      });
+                    }
+                  }
+                });
+                return _players.map(p =>
+                  k === p.i ? { ...p, moveSpeed: p.moveSpeed - 4 } : p
+                );
+              });
+            },
             displayLookup: "abilityLightning",
             element: "lightning",
             isPassive: false,
-            isActive: false
+            isActive: false,
+            cooldownTime: 7000
           },
           {
+            passiveName: "Reaper",
+            activeName: "Haunting",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, isGrimReaper: true } : p
+                )
+              );
+            },
+            activateActive: () => {
+              setPlayerData(_players => {
+                _players.forEach(p => {
+                  // cast haunt.
+                  if (k === p.i && p.lives > 1) {
+                    const playerTile = p.tile;
+                    const enemyIndex = p.i === 0 ? 1 : 0;
+                    const enemyTile = _players[enemyIndex].tile;
+                    console.log(playerTile, enemyIndex, enemyTile);
+                    if (playerTile && enemyTile) {
+                      const hauntTile = getAdjacentTileFromTile(
+                        playerTile,
+                        enemyTile,
+                        scale
+                      );
+                      console.log(hauntTile);
+                      setTileStatuses(_tiles => {
+                        _tiles[hauntTile.i][hauntTile.j] = {
+                          isGhosted: {
+                            i: hauntTile.i - playerTile.i,
+                            j: hauntTile.j - playerTile.j
+                          }
+                        };
+                        return _tiles;
+                      });
+                    }
+                  }
+                });
+                return _players.map(p =>
+                  k === p.i ? { ...p, isGrimReaper: false, lives: 1 } : p
+                );
+              });
+            },
             displayLookup: "abilityDeath",
             element: "death",
             isPassive: false,
-            isActive: false
+            isActive: false,
+            cooldownTime: 3000
           },
           {
+            passiveName: "Shelter",
+            activeName: "Dispel",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i
+                    ? { ...p, immuneToFire: true, immuneToIvy: true }
+                    : p
+                )
+              );
+            },
+            activateActive: () => {
+              setPlayerData(_players => {
+                _players.forEach(p => {
+                  // cast bubble.
+                  if (k === p.i) {
+                    const playerTile = p.tile;
+                    const enemyIndex = p.i === 0 ? 1 : 0;
+                    const enemyTile = _players[enemyIndex].tile;
+                    console.log(playerTile, enemyIndex, enemyTile);
+                    if (playerTile && enemyTile) {
+                      const bubbleTile = getAdjacentTileFromTile(
+                        playerTile,
+                        enemyTile,
+                        scale
+                      );
+                      console.log(bubbleTile);
+                      setTileStatuses(_tiles => {
+                        _tiles[bubbleTile.i][bubbleTile.j] = {
+                          isBubble: {
+                            i: bubbleTile.i - playerTile.i,
+                            j: bubbleTile.j - playerTile.j
+                          }
+                        };
+                        return _tiles;
+                      });
+                    }
+                  }
+                });
+                return _players.map(p =>
+                  k === p.i
+                    ? { ...p, immuneToFire: false, immuneToIvy: false }
+                    : p
+                );
+              });
+            },
             displayLookup: "abilityBubble",
             element: "bubble",
             isPassive: false,
-            isActive: false
+            isActive: false,
+            cooldownTime: 3000
           },
           {
+            passiveName: "Aegis Armor",
+            activeName: "Aegis",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, immuneToBullets: true } : p
+                )
+              );
+            },
+            activateActive: () => {
+              setPlayerData(_players => {
+                _players.forEach(p => {
+                  // cast sheild.
+                  if (k === p.i) {
+                    const playerTile = p.tile;
+                    const enemyIndex = p.i === 0 ? 1 : 0;
+                    const enemyTile = _players[enemyIndex].tile;
+                    console.log(playerTile, enemyIndex, enemyTile);
+                    if (playerTile && enemyTile) {
+                      const shieldTile = getAdjacentTileFromTile(
+                        playerTile,
+                        enemyTile,
+                        scale
+                      );
+                      console.log(shieldTile);
+                      setTileStatuses(_tiles => {
+                        _tiles[shieldTile.i][shieldTile.j] = {
+                          isShielded: { i: 0, j: 0 }
+                        };
+                        return _tiles;
+                      });
+                    }
+                  }
+                });
+                return _players.map(p =>
+                  k === p.i ? { ...p, immuneToBullets: false } : p
+                );
+              });
+            },
             displayLookup: "abilityMetal",
             element: "metal",
             isPassive: false,
-            isActive: false
+            isActive: false,
+            cooldownTime: 6000
           }
         ],
         accessory: {
@@ -280,13 +543,15 @@ const App = () => {
   }, [playerMoveToTiles]);
   useInterval(() => {
     movePiece(playerData, setPlayerData, scale);
-    movePiece(kaiju1Data, setKaiju1Data, scale);
-    movePiece(kaiju2Data, setKaiju2Data, scale);
-    checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
+    // movePiece(kaiju1Data, setKaiju1Data, scale);
+    // movePiece(kaiju2Data, setKaiju2Data, scale);
+    // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
   }, 250);
   return (
     <div className="App">
       <GameBoard
+        tileStatuses={tileStatuses}
+        setTileStatuses={setTileStatuses}
         setPlayerMoveToTiles={setPlayerMoveToTiles}
         playerData={playerData}
         graveyardData={graveyardData}

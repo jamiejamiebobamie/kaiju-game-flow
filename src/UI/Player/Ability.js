@@ -89,12 +89,21 @@ const AbilityIcon = styled.i`
 `;
 export const Ability = ({
   abilityData,
-  setDisplayString,
-  cooldownTime = 9000,
+  setDisplayString
+  // cooldownTime = 9000
   // chargeUpTime = 3000,
-  activatePassive = () => console.log("Passive activated!"),
-  activateActive = () => console.log("Active activated!")
+  // activatePassive = () => console.log("Passive activated!"),
+  // activateActive = () => console.log("Active activated!")
 }) => {
+  const {
+    passiveName,
+    activeName,
+    activatePassive,
+    activateActive,
+    cooldownTime,
+    displayLookup,
+    element
+  } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const [isPassive, setIsPassive] = useState(false);
@@ -131,16 +140,16 @@ export const Ability = ({
       }}
       isAnimating={isAnimating}
       ref={setHoverRef(
-        `${abilityData.displayLookup}${
+        `${displayLookup}${
           iconLookupString === "passive" ? "Passive" : "Active"
         }`
       )}
-      title={abilityData.displayLookup}
+      title={isPassive && !isActive ? activeName : passiveName}
       alt="test desc"
     >
       <AbilityIcon
         disabled={true}
-        className={`fa ${ICON_LOOKUP[abilityData.element][iconLookupString]}`}
+        className={`fa ${ICON_LOOKUP[element][iconLookupString]}`}
         isCoolDown={isPassive && isActive}
         cooldownTime={cooldownTime}
       />

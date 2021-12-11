@@ -64,13 +64,19 @@ export const Player = ({
             setDisplayString={setDisplayString}
             isReversed={isReversed}
           />
-          <HealthBar setDisplayString={setDisplayString} />
+          <HealthBar
+            health={playerData.lives}
+            setDisplayString={setDisplayString}
+          />
           <Kaiju setDisplayString={setDisplayString} />
         </>
       ) : (
         <>
           <Kaiju setDisplayString={setDisplayString} />
-          <HealthBar setDisplayString={setDisplayString} />
+          <HealthBar
+            health={playerData.lives}
+            setDisplayString={setDisplayString}
+          />
           <Abilities
             abilities={playerData.abilities}
             setDisplayString={setDisplayString}

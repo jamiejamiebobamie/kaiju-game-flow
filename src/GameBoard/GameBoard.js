@@ -45,6 +45,8 @@ export const GameBoard = ({
   kaijuTokenTiles,
   setKaijuTokenTiles,
   setPlayerMoveToTiles,
+  tileStatuses,
+  setTileStatuses,
   kaiju2Data,
   scale
 }) => {
@@ -57,7 +59,6 @@ export const GameBoard = ({
   const [setHoverRef, hoverLookupString] = useHover();
   const [goalTile, setGoalTile] = useState(null);
   const [tileInterval, setTileInterval] = useState(null);
-  const [tileStatuses, setTileStatuses] = useState(null);
 
   useEffect(() => {
     redrawTiles([]);
@@ -70,7 +71,7 @@ export const GameBoard = ({
         _status.push({
           updateKey: Math.random(),
           isPlayer: playerData.some(({ tile }) => tile.i === i && tile.j === j),
-          isOnFire: getRandBool() ? { i: -1, j: -1 } : null,
+          isOnFire: null, //getRandBool() ? { i: -1, j: -1 } : null,
           isWooded: null, //getRandBool() ? { i: 1, j: 1 } : null,
           isElectrified: null, //getRandBool() ? { i: 0, j: -1 } : null,
           isBubble: null, //getRandBool() ? { i: -1, j: -1 } : null,
@@ -272,18 +273,10 @@ export const GameBoard = ({
         setKaijuTokenPickedup({ i, j });
         // else move the player to the clicked tile.
       } else {
-        const path = findPath(playerData[0].tile, { i, j }, scale);
-        setPlayerMoveToTiles(path);
-        setGoalTile({ i, j });
-        // const test1 = getNormVecFromTiles(playerData[0].tile, { i, j }, scale);
-        // const test2 = getTileDiff(playerData[0].tile, { i, j });
-        // const test3 = getAdjacentTileFromTile(
-        //   playerData[0].tile,
-        //   { i, j },
-        //   scale
-        // );
-        // console.log(test3);
-        // setGoalTile(test3);
+        // const path = findPath(playerData[0].tile, { i, j }, scale);
+        // setPlayerMoveToTiles(path);
+        // setGoalTile({ i, j });
+        console.log(i, j);
       }
       setClickedTile({ i: -1, j: -1 });
     }

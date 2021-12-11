@@ -147,7 +147,7 @@ const DESCRIPTION_LOOKUP = {
     formatData: {}
   },
   abilityBubbleActive: {
-    title: "Dispell",
+    title: "Dispel",
     description: "The giant bubble you wear slides off you and rushes forward.",
     effect:
       "Send out a bubble in a straight line that dispells all tile effects.",

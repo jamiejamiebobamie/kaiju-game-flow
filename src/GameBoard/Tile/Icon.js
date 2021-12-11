@@ -20,10 +20,10 @@ export const Icon = ({ status, zIndex }) => {
   const ICON_LOOKUP = {
     isOnFire: { className: "fa-free-code-camp", offset: 0, color: "tomato" },
     isWooded: { className: "fa-leaf", offset: 45, color: "green" },
-    isElectrified: { className: "fa-bolt", offset: 180, color: "blue" },
+    isElectrified: { className: "fa-bolt", offset: 180, color: "cyan" },
     isGhosted: { className: "fa-snapchat-ghost", offset: 0, color: "white" },
-    isBubble: { className: "fa-question-circle-o", offset: 0, color: "coral" },
-    isShielded: { className: "fa-shield", offset: 0, color: "brown" },
+    isBubble: { className: "fa-question-circle-o", offset: 0, color: "white" },
+    isShielded: { className: "fa-shield", offset: 0, color: "black" },
     isGraveyard: { className: "fa-toggle-off", offset: -90, color: "white" }
   };
   const determineIcon = status => {
