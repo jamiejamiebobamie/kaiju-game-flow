@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
 import {
@@ -16,10 +17,26 @@ import {
   movePiece,
   isLocatonInsidePolygon,
   checkIsInManaPool,
-  getAdjacentTileFromTile,
-  setTileWithStatus
+  getAdjacentTilesFromTile,
+  setTileWithStatus,
+  shootPower
 } from "./Utils/utils";
 import "./App.css";
+
+const GameTitle = styled.div`
+  display: flex;
+  margin-top: 40px;
+  margin-left: 40px;
+  margin-bottom: -50px;
+
+  color: black;
+  font-family: data;
+  font-size: 40px;
+  @font-face {
+    font-family: data;
+    src: url(Datalegreya-Dot.otf);
+  }
+`;
 
 const App = () => {
   /*
@@ -32,9 +49,9 @@ const App = () => {
                     graveyard placement
                 do not place mana wells adjacent to one another
         6. home screen.
-        7. make character move to the last tile on a path.
-        8. do a circular of icons around profile pic for activated passives
 
+        - make character move to the last tile on a path.
+        - do a circular of icons around profile pic for activated passives
         - hover descriptions.
         - fix issue with NaN location values.
         - hexagon pathing
@@ -146,7 +163,7 @@ const App = () => {
                     ? {
                         ...p,
                         curveBullets: false,
-                        moveSpeed: p.moveSpeed + 20,
+                        // moveSpeed: p.moveSpeed + 20,
                         moveToLocation: p.moveToTiles.length
                           ? getCharXAndY({
                               ...p.moveToTiles[p.moveToTiles.length - 1],
@@ -163,27 +180,28 @@ const App = () => {
                     : p
                 )
               );
-              setTimeout(
-                () =>
-                  setPlayerData(_players =>
-                    _players.map(p =>
-                      k === p.i
-                        ? {
-                            ...p,
-                            moveSpeed: p.moveSpeed - 20
-                          }
-                        : p
-                    )
-                  ),
-                4000
-              );
+              // setTimeout(
+              //   () =>
+              //     setPlayerData(_players =>
+              //       _players.map(p =>
+              //         k === p.i
+              //           ? {
+              //               ...p,
+              //               moveSpeed: p.moveSpeed - 20
+              //             }
+              //           : p
+              //       )
+              //     ),
+              //   4000
+              // );
             },
             getPlayerIndex: () => k,
             displayLookup: "abilityGlass",
             element: "glass",
             isPassive: false,
             isActive: false,
-            cooldownTime: 25000
+            // cooldownTime: 25000
+            cooldownTime: 3000
           },
           {
             passiveName: "Campfire",
@@ -195,30 +213,17 @@ const App = () => {
                 )
               );
             },
-            activateActive: () => {
-              setPlayerData(_players => {
-                _players.forEach(p => {
-                  // cast fire.
-                  if (k === p.i) {
-                    const playerTile = p.tile;
-                    const enemyIndex = p.i === 0 ? 1 : 0;
-                    const enemyTile = _players[enemyIndex].tile;
-                    console.log(playerTile, enemyIndex, enemyTile);
-                    if (playerTile && enemyTile) {
-                      const [tile, dir] = getAdjacentTileFromTile(
-                        playerTile,
-                        enemyTile,
-                        scale
-                      );
-                      setTileWithStatus(setTileStatuses, "isOnFire", tile, dir);
-                    }
-                  }
-                });
-                return _players.map(p =>
-                  k === p.i ? { ...p, immuneToGhosts: false } : p
-                );
-              });
-            },
+            activateActive: () =>
+              shootPower({
+                setPlayerData,
+                setTileStatuses,
+                scale,
+                count: 10,
+                statusKey: "isOnFire",
+                numTiles: 3,
+                sideEffectObject: {},
+                playerIndex: k
+              }),
             getPlayerIndex: () => k,
             displayLookup: "abilityFire",
             element: "fire",
@@ -236,30 +241,17 @@ const App = () => {
                 )
               );
             },
-            activateActive: () => {
-              setPlayerData(_players => {
-                _players.forEach(p => {
-                  // cast ivy.
-                  if (k === p.i) {
-                    const playerTile = p.tile;
-                    const enemyIndex = p.i === 0 ? 1 : 0;
-                    const enemyTile = _players[enemyIndex].tile;
-                    console.log(playerTile, enemyIndex, enemyTile);
-                    if (playerTile && enemyTile) {
-                      const [tile, dir] = getAdjacentTileFromTile(
-                        playerTile,
-                        enemyTile,
-                        scale
-                      );
-                      setTileWithStatus(setTileStatuses, "isWooded", tile, dir);
-                    }
-                  }
-                });
-                return _players.map(p =>
-                  k === p.i ? { ...p, immuneToMelee: false } : p
-                );
-              });
-            },
+            activateActive: () =>
+              shootPower({
+                setPlayerData,
+                setTileStatuses,
+                scale,
+                count: 10,
+                statusKey: "isWooded",
+                numTiles: 3,
+                sideEffectObject: {},
+                playerIndex: k
+              }),
             getPlayerIndex: () => k,
             displayLookup: "abilityWood",
             element: "wood",
@@ -277,35 +269,17 @@ const App = () => {
                 )
               );
             },
-            activateActive: () => {
-              setPlayerData(_players => {
-                _players.forEach(p => {
-                  // cast discharge
-                  if (k === p.i) {
-                    const playerTile = p.tile;
-                    const enemyIndex = p.i === 0 ? 1 : 0;
-                    const enemyTile = _players[enemyIndex].tile;
-                    console.log(playerTile, enemyIndex, enemyTile);
-                    if (playerTile && enemyTile) {
-                      const [boltTile, boltDir] = getAdjacentTileFromTile(
-                        playerTile,
-                        enemyTile,
-                        scale
-                      );
-                      setTileWithStatus(
-                        setTileStatuses,
-                        "isElectrified",
-                        boltTile,
-                        boltDir
-                      );
-                    }
-                  }
-                });
-                return _players.map(p =>
-                  k === p.i ? { ...p, moveSpeed: p.moveSpeed - 4 } : p
-                );
-              });
-            },
+            activateActive: () =>
+              shootPower({
+                setPlayerData,
+                setTileStatuses,
+                scale,
+                count: 100,
+                statusKey: "isElectrified",
+                numTiles: 1,
+                sideEffectObject: {},
+                playerIndex: k
+              }),
             getPlayerIndex: () => k,
             displayLookup: "abilityLightning",
             element: "lightning",
@@ -315,7 +289,7 @@ const App = () => {
           },
           {
             passiveName: "Reaper",
-            activeName: "Haunting",
+            activeName: "Haunt",
             activatePassive: () => {
               setPlayerData(_players =>
                 _players.map(p =>
@@ -323,37 +297,19 @@ const App = () => {
                 )
               );
             },
-            activateActive: () => {
-              setPlayerData(_players => {
-                _players.forEach(p => {
-                  // cast haunt.
-                  if (k === p.i && p.lives > 1) {
-                    const playerTile = p.tile;
-                    const enemyIndex = p.i === 0 ? 1 : 0;
-                    const enemyTile = _players[enemyIndex].tile;
-                    console.log(playerTile, enemyIndex, enemyTile);
-                    if (playerTile && enemyTile) {
-                      const [tile, dir] = getAdjacentTileFromTile(
-                        playerTile,
-                        enemyTile,
-                        scale
-                      );
-                      setTileWithStatus(
-                        setTileStatuses,
-                        "isGhosted",
-                        tile,
-                        dir
-                      );
-                    }
-                  }
-                });
-                return _players.map(p =>
-                  k === p.i ? { ...p, isGrimReaper: false, lives: 1 } : p
-                );
+            activateActive: ghosts => {
+              shootPower({
+                setPlayerData,
+                setTileStatuses,
+                scale,
+                count: 30,
+                statusKey: "isGhosted",
+                numTiles: ghosts,
+                sideEffectObject: { lives: 1 },
+                playerIndex: k
               });
             },
             getPlayerIndex: () => k,
-
             displayLookup: "abilityDeath",
             element: "death",
             isPassive: false,
@@ -373,28 +329,15 @@ const App = () => {
               );
             },
             activateActive: () => {
-              setPlayerData(_players => {
-                _players.forEach(p => {
-                  // cast bubble.
-                  if (k === p.i) {
-                    const playerTile = p.tile;
-                    const enemyIndex = p.i === 0 ? 1 : 0;
-                    const enemyTile = _players[enemyIndex].tile;
-                    if (playerTile && enemyTile) {
-                      const [tile, dir] = getAdjacentTileFromTile(
-                        playerTile,
-                        enemyTile,
-                        scale
-                      );
-                      setTileWithStatus(setTileStatuses, "isBubble", tile, dir);
-                    }
-                  }
-                });
-                return _players.map(p =>
-                  k === p.i
-                    ? { ...p, immuneToFire: false, immuneToIvy: false }
-                    : p
-                );
+              shootPower({
+                setPlayerData,
+                setTileStatuses,
+                scale,
+                count: 30,
+                statusKey: "isBubble",
+                numTiles: 4,
+                sideEffectObject: {},
+                playerIndex: k
               });
             },
             getPlayerIndex: () => k,
@@ -415,31 +358,15 @@ const App = () => {
               );
             },
             activateActive: () => {
-              setPlayerData(_players => {
-                _players.forEach(p => {
-                  // cast sheild.
-                  if (k === p.i) {
-                    const playerTile = p.tile;
-                    const enemyIndex = p.i === 0 ? 1 : 0;
-                    const enemyTile = _players[enemyIndex].tile;
-                    if (playerTile && enemyTile) {
-                      const [tile, dir] = getAdjacentTileFromTile(
-                        playerTile,
-                        enemyTile,
-                        scale
-                      );
-                      setTileWithStatus(
-                        setTileStatuses,
-                        "isShielded",
-                        tile,
-                        ""
-                      );
-                    }
-                  }
-                });
-                return _players.map(p =>
-                  k === p.i ? { ...p, immuneToBullets: false } : p
-                );
+              shootPower({
+                setPlayerData,
+                setTileStatuses,
+                scale,
+                count: 0,
+                statusKey: "isShielded",
+                numTiles: 3,
+                sideEffectObject: {},
+                playerIndex: k
               });
             },
             getPlayerIndex: () => k,
@@ -566,22 +493,26 @@ const App = () => {
     // movePiece(kaiju2Data, setKaiju2Data, scale);
     // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
   }, 250);
+  // <GameTitle>Kaiju City</GameTitle>
+
   return (
-    <div className="App">
-      <GameBoard
-        tileStatuses={tileStatuses}
-        setTileStatuses={setTileStatuses}
-        setPlayerMoveToTiles={setPlayerMoveToTiles}
-        playerData={playerData}
-        graveyardData={graveyardData}
-        kaiju1Data={kaiju1Data}
-        kaijuTokenTiles={kaijuTokenTiles}
-        setKaijuTokenTiles={setKaijuTokenTiles}
-        kaiju2Data={kaiju2Data}
-        scale={scale}
-      />
-      <UI playerData={playerData} />
-    </div>
+    <>
+      <div className="App">
+        <GameBoard
+          tileStatuses={tileStatuses}
+          setTileStatuses={setTileStatuses}
+          setPlayerMoveToTiles={setPlayerMoveToTiles}
+          playerData={playerData}
+          graveyardData={graveyardData}
+          kaiju1Data={kaiju1Data}
+          kaijuTokenTiles={kaijuTokenTiles}
+          setKaijuTokenTiles={setKaijuTokenTiles}
+          kaiju2Data={kaiju2Data}
+          scale={scale}
+        />
+        <UI playerData={playerData} />
+      </div>
+    </>
   );
 };
 // {testPlayerScale}

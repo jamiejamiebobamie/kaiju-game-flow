@@ -86,7 +86,7 @@ const DESCRIPTION_LOOKUP = {
   abilityFirePassive: {
     title: "Campfire",
     description: "A warm glow emanates from you. A flame burns in your palm.",
-    effect: "Any wraith in proximity to you is destroyed.",
+    effect: "Any ghost in proximity to you is destroyed.",
     img: "",
     formatData: {}
   },
@@ -135,7 +135,7 @@ const DESCRIPTION_LOOKUP = {
   abilityDeathActive: {
     title: "Haunt",
     description: "Send out all of the harvested souls to hunt your enemy.",
-    effect: "Shoot a wraith at your enemy for every extra life you have.",
+    effect: "Shoot a ghost at your enemy for every extra life you have.",
     img: "",
     formatData: {}
   },
@@ -221,6 +221,20 @@ const DESCRIPTION_LOOKUP = {
     title: "Shotgun",
     description: "A shotgun.",
     effect: 'Gives the player an extra ability: "Shoot".',
+    img: "",
+    formatData: {}
+  },
+  ghostHealthBar: {
+    title: "Ghost",
+    description: "The soul of your foe.",
+    effect: "Ignore a killing blow.",
+    img: "",
+    formatData: {}
+  },
+  healthBar: {
+    title: "Life",
+    description: "You only have one.",
+    effect: "",
     img: "",
     formatData: {}
   }

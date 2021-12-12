@@ -23,7 +23,7 @@ const Bar = styled.div`
   border-style: solid;
   border-width: thin;
   ${props =>
-    props.isWraith
+    props.isGhost
       ? "background: linear-gradient(45deg, #AFE1AF, #AAFF00 ); border-color: #AFE1AF;"
       : "background: linear-gradient(45deg, #D22B2B, #880808); border-color: #880808;"};
 `;
@@ -35,8 +35,8 @@ export const HealthBar = ({ setDisplayString, health = 1 }) => {
     bars.push(
       <Bar
         key={i}
-        ref={setHoverRef(i > 0 ? "wraithHealthBar" : undefined)}
-        isWraith={i > 0}
+        ref={setHoverRef(i > 0 ? "ghostHealthBar" : "healthBar")}
+        isGhost={i > 0}
       />
     );
   }

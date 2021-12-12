@@ -39,9 +39,14 @@ const Image = styled.div`
   transform: rotate(-60deg);
   ${props =>
     props.isHighlighted &&
-    !props.isPlayer &&
-    "background-color: #FEBA4F;opacity: 0.3;"}
-  ${props => props.isPlayer && "background-color: #FFA836;opacity: 0.5;"}
+    (props.isPlayer !== 0 || props.isPlayer !== 1) &&
+    "background-color: #495a6e;opacity: 0.5;"}
+  ${props =>
+    props.isPlayer === 0
+      ? "background-color: #495a6e;opacity: .7;"
+      : props.isPlayer === 1
+      ? "background-color: #FFA836;opacity: .2;"
+      : null}
 `;
 export const Content = ({
   isHighlighted = false,

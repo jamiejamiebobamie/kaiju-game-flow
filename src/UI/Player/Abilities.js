@@ -13,6 +13,7 @@ const Wrapper = styled.div`
   overflow-y: scroll;
 `;
 export const Abilities = ({
+  ghosts,
   setDisplayString,
   isReversed,
   abilities = [
@@ -66,6 +67,7 @@ export const Abilities = ({
       setDisplayString={setDisplayString}
       abilityData={abilityData}
       keyNum={i + 1}
+      ghosts={ghosts}
     />
   ));
   return <Wrapper isReversed={isReversed}>{abilityButtons}</Wrapper>;

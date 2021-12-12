@@ -9,17 +9,17 @@ const ICON_LOOKUP = {
     loader: "fa-spinner"
   },
   fire: {
-    passive: "fa-free-code-camp",
-    active: "fa-hand-lizard-o",
+    passive: "fa-fire",
+    active: "fa-free-code-camp",
     loader: "fa-spinner"
   },
   wood: {
-    passive: "fa-leaf",
-    active: "fa-tree",
+    passive: "fa-tree",
+    active: "fa-leaf",
     loader: "fa-spinner"
   },
   lightning: {
-    passive: "fa-bug",
+    passive: "fa-hourglass-half",
     active: "fa-bolt",
     loader: "fa-spinner"
   },
@@ -41,6 +41,7 @@ const ICON_LOOKUP = {
 };
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-self: center;
@@ -87,15 +88,33 @@ const AbilityIcon = styled.i`
     }
   }
 `;
-export const Ability = ({
-  abilityData,
-  setDisplayString,
-  keyNum
-  // cooldownTime = 9000
-  // chargeUpTime = 3000,
-  // activatePassive = () => console.log("Passive activated!"),
-  // activateActive = () => console.log("Active activated!")
-}) => {
+const AbilityNum = styled.div`
+  display: flex;
+  position: absolute;
+  right: -10px;
+  bottom: -3px;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border-radius: 10px;
+  border-radius: 100%;
+  border-style: solid;
+  border-thickness: thin;
+  border-color: black;
+  background-color: #f2e3cc;
+  color: black;
+  text-align: center;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  font-family: gameboy;
+  font-size: 12px;
+  @font-face {
+    font-family: gameboy;
+    src: url(Early_GameBoy.ttf);
+  }
+`;
+export const Ability = ({ abilityData, setDisplayString, keyNum, ghosts }) => {
   const {
     passiveName,
     activeName,
@@ -107,58 +126,47 @@ export const Ability = ({
     getPlayerIndex
   } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
+  useEffect(() => {
+    activatePassive && activatePassive();
+  }, []);
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const [isPassive, setIsPassive] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [iconLookupString, setIconLookupString] = useState("passive");
+  const [iconLookupString, setIconLookupString] = useState("active");
   useKeyPress(() => {
-    if (getPlayerIndex && getPlayerIndex() === 0) setIsActive(curr => !curr);
+    if (getPlayerIndex && getPlayerIndex() === 0) handleClick();
   }, `Digit${keyNum}`);
   useEffect(() => {
-    if (isPassive) activatePassive();
-  }, [isPassive]);
-  useEffect(() => {
-    if (isActive) activateActive();
+    if (isActive) {
+      activateActive(ghosts);
+      setIsAnimating(true);
+      setTimeout(() => setIconLookupString("loader"), 250);
+      setTimeout(() => {
+        setIsActive(false);
+        setIconLookupString("active");
+      }, cooldownTime);
+    }
   }, [isActive]);
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
-  const handleClick = () => {
-    if (!isPassive) {
-      setIsPassive(true);
-      setIsAnimating(true);
-      setTimeout(() => setIconLookupString("active"), 250);
-    } else if (isPassive && !isActive) {
-      setIsActive(true);
-      setIsAnimating(true);
-      setTimeout(() => setIconLookupString("loader"), 250);
-      setTimeout(() => {
-        setIsPassive(false);
-        setIsActive(false);
-        setIconLookupString("passive");
-        console.log("Cooldown is over!");
-      }, cooldownTime);
-    }
-  };
+  const handleClick = () => !isActive && setIsActive(true);
   return (
     <Wrapper
       onClick={handleClick}
       isAnimating={isAnimating}
-      ref={setHoverRef(
-        `${displayLookup}${
-          iconLookupString === "passive" ? "Passive" : "Active"
-        }`
-      )}
-      title={isPassive && !isActive ? activeName : passiveName}
+      ref={setHoverRef(`${displayLookup}Active`)}
+      title={activeName}
       alt="test desc"
     >
       <AbilityIcon
         disabled={true}
         className={`fa ${ICON_LOOKUP[element][iconLookupString]}`}
-        isCoolDown={isPassive && isActive}
+        isCoolDown={isActive}
         cooldownTime={cooldownTime}
       />
+      <AbilityNum>{keyNum}</AbilityNum>
     </Wrapper>
   );
 };

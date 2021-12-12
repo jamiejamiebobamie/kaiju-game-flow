@@ -4,6 +4,7 @@ import { Abilities } from "./Abilities";
 import { HealthBar } from "./HealthBar";
 import { Kaiju } from "./Kaiju";
 import { useHover } from "../../Utils/utils";
+import { PassiveAbilities } from "./PassiveAbilities";
 
 const Wrapper = styled.div`
   position: relative;
@@ -31,7 +32,9 @@ const PlayerPicture = styled.i`
   margin-left: 68px;
   transform: scale(10);
 `;
-const AccessoryPicture = styled.img`
+const AccessoryPicture = styled.i`
+  display: flex;
+  justify-content: center;
   position: absolute;
   right: 20px;
   bottom: 10px;
@@ -42,7 +45,8 @@ const AccessoryPicture = styled.img`
   border-radius: 100%;
   border-style: solid;
   border-thickness: thin;
-  background-color: white;
+  background-color: #f2e3cc;
+  align-items: center;
 `;
 export const Player = ({
   playerData = [{}, {}],
@@ -63,12 +67,13 @@ export const Player = ({
             abilities={playerData.abilities}
             setDisplayString={setDisplayString}
             isReversed={isReversed}
+            ghosts={playerData.lives - 1}
           />
           <HealthBar
             health={playerData.lives}
             setDisplayString={setDisplayString}
           />
-          <Kaiju setDisplayString={setDisplayString} />
+          <Kaiju isReversed={isReversed} setDisplayString={setDisplayString} />
         </>
       ) : (
         <>
@@ -80,6 +85,7 @@ export const Player = ({
           <Abilities
             abilities={playerData.abilities}
             setDisplayString={setDisplayString}
+            ghosts={playerData.lives - 1}
           />
         </>
       )}
@@ -89,10 +95,15 @@ export const Player = ({
           ref={setHoverRef(
             playerData.accessory && playerData.accessory.displayLookup
           )}
-          src={playerData.accessory && playerData.accessory.accessoryImgFile}
+          className="fa fa-wrench"
           isReversed={isReversed}
         />
       </PlayerBorder>
+      <PassiveAbilities
+        setDisplayString={setDisplayString}
+        isReversed={isReversed}
+        abilities={playerData.abilities}
+      />
     </Wrapper>
   );
   return playerUI;

@@ -4,13 +4,20 @@ import { useHover } from "../../Utils/utils";
 /* border-style: solid;
 border-thickness: thin; */
 const Wrapper = styled.div`
+  /* background-color: red; */
   display: flex;
+  padding-top: 10px;
+  ${props =>
+    props.isReversed
+      ? "margin-top: -10px;"
+      : "margin-bottom: -10px; padding-top: 10px;"}
   width: 70%;
-  height: 70px;
+  height: 60px;
   border-radius: 10px;
   overflow: scroll;
+  /* margin: 1px; */
 `;
-const KaijuIcon = styled.img`
+const KaijuIcon = styled.i`
   min-width: 30px;
   margin-left: 10px;
   justify-self: center;
@@ -19,26 +26,27 @@ const KaijuIcon = styled.img`
 `;
 export const Kaiju = ({
   kaijuArr = [
-    { displayLookup: "kaijuGlass" },
-    { displayLookup: "kaijuFire" },
-    { displayLookup: "kaijuWood" },
-    { displayLookup: "kaijuLightning" },
-    { displayLookup: "kaijuDeath" },
-    { displayLookup: "kaijuBubble" },
-    { displayLookup: "kaijuMetal" }
+    { displayLookup: "kaijuGlass", name: "Mothra" },
+    { displayLookup: "kaijuFire", name: "Not-Godzilla" },
+    { displayLookup: "kaijuWood", name: "Kudzu" },
+    { displayLookup: "kaijuLightning", name: "Gargantula" },
+    { displayLookup: "kaijuDeath", name: "Giant Mantis" },
+    { displayLookup: "kaijuBubble", name: "Parade Float" },
+    { displayLookup: "kaijuMetal", name: "Mechatron" }
   ],
-  setDisplayString
+  setDisplayString,
+  isReversed
 }) => {
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
-  const kaijuIcons = kaijuArr.map(({ displayLookup }) => (
+  const kaijuIcons = kaijuArr.map(({ displayLookup, name }) => (
     <KaijuIcon
       key={displayLookup}
-      src={"testKaijuTile.png"}
+      className="fa fa-optin-monster"
       ref={setHoverRef(displayLookup)}
-      title="test"
-      alt="image of test"
+      title={name}
+      alt={name}
     />
   ));
-  return <Wrapper>{kaijuIcons}</Wrapper>;
+  return <Wrapper isReversed={isReversed}>{kaijuIcons}</Wrapper>;
 };

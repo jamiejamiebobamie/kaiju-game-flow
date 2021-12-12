@@ -27,6 +27,8 @@ const Board = styled.div`
   border-radius: 10px;
   cursor: ${props =>
     props.kaijuTokenPickedup ? "url(testKaijuTile.png), auto;" : "pointer"};
+  /* color: #495a6e;
+  background-color: #495a6e; */
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;
@@ -72,7 +74,9 @@ export const GameBoard = ({
       for (let j = 0; j < colLength; j++) {
         _status.push({
           updateKey: Math.random(),
-          isPlayer: playerData.some(({ tile }) => tile.i === i && tile.j === j),
+          isPlayer:
+            playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
+            playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
           isOnFire: null, //getRandBool() ? { i: -1, j: -1 } : null,
           isWooded: null, //getRandBool() ? { i: 1, j: 1 } : null,
           isElectrified: null, //getRandBool() ? { i: 0, j: -1 } : null,
@@ -106,29 +110,56 @@ export const GameBoard = ({
               let tileStatus = solveForStatus(status[i][j]);
               const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
               if (entry) {
-                const [k, dir] = entry;
-                // 2. move the status based on the direction
-                const offset = getTileOffsetFromDir(dir, { i, j });
-                const nextTile = { i: i + offset.i, j: j + offset.j };
-                if (
-                  isTileOnGameBoard({
-                    i: nextTile.i,
-                    j: nextTile.j
-                  })
-                ) {
-                  status[nextTile.i][nextTile.j][k] = dir;
-                  const nextTilesStatus = solveForStatus(
-                    status[nextTile.i][nextTile.j]
-                  );
-                  status[nextTile.i][nextTile.j] = nextTilesStatus;
-                  // status[nextTile.i][nextTile.j].updateKey = updateKey;
+                const [k, data] = entry;
+                const { count, dirs } = data;
+                if (count) {
+                  Array.isArray(dirs) &&
+                    dirs.forEach(d => {
+                      // 2. move the status based on the direction
+                      const offset = getTileOffsetFromDir(d, { i, j });
+                      const nextTile = { i: i + offset.i, j: j + offset.j };
+                      if (
+                        isTileOnGameBoard({
+                          i: nextTile.i,
+                          j: nextTile.j
+                        })
+                      ) {
+                        status[nextTile.i][nextTile.j][k] = {
+                          dirs: [d],
+                          count: count - 1
+                        };
+                        const nextTilesStatus = solveForStatus(
+                          status[nextTile.i][nextTile.j]
+                        );
+                        status[nextTile.i][nextTile.j] = nextTilesStatus;
+                        // status[nextTile.i][nextTile.j].updateKey = updateKey;
+                      }
+                      // 3. erase current tile's state if not: isElectrified
+                      const doNotErase = [
+                        "isElectrified",
+                        "isShielded",
+                        "isWooded"
+                      ];
+                      status[i][j][k] = !doNotErase.includes(k)
+                        ? null
+                        : tileStatus[k];
+                      status[i][j].updateKey = updateKey;
+                    });
+                } else {
+                  Array.isArray(dirs) &&
+                    dirs.forEach(d => {
+                      // 3. erase current tile's state if not: isElectrified
+                      const doNotErase = [
+                        "isElectrified",
+                        "isShielded",
+                        "isWooded"
+                      ];
+                      status[i][j][k] = !doNotErase.includes(k)
+                        ? null
+                        : tileStatus[k];
+                      status[i][j].updateKey = updateKey;
+                    });
                 }
-                // 3. erase current tile's state if not: isElectrified
-                const doNotErase = ["isElectrified", "isShielded", "isWooded"];
-                status[i][j][k] = !doNotErase.includes(k)
-                  ? null
-                  : tileStatus[k];
-                status[i][j].updateKey = updateKey;
               }
             }
           }
@@ -219,9 +250,12 @@ export const GameBoard = ({
                 )}
                 status={{
                   ...tileStatuses[i][j],
-                  isPlayer: playerData.some(
-                    ({ tile }) => tile.i === i && tile.j === j
-                  ),
+                  isPlayer:
+                    playerData.find(
+                      ({ tile }) => tile.i === i && tile.j === j
+                    ) &&
+                    playerData.find(({ tile }) => tile.i === i && tile.j === j)
+                      .i,
                   isKaiju: kaijuTokenTiles.find(
                     ({ tile }) => tile.i == i && tile.j == j
                   ),

@@ -6,16 +6,49 @@ export const isTileOnGameBoard = tile => {
     ? Object.keys(PENINSULA_TILE_LOOKUP).includes(`${tile.i} ${tile.j}`)
     : false;
 };
+export const shootPower = ({
+  setPlayerData,
+  setTileStatuses,
+  scale,
+  count,
+  statusKey,
+  numTiles,
+  sideEffectObject,
+  playerIndex
+}) => {
+  setPlayerData(_players => {
+    _players.forEach(p => {
+      if (playerIndex === p.i) {
+        const playerTile = p.tile;
+        const enemyIndex = p.i === 0 ? 1 : 0;
+        const enemyTile = _players[enemyIndex].tile;
+        if (playerTile && enemyTile) {
+          const [tile, dirs] = getAdjacentTilesFromTile(
+            playerTile,
+            enemyTile,
+            scale,
+            numTiles
+          );
+          setTileWithStatus(setTileStatuses, statusKey, tile, dirs, count);
+        }
+      }
+    });
+    return _players.map(p =>
+      playerIndex === p.i ? { ...p, ...sideEffectObject } : p
+    );
+  });
+};
 export const setTileWithStatus = (
   setTileStatuses,
   statusName,
   currTile,
-  dir
+  dirs,
+  count
 ) => {
   setTileStatuses(_tiles => {
     _tiles[currTile.i][currTile.j] = {
       ..._tiles[currTile.i][currTile.j],
-      [statusName]: dir
+      [statusName]: { dirs, count }
     };
     return _tiles;
   });
@@ -42,9 +75,14 @@ export const solveForStatus = tile => {
 export const getRandBool = () => {
   return Math.random() > 0.5;
 };
-export const getAdjacentTileFromTile = (currTile, destTile, scale) => {
+export const getAdjacentTilesFromTile = (
+  currTile,
+  destTile,
+  scale,
+  numTiles
+) => {
   const normVec = getNormVecFromTiles(currTile, destTile, scale);
-  return getAdjacentTileFromNormVec(currTile, normVec, scale);
+  return getAdjacentTilesFromNormVec(currTile, normVec, scale, numTiles);
 };
 export const getTileDiff = (currTile, destTile) => {
   return {
@@ -87,23 +125,12 @@ export const getTileOffsetFromDir = (dir, currTile) => {
       return { i: 0, j: 0 };
   }
 };
-export const getAdjacentTileFromNormVec = (currTile, normVec, scale) => {
-  const tileIndexMapping = [
-    { i: 0, j: -1 }, // up
-    { i: 1, j: currTile.i % 2 ? 0 : -1 }, // up right
-    { i: 1, j: currTile.i % 2 ? 1 : 0 }, // down right
-    { i: 0, j: 1 }, // down
-    { i: -1, j: currTile.i % 2 ? 0 : +1 }, // down left
-    { i: -1, j: currTile.i % 2 ? 0 : -1 } // up left
-  ];
-  const tileDirMapping = [
-    "up",
-    "up right",
-    "down right",
-    "down",
-    "down left",
-    "up left"
-  ];
+export const getAdjacentTilesFromNormVec = (
+  currTile,
+  normVec,
+  scale,
+  numTiles
+) => {
   const directionMapping = [
     { x: 0, y: -1 },
     { x: 0.868, y: -0.496 },
@@ -111,6 +138,14 @@ export const getAdjacentTileFromNormVec = (currTile, normVec, scale) => {
     { x: 0, y: 1 },
     { x: -0.868, y: 0.496 },
     { x: -0.868, y: -0.496 }
+  ];
+  const tileIndexMapping = [
+    { i: 0, j: -1 }, // up
+    { i: 1, j: currTile.i % 2 ? 0 : -1 }, // up right
+    { i: 1, j: currTile.i % 2 ? 1 : 0 }, // down right
+    { i: 0, j: 1 }, // down
+    { i: -1, j: currTile.i % 2 ? 0 : +1 }, // down left
+    { i: -1, j: currTile.i % 2 ? 0 : -1 } // up left
   ];
   const distance = getDistance(directionMapping[0], normVec);
   const closest = directionMapping.reduce(
@@ -120,15 +155,34 @@ export const getAdjacentTileFromNormVec = (currTile, normVec, scale) => {
     },
     { i: 0, coords: directionMapping[0], distance: distance }
   );
-  const i = closest.i;
-  return [
-    {
-      i: currTile.i + tileIndexMapping[i].i,
-      j: currTile.j + tileIndexMapping[i].j
-    },
-    tileDirMapping[i]
+  const tileDirMapping = [
+    "up",
+    "up right",
+    "down right",
+    "down",
+    "down left",
+    "up left"
   ];
-  // return tileIndexMapping[i];
+  const i = closest.i;
+  const spawnPowerTile = {
+    i: currTile.i + tileIndexMapping[i].i,
+    j: currTile.j + tileIndexMapping[i].j
+  };
+  if (numTiles >= 6) {
+    return [spawnPowerTile, tileDirMapping];
+  } else if (numTiles) {
+    const dirs = [tileDirMapping[i]];
+    for (let k = 1; k < numTiles - 2; k++) {
+      console.log(numTiles, k);
+      const l = i - k < 0 ? 6 - i - k : i - k;
+      const m = i + k > 5 ? -1 * (6 - k - i) : i + k;
+      dirs.push(tileDirMapping[l]);
+      dirs.push(tileDirMapping[m]);
+    }
+    return [spawnPowerTile, dirs];
+  } else {
+    return [spawnPowerTile, []];
+  }
 };
 export const returnNotNaN = (num, fallback) => {
   return num && !Number.isNaN(num) ? num : fallback ? fallback : 0;
@@ -211,13 +265,46 @@ export const movePiece = (data, setData, scale) => {
       _data[i].isThere = hasArrived;
       if (_data[i].isThere && _data[i].moveToTiles.length) {
         const [nextTile, ...tiles] = _data[i].moveToTiles;
-        _data[i].tile = nextTile;
-        _data[i].moveToTiles = tiles;
-        _data[i].moveFromLocation = newLocation;
-        _data[i].moveToLocation = getCharXAndY({
-          ...nextTile,
-          scale
-        });
+
+        /*
+        ? {
+            ...p,
+            curveBullets: false,
+            // moveSpeed: p.moveSpeed + 20,
+            moveToLocation: p.moveToTiles.length
+              ? getCharXAndY({
+                  ...p.moveToTiles[p.moveToTiles.length - 1],
+                  scale
+                })
+              : p.moveToLocation,
+            tile: p.moveToTiles.length
+              ? p.moveToTiles[p.moveToTiles.length - 1]
+              : p.tile,
+            moveFromLocation: p.charLocation,
+            moveToTiles: [],
+            isThere: false
+          }
+
+        */
+        if (!tiles.length) {
+          _data[i].moveToLocation =
+            getCharXAndY({
+              ...nextTile,
+              scale
+            }) || _data[i].moveToLocation;
+          _data[i].tile = nextTile;
+          _data[i].moveFromLocation = _data[i].charLocation;
+          _data[i].moveToTiles = [];
+          _data[i].isThere = false;
+        } else {
+          _data[i].tile = nextTile;
+          _data[i].moveToTiles = tiles;
+          _data[i].moveFromLocation = newLocation;
+          _data[i].moveToLocation = getCharXAndY({
+            ...nextTile,
+            scale
+          });
+        }
       }
     }
   }
