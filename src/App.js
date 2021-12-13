@@ -49,6 +49,7 @@ const App = () => {
                     graveyard placement
                 do not place mana wells adjacent to one another
         6. home screen.
+        7. deactivate passive when active is on cooldown
 
         - make character move to the last tile on a path.
         - do a circular of icons around profile pic for activated passives
@@ -248,7 +249,7 @@ const App = () => {
                 scale,
                 count: 10,
                 statusKey: "isWooded",
-                numTiles: 3,
+                numTiles: 1,
                 sideEffectObject: {},
                 playerIndex: k
               }),
@@ -333,9 +334,9 @@ const App = () => {
                 setPlayerData,
                 setTileStatuses,
                 scale,
-                count: 30,
+                count: 4,
                 statusKey: "isBubble",
-                numTiles: 4,
+                numTiles: 5,
                 sideEffectObject: {},
                 playerIndex: k
               });
@@ -345,7 +346,7 @@ const App = () => {
             element: "bubble",
             isPassive: false,
             isActive: false,
-            cooldownTime: 3000
+            cooldownTime: 8000
           },
           {
             passiveName: "Aegis Armor",
@@ -362,7 +363,7 @@ const App = () => {
                 setPlayerData,
                 setTileStatuses,
                 scale,
-                count: 0,
+                count: 2,
                 statusKey: "isShielded",
                 numTiles: 3,
                 sideEffectObject: {},
@@ -413,7 +414,7 @@ const App = () => {
         isUsed: false
       });
     }
-    setGraveyardData(_graveyards);
+    // setGraveyardData(_graveyards);
     // GRAVEYARDS - - - - - - - - - - - -
     // KAIJU - - - - - - - - - - - -
     const _kaiju = [];

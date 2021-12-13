@@ -29,7 +29,14 @@ export const shootPower = ({
             scale,
             numTiles
           );
-          setTileWithStatus(setTileStatuses, statusKey, tile, dirs, count);
+          setTileWithStatus(
+            setTileStatuses,
+            statusKey,
+            tile,
+            dirs,
+            count,
+            playerIndex
+          );
         }
       }
     });
@@ -43,31 +50,60 @@ export const setTileWithStatus = (
   statusName,
   currTile,
   dirs,
-  count
+  count,
+  playerIndex
 ) => {
   setTileStatuses(_tiles => {
     _tiles[currTile.i][currTile.j] = {
       ..._tiles[currTile.i][currTile.j],
-      [statusName]: { dirs, count }
+      [statusName]: { dirs, count, playerIndex }
     };
     return _tiles;
   });
 };
 export const solveForStatus = tile => {
   if (tile.isGraveyard) {
-    return { isGraveyard: tile.isGraveyard };
+    return {
+      isGraveyard: tile.isGraveyard,
+      count: tile.count,
+      playerIndex: tile.playerIndex
+    };
   } else if (tile.isBubble) {
-    return { isBubble: tile.isBubble };
+    return {
+      isBubble: tile.isBubble,
+      count: tile.count,
+      playerIndex: tile.playerIndex
+    };
   } else if (tile.isGhosted) {
-    return { isGhosted: tile.isGhosted };
+    return {
+      isGhosted: tile.isGhosted,
+      count: tile.count,
+      playerIndex: tile.playerIndex
+    };
   } else if (tile.isShielded) {
-    return { isShielded: tile.isShielded };
+    return {
+      isShielded: tile.isShielded,
+      count: tile.count,
+      playerIndex: tile.playerIndex
+    };
   } else if (tile.isElectrified) {
-    return { isElectrified: tile.isElectrified };
+    return {
+      isElectrified: tile.isElectrified,
+      count: tile.count,
+      playerIndex: tile.playerIndex
+    };
   } else if (tile.isOnFire) {
-    return { isOnFire: tile.isOnFire };
+    return {
+      isOnFire: tile.isOnFire,
+      count: tile.count,
+      playerIndex: tile.playerIndex
+    };
   } else if (tile.isWooded) {
-    return { isWooded: tile.isWooded };
+    return {
+      isWooded: tile.isWooded,
+      count: tile.count,
+      playerIndex: tile.playerIndex
+    };
   } else {
     return {};
   }
@@ -116,7 +152,7 @@ export const getTileOffsetFromDir = (dir, currTile) => {
       return { i: 0, j: 1 }; // down
       break;
     case "down left":
-      return { i: -1, j: currTile.i % 2 ? 0 : +1 }; // down left
+      return { i: -1, j: currTile.i % 2 ? 1 : 0 }; // down left
       break;
     case "up left":
       return { i: -1, j: currTile.i % 2 ? 0 : -1 }; // up left
@@ -144,7 +180,7 @@ export const getAdjacentTilesFromNormVec = (
     { i: 1, j: currTile.i % 2 ? 0 : -1 }, // up right
     { i: 1, j: currTile.i % 2 ? 1 : 0 }, // down right
     { i: 0, j: 1 }, // down
-    { i: -1, j: currTile.i % 2 ? 0 : +1 }, // down left
+    { i: -1, j: currTile.i % 2 ? 1 : 0 }, // down left
     { i: -1, j: currTile.i % 2 ? 0 : -1 } // up left
   ];
   const distance = getDistance(directionMapping[0], normVec);
@@ -172,8 +208,7 @@ export const getAdjacentTilesFromNormVec = (
     return [spawnPowerTile, tileDirMapping];
   } else if (numTiles) {
     const dirs = [tileDirMapping[i]];
-    for (let k = 1; k < numTiles - 2; k++) {
-      console.log(numTiles, k);
+    for (let k = 1; k < numTiles - 1; k++) {
       const l = i - k < 0 ? 6 - i - k : i - k;
       const m = i + k > 5 ? -1 * (6 - k - i) : i + k;
       dirs.push(tileDirMapping[l]);
@@ -265,27 +300,6 @@ export const movePiece = (data, setData, scale) => {
       _data[i].isThere = hasArrived;
       if (_data[i].isThere && _data[i].moveToTiles.length) {
         const [nextTile, ...tiles] = _data[i].moveToTiles;
-
-        /*
-        ? {
-            ...p,
-            curveBullets: false,
-            // moveSpeed: p.moveSpeed + 20,
-            moveToLocation: p.moveToTiles.length
-              ? getCharXAndY({
-                  ...p.moveToTiles[p.moveToTiles.length - 1],
-                  scale
-                })
-              : p.moveToLocation,
-            tile: p.moveToTiles.length
-              ? p.moveToTiles[p.moveToTiles.length - 1]
-              : p.tile,
-            moveFromLocation: p.charLocation,
-            moveToTiles: [],
-            isThere: false
-          }
-
-        */
         if (!tiles.length) {
           _data[i].moveToLocation =
             getCharXAndY({

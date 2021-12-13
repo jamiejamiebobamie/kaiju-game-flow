@@ -14,7 +14,8 @@ import {
   getRandBool,
   isTileOnGameBoard,
   solveForStatus,
-  getTileOffsetFromDir
+  getTileOffsetFromDir,
+  getAdjacentTilesFromTile
 } from "../Utils/utils";
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -99,19 +100,18 @@ export const GameBoard = ({
   const updateTileState = () => {
     setTileStatuses(_statuses => {
       if (_statuses) {
-        const status = [..._statuses];
         const rowLength = Math.ceil(width / (70 * scale));
         const colLength = Math.ceil(height / (75 * scale));
         const updateKey = Math.random();
         for (let i = 0; i < rowLength; i++) {
           for (let j = 0; j < colLength; j++) {
             // 1. solve what should be on the tile
-            if (status[i][j].updateKey !== updateKey) {
-              let tileStatus = solveForStatus(status[i][j]);
+            if (_statuses[i][j].updateKey !== updateKey) {
+              let tileStatus = solveForStatus(_statuses[i][j]);
               const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
               if (entry) {
                 const [k, data] = entry;
-                const { count, dirs } = data;
+                const { count, dirs, playerIndex } = data;
                 if (count) {
                   Array.isArray(dirs) &&
                     dirs.forEach(d => {
@@ -124,15 +124,36 @@ export const GameBoard = ({
                           j: nextTile.j
                         })
                       ) {
-                        status[nextTile.i][nextTile.j][k] = {
-                          dirs: [d],
-                          count: count - 1
+                        let direction = [d];
+                        if (
+                          k === "isOnFire" ||
+                          k === "isBubble" ||
+                          k === "isShielded"
+                        ) {
+                          direction = dirs;
+                        } else if (k === "isGhosted" || k === "isWooded") {
+                          const targetIndex = playerIndex ? 0 : 1;
+                          const targetTile = playerData
+                            ? playerData[targetIndex].tile
+                            : { i, j };
+                          const [_, targetDirection] = getAdjacentTilesFromTile(
+                            nextTile,
+                            targetTile,
+                            scale,
+                            1
+                          );
+                          direction = targetDirection;
+                        }
+                        _statuses[nextTile.i][nextTile.j][k] = {
+                          dirs: direction,
+                          count: count - 1,
+                          ..._statuses[nextTile.i][nextTile.j][k]
                         };
                         const nextTilesStatus = solveForStatus(
-                          status[nextTile.i][nextTile.j]
+                          _statuses[nextTile.i][nextTile.j]
                         );
-                        status[nextTile.i][nextTile.j] = nextTilesStatus;
-                        // status[nextTile.i][nextTile.j].updateKey = updateKey;
+                        _statuses[nextTile.i][nextTile.j] = nextTilesStatus;
+                        _statuses[nextTile.i][nextTile.j].updateKey = updateKey;
                       }
                       // 3. erase current tile's state if not: isElectrified
                       const doNotErase = [
@@ -140,10 +161,12 @@ export const GameBoard = ({
                         "isShielded",
                         "isWooded"
                       ];
-                      status[i][j][k] = !doNotErase.includes(k)
-                        ? null
-                        : tileStatus[k];
-                      status[i][j].updateKey = updateKey;
+                      _statuses[i][j][k] =
+                        !doNotErase.includes(k) ||
+                        (k === "isShielded" && count === 1)
+                          ? null
+                          : { ...tileStatus[k], count: 0 };
+                      _statuses[i][j].updateKey = updateKey;
                     });
                 } else {
                   Array.isArray(dirs) &&
@@ -154,17 +177,17 @@ export const GameBoard = ({
                         "isShielded",
                         "isWooded"
                       ];
-                      status[i][j][k] = !doNotErase.includes(k)
+                      _statuses[i][j][k] = !doNotErase.includes(k)
                         ? null
-                        : tileStatus[k];
-                      status[i][j].updateKey = updateKey;
+                        : { ...tileStatus[k], count: 0 };
+                      _statuses[i][j].updateKey = updateKey;
                     });
                 }
               }
             }
           }
         }
-        return status;
+        return _statuses;
       } else {
         return _statuses;
       }
