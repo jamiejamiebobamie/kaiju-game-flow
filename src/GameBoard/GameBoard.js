@@ -15,7 +15,8 @@ import {
   isTileOnGameBoard,
   solveForStatus,
   getTileOffsetFromDir,
-  getAdjacentTilesFromTile
+  getAdjacentTilesFromTile,
+  getRandomIntInRange
 } from "../Utils/utils";
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -114,7 +115,7 @@ export const GameBoard = ({
                 const { count, dirs, playerIndex } = data;
                 if (count) {
                   Array.isArray(dirs) &&
-                    dirs.forEach(d => {
+                    dirs.forEach((d, l) => {
                       // 2. move the status based on the direction
                       const offset = getTileOffsetFromDir(d, { i, j });
                       const nextTile = { i: i + offset.i, j: j + offset.j };
@@ -127,8 +128,10 @@ export const GameBoard = ({
                         let direction = [d];
                         if (
                           k === "isOnFire" ||
-                          k === "isBubble" ||
+                          (k === "isBubble" && count > 3) ||
+                          // (k === "isShielded" && count > 2) ||
                           k === "isShielded"
+                          // || (k === "isWooded" && count > 9)
                         ) {
                           direction = dirs;
                         } else if (k === "isGhosted" || k === "isWooded") {
@@ -144,10 +147,32 @@ export const GameBoard = ({
                           );
                           direction = targetDirection;
                         }
+                        const _count =
+                          count -
+                          getRandomIntInRange({
+                            min: count - 3,
+                            max: count - 2
+                          });
+                        const nextTileCount =
+                          _statuses[nextTile.i][nextTile.j][k] &&
+                          _statuses[nextTile.i][nextTile.j][k].count
+                            ? _statuses[nextTile.i][nextTile.j][k].count
+                            : 0;
+                        console.log({ _count, nextTileCount, l });
                         _statuses[nextTile.i][nextTile.j][k] = {
                           dirs: direction,
-                          count: count - 1,
-                          ..._statuses[nextTile.i][nextTile.j][k]
+                          count:
+                            k === "isWooded" && // this is broken nextTile
+                            dirs.length > 1 &&
+                            l > 0 &&
+                            nextTileCount < _count - 1
+                              ? _count - 1
+                              : count - 1,
+                          playerIndex: playerIndex
+                          // k === "isGhosted" || k === "isWooded"
+                          //   ? playerIndex
+                          //   : undefined
+                          // ..._statuses[nextTile.i][nextTile.j][k]
                         };
                         const nextTilesStatus = solveForStatus(
                           _statuses[nextTile.i][nextTile.j]
@@ -163,23 +188,41 @@ export const GameBoard = ({
                       ];
                       _statuses[i][j][k] =
                         !doNotErase.includes(k) ||
-                        (k === "isShielded" && count === 1)
-                          ? null
-                          : { ...tileStatus[k], count: 0 };
+                        (k === "isShielded" && count > 1) ||
+                        (k === "isWooded" && count > 9)
+                          ? // (k === "isShielded" && count < 2)
+                            // (k === "isShielded" && count !== 1)
+                            undefined
+                          : {
+                              ...tileStatus[k],
+                              count: 0
+                            };
                       _statuses[i][j].updateKey = updateKey;
                     });
                 } else {
                   Array.isArray(dirs) &&
                     dirs.forEach(d => {
-                      // 3. erase current tile's state if not: isElectrified
-                      const doNotErase = [
-                        "isElectrified",
-                        "isShielded",
-                        "isWooded"
-                      ];
-                      _statuses[i][j][k] = !doNotErase.includes(k)
-                        ? null
-                        : { ...tileStatus[k], count: 0 };
+                      // 3. erase current tile's state.
+                      const doNotErase = ["isShielded", "isWooded"];
+                      _statuses[i][j][k] =
+                        !doNotErase.includes(k) ||
+                        // (k === "isShielded" &&
+                        playerData.find(
+                          ({ tile }) => tile.i === i && tile.j === j
+                        )
+                          ? // )
+                            // ||
+                            // (k === "isShielded" && count > 1)
+                            // isShielded: playerData.find(
+                            //   ({ tile }) => tile.i === i && tile.j === j
+                            // )
+                            //   ? null
+                            //   : tileStatuses[i][j].isShielded,
+                            // (k === "isShielded" && count > 2) ||
+                            // (k === "isShielded" && count < 2)
+                            // (k === "isShielded" && count !== 1)
+                            undefined
+                          : { ...tileStatus[k], count: 0 };
                       _statuses[i][j].updateKey = updateKey;
                     });
                 }
@@ -213,22 +256,22 @@ export const GameBoard = ({
     let highlightedTiles = [];
     if (hoverLookupString) {
       const [i, j] = hoverLookupString.split(" ");
-      if (
-        kaiju1Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
-        kaiju2Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
-        !kaijuTokenPickedup
-      ) {
-        const path = findPath(
-          playerData[0].tile,
-          { i: Number(i), j: Number(j) },
-          scale
-        );
-        highlightedTiles = path.map(t => {
-          return { h_i: t.i, h_j: t.j };
-        });
-      } else {
-        highlightedTiles = [{ h_i: Number(i), h_j: Number(j) }];
-      }
+      // if (
+      //   kaiju1Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
+      //   kaiju2Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
+      //   !kaijuTokenPickedup
+      // ) {
+      const path = findPath(
+        playerData[0].tile,
+        { i: Number(i), j: Number(j) },
+        scale
+      );
+      highlightedTiles = path.map(t => {
+        return { h_i: t.i, h_j: t.j };
+      });
+      // } else {
+      // highlightedTiles = [{ h_i: Number(i), h_j: Number(j) }];
+      // }
     } else if (goalTile) {
       const path = findPath(playerData[0].tile, goalTile, scale);
       highlightedTiles = path.map(t => {
@@ -237,10 +280,11 @@ export const GameBoard = ({
       if (!path.length) setGoalTile(null);
     }
     redrawTiles(highlightedTiles);
-  }, 500);
-  useInterval(() => {
     updateTileState();
   }, 500);
+  // useInterval(() => {
+  //   redrawTiles([]);
+  // }, 500);
   // useEffect(() => {
   //   if (hoverLookupString || goalTile) setTileInterval(250);
   //   else {

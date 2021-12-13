@@ -134,15 +134,20 @@ export const Ability = ({ abilityData, setDisplayString, keyNum, ghosts }) => {
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
-  useKeyPress(() => {
-    if (getPlayerIndex && getPlayerIndex() === 0) {
-      console.log(keyNum);
-      handleClick();
-    }
-  }, `Digit${keyNum}`);
+  useKeyPress(
+    () => handleClick(),
+
+    // {
+    // console.log(getPlayerIndex, keyNum);
+    // if (getPlayerIndex && getPlayerIndex() === 0) {
+    //   console.log(keyNum);
+    // }
+    // }
+    `Digit${keyNum}`
+  );
   useEffect(() => {
     if (isActive) {
-      element === "death" && ghosts ? activateActive(ghosts) : activateActive();
+      activateActive();
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
       setTimeout(() => {

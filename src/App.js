@@ -219,7 +219,7 @@ const App = () => {
                 setPlayerData,
                 setTileStatuses,
                 scale,
-                count: 10,
+                count: 7,
                 statusKey: "isOnFire",
                 numTiles: 3,
                 sideEffectObject: {},
@@ -242,17 +242,18 @@ const App = () => {
                 )
               );
             },
-            activateActive: () =>
+            activateActive: () => {
               shootPower({
                 setPlayerData,
                 setTileStatuses,
                 scale,
                 count: 10,
                 statusKey: "isWooded",
-                numTiles: 1,
+                numTiles: 3,
                 sideEffectObject: {},
                 playerIndex: k
-              }),
+              });
+            },
             getPlayerIndex: () => k,
             displayLookup: "abilityWood",
             element: "wood",
@@ -275,9 +276,9 @@ const App = () => {
                 setPlayerData,
                 setTileStatuses,
                 scale,
-                count: 100,
+                count: 30,
                 statusKey: "isElectrified",
-                numTiles: 1,
+                numTiles: 3,
                 sideEffectObject: {},
                 playerIndex: k
               }),
@@ -305,7 +306,7 @@ const App = () => {
                 scale,
                 count: 30,
                 statusKey: "isGhosted",
-                numTiles: ghosts,
+                numTiles: 1, //ghosts,
                 sideEffectObject: { lives: 1 },
                 playerIndex: k
               });
@@ -375,7 +376,7 @@ const App = () => {
             element: "metal",
             isPassive: false,
             isActive: false,
-            cooldownTime: 6000
+            cooldownTime: 8000
           }
         ],
         accessory: {

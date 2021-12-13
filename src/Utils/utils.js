@@ -64,48 +64,48 @@ export const setTileWithStatus = (
 export const solveForStatus = tile => {
   if (tile.isGraveyard) {
     return {
-      isGraveyard: tile.isGraveyard,
-      count: tile.count,
-      playerIndex: tile.playerIndex
+      isGraveyard: tile.isGraveyard
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
     };
   } else if (tile.isBubble) {
     return {
-      isBubble: tile.isBubble,
-      count: tile.count,
-      playerIndex: tile.playerIndex
+      isBubble: tile.isBubble
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
     };
   } else if (tile.isGhosted) {
     return {
-      isGhosted: tile.isGhosted,
-      count: tile.count,
-      playerIndex: tile.playerIndex
+      isGhosted: tile.isGhosted
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
     };
   } else if (tile.isShielded) {
     return {
-      isShielded: tile.isShielded,
-      count: tile.count,
-      playerIndex: tile.playerIndex
+      isShielded: tile.isShielded
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
     };
   } else if (tile.isElectrified) {
     return {
-      isElectrified: tile.isElectrified,
-      count: tile.count,
-      playerIndex: tile.playerIndex
+      isElectrified: tile.isElectrified
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
     };
   } else if (tile.isOnFire) {
     return {
-      isOnFire: tile.isOnFire,
-      count: tile.count,
-      playerIndex: tile.playerIndex
+      isOnFire: tile.isOnFire
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
     };
   } else if (tile.isWooded) {
     return {
-      isWooded: tile.isWooded,
-      count: tile.count,
-      playerIndex: tile.playerIndex
+      isWooded: tile.isWooded
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
     };
   } else {
-    return {};
+    return tile;
   }
 };
 export const getRandBool = () => {
