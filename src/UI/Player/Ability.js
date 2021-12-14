@@ -37,6 +37,11 @@ const ICON_LOOKUP = {
     passive: "fa-cutlery",
     active: "fa-shield",
     loader: "fa-spinner"
+  },
+  wind: {
+    passive: "fa-feed",
+    active: "fa-cloud",
+    loader: "fa-spinner"
   }
 };
 

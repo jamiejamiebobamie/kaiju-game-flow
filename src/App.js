@@ -209,6 +209,34 @@ const App = () => {
         lives: 3,
         abilities: [
           {
+            passiveName: "Second Wind",
+            activeName: "Whirlwood",
+            activatePassive: () => {
+              setPlayerData(_players =>
+                _players.map(p =>
+                  k === p.i ? { ...p, lives: p.lives + 1 } : p
+                )
+              );
+            },
+            activateActive: () =>
+              shootPower({
+                setPlayerData,
+                setTileStatuses,
+                scale,
+                count: 20,
+                statusKey: "isWindy",
+                numTiles: 3,
+                sideEffectObject: {},
+                playerIndex: k
+              }),
+            getPlayerIndex: () => k,
+            displayLookup: "abilityWind",
+            element: "wind",
+            isPassive: false,
+            isActive: false,
+            cooldownTime: 2000
+          },
+          {
             passiveName: "Shatter Shot",
             activeName: "Shatter Travel",
             activatePassive: () => {

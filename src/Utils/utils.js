@@ -85,9 +85,9 @@ export const shootPower = ({
               ? [20, 3]
               : statusKey === "isOnFire"
               ? [30, 3]
-              : statusKey === "isElectrified"
-              ? [60, 5]
-              : statusKey === "isGhosted"
+              : // : statusKey === "isElectrified"
+              // ? [60, 5]
+              statusKey === "isGhosted"
               ? [60, 3]
               : statusKey === "isBubble"
               ? [7, 6]
@@ -173,6 +173,12 @@ export const solveForStatus = tile => {
   } else if (tile.isElectrified) {
     return {
       isElectrified: tile.isElectrified
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
+    };
+  } else if (tile.isWindy) {
+    return {
+      isWindy: tile.isWindy
       // count: tile.count,
       // playerIndex: tile.playerIndex
     };

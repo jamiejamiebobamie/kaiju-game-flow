@@ -139,16 +139,53 @@ export const GameBoard = ({
                         })
                       ) {
                         let direction = [d];
-                        if (
+                        if (k === "isWindy") {
+                          const tileDirMapping = [
+                            "up",
+                            "up right",
+                            "down right",
+                            "down",
+                            "down left",
+                            "up left"
+                          ];
+                          const newDir =
+                            tileDirMapping[count % tileDirMapping.length];
+                          direction = [newDir];
+                          // const [_, newDirs] = getAdjacentTilesFromTile(
+                          //   { i, j },
+                          //   nextTile,
+                          //   scale,
+                          //   3
+                          // );
+                          // direction = [...d, ...newDirs];
+                        } else if (
+                          k === "isElectrified" &&
+                          isInManaPool &&
+                          count === startCount - 3
+                        ) {
+                          const [_, newDirs] = getAdjacentTilesFromTile(
+                            { i, j },
+                            nextTile,
+                            scale,
+                            3
+                          );
+                          direction = newDirs;
+                        } else if (
                           k === "isOnFire" ||
                           (k === "isBubble" && count === startCount) ||
                           (k === "isBubble" && isInManaPool) ||
-                          // (k === "isShielded" && count > 2) ||
                           k === "isShielded"
                           // || (k === "isWooded" && count > 9)
                         ) {
                           direction = dirs;
-                        } else if (k === "isGhosted" || k === "isWooded") {
+                        } else if (
+                          k === "isGhosted" ||
+                          k === "isWooded"
+                          // ||
+                          // (k === "isElectrified" &&
+                          //   isInManaPool &&
+                          //   count > startCount - 3)
+                        ) {
                           const targetIndex = playerIndex ? 0 : 1;
                           const targetTile = playerData
                             ? playerData[targetIndex].tile
@@ -221,7 +258,7 @@ export const GameBoard = ({
                   Array.isArray(dirs) &&
                     dirs.forEach(d => {
                       // 3. erase current tile's state.
-                      const doNotErase = ["isShielded", "isWooded"];
+                      const doNotErase = [("isShielded", "isWooded")];
                       const playerOnTileStatus = playerData.find(
                         ({ tile }) => tile.i === i && tile.j === j
                       );
@@ -231,7 +268,10 @@ export const GameBoard = ({
                       _statuses[i][j][k] =
                         !doNotErase.includes(k) || playerOnTileStatus
                           ? undefined
-                          : { ...tileStatus[k], count: 0 };
+                          : {
+                              ...tileStatus[k]
+                              // count: 0
+                            };
                       _statuses[i][j].updateKey = updateKey;
                     });
                 }
