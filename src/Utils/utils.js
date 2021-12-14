@@ -6,6 +6,61 @@ export const isTileOnGameBoard = tile => {
     ? Object.keys(PENINSULA_TILE_LOOKUP).includes(`${tile.i} ${tile.j}`)
     : false;
 };
+export const respawnPlayers = (
+  setPlayerData,
+  graveyardData,
+  setGraveyardData,
+  setWinner,
+  scale
+) => {
+  setPlayerData(_players => {
+    return _players.map((p, k) => {
+      if (p.lives < 1) {
+        const enemyPlayer = k === 0 ? _players[1] : _players[0];
+        if (Array.isArray(graveyardData) && graveyardData.length) {
+          const distances = graveyardData.map(g =>
+            getDistance(
+              getCharXAndY({ ...g.tile, scale }),
+              enemyPlayer.charLocation
+            )
+          );
+          const farthestGraveyard = distances.reduce(
+            (acc, distance, j) =>
+              distance > acc.distance
+                ? { j, tile: graveyardData[j].tile, distance }
+                : acc,
+            { j: 0, tile: graveyardData[0].tile, distance: distances[0] }
+          );
+          if (farthestGraveyard) {
+            const { tile } = farthestGraveyard;
+            const location = getCharXAndY({ ...tile, scale });
+            setGraveyardData(graveyards =>
+              farthestGraveyard
+                ? graveyards.filter((g, j) => j !== farthestGraveyard.j)
+                : graveyards
+            );
+            return {
+              ...p,
+              lives: 1,
+              tile: farthestGraveyard.tile,
+              charLocation: location,
+              moveToLocation: location,
+              moveFromLocation: location,
+              isThere: true
+            };
+          } else {
+            return p;
+          }
+        } else {
+          setWinner(enemyPlayer);
+          return p;
+        }
+      } else {
+        return p;
+      }
+    });
+  });
+};
 export const shootPower = ({
   setPlayerData,
   setTileStatuses,
@@ -23,19 +78,41 @@ export const shootPower = ({
         const enemyIndex = p.i === 0 ? 1 : 0;
         const enemyTile = _players[enemyIndex].tile;
         if (playerTile && enemyTile) {
+          const [manaPoolCount, manaPoolNumTiles] = p.isInManaPool
+            ? statusKey === "isShielded"
+              ? [3, 5]
+              : statusKey === "isWooded"
+              ? [20, 3]
+              : statusKey === "isOnFire"
+              ? [30, 3]
+              : statusKey === "isElectrified"
+              ? [60, 5]
+              : statusKey === "isGhosted"
+              ? [60, 3]
+              : statusKey === "isBubble"
+              ? [7, 6]
+              : [null, null]
+            : [null, null];
+          console.log(
+            p.isInManaPool,
+            statusKey,
+            manaPoolCount,
+            manaPoolNumTiles
+          );
           const [tile, dirs] = getAdjacentTilesFromTile(
             playerTile,
             enemyTile,
             scale,
-            numTiles
+            manaPoolNumTiles ? manaPoolNumTiles : numTiles
           );
           setTileWithStatus(
             setTileStatuses,
             statusKey,
             tile,
             dirs,
-            count,
-            playerIndex
+            manaPoolCount ? manaPoolCount : count,
+            playerIndex,
+            p.isInManaPool
           );
         }
       }
@@ -51,12 +128,19 @@ export const setTileWithStatus = (
   currTile,
   dirs,
   count,
-  playerIndex
+  playerIndex,
+  isInManaPool
 ) => {
   setTileStatuses(_tiles => {
     _tiles[currTile.i][currTile.j] = {
       ..._tiles[currTile.i][currTile.j],
-      [statusName]: { dirs, count, playerIndex }
+      [statusName]: {
+        dirs,
+        count,
+        playerIndex,
+        startCount: count,
+        isInManaPool
+      }
     };
     return _tiles;
   });
@@ -393,8 +477,10 @@ export const useHover = () => {
 };
 export const useKeyPress = (callback, keyCode) => {
   const handler = ({ code }) => {
-    if (keyCode === code) {
-      callback();
+    if (Array.isArray(keyCode) && keyCode.includes(code)) {
+      callback(code);
+    } else if (keyCode === code) {
+      callback(code);
     }
   };
   useEffect(() => {

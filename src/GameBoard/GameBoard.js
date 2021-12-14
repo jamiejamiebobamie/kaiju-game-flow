@@ -45,6 +45,7 @@ const BackgroundImage = styled.img`
 `;
 export const GameBoard = ({
   playerData,
+  incrementPlayerLives,
   graveyardData,
   kaiju1Data,
   kaijuTokenTiles,
@@ -79,12 +80,12 @@ export const GameBoard = ({
           isPlayer:
             playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
             playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
-          isOnFire: null, //getRandBool() ? { i: -1, j: -1 } : null,
-          isWooded: null, //getRandBool() ? { i: 1, j: 1 } : null,
-          isElectrified: null, //getRandBool() ? { i: 0, j: -1 } : null,
-          isBubble: null, //getRandBool() ? { i: -1, j: -1 } : null,
-          isShielded: null, //getRandBool() ? { i: -1, j: -1 } : null,
-          isGhosted: null, //getRandBool() ? { i: -1, j: -1 } : null,
+          isOnFire: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
+          isWooded: undefined, //getRandBool() ? { i: 1, j: 1 } : null,
+          isElectrified: undefined, //getRandBool() ? { i: 0, j: -1 } : null,
+          isBubble: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
+          isShielded: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
+          isGhosted: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
           isKaiju: kaijuTokenTiles.find(
             ({ tile }) => tile.i == i && tile.j == j
           ),
@@ -112,7 +113,19 @@ export const GameBoard = ({
               const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
               if (entry) {
                 const [k, data] = entry;
-                const { count, dirs, playerIndex } = data;
+                const {
+                  startCount,
+                  count,
+                  dirs,
+                  playerIndex,
+                  isInManaPool
+                } = data;
+                const deathTiles = [
+                  "isElectrified",
+                  "isOnFire",
+                  "isGhosted",
+                  "isWooded"
+                ];
                 if (count) {
                   Array.isArray(dirs) &&
                     dirs.forEach((d, l) => {
@@ -128,7 +141,8 @@ export const GameBoard = ({
                         let direction = [d];
                         if (
                           k === "isOnFire" ||
-                          (k === "isBubble" && count > 3) ||
+                          (k === "isBubble" && count === startCount) ||
+                          (k === "isBubble" && isInManaPool) ||
                           // (k === "isShielded" && count > 2) ||
                           k === "isShielded"
                           // || (k === "isWooded" && count > 9)
@@ -150,15 +164,15 @@ export const GameBoard = ({
                         const _count =
                           count -
                           getRandomIntInRange({
-                            min: count - 3,
-                            max: count - 2
+                            min: count - 2,
+                            max: count - 1
                           });
                         const nextTileCount =
                           _statuses[nextTile.i][nextTile.j][k] &&
                           _statuses[nextTile.i][nextTile.j][k].count
                             ? _statuses[nextTile.i][nextTile.j][k].count
                             : 0;
-                        console.log({ _count, nextTileCount, l });
+                        // console.log({ _count, nextTileCount, l });
                         _statuses[nextTile.i][nextTile.j][k] = {
                           dirs: direction,
                           count:
@@ -168,11 +182,9 @@ export const GameBoard = ({
                             nextTileCount < _count - 1
                               ? _count - 1
                               : count - 1,
-                          playerIndex: playerIndex
-                          // k === "isGhosted" || k === "isWooded"
-                          //   ? playerIndex
-                          //   : undefined
-                          // ..._statuses[nextTile.i][nextTile.j][k]
+                          playerIndex: playerIndex,
+                          startCount,
+                          isInManaPool
                         };
                         const nextTilesStatus = solveForStatus(
                           _statuses[nextTile.i][nextTile.j]
@@ -186,13 +198,19 @@ export const GameBoard = ({
                         "isShielded",
                         "isWooded"
                       ];
+                      const playerOnTileStatus = playerData.find(
+                        ({ tile }) => tile.i === i && tile.j === j
+                      );
+                      playerOnTileStatus &&
+                        deathTiles.includes(k) &&
+                        incrementPlayerLives(playerOnTileStatus.i);
                       _statuses[i][j][k] =
                         !doNotErase.includes(k) ||
-                        (k === "isShielded" && count > 1) ||
-                        (k === "isWooded" && count > 9)
-                          ? // (k === "isShielded" && count < 2)
-                            // (k === "isShielded" && count !== 1)
-                            undefined
+                        (k === "isShielded" && count === startCount) ||
+                        (k === "isWooded" && count === startCount) ||
+                        (k === "isOnFire" && count === startCount) ||
+                        playerOnTileStatus
+                          ? undefined
                           : {
                               ...tileStatus[k],
                               count: 0
@@ -204,24 +222,15 @@ export const GameBoard = ({
                     dirs.forEach(d => {
                       // 3. erase current tile's state.
                       const doNotErase = ["isShielded", "isWooded"];
+                      const playerOnTileStatus = playerData.find(
+                        ({ tile }) => tile.i === i && tile.j === j
+                      );
+                      playerOnTileStatus &&
+                        deathTiles.includes(k) &&
+                        incrementPlayerLives(playerOnTileStatus.i);
                       _statuses[i][j][k] =
-                        !doNotErase.includes(k) ||
-                        // (k === "isShielded" &&
-                        playerData.find(
-                          ({ tile }) => tile.i === i && tile.j === j
-                        )
-                          ? // )
-                            // ||
-                            // (k === "isShielded" && count > 1)
-                            // isShielded: playerData.find(
-                            //   ({ tile }) => tile.i === i && tile.j === j
-                            // )
-                            //   ? null
-                            //   : tileStatuses[i][j].isShielded,
-                            // (k === "isShielded" && count > 2) ||
-                            // (k === "isShielded" && count < 2)
-                            // (k === "isShielded" && count !== 1)
-                            undefined
+                        !doNotErase.includes(k) || playerOnTileStatus
+                          ? undefined
                           : { ...tileStatus[k], count: 0 };
                       _statuses[i][j].updateKey = updateKey;
                     });
@@ -399,26 +408,28 @@ export const GameBoard = ({
       isInManaPool={p.isInManaPool}
     />
   ));
-  const manaPools = null;
-
-  // (
-  //   <>
-  //     <ManaPool
-  //       width={width}
-  //       height={height}
-  //       kaijuData={kaiju1Data}
-  //       color={playerData[0] && playerData[0].color}
-  //     />
-  //     <ManaPool
-  //       width={width}
-  //       height={height}
-  //       kaijuData={kaiju2Data}
-  //       color={playerData[1] && playerData[1].color}
-  //     />
-  //   </>
-  // );
-  const kaiju = null;
-  // <>kaiju1 kaiju2</>;
+  const manaPools = (
+    <>
+      <ManaPool
+        width={width}
+        height={height}
+        kaijuData={kaiju1Data}
+        color={playerData[0] && playerData[0].color}
+      />
+      <ManaPool
+        width={width}
+        height={height}
+        kaijuData={kaiju2Data}
+        color={playerData[1] && playerData[1].color}
+      />
+    </>
+  );
+  const kaiju = (
+    <>
+      {kaiju1}
+      {kaiju2}
+    </>
+  );
   return (
     <Board
       kaijuTokenPickedup={kaijuTokenPickedup}

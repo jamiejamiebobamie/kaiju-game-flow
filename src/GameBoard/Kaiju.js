@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const Ripple = styled.div`
+const Ripple = styled.i`
   position: absolute;
   z-index: 20001;
   left: ${props => `${props.charLocation.x}px`};
@@ -38,7 +38,11 @@ const Ripple = styled.div`
 `;
 export const Kaiju = ({ charLocation, element, color }) => {
   return (
-    <Ripple charLocation={charLocation} color={color}>
+    <Ripple
+      className="fa fa-optin-monster"
+      charLocation={charLocation}
+      color={color}
+    >
       <div className="lds-ripple">
         <div></div>
         <div></div>
