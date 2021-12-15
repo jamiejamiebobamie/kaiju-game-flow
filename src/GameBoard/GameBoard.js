@@ -46,7 +46,7 @@ const BackgroundImage = styled.img`
 export const GameBoard = ({
   playerData,
   incrementPlayerLives,
-  graveyardData,
+  graveyardTileKeys,
   kaiju1Data,
   kaijuTokenTiles,
   setKaijuTokenTiles,
@@ -64,9 +64,8 @@ export const GameBoard = ({
   const [tiles, setTiles] = useState([]);
   const [kaijuTokenPickedup, setKaijuTokenPickedup] = useState(null);
   const [setHoverRef, hoverLookupString] = useHover();
-  const [goalTile, setGoalTile] = useState(null);
+  const [path, setPath] = useState(null);
   const [tileInterval, setTileInterval] = useState(null);
-
   useEffect(() => {
     redrawTiles([]);
     const status = [];
@@ -89,9 +88,7 @@ export const GameBoard = ({
           isKaiju: kaijuTokenTiles.find(
             ({ tile }) => tile.i == i && tile.j == j
           ),
-          isGraveyard: graveyardData.find(
-            ({ tile }) => tile.i == i && tile.j == j
-          )
+          isGraveyard: graveyardTileKeys.find(key => key === `${i} ${j}`)
         });
       }
       status.push(_status);
@@ -285,62 +282,47 @@ export const GameBoard = ({
       }
     });
   };
-  // useEffect(() => {
-  //   if (hoverLookupString) {
-  //     const [i, j] = hoverLookupString.split(" ");
-  //     const path = findPath(
-  //       playerData[0].tile,
-  //       { i: Number(i), j: Number(j) },
-  //       scale
-  //     );
-  //     const highlightedTiles = path.map(t => {
-  //       return { h_i: t.i, h_j: t.j };
-  //     });
-  //     redrawTiles(highlightedTiles);
-  //   } else {
-  //     redrawTiles([]);
-  //   }
-  // }, [hoverLookupString]);
   useInterval(() => {
     let highlightedTiles = [];
     if (hoverLookupString) {
       const [i, j] = hoverLookupString.split(" ");
-      // if (
-      //   kaiju1Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
-      //   kaiju2Data.every(k => k.tile.i !== i && k.tile.j !== j) &&
-      //   !kaijuTokenPickedup
-      // ) {
-      const path = findPath(
-        playerData[0].tile,
-        { i: Number(i), j: Number(j) },
-        scale
-      );
-      highlightedTiles = path.map(t => {
+      const lastTile =
+        Array.isArray(path) && path[path.length - 1]
+          ? path[path.length - 1]
+          : { i: -1, j: -1 };
+      if (
+        playerData &&
+        playerData[0] &&
+        playerData[0].moveToTiles.length === 0 &&
+        `${lastTile.i} ${lastTile.j}` === hoverLookupString
+      ) {
+        highlightedTiles = path.map(t => {
+          return { h_i: t.i, h_j: t.j };
+        });
+      } else if (!graveyardTileKeys.find(key => key === hoverLookupString)) {
+        const _path = findPath(
+          playerData[0].tile,
+          { i: Number(i), j: Number(j) },
+          scale,
+          graveyardTileKeys
+        );
+        highlightedTiles = _path.map(t => {
+          return { h_i: t.i, h_j: t.j };
+        });
+        setPath(_path);
+      }
+    } else if (
+      playerData &&
+      playerData[0] &&
+      playerData[0].moveToTiles.length > 0
+    ) {
+      highlightedTiles = playerData[0].moveToTiles.map(t => {
         return { h_i: t.i, h_j: t.j };
       });
-      // } else {
-      // highlightedTiles = [{ h_i: Number(i), h_j: Number(j) }];
-      // }
-    } else if (goalTile) {
-      const path = findPath(playerData[0].tile, goalTile, scale);
-      highlightedTiles = path.map(t => {
-        return { h_i: t.i, h_j: t.j };
-      });
-      if (!path.length) setGoalTile(null);
     }
     redrawTiles(highlightedTiles);
     updateTileState();
   }, 500);
-  // useInterval(() => {
-  //   redrawTiles([]);
-  // }, 500);
-  // useEffect(() => {
-  //   if (hoverLookupString || goalTile) setTileInterval(250);
-  //   else {
-  //     setTileInterval(2000);
-  //     redrawTiles([]);
-  //   }
-  // }, [hoverLookupString, goalTile]);
   const redrawTiles = highlightedTiles => {
     if (tileStatuses) {
       const rowLength = Math.ceil(width / (70 * scale));
@@ -375,8 +357,8 @@ export const GameBoard = ({
                   isKaiju: kaijuTokenTiles.find(
                     ({ tile }) => tile.i == i && tile.j == j
                   ),
-                  isGraveyard: graveyardData.find(
-                    ({ tile }) => tile.i == i && tile.j == j
+                  isGraveyard: graveyardTileKeys.find(
+                    key => key === `${i} ${j}`
                   )
                 }}
               />
@@ -387,36 +369,12 @@ export const GameBoard = ({
       setTiles(_tiles);
     }
   };
-  // useEffect(() => redrawTiles([]), [kaijuTokenTiles]);
   useEffect(() => {
     const { i, j } = clickedTile;
     if (i !== -1) {
-      // check to see if a kaijuToken is picked up.
-      if (kaijuTokenPickedup) {
-        // if so, put down the token on the tile if not next to another kaiju token tile.
-        if (kaijuTokenTiles.every(({ tile }) => !isAdjacent({ i, j }, tile))) {
-          setKaijuTokenTiles(
-            kaijuTokenTiles.map(data =>
-              data.tile.i === kaijuTokenPickedup.i &&
-              data.tile.j === kaijuTokenPickedup.j
-                ? { ...data, tile: { i, j } }
-                : data
-            )
-          );
-          setKaijuTokenPickedup(null);
-        }
-        // check if the current tile has a kaiju
-      } else if (
-        kaijuTokenTiles.find(({ tile }) => tile.i === i && tile.j === j)
-      ) {
-        // if so, pick up the tile token.
-        setKaijuTokenPickedup({ i, j });
-        // else move the player to the clicked tile.
-      } else {
-        const path = findPath(playerData[0].tile, { i, j }, scale);
+      // move the player to the clicked tile.
+      if (!graveyardTileKeys.find(key => key === `${i} ${j}`)) {
         setPlayerMoveToTiles(path);
-        setGoalTile({ i, j });
-        // console.log(i, j);
       }
       setClickedTile({ i: -1, j: -1 });
     }
@@ -476,13 +434,14 @@ export const GameBoard = ({
       width={width}
       height={height}
     >
-      {manaPools}
       <ShiftContentOver scale={scale}>
         {tiles}
-        {kaiju}
         {players}
       </ShiftContentOver>
       <BackgroundImage src={"test_map.png"} />
     </Board>
   );
 };
+// {manaPools}
+// {kaiju}
+//

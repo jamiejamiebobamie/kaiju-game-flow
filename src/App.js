@@ -115,8 +115,9 @@ const App = () => {
   );
   const [playerData, setPlayerData] = useState([]);
   const [winner, setWinner] = useState(null);
-  const [intervalTime, setIntervalTime] = useState(250);
+  const [intervalTime, setIntervalTime] = useState(0);
   const [graveyardData, setGraveyardData] = useState([]);
+  const [graveyardTileKeys, setGraveyardTileKeys] = useState([]);
   const [kaiju1Data, setKaiju1Data] = useState([]);
   const [kaiju2Data, setKaiju2Data] = useState([]);
   const [kaijuTokenTiles, setKaijuTokenTiles] = useState([]);
@@ -128,58 +129,59 @@ const App = () => {
       _players.map((p, i) => (i === index ? { ...p, lives: p.lives - 1 } : p))
     );
   };
-  useKeyPress(
-    code => {
-      let offset = { i: 0, j: 0 };
-      switch (code) {
-        case "KeyW":
-          offset = { i: 0, j: -1 }; // up
-          break;
-        case "KeyS":
-          offset = { i: 0, j: 1 }; // down
-          break;
-        case "KeyD":
-          offset = { i: 1, j: 0 }; // down left
-          break;
-        case "KeyA":
-          offset = { i: -1, j: 0 }; // up left
-          break;
-        default:
-          offset = { i: 0, j: 0 };
-      }
-      setPlayerData(_players =>
-        _players.map((p, i) => {
-          if (i === 0 && p.isThere) {
-            const nextTile = {
-              i: p.tile.i + offset.i,
-              j: p.tile.j + offset.j
-            };
-            return PENINSULA_TILE_LOOKUP &&
-              Object.keys(PENINSULA_TILE_LOOKUP).includes(
-                `${nextTile.i} ${nextTile.j}`
-              )
-              ? {
-                  ...p,
-                  moveToLocation: getCharXAndY({
-                    ...nextTile,
-                    scale
-                  }),
-                  isThere: false,
-                  moveFromLocation: p.charLocation,
-                  tile: {
-                    i: p.tile.i + offset.i,
-                    j: p.tile.j + offset.j
-                  }
-                }
-              : p;
-          } else {
-            return p;
-          }
-        })
-      );
-    },
-    ["KeyW", "KeyA", "KeyS", "KeyD"]
-  );
+  // useKeyPress(
+  //   code => {
+  //     let offset = { i: 0, j: 0 };
+  //     switch (code) {
+  //       case "KeyW":
+  //         offset = { i: 0, j: -1 }; // up
+  //         break;
+  //       case "KeyS":
+  //         offset = { i: 0, j: 1 }; // down
+  //         break;
+  //       case "KeyD":
+  //         offset = { i: 1, j: 0 }; // down left
+  //         break;
+  //       case "KeyA":
+  //         offset = { i: -1, j: 0 }; // up left
+  //         break;
+  //       default:
+  //         offset = { i: 0, j: 0 };
+  //     }
+  //     setPlayerData(_players =>
+  //       _players.map((p, i) => {
+  //         if (i === 0 && p.isThere) {
+  //           const nextTile = {
+  //             i: p.tile.i + offset.i,
+  //             j: p.tile.j + offset.j
+  //           };
+  //           return PENINSULA_TILE_LOOKUP &&
+  //             PENINSULA_TILE_LOOKUP[`${nextTile.i} ${nextTile.j}`] &&
+  //             graveyardTileKeys.every(
+  //               key => key !== `${nextTile.i} ${nextTile.j}`
+  //             )
+  //             ? {
+  //                 ...p,
+  //                 moveToLocation: getCharXAndY({
+  //                   ...nextTile,
+  //                   scale
+  //                 }),
+  //                 isThere: false,
+  //                 moveFromLocation: p.charLocation,
+  //                 tile: {
+  //                   i: p.tile.i + offset.i,
+  //                   j: p.tile.j + offset.j
+  //                 }
+  //               }
+  //             : p;
+  //         } else {
+  //           return p;
+  //         }
+  //       })
+  //     );
+  //   },
+  //   ["KeyW", "KeyA", "KeyS", "KeyD"]
+  // );
   useEffect(() => {
     const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
     // PLAYERS - - - - - - - - - - - -
@@ -207,267 +209,7 @@ const App = () => {
         isThere: true,
         moveSpeed: 14,
         lives: 3,
-        abilities: [
-          {
-            passiveName: "Second Wind",
-            activeName: "Whirlwood",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i ? { ...p, lives: p.lives + 1 } : p
-                )
-              );
-            },
-            activateActive: () =>
-              shootPower({
-                setPlayerData,
-                setTileStatuses,
-                scale,
-                count: 20,
-                statusKey: "isWindy",
-                numTiles: 3,
-                sideEffectObject: {},
-                playerIndex: k
-              }),
-            getPlayerIndex: () => k,
-            displayLookup: "abilityWind",
-            element: "wind",
-            isPassive: false,
-            isActive: false,
-            cooldownTime: 2000
-          },
-          {
-            passiveName: "Shatter Shot",
-            activeName: "Shatter Travel",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i ? { ...p, curveBullets: true } : p
-                )
-              );
-            },
-            activateActive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i
-                    ? {
-                        ...p,
-                        curveBullets: false,
-                        // moveSpeed: p.moveSpeed + 20,
-                        moveToLocation: p.moveToTiles.length
-                          ? getCharXAndY({
-                              ...p.moveToTiles[p.moveToTiles.length - 1],
-                              scale
-                            })
-                          : p.moveToLocation,
-                        tile: p.moveToTiles.length
-                          ? p.moveToTiles[p.moveToTiles.length - 1]
-                          : p.tile,
-                        moveFromLocation: p.charLocation,
-                        moveToTiles: [],
-                        isThere: false
-                      }
-                    : p
-                )
-              );
-              // setTimeout(
-              //   () =>
-              //     setPlayerData(_players =>
-              //       _players.map(p =>
-              //         k === p.i
-              //           ? {
-              //               ...p,
-              //               moveSpeed: p.moveSpeed - 20
-              //             }
-              //           : p
-              //       )
-              //     ),
-              //   4000
-              // );
-            },
-            getPlayerIndex: () => k,
-            displayLookup: "abilityGlass",
-            element: "glass",
-            isPassive: false,
-            isActive: false,
-            // cooldownTime: 25000
-            cooldownTime: 3000
-          },
-          {
-            passiveName: "Campfire",
-            activeName: "Dragon's Breath",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i ? { ...p, immuneToGhosts: true } : p
-                )
-              );
-            },
-            activateActive: () =>
-              shootPower({
-                setPlayerData,
-                setTileStatuses,
-                scale,
-                count: 7,
-                statusKey: "isOnFire",
-                numTiles: 3,
-                sideEffectObject: {},
-                playerIndex: k
-              }),
-            getPlayerIndex: () => k,
-            displayLookup: "abilityFire",
-            element: "fire",
-            isPassive: false,
-            isActive: false,
-            cooldownTime: 6000
-          },
-          {
-            passiveName: "Barkskin",
-            activeName: "Overgrowth",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i ? { ...p, immuneToMelee: true } : p
-                )
-              );
-            },
-            activateActive: () => {
-              shootPower({
-                setPlayerData,
-                setTileStatuses,
-                scale,
-                count: 10,
-                statusKey: "isWooded",
-                numTiles: 3,
-                sideEffectObject: {},
-                playerIndex: k
-              });
-            },
-            getPlayerIndex: () => k,
-            displayLookup: "abilityWood",
-            element: "wood",
-            isPassive: false,
-            isActive: false,
-            cooldownTime: 6000
-          },
-          {
-            passiveName: "Charged Step",
-            activeName: "Discharge",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i ? { ...p, moveSpeed: p.moveSpeed + 4 } : p
-                )
-              );
-            },
-            activateActive: () =>
-              shootPower({
-                setPlayerData,
-                setTileStatuses,
-                scale,
-                count: 30,
-                statusKey: "isElectrified",
-                numTiles: 3,
-                sideEffectObject: {},
-                playerIndex: k
-              }),
-            getPlayerIndex: () => k,
-            displayLookup: "abilityLightning",
-            element: "lightning",
-            isPassive: false,
-            isActive: false,
-            cooldownTime: 7000
-          },
-          {
-            passiveName: "Reaper",
-            activeName: "Haunt",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i ? { ...p, isGrimReaper: true } : p
-                )
-              );
-            },
-            activateActive: ghosts => {
-              shootPower({
-                setPlayerData,
-                setTileStatuses,
-                scale,
-                count: 30,
-                statusKey: "isGhosted",
-                numTiles: 1, //ghosts,
-                sideEffectObject: { lives: 1 },
-                playerIndex: k
-              });
-            },
-            getPlayerIndex: () => k,
-            displayLookup: "abilityDeath",
-            element: "death",
-            isPassive: false,
-            isActive: false,
-            cooldownTime: 3000
-          },
-          {
-            passiveName: "Shelter",
-            activeName: "Dispel",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i
-                    ? { ...p, immuneToFire: true, immuneToIvy: true }
-                    : p
-                )
-              );
-            },
-            activateActive: () => {
-              shootPower({
-                setPlayerData,
-                setTileStatuses,
-                scale,
-                count: 4,
-                statusKey: "isBubble",
-                numTiles: 5,
-                sideEffectObject: {},
-                playerIndex: k
-              });
-            },
-            getPlayerIndex: () => k,
-            displayLookup: "abilityBubble",
-            element: "bubble",
-            isPassive: false,
-            isActive: false,
-            cooldownTime: 8000
-          },
-          {
-            passiveName: "Aegis Armor",
-            activeName: "Aegis",
-            activatePassive: () => {
-              setPlayerData(_players =>
-                _players.map(p =>
-                  k === p.i ? { ...p, immuneToBullets: true } : p
-                )
-              );
-            },
-            activateActive: () => {
-              shootPower({
-                setPlayerData,
-                setTileStatuses,
-                scale,
-                count: 2,
-                statusKey: "isShielded",
-                numTiles: 3,
-                sideEffectObject: {},
-                playerIndex: k
-              });
-            },
-            getPlayerIndex: () => k,
-            displayLookup: "abilityMetal",
-            element: "metal",
-            isPassive: false,
-            isActive: false,
-            cooldownTime: 8000
-          }
-        ],
+        abilities: [],
         accessory: {
           displayLookup: "testAccessoryLookup",
           accessoryImgFile: "fire_icon.png"
@@ -505,6 +247,7 @@ const App = () => {
       });
     }
     setGraveyardData(_graveyards);
+    setGraveyardTileKeys(_graveyards.map(({ tile }) => `${tile.i} ${tile.j}`));
     // GRAVEYARDS - - - - - - - - - - - -
     // KAIJU - - - - - - - - - - - -
     const _kaiju = [];
@@ -534,39 +277,9 @@ const App = () => {
       });
     }
     setKaiju1Data(_kaiju.filter(k => k.owner === _players[0]));
-    // setKaijuTokenTiles(
-    //   _kaiju
-    //     .filter(k => k.owner === _players[0])
-    //     .map(({ tile, key }) => {
-    //       return {
-    //         key,
-    //         tile
-    //       };
-    //     })
-    // );
     setKaiju2Data(_kaiju.filter(k => k.owner === _players[1]));
     // KAIJU - - - - - - - - - - - -
   }, []);
-  // useEffect(() => {
-  //   if (kaijuTokenTiles && kaijuTokenTiles.length)
-  //     setKaiju1Data(_kaiju1Data =>
-  //       _kaiju1Data.map(data => {
-  //         return {
-  //           ...data,
-  //           isThere: false,
-  //           moveToLocation: getCharXAndY({
-  //             i: kaijuTokenTiles.find(t => t.key === data.key)
-  //               ? kaijuTokenTiles.find(t => t.key === data.key).tile.i
-  //               : 0,
-  //             j: kaijuTokenTiles.find(t => t.key === data.key)
-  //               ? kaijuTokenTiles.find(t => t.key === data.key).tile.j
-  //               : 0,
-  //             scale
-  //           })
-  //         };
-  //       })
-  //     );
-  // }, [kaijuTokenTiles]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
       getCharXAndY(playerMoveToTiles);
@@ -586,19 +299,27 @@ const App = () => {
   }, [winner]);
   useInterval(() => {
     movePiece(playerData, setPlayerData, scale);
-    respawnPlayers(
-      setPlayerData,
-      graveyardData,
-      setGraveyardData,
-      setWinner,
-      scale
-    );
-    movePiece(kaiju1Data, setKaiju1Data, scale);
-    movePiece(kaiju2Data, setKaiju2Data, scale);
-    checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
+    // respawnPlayers(
+    //   setPlayerData,
+    //   graveyardData,
+    //   setGraveyardData,
+    //   setWinner,
+    //   scale
+    // );
+    // movePiece(kaiju1Data, setKaiju1Data, scale);
+    // movePiece(kaiju2Data, setKaiju2Data, scale);
+    // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
   }, intervalTime);
   // <GameTitle>Kaiju City</GameTitle>
-
+  // useEffect(() => {
+  //   if (
+  //     playerData.every(
+  //       p => !p.moveToTiles.length && p.moveToLocation !== p.moveFromLocation
+  //     )
+  //   )
+  //     setIntervalTime(null);
+  //   else setIntervalTime(0);
+  // }, [playerData]);
   return (
     <>
       <div className="App">
@@ -609,6 +330,7 @@ const App = () => {
           setPlayerMoveToTiles={setPlayerMoveToTiles}
           playerData={playerData}
           graveyardData={graveyardData}
+          graveyardTileKeys={graveyardTileKeys}
           kaiju1Data={kaiju1Data}
           kaijuTokenTiles={kaijuTokenTiles}
           setKaijuTokenTiles={setKaijuTokenTiles}

@@ -32,13 +32,7 @@ export const HealthBar = ({ setDisplayString, health = 1 }) => {
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const bars = [];
   for (let i = 0; i < health; i++) {
-    bars.push(
-      <Bar
-        key={i}
-        ref={setHoverRef(i > 0 ? "ghostHealthBar" : "healthBar")}
-        isGhost={i > 0}
-      />
-    );
+    bars.push(<Bar key={i} ref={setHoverRef("healthBar")} isGhost={false} />);
   }
   return <Wrapper>{bars}</Wrapper>;
 };

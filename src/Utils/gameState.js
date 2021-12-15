@@ -607,3 +607,251 @@ export const BRIDGE_TILES = {
   "22 6": { i: 22, j: 6 },
   "23 5": { i: 23, j: 5 }
 };
+
+// const PLAYER_ABILITIES = {
+//   wind: {
+//     passiveName: "Second Wind",
+//     activeName: "Whirlwood",
+//     activatePassive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p => (k === p.i ? { ...p, lives: p.lives + 1 } : p))
+//       );
+//     },
+//     activateActive: k =>
+//       shootPower({
+//         setPlayerData,
+//         setTileStatuses,
+//         scale,
+//         count: 20,
+//         statusKey: "isWindy",
+//         numTiles: 3,
+//         sideEffectObject: {},
+//         playerIndex: k
+//       }),
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityWind",
+//     element: "wind",
+//     isPassive: false,
+//     isActive: false,
+//     cooldownTime: 2000
+//   },
+//   glass: {
+//     passiveName: "Shatter Shot",
+//     activeName: "Shatter Travel",
+//     activatePassive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p => (k === p.i ? { ...p, curveBullets: true } : p))
+//       );
+//     },
+//     activateActive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p =>
+//           k === p.i
+//             ? {
+//                 ...p,
+//                 curveBullets: false,
+//                 // moveSpeed: p.moveSpeed + 20,
+//                 moveToLocation: p.moveToTiles.length
+//                   ? getCharXAndY({
+//                       ...p.moveToTiles[p.moveToTiles.length - 1],
+//                       scale
+//                     })
+//                   : p.moveToLocation,
+//                 tile: p.moveToTiles.length
+//                   ? p.moveToTiles[p.moveToTiles.length - 1]
+//                   : p.tile,
+//                 moveFromLocation: p.charLocation,
+//                 moveToTiles: [],
+//                 isThere: false
+//               }
+//             : p
+//         )
+//       );
+//       // setTimeout(
+//       //   () =>
+//       //     setPlayerData(_players =>
+//       //       _players.map(p =>
+//       //         k === p.i
+//       //           ? {
+//       //               ...p,
+//       //               moveSpeed: p.moveSpeed - 20
+//       //             }
+//       //           : p
+//       //       )
+//       //     ),
+//       //   4000
+//       // );
+//     },
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityGlass",
+//     element: "glass",
+//     isPassive: false,
+//     isActive: false,
+//     // cooldownTime: 25000
+//     cooldownTime: 3000
+//   },
+//   fire: {
+//     passiveName: "Campfire",
+//     activeName: "Dragon's Breath",
+//     activatePassive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p => (k === p.i ? { ...p, immuneToGhosts: true } : p))
+//       );
+//     },
+//     activateActive: k =>
+//       shootPower({
+//         setPlayerData,
+//         setTileStatuses,
+//         scale,
+//         count: 7,
+//         statusKey: "isOnFire",
+//         numTiles: 3,
+//         sideEffectObject: {},
+//         playerIndex: k
+//       }),
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityFire",
+//     element: "fire",
+//     isPassive: false,
+//     isActive: false,
+//     cooldownTime: 6000
+//   },
+//   wood: {
+//     passiveName: "Barkskin",
+//     activeName: "Overgrowth",
+//     activatePassive: () => {
+//       setPlayerData(_players =>
+//         _players.map(p => (k === p.i ? { ...p, immuneToMelee: true } : p))
+//       );
+//     },
+//     activateActive: (k) => {
+//       shootPower({
+//         setPlayerData,
+//         setTileStatuses,
+//         scale,
+//         count: 10,
+//         statusKey: "isWooded",
+//         numTiles: 3,
+//         sideEffectObject: {},
+//         playerIndex: k
+//       });
+//     },
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityWood",
+//     element: "wood",
+//     isPassive: false,
+//     isActive: false,
+//     cooldownTime: 6000
+//   },
+//   lightning: {
+//     passiveName: "Charged Step",
+//     activeName: "Discharge",
+//     activatePassive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p =>
+//           k === p.i ? { ...p, moveSpeed: p.moveSpeed + 4 } : p
+//         )
+//       );
+//     },
+//     activateActive: k =>
+//       shootPower({
+//         setPlayerData,
+//         setTileStatuses,
+//         scale,
+//         count: 30,
+//         statusKey: "isElectrified",
+//         numTiles: 3,
+//         sideEffectObject: {},
+//         playerIndex: k
+//       }),
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityLightning",
+//     element: "lightning",
+//     isPassive: false,
+//     isActive: false,
+//     cooldownTime: 7000
+//   },
+//   death: {
+//     passiveName: "Reaper",
+//     activeName: "Haunt",
+//     activatePassive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p => (k === p.i ? { ...p, isGrimReaper: true } : p))
+//       );
+//     },
+//     activateActive: k => {
+//       shootPower({
+//         setPlayerData,
+//         setTileStatuses,
+//         scale,
+//         count: 30,
+//         statusKey: "isGhosted",
+//         numTiles: 1, //ghosts,
+//         sideEffectObject: { lives: 1 },
+//         playerIndex: k
+//       });
+//     },
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityDeath",
+//     element: "death",
+//     isPassive: false,
+//     isActive: false,
+//     cooldownTime: 3000
+//   },
+//   bubble: {
+//     passiveName: "Shelter",
+//     activeName: "Dispel",
+//     activatePassive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p =>
+//           k === p.i ? { ...p, immuneToFire: true, immuneToIvy: true } : p
+//         )
+//       );
+//     },
+//     activateActive: k => {
+//       shootPower({
+//         setPlayerData,
+//         setTileStatuses,
+//         scale,
+//         count: 4,
+//         statusKey: "isBubble",
+//         numTiles: 5,
+//         sideEffectObject: {},
+//         playerIndex: k
+//       });
+//     },
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityBubble",
+//     element: "bubble",
+//     isPassive: false,
+//     isActive: false,
+//     cooldownTime: 8000
+//   },
+//   metal: {
+//     passiveName: "Aegis Armor",
+//     activeName: "Aegis",
+//     activatePassive: k => {
+//       setPlayerData(_players =>
+//         _players.map(p => (k === p.i ? { ...p, immuneToBullets: true } : p))
+//       );
+//     },
+//     activateActive: k => {
+//       shootPower({
+//         setPlayerData,
+//         setTileStatuses,
+//         scale,
+//         count: 2,
+//         statusKey: "isShielded",
+//         numTiles: 3,
+//         sideEffectObject: {},
+//         playerIndex: k
+//       });
+//     },
+//     getPlayerIndex: k => k,
+//     displayLookup: "abilityMetal",
+//     element: "metal",
+//     isPassive: false,
+//     isActive: false,
+//     cooldownTime: 8000
+//   }
+// };

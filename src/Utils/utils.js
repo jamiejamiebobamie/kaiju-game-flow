@@ -578,9 +578,20 @@ export const isLocatonInsidePolygon = (polygon, p) => {
   return isInside;
 };
 const getAdjacentTiles = tile => {
-  return Object.values(PENINSULA_TILE_LOOKUP).filter(t => isAdjacent(t, tile));
+  return [
+    { i: 0, j: -1 },
+    { i: 1, j: tile.i % 2 ? 0 : -1 },
+    { i: 1, j: tile.i % 2 ? 1 : 0 },
+    { i: 0, j: 1 },
+    { i: -1, j: tile.i % 2 ? 1 : 0 },
+    { i: -1, j: tile.i % 2 ? 0 : -1 }
+  ]
+    .map(t => {
+      return { i: t.i + tile.i, j: t.j + tile.j };
+    })
+    .filter(t => PENINSULA_TILE_LOOKUP[`${t.i} ${t.j}`]);
 };
-export const findPath = (start, goal, scale) => {
+export const findPath = (start, goal, scale, graveyardTileKeys) => {
   let count = 0;
   // const duplicateLookup = {};
   return recur(start, [], count);
@@ -610,7 +621,10 @@ export const findPath = (start, goal, scale) => {
         shortest.distance = distance;
       }
     });
-    if (shortest.tile.i === currTile.i && shortest.tile.j === currTile.j) {
+    if (
+      (shortest.tile.i === currTile.i && shortest.tile.j === currTile.j) ||
+      graveyardTileKeys.includes(`${shortest.tile.i} ${shortest.tile.j}`)
+    ) {
       // const randTile = getRandAdjacentTile(currTile);
       const keyedArr = arr.map(({ i, j }) => `${i} ${j}`);
       const remainingTiles = adjacentTiles.filter(
