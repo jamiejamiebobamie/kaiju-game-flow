@@ -44,6 +44,7 @@ const BackgroundImage = styled.img`
   background-repeat: no-repeat;
 `;
 export const GameBoard = ({
+  kaijuData,
   playerData,
   incrementPlayerLives,
   graveyardTileKeys,
@@ -284,42 +285,45 @@ export const GameBoard = ({
   };
   useInterval(() => {
     let highlightedTiles = [];
-    if (hoverLookupString) {
-      const [i, j] = hoverLookupString.split(" ");
-      const lastTile =
-        Array.isArray(path) && path[path.length - 1]
-          ? path[path.length - 1]
-          : { i: -1, j: -1 };
-      if (
+    if (playerData && playerData[0]) {
+      if (hoverLookupString) {
+        const [i, j] = hoverLookupString.split(" ");
+        const lastTile =
+          Array.isArray(path) && path[path.length - 1]
+            ? path[path.length - 1]
+            : { i: -1, j: -1 };
+        if (
+          playerData &&
+          playerData[0] &&
+          playerData[0].moveToTiles.length === 0 &&
+          `${lastTile.i} ${lastTile.j}` === hoverLookupString
+        ) {
+          highlightedTiles = path.map(t => {
+            return { h_i: t.i, h_j: t.j };
+          });
+        } else if (!graveyardTileKeys.find(key => key === hoverLookupString)) {
+          const _path = findPath(
+            playerData[0].tile,
+            { i: Number(i), j: Number(j) },
+            scale,
+            graveyardTileKeys
+          );
+          highlightedTiles = _path.map(t => {
+            return { h_i: t.i, h_j: t.j };
+          });
+          setPath(_path);
+        }
+      } else if (
         playerData &&
         playerData[0] &&
-        playerData[0].moveToTiles.length === 0 &&
-        `${lastTile.i} ${lastTile.j}` === hoverLookupString
+        playerData[0].moveToTiles.length > 0
       ) {
-        highlightedTiles = path.map(t => {
+        highlightedTiles = playerData[0].moveToTiles.map(t => {
           return { h_i: t.i, h_j: t.j };
         });
-      } else if (!graveyardTileKeys.find(key => key === hoverLookupString)) {
-        const _path = findPath(
-          playerData[0].tile,
-          { i: Number(i), j: Number(j) },
-          scale,
-          graveyardTileKeys
-        );
-        highlightedTiles = _path.map(t => {
-          return { h_i: t.i, h_j: t.j };
-        });
-        setPath(_path);
       }
-    } else if (
-      playerData &&
-      playerData[0] &&
-      playerData[0].moveToTiles.length > 0
-    ) {
-      highlightedTiles = playerData[0].moveToTiles.map(t => {
-        return { h_i: t.i, h_j: t.j };
-      });
     }
+
     redrawTiles(highlightedTiles);
     updateTileState();
   }, 500);
@@ -379,15 +383,23 @@ export const GameBoard = ({
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
-  const kaiju1 = kaiju1Data.map((k, i) => (
-    <Kaiju
-      key={i}
-      charLocation={k.charLocation}
-      element={k.element}
-      color={k.color}
-    />
-  ));
-  const kaiju2 = kaiju2Data.map((k, i) => (
+  // const kaiju1 = kaiju1Data.map((k, i) => (
+  //   <Kaiju
+  //     key={i}
+  //     charLocation={k.charLocation}
+  //     element={k.element}
+  //     color={k.color}
+  //   />
+  // ));
+  // const kaiju2 = kaiju2Data.map((k, i) => (
+  //   <Kaiju
+  //     key={i}
+  //     charLocation={k.charLocation}
+  //     element={k.element}
+  //     color={k.color}
+  //   />
+  // ));
+  const kaiju = kaijuData.map((k, i) => (
     <Kaiju
       key={i}
       charLocation={k.charLocation}
@@ -406,28 +418,28 @@ export const GameBoard = ({
       isInManaPool={p.isInManaPool}
     />
   ));
-  const manaPools = (
-    <>
-      <ManaPool
-        width={width}
-        height={height}
-        kaijuData={kaiju1Data}
-        color={playerData[0] && playerData[0].color}
-      />
-      <ManaPool
-        width={width}
-        height={height}
-        kaijuData={kaiju2Data}
-        color={playerData[1] && playerData[1].color}
-      />
-    </>
-  );
-  const kaiju = (
-    <>
-      {kaiju1}
-      {kaiju2}
-    </>
-  );
+  // const manaPools = (
+  //   <>
+  //     <ManaPool
+  //       width={width}
+  //       height={height}
+  //       kaijuData={kaiju1Data}
+  //       color={playerData[0] && playerData[0].color}
+  //     />
+  //     <ManaPool
+  //       width={width}
+  //       height={height}
+  //       kaijuData={kaiju2Data}
+  //       color={playerData[1] && playerData[1].color}
+  //     />
+  //   </>
+  // );
+  // const kaiju = (
+  //   <>
+  //     {kaiju1}
+  //     {kaiju2}
+  //   </>
+  // );
   return (
     <Board
       kaijuTokenPickedup={kaijuTokenPickedup}
@@ -436,6 +448,7 @@ export const GameBoard = ({
     >
       <ShiftContentOver scale={scale}>
         {tiles}
+        {kaiju}
         {players}
       </ShiftContentOver>
       <BackgroundImage src={"test_map.png"} />

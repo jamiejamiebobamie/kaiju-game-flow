@@ -13,7 +13,11 @@ const Wrapper = styled.div`
   overflow-y: scroll;
 `;
 export const Abilities = ({
+  playerIndex,
   ghosts,
+  setPlayerData,
+  setTileStatuses,
+  scale,
   setDisplayString,
   isReversed,
   abilities = [
@@ -64,10 +68,14 @@ export const Abilities = ({
   const abilityButtons = abilities.map((abilityData, i) => (
     <Ability
       key={i}
+      setPlayerData={setPlayerData}
+      setTileStatuses={setTileStatuses}
+      scale={scale}
       setDisplayString={setDisplayString}
       abilityData={abilityData}
       keyNum={i + 1}
       ghosts={ghosts}
+      playerIndex={playerIndex}
     />
   ));
   return <Wrapper isReversed={isReversed}>{abilityButtons}</Wrapper>;

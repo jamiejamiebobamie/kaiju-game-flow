@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { PENINSULA_TILE_LOOKUP } from "./gameState";
+import { PENINSULA_TILE_LOOKUP, PLAYER_ABILITIES } from "./gameState";
 
 export const isTileOnGameBoard = tile => {
   return PENINSULA_TILE_LOOKUP
@@ -371,9 +371,46 @@ const getDistance = (to, from) => {
     (to.x - from.x) * (to.x - from.x) + (to.y - from.y) * (to.y - from.y)
   );
 };
-export const movePiece = (data, setData, scale) => {
+export const movePiece = (
+  data,
+  setData,
+  kaijuData,
+  setKaijuData,
+  graveyardTileKeys,
+  scale
+) => {
   const _data = [...data];
   for (let i = 0; i < _data.length; i++) {
+    // set logic for enemy player
+    if (i === 1 && kaijuData.length) {
+      //&& !_data[i].moveToTiles.length) {
+      // find the closest kaiju
+      const closetKaiju = kaijuData.reduce(
+        (acc, kaiju, j) => {
+          const distToKaiju = getDistance(
+            getCharXAndY({ ...kaiju.tile, scale }),
+            getCharXAndY({ ..._data[1].tile, scale })
+          );
+          if (acc.distance && distToKaiju < acc.distance) {
+            return {
+              distance: distToKaiju,
+              tile: kaiju.tile
+            };
+          } else return acc;
+        },
+        { distance: Number.MAX_SAFE_INTEGER }
+      );
+      // get path
+      const moveToTiles = findPath(
+        _data[1].tile,
+        closetKaiju.tile,
+        scale,
+        graveyardTileKeys
+      );
+      console.log(_data[1].tile, closetKaiju, scale, moveToTiles);
+      _data[i].moveToTiles = moveToTiles;
+    }
+    // - - - - - - - - - - -
     if (
       _data[i].charLocation &&
       _data[i].moveFromLocation &&
@@ -388,6 +425,15 @@ export const movePiece = (data, setData, scale) => {
       });
       _data[i].charLocation = newLocation;
       _data[i].isThere = hasArrived;
+      // check tile for kaiju
+      const kaiju = kaijuData.find(
+        ({ tile }) => tile.i === _data[i].tile.i && tile.j === _data[i].tile.j
+      );
+      if (kaiju) {
+        _data[i].abilities.push(PLAYER_ABILITIES[kaiju.element]);
+        setKaijuData(_kaiju => _kaiju.filter(k => k !== kaiju));
+      }
+      // - - - - - - - - - - -
       if (_data[i].isThere && _data[i].moveToTiles.length) {
         const [nextTile, ...tiles] = _data[i].moveToTiles;
         if (!tiles.length) {
@@ -577,7 +623,7 @@ export const isLocatonInsidePolygon = (polygon, p) => {
   }
   return isInside;
 };
-const getAdjacentTiles = tile => {
+export const getAdjacentTiles = tile => {
   return [
     { i: 0, j: -1 },
     { i: 1, j: tile.i % 2 ? 0 : -1 },

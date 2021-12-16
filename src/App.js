@@ -18,10 +18,10 @@ import {
   movePiece,
   isLocatonInsidePolygon,
   checkIsInManaPool,
-  getAdjacentTilesFromTile,
   setTileWithStatus,
   shootPower,
-  respawnPlayers
+  respawnPlayers,
+  getAdjacentTiles
 } from "./Utils/utils";
 import "./App.css";
 
@@ -118,11 +118,22 @@ const App = () => {
   const [intervalTime, setIntervalTime] = useState(0);
   const [graveyardData, setGraveyardData] = useState([]);
   const [graveyardTileKeys, setGraveyardTileKeys] = useState([]);
+  const [kaijuData, setKaijuData] = useState([]);
   const [kaiju1Data, setKaiju1Data] = useState([]);
   const [kaiju2Data, setKaiju2Data] = useState([]);
   const [kaijuTokenTiles, setKaijuTokenTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
+  const [elementPickUps, setElementPickUps] = useState([
+    "wind",
+    "glass",
+    "fire",
+    "wood",
+    "lightning",
+    "death",
+    "bubble",
+    "metal"
+  ]);
   const scale = 0.3;
   const incrementPlayerLives = index => {
     setPlayerData(_players =>
@@ -207,7 +218,7 @@ const App = () => {
         tile: { i, j },
         i: k,
         isThere: true,
-        moveSpeed: 14,
+        moveSpeed: 10,
         lives: 3,
         abilities: [],
         accessory: {
@@ -282,7 +293,7 @@ const App = () => {
   }, []);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
-      getCharXAndY(playerMoveToTiles);
+      // getCharXAndY(playerMoveToTiles);
       setPlayerData(_playerData =>
         _playerData.map((p, i) =>
           i === 0 ? { ...p, moveToTiles: playerMoveToTiles } : p
@@ -298,7 +309,14 @@ const App = () => {
     }
   }, [winner]);
   useInterval(() => {
-    movePiece(playerData, setPlayerData, scale);
+    movePiece(
+      playerData,
+      setPlayerData,
+      kaijuData,
+      setKaijuData,
+      graveyardTileKeys,
+      scale
+    );
     // respawnPlayers(
     //   setPlayerData,
     //   graveyardData,
@@ -310,6 +328,48 @@ const App = () => {
     // movePiece(kaiju2Data, setKaiju2Data, scale);
     // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
   }, intervalTime);
+  useInterval(() => {
+    if (kaijuData.length < 2 && elementPickUps.length) {
+      const freeTiles = Object.entries(PENINSULA_TILE_LOOKUP).filter(
+        (k, v) =>
+          k !== graveyardTileKeys.every(key => key !== k) &&
+          playerData.every(
+            ({ tile }) =>
+              `${tile.i} ${tile.j}` !== k &&
+              playerData.every(({ tile }) =>
+                getAdjacentTiles(tile).every(t => `${t.i} ${t.j}` !== k)
+              )
+          )
+      );
+      const randInt = getRandomIntInRange({ max: freeTiles.length - 1 });
+      const randInt2 = getRandomIntInRange({ max: elementPickUps.length - 1 });
+      const ability = elementPickUps[randInt2];
+      setElementPickUps(_pickups => {
+        _pickups.splice(randInt2, 0);
+        return _pickups;
+      });
+      const [k, v] = freeTiles[randInt];
+      const location = getCharXAndY({ ...v, scale });
+      setKaijuData(_kaiju => {
+        return [
+          ..._kaiju,
+          {
+            charLocation: location,
+            moveFromLocation: location,
+            moveToLocation: location,
+            moveToTiles: [],
+            key: k,
+            tile: v,
+            isThere: true,
+            element: ability,
+            owner: undefined,
+            color: "blue",
+            moveSpeed: 14
+          }
+        ];
+      });
+    }
+  }, 5000);
   // <GameTitle>Kaiju City</GameTitle>
   // useEffect(() => {
   //   if (
@@ -335,9 +395,15 @@ const App = () => {
           kaijuTokenTiles={kaijuTokenTiles}
           setKaijuTokenTiles={setKaijuTokenTiles}
           kaiju2Data={kaiju2Data}
+          kaijuData={kaijuData}
           scale={scale}
         />
-        <UI playerData={playerData} />
+        <UI
+          playerData={playerData}
+          setPlayerData={setPlayerData}
+          setTileStatuses={setTileStatuses}
+          scale={scale}
+        />
       </div>
     </>
   );

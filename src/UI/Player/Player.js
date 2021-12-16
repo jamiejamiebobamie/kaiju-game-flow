@@ -51,7 +51,10 @@ const AccessoryPicture = styled.i`
 export const Player = ({
   playerData = [{}, {}],
   isReversed,
-  setDisplayString
+  setDisplayString,
+  setPlayerData,
+  setTileStatuses,
+  scale
   // accessory = {
   //   displayLookup: "testAccessoryLookup",
   //   accessoryImgFile: "fire_icon.png"
@@ -64,10 +67,14 @@ export const Player = ({
       {isReversed ? (
         <>
           <Abilities
+            setPlayerData={setPlayerData}
+            setTileStatuses={setTileStatuses}
+            scale={scale}
             abilities={playerData.abilities}
             setDisplayString={setDisplayString}
             isReversed={isReversed}
             ghosts={playerData.lives - 1}
+            playerIndex={1}
           />
           <HealthBar
             health={playerData.lives}
@@ -83,9 +90,13 @@ export const Player = ({
             setDisplayString={setDisplayString}
           />
           <Abilities
+            setPlayerData={setPlayerData}
+            setTileStatuses={setTileStatuses}
+            scale={scale}
             abilities={playerData.abilities}
             setDisplayString={setDisplayString}
             ghosts={playerData.lives - 1}
+            playerIndex={0}
           />
         </>
       )}

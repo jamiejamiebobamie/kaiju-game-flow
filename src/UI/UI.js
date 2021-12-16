@@ -12,14 +12,23 @@ const Wrapper = styled.div`
   width: 500px;
   height: 800px;
 `;
-export const UI = ({ playerData }) => {
+export const UI = ({ playerData, setPlayerData, setTileStatuses, scale }) => {
   const [displayString, setDisplayString] = useState(null);
   return (
     <Wrapper>
-      <Player playerData={playerData[0]} setDisplayString={setDisplayString} />
+      <Player
+        playerData={playerData[0]}
+        setPlayerData={setPlayerData}
+        setTileStatuses={setTileStatuses}
+        scale={scale}
+        setDisplayString={setDisplayString}
+      />
       <Display displayString={displayString} />
       <Player
         playerData={playerData[1]}
+        setPlayerData={setPlayerData}
+        setTileStatuses={setTileStatuses}
+        scale={scale}
         setDisplayString={setDisplayString}
         isReversed={true}
       />

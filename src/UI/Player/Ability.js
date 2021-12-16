@@ -119,21 +119,29 @@ const AbilityNum = styled.div`
     src: url(Early_GameBoy.ttf);
   }
 `;
-export const Ability = ({ abilityData, setDisplayString, keyNum, ghosts }) => {
+export const Ability = ({
+  playerIndex,
+  abilityData,
+  setPlayerData,
+  setTileStatuses,
+  scale,
+  setDisplayString,
+  keyNum,
+  ghosts
+}) => {
   const {
     passiveName,
     activeName,
-    activatePassive,
+    // activatePassive,
     activateActive,
     cooldownTime,
     displayLookup,
-    element,
-    getPlayerIndex
+    element
   } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
-  useEffect(() => {
-    activatePassive && activatePassive();
-  }, []);
+  // useEffect(() => {
+  //   activatePassive && activatePassive();
+  // }, []);
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const [isPassive, setIsPassive] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -152,7 +160,7 @@ export const Ability = ({ abilityData, setDisplayString, keyNum, ghosts }) => {
   );
   useEffect(() => {
     if (isActive) {
-      activateActive();
+      activateActive(playerIndex, setPlayerData, setTileStatuses, scale);
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
       setTimeout(() => {
