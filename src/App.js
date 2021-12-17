@@ -125,7 +125,7 @@ const App = () => {
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
   const [elementPickUps, setElementPickUps] = useState([
-    "wind",
+    "ice",
     "glass",
     "fire",
     "wood",
@@ -221,6 +221,7 @@ const App = () => {
         moveSpeed: 10,
         lives: 3,
         abilities: [],
+        abilityCooldowns: [],
         accessory: {
           displayLookup: "testAccessoryLookup",
           accessoryImgFile: "fire_icon.png"
@@ -314,16 +315,17 @@ const App = () => {
       setPlayerData,
       kaijuData,
       setKaijuData,
+      setTileStatuses,
       graveyardTileKeys,
       scale
     );
-    // respawnPlayers(
-    //   setPlayerData,
-    //   graveyardData,
-    //   setGraveyardData,
-    //   setWinner,
-    //   scale
-    // );
+    respawnPlayers(
+      setPlayerData,
+      graveyardData,
+      setGraveyardData,
+      setWinner,
+      scale
+    );
     // movePiece(kaiju1Data, setKaiju1Data, scale);
     // movePiece(kaiju2Data, setKaiju2Data, scale);
     // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });

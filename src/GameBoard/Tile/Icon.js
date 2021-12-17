@@ -25,7 +25,7 @@ export const Icon = ({ status, zIndex }) => {
     isBubble: { className: "fa-question-circle-o", offset: 0, color: "white" },
     isShielded: { className: "fa-shield", offset: 0, color: "black" },
     isGraveyard: { className: "fa-toggle-off", offset: -90, color: "white" },
-    isWindy: { className: "fa-cloud", color: "grey" }
+    isCold: { className: "fa-snowflake-o", color: "grey" }
   };
   const determineIcon = status => {
     if (status.isGraveyard) {
@@ -38,8 +38,8 @@ export const Icon = ({ status, zIndex }) => {
       return ICON_LOOKUP["isShielded"];
     } else if (status.isElectrified) {
       return ICON_LOOKUP["isElectrified"];
-    } else if (status.isWindy) {
-      return ICON_LOOKUP["isWindy"];
+    } else if (status.isCold) {
+      return ICON_LOOKUP["isCold"];
     } else if (status.isOnFire) {
       return ICON_LOOKUP["isOnFire"];
     } else if (status.isWooded) {

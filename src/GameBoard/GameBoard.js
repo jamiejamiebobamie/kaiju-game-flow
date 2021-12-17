@@ -137,7 +137,7 @@ export const GameBoard = ({
                         })
                       ) {
                         let direction = [d];
-                        if (k === "isWindy") {
+                        if (k === "isCold") {
                           const tileDirMapping = [
                             "up",
                             "up right",

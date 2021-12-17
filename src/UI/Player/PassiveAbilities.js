@@ -65,7 +65,8 @@ export const PassiveAbilities = ({
     lightning: "fa-hourglass-half",
     death: "fa-heartbeat",
     bubble: "fa-universal-access",
-    metal: "fa-cutlery"
+    metal: "fa-cutlery",
+    ice: "fa-thermometer-quarter"
   };
   const abilityButtons = abilities.map((data, i) => (
     <PassiveAbilityWrapper i={i}>

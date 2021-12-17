@@ -38,9 +38,9 @@ const ICON_LOOKUP = {
     active: "fa-shield",
     loader: "fa-spinner"
   },
-  wind: {
-    passive: "fa-feed",
-    active: "fa-cloud",
+  ice: {
+    passive: "fa-thermometer-quarter",
+    active: "fa-snowflake-o",
     loader: "fa-spinner"
   }
 };

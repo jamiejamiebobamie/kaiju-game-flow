@@ -611,28 +611,30 @@ export const BRIDGE_TILES = {
 };
 
 export const PLAYER_ABILITIES = {
-  wind: {
-    passiveName: "Second Wind",
-    activeName: "Whirlwood",
+  ice: {
+    passiveName: "Cold Shoulder",
+    activeName: "Ice Slice",
     // activatePassive: k => {
     //   setPlayerData(_players =>
     //     _players.map(p => (k === p.i ? { ...p, lives: p.lives + 1 } : p))
     //   );
     // },
+    count: 20,
+    type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) =>
       shootPower({
         setPlayerData,
         setTileStatuses,
         scale,
         count: 20,
-        statusKey: "isWindy",
+        statusKey: "isCold",
         numTiles: 3,
         sideEffectObject: {},
         playerIndex: k
       }),
     // getPlayerIndex: k => k,
-    displayLookup: "abilityWind",
-    element: "wind",
+    displayLookup: "abilityIce",
+    element: "ice",
     isPassive: false,
     isActive: false,
     cooldownTime: 2000
@@ -645,6 +647,8 @@ export const PLAYER_ABILITIES = {
     //     _players.map(p => (k === p.i ? { ...p, curveBullets: true } : p))
     //   );
     // },
+    count: 30,
+    type: "escape",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       setPlayerData(_players =>
         _players.map(p =>
@@ -700,6 +704,8 @@ export const PLAYER_ABILITIES = {
     //     _players.map(p => (k === p.i ? { ...p, immuneToGhosts: true } : p))
     //   );
     // },
+    count: 7,
+    type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) =>
       shootPower({
         setPlayerData,
@@ -726,6 +732,7 @@ export const PLAYER_ABILITIES = {
     //     _players.map(p => (k === p.i ? { ...p, immuneToMelee: true } : p))
     //   );
     // },
+    type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       shootPower({
         setPlayerData,
@@ -738,6 +745,7 @@ export const PLAYER_ABILITIES = {
         playerIndex: k
       });
     },
+    count: 10,
     // getPlayerIndex: k => k,
     displayLookup: "abilityWood",
     element: "wood",
@@ -755,17 +763,21 @@ export const PLAYER_ABILITIES = {
     //     )
     //   );
     // },
+    type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) =>
       shootPower({
         setPlayerData,
         setTileStatuses,
         scale,
         count: 30,
+
         statusKey: "isElectrified",
         numTiles: 3,
         // sideEffectObject: {},
         playerIndex: k
       }),
+    count: 30,
+
     // getPlayerIndex: k => k,
     displayLookup: "abilityLightning",
     element: "lightning",
@@ -781,6 +793,8 @@ export const PLAYER_ABILITIES = {
     //     _players.map(p => (k === p.i ? { ...p, isGrimReaper: true } : p))
     //   );
     // },
+    count: 30,
+    type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       shootPower({
         setPlayerData,
@@ -810,18 +824,21 @@ export const PLAYER_ABILITIES = {
     //     )
     //   );
     // },
+    type: "defensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       shootPower({
         setPlayerData,
         setTileStatuses,
         scale,
         count: 4,
+
         statusKey: "isBubble",
         numTiles: 5,
         // sideEffectObject: {},
         playerIndex: k
       });
     },
+    count: 4,
     // getPlayerIndex: k => k,
     displayLookup: "abilityBubble",
     element: "bubble",
@@ -837,6 +854,7 @@ export const PLAYER_ABILITIES = {
     //     _players.map(p => (k === p.i ? { ...p, immuneToBullets: true } : p))
     //   );
     // },
+    type: "defensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       shootPower({
         setPlayerData,
@@ -848,6 +866,7 @@ export const PLAYER_ABILITIES = {
         playerIndex: k
       });
     },
+    count: 2,
     displayLookup: "abilityMetal",
     element: "metal",
     isPassive: false,
