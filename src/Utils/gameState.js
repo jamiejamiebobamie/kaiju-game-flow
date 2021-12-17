@@ -628,7 +628,7 @@ export const PLAYER_ABILITIES = {
         scale,
         count: 20,
         statusKey: "isCold",
-        numTiles: 3,
+        numTiles: 6,
         sideEffectObject: {},
         playerIndex: k
       }),
@@ -673,20 +673,20 @@ export const PLAYER_ABILITIES = {
             : p
         )
       );
-      // setTimeout(
-      //   () =>
-      //     setPlayerData(_players =>
-      //       _players.map(p =>
-      //         k === p.i
-      //           ? {
-      //               ...p,
-      //               moveSpeed: p.moveSpeed - 20
-      //             }
-      //           : p
-      //       )
-      //     ),
-      //   4000
-      // );
+      setTimeout(
+        () =>
+          setPlayerData(_players =>
+            _players.map(p =>
+              k === p.i
+                ? {
+                    ...p,
+                    moveSpeed: p.moveSpeed - 20
+                  }
+                : p
+            )
+          ),
+        4000
+      );
     },
     getPlayerIndex: k => k,
     displayLookup: "abilityGlass",
@@ -860,7 +860,7 @@ export const PLAYER_ABILITIES = {
         setPlayerData,
         setTileStatuses,
         scale,
-        count: 2,
+        count: 4,
         statusKey: "isShielded",
         numTiles: 3,
         playerIndex: k
@@ -871,6 +871,6 @@ export const PLAYER_ABILITIES = {
     element: "metal",
     isPassive: false,
     isActive: false,
-    cooldownTime: 8000
+    cooldownTime: 4000
   }
 };

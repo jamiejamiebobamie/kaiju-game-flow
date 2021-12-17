@@ -80,12 +80,12 @@ export const GameBoard = ({
           isPlayer:
             playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
             playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
-          isOnFire: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
-          isWooded: undefined, //getRandBool() ? { i: 1, j: 1 } : null,
-          isElectrified: undefined, //getRandBool() ? { i: 0, j: -1 } : null,
-          isBubble: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
-          isShielded: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
-          isGhosted: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
+          // isOnFire: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
+          // isWooded: undefined, //getRandBool() ? { i: 1, j: 1 } : null,
+          // isElectrified: undefined, //getRandBool() ? { i: 0, j: -1 } : null,
+          // isBubble: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
+          // isShielded: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
+          // isGhosted: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
           isKaiju: kaijuTokenTiles.find(
             ({ tile }) => tile.i == i && tile.j == j
           ),
@@ -118,12 +118,16 @@ export const GameBoard = ({
                   playerIndex,
                   isInManaPool
                 } = data;
-                const deathTiles = [
-                  "isElectrified",
-                  "isOnFire",
-                  "isGhosted",
-                  "isWooded"
-                ];
+                const deathTiles =
+                  startCount - 1 > count
+                    ? [
+                        "isElectrified",
+                        "isOnFire",
+                        "isGhosted",
+                        "isWooded",
+                        "isCold"
+                      ]
+                    : [];
                 if (count) {
                   Array.isArray(dirs) &&
                     dirs.forEach((d, l) => {
@@ -137,7 +141,7 @@ export const GameBoard = ({
                         })
                       ) {
                         let direction = [d];
-                        if (k === "isCold") {
+                        if (count < startCount && k === "isCold") {
                           const tileDirMapping = [
                             "up",
                             "up right",
@@ -241,7 +245,7 @@ export const GameBoard = ({
                         incrementPlayerLives(playerOnTileStatus.i);
                       _statuses[i][j][k] =
                         !doNotErase.includes(k) ||
-                        (k === "isShielded" && count === startCount) ||
+                        // (k === "isShielded" && count === startCount) ||
                         (k === "isWooded" && count === startCount) ||
                         (k === "isOnFire" && count === startCount) ||
                         playerOnTileStatus
@@ -267,13 +271,13 @@ export const GameBoard = ({
                         !doNotErase.includes(k) || playerOnTileStatus
                           ? undefined
                           : {
-                              ...tileStatus[k]
-                              // count: 0
+                              ...tileStatus[k],
+                              count: 0
                             };
-                      _statuses[i][j].updateKey = updateKey;
                     });
                 }
               }
+              _statuses[i][j].updateKey = updateKey;
             }
           }
         }
@@ -323,10 +327,10 @@ export const GameBoard = ({
         });
       }
     }
-
+    // console.log(tileStatuses);
     redrawTiles(highlightedTiles);
     updateTileState();
-  }, 500);
+  }, 250);
   const redrawTiles = highlightedTiles => {
     if (tileStatuses) {
       const rowLength = Math.ceil(width / (70 * scale));

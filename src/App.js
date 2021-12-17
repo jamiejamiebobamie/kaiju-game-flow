@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
@@ -115,7 +115,7 @@ const App = () => {
   );
   const [playerData, setPlayerData] = useState([]);
   const [winner, setWinner] = useState(null);
-  const [intervalTime, setIntervalTime] = useState(0);
+  const [intervalTime, setIntervalTime] = useState(200);
   const [graveyardData, setGraveyardData] = useState([]);
   const [graveyardTileKeys, setGraveyardTileKeys] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
@@ -135,6 +135,7 @@ const App = () => {
     "metal"
   ]);
   const scale = 0.3;
+  const accTime = useRef(0);
   const incrementPlayerLives = index => {
     setPlayerData(_players =>
       _players.map((p, i) => (i === index ? { ...p, lives: p.lives - 1 } : p))
@@ -218,7 +219,7 @@ const App = () => {
         tile: { i, j },
         i: k,
         isThere: true,
-        moveSpeed: 10,
+        moveSpeed: 14,
         lives: 3,
         abilities: [],
         abilityCooldowns: [],
@@ -283,8 +284,8 @@ const App = () => {
         tile: { i, j },
         isThere: true,
         element: undefined,
-        owner: k < 4 ? _players[0] : _players[1],
-        color: k < 4 ? _players[0].color : _players[1].color,
+        owner: undefined, //k < 4 ? _players[0] : _players[1],
+        color: "blue", //k < 4 ?_players[0].color : _players[1].color,
         moveSpeed: 14
       });
     }
@@ -317,15 +318,16 @@ const App = () => {
       setKaijuData,
       setTileStatuses,
       graveyardTileKeys,
-      scale
+      scale,
+      accTime
     );
-    respawnPlayers(
-      setPlayerData,
-      graveyardData,
-      setGraveyardData,
-      setWinner,
-      scale
-    );
+    // respawnPlayers(
+    //   setPlayerData,
+    //   graveyardData,
+    //   setGraveyardData,
+    //   setWinner,
+    //   scale
+    // );
     // movePiece(kaiju1Data, setKaiju1Data, scale);
     // movePiece(kaiju2Data, setKaiju2Data, scale);
     // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
@@ -347,7 +349,7 @@ const App = () => {
       const randInt2 = getRandomIntInRange({ max: elementPickUps.length - 1 });
       const ability = elementPickUps[randInt2];
       setElementPickUps(_pickups => {
-        _pickups.splice(randInt2, 0);
+        _pickups.splice(randInt2, 1);
         return _pickups;
       });
       const [k, v] = freeTiles[randInt];
@@ -371,7 +373,7 @@ const App = () => {
         ];
       });
     }
-  }, 5000);
+  }, 15000);
   // <GameTitle>Kaiju City</GameTitle>
   // useEffect(() => {
   //   if (
