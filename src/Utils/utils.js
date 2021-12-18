@@ -501,12 +501,11 @@ const getDistance = (to, from) => {
 export const movePiece = (
   data,
   setData,
-  kaijuData,
-  setKaijuData,
+  powerUpData,
+  setPowerUpData,
   setTileStatuses,
   graveyardTileKeys,
-  scale,
-  accTime
+  scale
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -571,14 +570,17 @@ export const movePiece = (
         });
         _data[i].charLocation = newLocation;
         _data[i].isThere = hasArrived;
-        // check tile for kaiju
-        const kaiju = kaijuData.find(
-          ({ tile }) => tile.i === _data[i].tile.i && tile.j === _data[i].tile.j
-        );
-        if (kaiju) {
-          if (!_data[i].abilities.find(a => a.element === kaiju.element))
-            _data[i].abilities.push(PLAYER_ABILITIES[kaiju.element]);
-          setKaijuData(_kaiju => _kaiju.filter(k => k !== kaiju));
+        // check tile for powerups
+        if (powerUpData) {
+          const powerup = powerUpData.find(
+            ({ tile }) =>
+              tile.i === _data[i].tile.i && tile.j === _data[i].tile.j
+          );
+          if (powerup) {
+            if (!_data[i].abilities.find(a => a.element === powerup.element))
+              _data[i].abilities.push(PLAYER_ABILITIES[powerup.element]);
+            setPowerUpData(_powerups => _powerups.filter(k => k !== powerup));
+          }
         }
         // - - - - - - - - - - -
         if (_data[i].isThere && _data[i].moveToTiles.length) {

@@ -25,10 +25,12 @@ export const Icon = ({ status, zIndex }) => {
     isBubble: { className: "fa-question-circle-o", offset: 0, color: "white" },
     isShielded: { className: "fa-shield", offset: 0, color: "black" },
     isGraveyard: { className: "fa-toggle-off", offset: -90, color: "white" },
-    isCold: { className: "fa-snowflake-o", color: "grey" }
+    isMonster: { className: "fa-optin-monster", color: "purple" }
   };
   const determineIcon = status => {
-    if (status.isGraveyard) {
+    if (status.isMonster) {
+      return ICON_LOOKUP["isMonster"];
+    } else if (status.isGraveyard) {
       return ICON_LOOKUP["isGraveyard"];
     } else if (status.isBubble) {
       return ICON_LOOKUP["isBubble"];

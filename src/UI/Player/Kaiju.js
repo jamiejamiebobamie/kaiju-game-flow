@@ -26,12 +26,12 @@ const KaijuIcon = styled.i`
 `;
 export const Kaiju = ({
   kaijuArr = [
-    { displayLookup: "kaijuGlass", name: "Mothra" },
+    { displayLookup: "kaijuGlass", name: "Not-Mothra" },
     { displayLookup: "kaijuFire", name: "Not-Godzilla" },
     { displayLookup: "kaijuWood", name: "Kudzu" },
     { displayLookup: "kaijuLightning", name: "Gargantula" },
     { displayLookup: "kaijuDeath", name: "Giant Mantis" },
-    { displayLookup: "kaijuBubble", name: "Parade Float" },
+    { displayLookup: "kaijuBubble", name: "Bubbles" },
     { displayLookup: "kaijuMetal", name: "Mechatron" }
   ],
   setDisplayString,

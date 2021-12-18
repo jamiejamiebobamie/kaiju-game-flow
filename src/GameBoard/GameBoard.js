@@ -3,8 +3,13 @@ import styled from "styled-components";
 import { HexagonTile } from "./Tile/HexagonTile";
 import { Player } from "./Player";
 import { Kaiju } from "./Kaiju";
+import { PowerUp } from "./PowerUp";
 import { ManaPool } from "./ManaPool";
-import { PENINSULA_TILE_LOOKUP } from "../Utils/gameState";
+import {
+  PENINSULA_TILE_LOOKUP,
+  BRIDGE_TILES,
+  PERIMETER_TILES
+} from "../Utils/gameState";
 import {
   getTileXAndY,
   isAdjacent,
@@ -27,10 +32,6 @@ const Board = styled.div`
   border-style: solid;
   border-thickness: medium;
   border-radius: 10px;
-  cursor: ${props =>
-    props.kaijuTokenPickedup ? "url(testKaijuTile.png), auto;" : "pointer"};
-  /* color: #495a6e;
-  background-color: #495a6e; */
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;
@@ -44,18 +45,14 @@ const BackgroundImage = styled.img`
   background-repeat: no-repeat;
 `;
 export const GameBoard = ({
-  kaijuData,
+  powerUpData,
   playerData,
+  kaijuData,
   incrementPlayerLives,
   graveyardTileKeys,
-  kaiju1Data,
-  kaijuTokenTiles,
-  setKaijuTokenTiles,
   setPlayerMoveToTiles,
   tileStatuses,
   setTileStatuses,
-  kaiju2Data,
-  setTestDir,
   scale
 }) => {
   const width = 500;
@@ -63,7 +60,6 @@ export const GameBoard = ({
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
   const [clickedTiles, setClickedTiles] = useState([]);
   const [tiles, setTiles] = useState([]);
-  const [kaijuTokenPickedup, setKaijuTokenPickedup] = useState(null);
   const [setHoverRef, hoverLookupString] = useHover();
   const [path, setPath] = useState(null);
   const [tileInterval, setTileInterval] = useState(null);
@@ -80,15 +76,6 @@ export const GameBoard = ({
           isPlayer:
             playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
             playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
-          // isOnFire: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
-          // isWooded: undefined, //getRandBool() ? { i: 1, j: 1 } : null,
-          // isElectrified: undefined, //getRandBool() ? { i: 0, j: -1 } : null,
-          // isBubble: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
-          // isShielded: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
-          // isGhosted: undefined, //getRandBool() ? { i: -1, j: -1 } : null,
-          isKaiju: kaijuTokenTiles.find(
-            ({ tile }) => tile.i == i && tile.j == j
-          ),
           isGraveyard: graveyardTileKeys.find(key => key === `${i} ${j}`)
         });
       }
@@ -362,9 +349,6 @@ export const GameBoard = ({
                     ) &&
                     playerData.find(({ tile }) => tile.i === i && tile.j === j)
                       .i,
-                  isKaiju: kaijuTokenTiles.find(
-                    ({ tile }) => tile.i == i && tile.j == j
-                  ),
                   isGraveyard: graveyardTileKeys.find(
                     key => key === `${i} ${j}`
                   )
@@ -387,24 +371,16 @@ export const GameBoard = ({
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
-  // const kaiju1 = kaiju1Data.map((k, i) => (
-  //   <Kaiju
-  //     key={i}
-  //     charLocation={k.charLocation}
-  //     element={k.element}
-  //     color={k.color}
-  //   />
-  // ));
-  // const kaiju2 = kaiju2Data.map((k, i) => (
-  //   <Kaiju
-  //     key={i}
-  //     charLocation={k.charLocation}
-  //     element={k.element}
-  //     color={k.color}
-  //   />
-  // ));
   const kaiju = kaijuData.map((k, i) => (
     <Kaiju
+      key={k.i}
+      charLocation={k.charLocation}
+      color={k.color}
+      scale={scale}
+    />
+  ));
+  const powerUps = powerUpData.map((k, i) => (
+    <PowerUp
       key={i}
       charLocation={k.charLocation}
       element={k.element}
@@ -416,42 +392,16 @@ export const GameBoard = ({
       key={p.i}
       i={p.i}
       charLocation={p.charLocation}
-      accessoryAndFamiliars={[]}
       color={p.color}
       scale={scale}
       isInManaPool={p.isInManaPool}
     />
   ));
-  // const manaPools = (
-  //   <>
-  //     <ManaPool
-  //       width={width}
-  //       height={height}
-  //       kaijuData={kaiju1Data}
-  //       color={playerData[0] && playerData[0].color}
-  //     />
-  //     <ManaPool
-  //       width={width}
-  //       height={height}
-  //       kaijuData={kaiju2Data}
-  //       color={playerData[1] && playerData[1].color}
-  //     />
-  //   </>
-  // );
-  // const kaiju = (
-  //   <>
-  //     {kaiju1}
-  //     {kaiju2}
-  //   </>
-  // );
   return (
-    <Board
-      kaijuTokenPickedup={kaijuTokenPickedup}
-      width={width}
-      height={height}
-    >
+    <Board width={width} height={height}>
       <ShiftContentOver scale={scale}>
         {tiles}
+        {powerUps}
         {kaiju}
         {players}
       </ShiftContentOver>
@@ -459,6 +409,3 @@ export const GameBoard = ({
     </Board>
   );
 };
-// {manaPools}
-// {kaiju}
-//

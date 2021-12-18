@@ -6,7 +6,8 @@ import {
   STARTING_KAIJU_CHOICES,
   ACCESSORIES,
   PENINSULA_TILE_LOOKUP,
-  BRIDGE_TILES
+  BRIDGE_TILES,
+  PERIMETER_TILES
 } from "./Utils/gameState";
 import {
   getRandAdjacentTile,
@@ -118,10 +119,8 @@ const App = () => {
   const [intervalTime, setIntervalTime] = useState(200);
   const [graveyardData, setGraveyardData] = useState([]);
   const [graveyardTileKeys, setGraveyardTileKeys] = useState([]);
+  const [powerUpData, setPowerUpData] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
-  const [kaiju1Data, setKaiju1Data] = useState([]);
-  const [kaiju2Data, setKaiju2Data] = useState([]);
-  const [kaijuTokenTiles, setKaijuTokenTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
   const [elementPickUps, setElementPickUps] = useState([
@@ -252,7 +251,6 @@ const App = () => {
       tileIndices[randomInt] = storeItem;
       const charLocation = getCharXAndY({ i, j, scale });
       const { x, y } = charLocation;
-      // console.log(charLocation, randTile, randomInt);
       _graveyards.push({
         charLocation,
         tile: { i, j },
@@ -262,36 +260,6 @@ const App = () => {
     setGraveyardData(_graveyards);
     setGraveyardTileKeys(_graveyards.map(({ tile }) => `${tile.i} ${tile.j}`));
     // GRAVEYARDS - - - - - - - - - - - -
-    // KAIJU - - - - - - - - - - - -
-    const _kaiju = [];
-    const _canvasLocations = [];
-    for (let k = 0; k < 7; k++) {
-      _max -= k;
-      const randomInt = getRandomIntInRange({
-        max: _max
-      });
-      const { i, j } = tileIndices[randomInt];
-      const storeItem = tileIndices.length - k;
-      const location = getCharXAndY({ i, j, scale });
-      tileIndices[tileIndices.length - k] = tileIndices[randomInt];
-      tileIndices[randomInt] = storeItem;
-      _kaiju.push({
-        charLocation: location,
-        moveFromLocation: location,
-        moveToLocation: location,
-        moveToTiles: [],
-        key: `${i} ${j}`,
-        tile: { i, j },
-        isThere: true,
-        element: undefined,
-        owner: undefined, //k < 4 ? _players[0] : _players[1],
-        color: "blue", //k < 4 ?_players[0].color : _players[1].color,
-        moveSpeed: 14
-      });
-    }
-    setKaiju1Data(_kaiju.filter(k => k.owner === _players[0]));
-    setKaiju2Data(_kaiju.filter(k => k.owner === _players[1]));
-    // KAIJU - - - - - - - - - - - -
   }, []);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
@@ -314,12 +282,11 @@ const App = () => {
     movePiece(
       playerData,
       setPlayerData,
-      kaijuData,
-      setKaijuData,
+      powerUpData,
+      setPowerUpData,
       setTileStatuses,
       graveyardTileKeys,
-      scale,
-      accTime
+      scale
     );
     // respawnPlayers(
     //   setPlayerData,
@@ -328,12 +295,21 @@ const App = () => {
     //   setWinner,
     //   scale
     // );
-    // movePiece(kaiju1Data, setKaiju1Data, scale);
+    movePiece(
+      kaijuData,
+      setKaijuData,
+      undefined,
+      undefined,
+      setTileStatuses,
+      graveyardTileKeys,
+      scale
+    );
     // movePiece(kaiju2Data, setKaiju2Data, scale);
     // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
   }, intervalTime);
+  // powerup spawning.
   useInterval(() => {
-    if (kaijuData.length < 2 && elementPickUps.length) {
+    if (powerUpData.length < 2 && elementPickUps.length) {
       const freeTiles = Object.entries(PENINSULA_TILE_LOOKUP).filter(
         (k, v) =>
           k !== graveyardTileKeys.every(key => key !== k) &&
@@ -354,36 +330,73 @@ const App = () => {
       });
       const [k, v] = freeTiles[randInt];
       const location = getCharXAndY({ ...v, scale });
-      setKaijuData(_kaiju => {
+      setPowerUpData(_powerUps => {
         return [
-          ..._kaiju,
+          ..._powerUps,
           {
             charLocation: location,
-            moveFromLocation: location,
-            moveToLocation: location,
-            moveToTiles: [],
             key: k,
             tile: v,
-            isThere: true,
             element: ability,
-            owner: undefined,
-            color: "blue",
-            moveSpeed: 14
+            color: "white"
           }
         ];
       });
     }
   }, 15000);
+  useInterval(() => {
+    const keys = Object.keys(PERIMETER_TILES);
+    const randInt1 = getRandomIntInRange({ max: keys.length - 1 });
+    const key = keys[randInt1];
+    const kaijuTile = PERIMETER_TILES[key];
+    const { x, y } = getCharXAndY({ ...kaijuTile, scale });
+    // 0, 500 x
+    // 0, 800 y
+    const possibileSpawnPoints = [
+      { "0x": Math.abs(0 - x) },
+      { "500x": Math.abs(500 - x) },
+      { "0y": Math.abs(0 - y) },
+      { "800y": Math.abs(800 - y) }
+    ];
+
+    const lowestDiff = possibileSpawnPoints.reduce(
+      (acc, item, i) => (Object.values(acc) > Object.values(item) ? item : acc),
+      possibileSpawnPoints[0]
+    );
+    const lookup = Object.keys(lowestDiff)[0];
+    let location = { x: 0, y: 0 };
+    switch (lookup) {
+      case "0x":
+        location = { x: 0, y };
+        break;
+      case "500x":
+        location = { x: 500, y };
+        break;
+      case "0y":
+        location = { x, y: 0 };
+        break;
+      case "800y":
+        location = { x, y: 800 };
+        break;
+    }
+    console.log(x, y, lowestDiff, location);
+
+    setKaijuData(_kaiju => [
+      ..._kaiju,
+      {
+        charLocation: location,
+        moveFromLocation: location,
+        moveToLocation: location,
+        moveToTiles: [kaijuTile],
+        tile: kaijuTile,
+        color: "purple",
+        isThere: false,
+        moveSpeed: 20,
+        abilities: []
+      }
+    ]);
+  }, 5000);
   // <GameTitle>Kaiju City</GameTitle>
-  // useEffect(() => {
-  //   if (
-  //     playerData.every(
-  //       p => !p.moveToTiles.length && p.moveToLocation !== p.moveFromLocation
-  //     )
-  //   )
-  //     setIntervalTime(null);
-  //   else setIntervalTime(0);
-  // }, [playerData]);
   return (
     <>
       <div className="App">
@@ -393,13 +406,9 @@ const App = () => {
           setTileStatuses={setTileStatuses}
           setPlayerMoveToTiles={setPlayerMoveToTiles}
           playerData={playerData}
-          graveyardData={graveyardData}
-          graveyardTileKeys={graveyardTileKeys}
-          kaiju1Data={kaiju1Data}
-          kaijuTokenTiles={kaijuTokenTiles}
-          setKaijuTokenTiles={setKaijuTokenTiles}
-          kaiju2Data={kaiju2Data}
           kaijuData={kaijuData}
+          graveyardTileKeys={graveyardTileKeys}
+          powerUpData={powerUpData}
           scale={scale}
         />
         <UI
@@ -412,8 +421,5 @@ const App = () => {
     </>
   );
 };
-// {testPlayerScale}
-// {gameBoardStandIn}
-// {uiStandIn}
 
 export default App;

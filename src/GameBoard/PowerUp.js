@@ -8,20 +8,18 @@ const Ripple = styled.i`
   top: ${props => `${props.charLocation.y}px`};
   width: 10px;
   height: 10px;
-  /* background-color: ${props => props.color}; */
-  color: ${props => props.color};
-
-  /* border-radius: 100%; */
-  /* border-color:transparent; */
-  /* border-style:solid; */
-  /* animation: lds-ripple 3s linear infinite; */
-  /* pointer-events: none; */
+  background-color: ${props => props.color};
+  border-radius: 100%;
+  border-color:transparent;
+  border-style:solid;
+  animation: lds-ripple 3s linear infinite;
+  pointer-events: none;
 }
 @keyframes lds-ripple {
   0% {
     width: 10;
     height: 10;
-    /* opacity: .5; */
+    opacity: .5;
   }
   50% {
       background-color: transparent;
@@ -30,20 +28,25 @@ const Ripple = styled.i`
       margin-top:-2px;
     width: 13px;
     height: 13px;
-    /* opacity: .1; */
+    opacity: .1;
   }
   100% {
     width: 10;
     height: 10;
-    /* opacity: .5; */
+    opacity: .5;
   }
 `;
-export const Kaiju = ({ charLocation, element, color }) => {
+export const PowerUp = ({ charLocation, element, color }) => {
   return (
     <Ripple
-      className="fa fa-optin-monster"
+      className="fa fa-chain-broken"
       charLocation={charLocation}
       color={color}
-    />
+    >
+      <div className="lds-ripple">
+        <div></div>
+        <div></div>
+      </div>
+    </Ripple>
   );
 };
