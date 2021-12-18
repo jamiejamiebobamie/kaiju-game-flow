@@ -1,10 +1,33 @@
 import { useState, useEffect, useRef } from "react";
-import { PENINSULA_TILE_LOOKUP, PLAYER_ABILITIES } from "./gameState";
+import {
+  PENINSULA_TILE_LOOKUP,
+  PLAYER_ABILITIES,
+  PERIMETER_TILES
+} from "./gameState";
 
 export const isTileOnGameBoard = tile => {
   return PENINSULA_TILE_LOOKUP
     ? Object.keys(PENINSULA_TILE_LOOKUP).includes(`${tile.i} ${tile.j}`)
     : false;
+};
+export const getClosestPerimeterTileFromLocation = ({ x, y, scale }) => {
+  let closest = { distance: Number.MAX_SAFE_INTEGER, tile: { i: 0, j: 0 } };
+  Object.values(PERIMETER_TILES).forEach(({ i, j }) => {
+    const distance = getDistance(getCharXAndY({ i, j, scale }), { x, y });
+    if (closest.distance > distance) closest = { distance, tile: { i, j } };
+  });
+  return closest.tile;
+};
+export const getClosestPlayerFromTile = (currTile, playerData, scale) => {
+  let closest = { distance: Number.MAX_SAFE_INTEGER, playerIndex: 0 };
+  playerData.forEach(({ tile }, i) => {
+    const distance = getDistance(
+      getCharXAndY({ ...tile, scale }),
+      getCharXAndY({ ...currTile, scale })
+    );
+    if (closest.distance > distance) closest = { distance, playerIndex: i };
+  });
+  return closest.playerIndex;
 };
 export const respawnPlayers = (
   setPlayerData,
@@ -126,6 +149,44 @@ export const shootPower = ({
     );
   });
 };
+export const shootKaijuPower = ({
+  setKaijuData,
+  setTileStatuses,
+  scale,
+  count,
+  statusKey,
+  numTiles,
+  dir,
+  index
+}) => {
+  setKaijuData(_kaiju => {
+    // {
+    //   setKaijuData,
+    //   setTileStatuses,
+    //   scale,
+    //   count: 30,
+    //   statusKey: "isMonster",
+    //   numTiles: 1,
+    //   index: i,
+    //   dir
+    // }
+
+    _kaiju.forEach(
+      (k, i) =>
+        index === i &&
+        setTileWithStatus(
+          setTileStatuses,
+          statusKey,
+          k.tile,
+          dir,
+          count,
+          i,
+          false
+        )
+    );
+    return _kaiju;
+  });
+};
 export const setTileWithStatus = (
   setTileStatuses,
   statusName,
@@ -195,6 +256,12 @@ export const solveForStatus = tile => {
   } else if (tile.isWooded) {
     return {
       isWooded: tile.isWooded
+      // count: tile.count,
+      // playerIndex: tile.playerIndex
+    };
+  } else if (tile.isMonster) {
+    return {
+      isMonster: tile.isMonster
       // count: tile.count,
       // playerIndex: tile.playerIndex
     };
@@ -581,6 +648,17 @@ export const movePiece = (
               _data[i].abilities.push(PLAYER_ABILITIES[powerup.element]);
             setPowerUpData(_powerups => _powerups.filter(k => k !== powerup));
           }
+        }
+        // - - - - - - - - - - -
+
+        // if Kaiju, and at the tile, cast power.
+        if (
+          _data[i].isKaiju &&
+          _data[i].isThere &&
+          !_data[i].moveToTiles.length
+        ) {
+          // console.log("utils movepiece", i);
+          _data[i].abilities[0]();
         }
         // - - - - - - - - - - -
         if (_data[i].isThere && _data[i].moveToTiles.length) {

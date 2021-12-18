@@ -7,7 +7,8 @@ import {
   ACCESSORIES,
   PENINSULA_TILE_LOOKUP,
   BRIDGE_TILES,
-  PERIMETER_TILES
+  PERIMETER_TILES,
+  PLAYER_ABILITIES
 } from "./Utils/gameState";
 import {
   getRandAdjacentTile,
@@ -22,7 +23,10 @@ import {
   setTileWithStatus,
   shootPower,
   respawnPlayers,
-  getAdjacentTiles
+  getAdjacentTiles,
+  getClosestPerimeterTileFromLocation,
+  getAdjacentTilesFromNormVec,
+  getNormVecFromTiles
 } from "./Utils/utils";
 import "./App.css";
 
@@ -124,14 +128,14 @@ const App = () => {
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
   const [elementPickUps, setElementPickUps] = useState([
-    "ice",
-    "glass",
-    "fire",
-    "wood",
-    "lightning",
-    "death",
-    "bubble",
-    "metal"
+    // "ice",
+    "glass"
+    // "fire",
+    // "wood",
+    // "lightning",
+    // "death",
+    // "bubble",
+    // "metal"
   ]);
   const scale = 0.3;
   const accTime = useRef(0);
@@ -343,59 +347,58 @@ const App = () => {
         ];
       });
     }
-  }, 15000);
-  useInterval(() => {
-    const keys = Object.keys(PERIMETER_TILES);
-    const randInt1 = getRandomIntInRange({ max: keys.length - 1 });
-    const key = keys[randInt1];
-    const kaijuTile = PERIMETER_TILES[key];
-    const { x, y } = getCharXAndY({ ...kaijuTile, scale });
-    // 0, 500 x
-    // 0, 800 y
-    const possibileSpawnPoints = [
-      { "0x": Math.abs(0 - x) },
-      { "500x": Math.abs(500 - x) },
-      { "0y": Math.abs(0 - y) },
-      { "800y": Math.abs(800 - y) }
-    ];
-
-    const lowestDiff = possibileSpawnPoints.reduce(
-      (acc, item, i) => (Object.values(acc) > Object.values(item) ? item : acc),
-      possibileSpawnPoints[0]
-    );
-    const lookup = Object.keys(lowestDiff)[0];
-    let location = { x: 0, y: 0 };
-    switch (lookup) {
-      case "0x":
-        location = { x: 0, y };
-        break;
-      case "500x":
-        location = { x: 500, y };
-        break;
-      case "0y":
-        location = { x, y: 0 };
-        break;
-      case "800y":
-        location = { x, y: 800 };
-        break;
-    }
-    console.log(x, y, lowestDiff, location);
-
-    setKaijuData(_kaiju => [
-      ..._kaiju,
-      {
-        charLocation: location,
-        moveFromLocation: location,
-        moveToLocation: location,
-        moveToTiles: [kaijuTile],
-        tile: kaijuTile,
-        color: "purple",
-        isThere: false,
-        moveSpeed: 20,
-        abilities: []
-      }
-    ]);
   }, 5000);
+  // useInterval(() => {
+  //   const minX = 0;
+  //   const minY = 30;
+  //   const maxX = 490;
+  //   const maxY = 800;
+  //   const randIntX = getRandomIntInRange({ min: minX, max: maxX });
+  //   const randIntY = getRandomIntInRange({ min: minY, max: maxY });
+  //   const randBool1 = Math.random() > 0.5;
+  //   const randBool2 = Math.random() > 0.5;
+  //   const randPlayerIndex = getRandomIntInRange({ max: playerData.length - 1 });
+  //   const location = randBool1
+  //     ? { x: randIntX, y: randBool2 ? minY : maxY }
+  //     : { x: randBool2 ? minX : maxX, y: randIntY };
+  //   const kaijuTile = getClosestPerimeterTileFromLocation({
+  //     ...location,
+  //     scale
+  //   });
+  //   const normVec = getNormVecFromTiles(
+  //     kaijuTile,
+  //     playerData[randPlayerIndex].tile,
+  //     scale
+  //   );
+  //   const [_, dirs] = getAdjacentTilesFromNormVec(kaijuTile, normVec, scale, 1);
+  //   const key = Math.random();
+  //   setKaijuData(_kaiju => [
+  //     ..._kaiju,
+  //     {
+  //       key,
+  //       charLocation: location,
+  //       moveFromLocation: location,
+  //       moveToLocation: location,
+  //       moveToTiles: [kaijuTile],
+  //       tile: kaijuTile,
+  //       color: "purple",
+  //       isThere: false,
+  //       moveSpeed: 14,
+  //       abilities: [
+  //         () =>
+  //           PLAYER_ABILITIES["kaiju"](
+  //             key,
+  //             dirs,
+  //             _kaiju.length,
+  //             setKaijuData,
+  //             setTileStatuses,
+  //             scale
+  //           )
+  //       ],
+  //       isKaiju: true
+  //     }
+  //   ]);
+  // }, 2000);
   // <GameTitle>Kaiju City</GameTitle>
   return (
     <>

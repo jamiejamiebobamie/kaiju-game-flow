@@ -1,4 +1,4 @@
-import { shootPower, getCharXAndY } from "./utils";
+import { shootPower, shootKaijuPower, getCharXAndY } from "./utils";
 
 export const STARTING_KAIJU_CHOICES = [
   { element: "Glass", name: "Moth", lvl: 1 },
@@ -137,7 +137,7 @@ export const ACCESSORIES = {
     name: "Winged Nikes",
     onStart: ({ kaiju, setStats }) => {
       let modifier = kaiju.find(k => k.element === "Lightning") ? 5 : 0;
-      console.log("modifier", modifier, kaiju);
+      // console.log("modifier", modifier, kaiju);
       setStats(stats => {
         return stats.WingedNikes && modifier === 5
           ? stats
@@ -749,27 +749,25 @@ export const PLAYER_ABILITIES = {
     type: "escape",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       setPlayerData(_players =>
-        _players.map(p =>
-          k === p.i
-            ? {
-                ...p,
-                // curveBullets: false,
-                // moveSpeed: p.moveSpeed + 20,
-                moveToLocation: p.moveToTiles.length
-                  ? getCharXAndY({
-                      ...p.moveToTiles[p.moveToTiles.length - 1],
-                      scale
-                    })
-                  : p.moveToLocation,
-                tile: p.moveToTiles.length
-                  ? p.moveToTiles[p.moveToTiles.length - 1]
-                  : p.tile,
-                moveFromLocation: p.charLocation,
-                moveToTiles: [],
-                isThere: false
-              }
-            : p
-        )
+        _players.map(p => {
+          if (k === p.i) {
+            const tile = p.moveToTiles.length
+              ? p.moveToTiles[p.moveToTiles.length - 1]
+              : p.tile;
+            const location = getCharXAndY({ ...tile, scale });
+            return {
+              ...p,
+              charLocation: location,
+              moveToLocation: location,
+              moveFromLocation: location,
+              tile,
+              moveToTiles: []
+              // isThere: true
+            };
+          } else {
+            return p;
+          }
+        })
       );
       setTimeout(
         () =>
@@ -970,5 +968,21 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     cooldownTime: 4000
+  },
+  kaiju: (key, dir, i, setKaijuData, setTileStatuses, scale) => {
+    // console.log("gameState", dir, i, setKaijuData, setTileStatuses, scale);
+    shootKaijuPower({
+      setKaijuData,
+      setTileStatuses,
+      scale,
+      count: 30,
+      statusKey: "isMonster",
+      numTiles: 1,
+      index: i,
+      dir
+    });
+    setKaijuData(_kaiju => {
+      return _kaiju.filter(k => k.key !== key);
+    });
   }
 };

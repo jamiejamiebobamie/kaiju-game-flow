@@ -25,12 +25,11 @@ export const Icon = ({ status, zIndex }) => {
     isBubble: { className: "fa-question-circle-o", offset: 0, color: "white" },
     isShielded: { className: "fa-shield", offset: 0, color: "black" },
     isGraveyard: { className: "fa-toggle-off", offset: -90, color: "white" },
-    isMonster: { className: "fa-optin-monster", color: "purple" }
+    isMonster: { className: "fa-optin-monster", color: "purple" },
+    isCold: { className: "fa-snowflake-o", color: "white" }
   };
   const determineIcon = status => {
-    if (status.isMonster) {
-      return ICON_LOOKUP["isMonster"];
-    } else if (status.isGraveyard) {
+    if (status.isGraveyard) {
       return ICON_LOOKUP["isGraveyard"];
     } else if (status.isBubble) {
       return ICON_LOOKUP["isBubble"];
@@ -46,6 +45,8 @@ export const Icon = ({ status, zIndex }) => {
       return ICON_LOOKUP["isOnFire"];
     } else if (status.isWooded) {
       return ICON_LOOKUP["isWooded"];
+    } else if (status.isMonster) {
+      return ICON_LOOKUP["isMonster"];
     } else {
       return { className: "", offset: 0 };
     }

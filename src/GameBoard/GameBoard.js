@@ -4,7 +4,6 @@ import { HexagonTile } from "./Tile/HexagonTile";
 import { Player } from "./Player";
 import { Kaiju } from "./Kaiju";
 import { PowerUp } from "./PowerUp";
-import { ManaPool } from "./ManaPool";
 import {
   PENINSULA_TILE_LOOKUP,
   BRIDGE_TILES,
@@ -21,7 +20,8 @@ import {
   solveForStatus,
   getTileOffsetFromDir,
   getAdjacentTilesFromTile,
-  getRandomIntInRange
+  getRandomIntInRange,
+  getClosestPlayerFromTile
 } from "../Utils/utils";
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -108,11 +108,12 @@ export const GameBoard = ({
                 const deathTiles =
                   startCount - 1 > count
                     ? [
-                        "isElectrified",
-                        "isOnFire",
-                        "isGhosted",
-                        "isWooded",
-                        "isCold"
+                        // "isElectrified",
+                        // "isOnFire",
+                        // "isGhosted",
+                        // "isWooded",
+                        // "isCold"
+                        "isMonster"
                       ]
                     : [];
                 if (count) {
@@ -170,12 +171,29 @@ export const GameBoard = ({
                         } else if (
                           k === "isGhosted" ||
                           k === "isWooded"
+
                           // ||
                           // (k === "isElectrified" &&
                           //   isInManaPool &&
                           //   count > startCount - 3)
                         ) {
                           const targetIndex = playerIndex ? 0 : 1;
+                          const targetTile = playerData
+                            ? playerData[targetIndex].tile
+                            : { i, j };
+                          const [_, targetDirection] = getAdjacentTilesFromTile(
+                            nextTile,
+                            targetTile,
+                            scale,
+                            1
+                          );
+                          direction = targetDirection;
+                        } else if (k === "isMonster") {
+                          const targetIndex = getClosestPlayerFromTile(
+                            { i, j },
+                            playerData,
+                            scale
+                          );
                           const targetTile = playerData
                             ? playerData[targetIndex].tile
                             : { i, j };

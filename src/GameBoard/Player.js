@@ -36,15 +36,6 @@ const Character = styled.img`
   100%	{filter: invert(25%);}
 }
 `;
-// ${props => props.color === "blue" && "filter: invert(100%);"};
-
-// @keyframes blinking{
-//   0%		{color: #10c018;}
-//   25%		{color: #1056c0;}
-//   50%		{color: #ef0a1a;}
-//   75%		{color: #254878;}
-//   100%	{color: #04a1d5;}
-// }
 export const Player = ({ charLocation, isInManaPool, color, i = 0 }) => {
   return (
     <Wrapper charLocation={charLocation}>
@@ -56,21 +47,3 @@ export const Player = ({ charLocation, isInManaPool, color, i = 0 }) => {
     </Wrapper>
   );
 };
-// <Character
-// className="fa fa-male"
-//   charLocation={charLocation}
-//   color={color}
-//   isInManaPool={isInManaPool}
-// />
-
-// <img
-//   style={{
-//     marginLeft: "-30px",
-//     marginTop: "-40px",
-//     width: "50px",
-//     height: "75px",
-//     position: "absolute",
-//     zIndex: 1
-//   }}
-//   src="test1.png"
-// />
