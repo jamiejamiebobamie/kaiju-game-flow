@@ -2,40 +2,27 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
+import { PENINSULA_TILE_LOOKUP, BRIDGE_TILES } from "./Utils/gameState";
 import {
-  STARTING_KAIJU_CHOICES,
-  ACCESSORIES,
-  PENINSULA_TILE_LOOKUP,
-  BRIDGE_TILES,
-  PERIMETER_TILES,
-  PLAYER_ABILITIES
-} from "./Utils/gameState";
-import {
-  getRandAdjacentTile,
   getCharXAndY,
-  getTileXAndY,
   getRandomIntInRange,
   useInterval,
   useKeyPress,
+  useHover,
   movePiece,
-  isLocatonInsidePolygon,
-  checkIsInManaPool,
-  setTileWithStatus,
-  shootPower,
   respawnPlayers,
-  getAdjacentTiles,
-  getClosestPerimeterTileFromLocation,
-  getAdjacentTilesFromNormVec,
-  getNormVecFromTiles
+  spawnKaiju,
+  spawnPowerUp,
+  updateTileState,
+  redrawTiles,
+  updateHighlightedTiles
 } from "./Utils/utils";
 import "./App.css";
-
 const GameTitle = styled.div`
   display: flex;
   margin-top: 40px;
   margin-left: 40px;
   margin-bottom: -50px;
-
   color: black;
   font-family: data;
   font-size: 40px;
@@ -44,18 +31,14 @@ const GameTitle = styled.div`
     src: url(Datalegreya-Dot.otf);
   }
 `;
-
 const App = () => {
   /*
-        1. randomized starting setup for each player.
-        2. kaiju pickups.
-        3. enemy a.i.
-        4. object placement, breadth first search
-                final battleground vertex / "end game point"
-                    graveyard placement
-                do not place mana wells adjacent to one another
-        5. home screen.
-        6. deactivate passive when active is on cooldown
+        1. teammate a.i.
+        2. graveyard placement.
+        3. home screen.
+        4. pause game on key presses. pause modal.
+        5. tutorial.
+        6. have powers attack the closest monster.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
@@ -80,70 +63,40 @@ const App = () => {
         - pull up Player functional state and store in 'players' state variable at GameBoard level.
             - pass down state to Player component
     */
-  const gameBoardStandIn = (
-    <div
-      style={{
-        width: "500px",
-        height: "800px",
-        minWidth: "500px",
-        borderStyle: "solid",
-        borderThickness: "thin",
-        borderRadius: "10px"
-      }}
-    ></div>
-  );
-  const uiStandIn = (
-    <div
-      style={{
-        width: "500px",
-        height: "800px",
-        minWidth: "500px",
-        borderStyle: "solid",
-        borderThickness: "thin",
-        borderRadius: "10px"
-      }}
-    ></div>
-  );
-  const testPlayerScale = (
-    <img
-      style={{
-        marginLeft: "180px",
-        marginTop: "193px",
-        width: "50px",
-        height: "75px",
-        position: "absolute",
-        zIndex: 1
-        // opacity: 0.5
-      }}
-      src="test1.png"
-    />
-  );
+  const width = 500;
+  const height = 800;
+  const scale = 0.3;
+  const [intervalTime, setIntervalTime] = useState(100);
+  const [accTime, setAccTime] = useState(0);
   const [playerData, setPlayerData] = useState([]);
   const [winner, setWinner] = useState(null);
-  const [intervalTime, setIntervalTime] = useState(200);
   const [graveyardData, setGraveyardData] = useState([]);
   const [graveyardTileKeys, setGraveyardTileKeys] = useState([]);
   const [powerUpData, setPowerUpData] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
+  const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
+  const [highlightedTiles, setHighlightedTiles] = useState([]);
+  const [tiles, setTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
   const [elementPickUps, setElementPickUps] = useState([
-    // "ice",
-    "glass"
-    // "fire",
-    // "wood",
-    // "lightning",
-    // "death",
-    // "bubble",
-    // "metal"
+    "ice",
+    // "glass"
+    "fire",
+    "wood",
+    "lightning",
+    "death",
+    "bubble",
+    "metal"
   ]);
-  const scale = 0.3;
-  const accTime = useRef(0);
+  const [setHoverRef, hoverLookupString] = useHover();
+  const [path, setPath] = useState(null);
   const incrementPlayerLives = index => {
     setPlayerData(_players =>
       _players.map((p, i) => (i === index ? { ...p, lives: p.lives - 1 } : p))
     );
   };
+  const shouldUpdate = (accTime, interval) => !(accTime % interval);
   // useKeyPress(
   //   code => {
   //     let offset = { i: 0, j: 0 };
@@ -233,8 +186,8 @@ const App = () => {
       });
     }
     setPlayerData(_players);
-    // PLAYERS - - - - - - - - - - - -
-    // GRAVEYARDS - - - - - - - - - - - -
+    // PLAYERS    - - - - - - - - - -
+    // GRAVEYARDS - - - - - - - - - -
     const _graveyards = [];
     for (let k = 0; k < 10; k++) {
       _max -= k;
@@ -263,11 +216,30 @@ const App = () => {
     }
     setGraveyardData(_graveyards);
     setGraveyardTileKeys(_graveyards.map(({ tile }) => `${tile.i} ${tile.j}`));
-    // GRAVEYARDS - - - - - - - - - - - -
+    // GRAVEYARDS - - - - - - - - - -
+    // TILES      - - - - - - - - - -
+    redrawTiles([]);
+    const status = [];
+    const rowLength = Math.ceil(width / (70 * scale));
+    const colLength = Math.ceil(height / (75 * scale));
+    for (let i = 0; i < rowLength; i++) {
+      const _status = [];
+      for (let j = 0; j < colLength; j++) {
+        _status.push({
+          updateKey: Math.random(),
+          isPlayer:
+            playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
+            playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
+          isGraveyard: graveyardTileKeys.find(key => key === `${i} ${j}`)
+        });
+      }
+      status.push(_status);
+    }
+    setTileStatuses(status);
+    // TILES      - - - - - - - - - -
   }, []);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
-      // getCharXAndY(playerMoveToTiles);
       setPlayerData(_playerData =>
         _playerData.map((p, i) =>
           i === 0 ? { ...p, moveToTiles: playerMoveToTiles } : p
@@ -283,6 +255,7 @@ const App = () => {
     }
   }, [winner]);
   useInterval(() => {
+    // move players
     movePiece(
       playerData,
       setPlayerData,
@@ -292,6 +265,66 @@ const App = () => {
       graveyardTileKeys,
       scale
     );
+    // move monsters
+    // (monsters become tile statuses when they reach the tiles.)
+    if (shouldUpdate(accTime, 500))
+      movePiece(
+        kaijuData,
+        setKaijuData,
+        undefined,
+        undefined,
+        setTileStatuses,
+        graveyardTileKeys,
+        scale
+      );
+    // powerup spawning.
+    if (shouldUpdate(accTime, 5000))
+      spawnPowerUp(
+        powerUpData,
+        setPowerUpData,
+        elementPickUps,
+        setElementPickUps,
+        graveyardTileKeys,
+        playerData,
+        scale
+      );
+    // spawn monsters on gameboard
+    if (shouldUpdate(accTime, 2000))
+      spawnKaiju(playerData, setKaijuData, setTileStatuses, scale);
+    if (shouldUpdate(accTime, 100))
+      redrawTiles(
+        highlightedTiles,
+        setHoverRef,
+        setClickedTile,
+        setTiles,
+        playerData,
+        graveyardTileKeys,
+        tileStatuses,
+        setTileStatuses,
+        incrementPlayerLives,
+        width,
+        height,
+        scale
+      );
+    if (shouldUpdate(accTime, 500))
+      updateTileState(
+        playerData,
+        setTileStatuses,
+        incrementPlayerLives,
+        width,
+        height,
+        scale
+      );
+    if (shouldUpdate(accTime, 100))
+      updateHighlightedTiles(
+        setHighlightedTiles,
+        playerData,
+        graveyardTileKeys,
+        hoverLookupString,
+        path,
+        setPath,
+        scale
+      );
     // respawnPlayers(
     //   setPlayerData,
     //   graveyardData,
@@ -299,119 +332,26 @@ const App = () => {
     //   setWinner,
     //   scale
     // );
-    movePiece(
-      kaijuData,
-      setKaijuData,
-      undefined,
-      undefined,
-      setTileStatuses,
-      graveyardTileKeys,
-      scale
-    );
-    // movePiece(kaiju2Data, setKaiju2Data, scale);
-    // checkIsInManaPool({ setPlayerData, kaiju1Data, kaiju2Data });
+    setAccTime(accTime + intervalTime);
   }, intervalTime);
-  // powerup spawning.
-  useInterval(() => {
-    if (powerUpData.length < 2 && elementPickUps.length) {
-      const freeTiles = Object.entries(PENINSULA_TILE_LOOKUP).filter(
-        (k, v) =>
-          k !== graveyardTileKeys.every(key => key !== k) &&
-          playerData.every(
-            ({ tile }) =>
-              `${tile.i} ${tile.j}` !== k &&
-              playerData.every(({ tile }) =>
-                getAdjacentTiles(tile).every(t => `${t.i} ${t.j}` !== k)
-              )
-          )
-      );
-      const randInt = getRandomIntInRange({ max: freeTiles.length - 1 });
-      const randInt2 = getRandomIntInRange({ max: elementPickUps.length - 1 });
-      const ability = elementPickUps[randInt2];
-      setElementPickUps(_pickups => {
-        _pickups.splice(randInt2, 1);
-        return _pickups;
-      });
-      const [k, v] = freeTiles[randInt];
-      const location = getCharXAndY({ ...v, scale });
-      setPowerUpData(_powerUps => {
-        return [
-          ..._powerUps,
-          {
-            charLocation: location,
-            key: k,
-            tile: v,
-            element: ability,
-            color: "white"
-          }
-        ];
-      });
-    }
-  }, 5000);
-  // useInterval(() => {
-  //   const minX = 0;
-  //   const minY = 30;
-  //   const maxX = 490;
-  //   const maxY = 800;
-  //   const randIntX = getRandomIntInRange({ min: minX, max: maxX });
-  //   const randIntY = getRandomIntInRange({ min: minY, max: maxY });
-  //   const randBool1 = Math.random() > 0.5;
-  //   const randBool2 = Math.random() > 0.5;
-  //   const randPlayerIndex = getRandomIntInRange({ max: playerData.length - 1 });
-  //   const location = randBool1
-  //     ? { x: randIntX, y: randBool2 ? minY : maxY }
-  //     : { x: randBool2 ? minX : maxX, y: randIntY };
-  //   const kaijuTile = getClosestPerimeterTileFromLocation({
-  //     ...location,
-  //     scale
-  //   });
-  //   const normVec = getNormVecFromTiles(
-  //     kaijuTile,
-  //     playerData[randPlayerIndex].tile,
-  //     scale
-  //   );
-  //   const [_, dirs] = getAdjacentTilesFromNormVec(kaijuTile, normVec, scale, 1);
-  //   const key = Math.random();
-  //   setKaijuData(_kaiju => [
-  //     ..._kaiju,
-  //     {
-  //       key,
-  //       charLocation: location,
-  //       moveFromLocation: location,
-  //       moveToLocation: location,
-  //       moveToTiles: [kaijuTile],
-  //       tile: kaijuTile,
-  //       color: "purple",
-  //       isThere: false,
-  //       moveSpeed: 14,
-  //       abilities: [
-  //         () =>
-  //           PLAYER_ABILITIES["kaiju"](
-  //             key,
-  //             dirs,
-  //             _kaiju.length,
-  //             setKaijuData,
-  //             setTileStatuses,
-  //             scale
-  //           )
-  //       ],
-  //       isKaiju: true
-  //     }
-  //   ]);
-  // }, 2000);
   // <GameTitle>Kaiju City</GameTitle>
   return (
     <>
       <div className="App">
         <GameBoard
-          incrementPlayerLives={incrementPlayerLives}
-          tileStatuses={tileStatuses}
-          setTileStatuses={setTileStatuses}
-          setPlayerMoveToTiles={setPlayerMoveToTiles}
+          powerUpData={powerUpData}
           playerData={playerData}
           kaijuData={kaijuData}
           graveyardTileKeys={graveyardTileKeys}
-          powerUpData={powerUpData}
+          setPlayerMoveToTiles={setPlayerMoveToTiles}
+          tileStatuses={tileStatuses}
+          setTileStatuses={setTileStatuses}
+          clickedTile={clickedTile}
+          setClickedTile={setClickedTile}
+          tiles={tiles}
+          path={path}
+          width={width}
+          height={height}
           scale={scale}
         />
         <UI

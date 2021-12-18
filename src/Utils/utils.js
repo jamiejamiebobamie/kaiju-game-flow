@@ -4,7 +4,409 @@ import {
   PLAYER_ABILITIES,
   PERIMETER_TILES
 } from "./gameState";
-
+import { HexagonTile } from "../GameBoard/Tile/HexagonTile";
+export const spawnPowerUp = (
+  powerUpData,
+  setPowerUpData,
+  elementPickUps,
+  setElementPickUps,
+  graveyardTileKeys,
+  playerData,
+  scale
+) => {
+  if (powerUpData.length < 2 && elementPickUps.length) {
+    const freeTiles = Object.entries(PENINSULA_TILE_LOOKUP).filter(
+      (k, v) =>
+        k !== graveyardTileKeys.every(key => key !== k) &&
+        playerData.every(
+          ({ tile }) =>
+            `${tile.i} ${tile.j}` !== k &&
+            playerData.every(({ tile }) =>
+              getAdjacentTiles(tile).every(t => `${t.i} ${t.j}` !== k)
+            )
+        )
+    );
+    const randInt = getRandomIntInRange({ max: freeTiles.length - 1 });
+    const randInt2 = getRandomIntInRange({
+      max: elementPickUps.length - 1
+    });
+    const ability = elementPickUps[randInt2];
+    setElementPickUps(_pickups => {
+      _pickups.splice(randInt2, 1);
+      return _pickups;
+    });
+    const [k, v] = freeTiles[randInt];
+    const location = getCharXAndY({ ...v, scale });
+    setPowerUpData(_powerUps => {
+      return [
+        ..._powerUps,
+        {
+          charLocation: location,
+          key: k,
+          tile: v,
+          element: ability,
+          color: "white"
+        }
+      ];
+    });
+  }
+};
+export const spawnKaiju = (
+  playerData,
+  setKaijuData,
+  setTileStatuses,
+  scale
+) => {
+  const minX = 0;
+  const minY = 30;
+  const maxX = 490;
+  const maxY = 800;
+  const randIntX = getRandomIntInRange({ min: minX, max: maxX });
+  const randIntY = getRandomIntInRange({ min: minY, max: maxY });
+  const randBool1 = Math.random() > 0.5;
+  const randBool2 = Math.random() > 0.5;
+  const randPlayerIndex = getRandomIntInRange({
+    max: playerData.length - 1
+  });
+  const location = randBool1
+    ? { x: randIntX, y: randBool2 ? minY : maxY }
+    : { x: randBool2 ? minX : maxX, y: randIntY };
+  const kaijuTile = getClosestPerimeterTileFromLocation({
+    ...location,
+    scale
+  });
+  const normVec = getNormVecFromTiles(
+    kaijuTile,
+    playerData[randPlayerIndex].tile,
+    scale
+  );
+  const [_, dirs] = getAdjacentTilesFromNormVec(kaijuTile, normVec, scale, 1);
+  const key = Math.random();
+  setKaijuData(_kaiju => [
+    ..._kaiju,
+    {
+      key,
+      charLocation: location,
+      moveFromLocation: location,
+      moveToLocation: location,
+      moveToTiles: [kaijuTile],
+      tile: kaijuTile,
+      color: "purple",
+      isThere: false,
+      moveSpeed: 14,
+      abilities: [
+        () =>
+          PLAYER_ABILITIES["kaiju"](
+            key,
+            dirs,
+            _kaiju.length,
+            setKaijuData,
+            setTileStatuses,
+            scale
+          )
+      ],
+      isKaiju: true
+    }
+  ]);
+};
+export const updateHighlightedTiles = (
+  setHighlightedTiles,
+  playerData,
+  graveyardTileKeys,
+  hoverLookupString,
+  path,
+  setPath,
+  scale
+) => {
+  let _highlightedTiles = [];
+  if (playerData && playerData[0]) {
+    if (hoverLookupString) {
+      const [i, j] = hoverLookupString.split(" ");
+      const lastTile =
+        Array.isArray(path) && path[path.length - 1]
+          ? path[path.length - 1]
+          : { i: -1, j: -1 };
+      if (
+        playerData &&
+        playerData[0] &&
+        playerData[0].moveToTiles.length === 0 &&
+        `${lastTile.i} ${lastTile.j}` === hoverLookupString
+      ) {
+        _highlightedTiles = path.map(t => {
+          return { h_i: t.i, h_j: t.j };
+        });
+      } else if (!graveyardTileKeys.find(key => key === hoverLookupString)) {
+        const _path = findPath(
+          playerData[0].tile,
+          { i: Number(i), j: Number(j) },
+          scale,
+          graveyardTileKeys
+        );
+        _highlightedTiles = _path.map(t => {
+          return { h_i: t.i, h_j: t.j };
+        });
+        setPath(_path);
+      }
+    } else if (
+      playerData &&
+      playerData[0] &&
+      playerData[0].moveToTiles.length > 0
+    ) {
+      _highlightedTiles = playerData[0].moveToTiles.map(t => {
+        return { h_i: t.i, h_j: t.j };
+      });
+    }
+  }
+  setHighlightedTiles(_highlightedTiles);
+};
+export const redrawTiles = (
+  highlightedTiles,
+  setHoverRef,
+  setClickedTile,
+  setTiles,
+  playerData,
+  graveyardTileKeys,
+  tileStatuses,
+  setTileStatuses,
+  incrementPlayerLives,
+  width,
+  height,
+  scale
+) => {
+  if (tileStatuses) {
+    const rowLength = Math.ceil(width / (70 * scale));
+    const colLength = Math.ceil(height / (75 * scale));
+    const _tiles = [];
+    for (let i = 0; i < rowLength; i++) {
+      for (let j = 0; j < colLength; j++) {
+        const key = `${i} ${j}`;
+        if (PENINSULA_TILE_LOOKUP[key]) {
+          const tileLocation = getTileXAndY({ i, j, scale });
+          _tiles.push(
+            <HexagonTile
+              key={key}
+              setHoverRef={setHoverRef}
+              rowLength={rowLength}
+              i={i}
+              j={j}
+              scale={scale}
+              setClickedIndex={setClickedTile}
+              tileLocation={tileLocation}
+              isHighlighted={highlightedTiles.some(
+                ({ h_i, h_j }) => h_i === i && h_j === j
+              )}
+              status={{
+                ...tileStatuses[i][j],
+                isPlayer:
+                  playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
+                  playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
+                isGraveyard: graveyardTileKeys.find(key => key === `${i} ${j}`)
+              }}
+            />
+          );
+        }
+      }
+    }
+    setTiles(_tiles);
+  }
+};
+export const updateTileState = (
+  playerData,
+  setTileStatuses,
+  incrementPlayerLives,
+  width,
+  height,
+  scale
+) => {
+  setTileStatuses(_statuses => {
+    if (_statuses) {
+      const rowLength = Math.ceil(width / (70 * scale));
+      const colLength = Math.ceil(height / (75 * scale));
+      const updateKey = Math.random();
+      for (let i = 0; i < rowLength; i++) {
+        for (let j = 0; j < colLength; j++) {
+          // 1. solve what should be on the tile
+          if (_statuses[i][j].updateKey !== updateKey) {
+            let tileStatus = solveForStatus(_statuses[i][j]);
+            const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
+            if (entry) {
+              const [k, data] = entry;
+              const {
+                startCount,
+                count,
+                dirs,
+                playerIndex,
+                isInManaPool
+              } = data;
+              const deathTiles =
+                startCount - 1 > count
+                  ? [
+                      // "isElectrified",
+                      // "isOnFire",
+                      // "isGhosted",
+                      // "isWooded",
+                      // "isCold"
+                      "isMonster"
+                    ]
+                  : [];
+              if (count) {
+                Array.isArray(dirs) &&
+                  dirs.forEach((d, l) => {
+                    // 2. move the status based on the direction
+                    const offset = getTileOffsetFromDir(d, { i, j });
+                    const nextTile = { i: i + offset.i, j: j + offset.j };
+                    if (
+                      isTileOnGameBoard({
+                        i: nextTile.i,
+                        j: nextTile.j
+                      })
+                    ) {
+                      let direction = [d];
+                      if (count < startCount && k === "isCold") {
+                        const tileDirMapping = [
+                          "up",
+                          "up right",
+                          "down right",
+                          "down",
+                          "down left",
+                          "up left"
+                        ];
+                        const newDir =
+                          tileDirMapping[count % tileDirMapping.length];
+                        direction = [newDir];
+                      } else if (
+                        k === "isElectrified" &&
+                        isInManaPool &&
+                        count === startCount - 3
+                      ) {
+                        const [_, newDirs] = getAdjacentTilesFromTile(
+                          { i, j },
+                          nextTile,
+                          scale,
+                          3
+                        );
+                        direction = newDirs;
+                      } else if (
+                        k === "isOnFire" ||
+                        (k === "isBubble" && count === startCount) ||
+                        (k === "isBubble" && isInManaPool) ||
+                        k === "isShielded"
+                      ) {
+                        direction = dirs;
+                      } else if (k === "isGhosted" || k === "isWooded") {
+                        const targetIndex = playerIndex ? 0 : 1;
+                        const targetTile = playerData
+                          ? playerData[targetIndex].tile
+                          : { i, j };
+                        const [_, targetDirection] = getAdjacentTilesFromTile(
+                          nextTile,
+                          targetTile,
+                          scale,
+                          1
+                        );
+                        direction = targetDirection;
+                      } else if (k === "isMonster") {
+                        const targetIndex = getClosestPlayerFromTile(
+                          { i, j },
+                          playerData,
+                          scale
+                        );
+                        const targetTile = playerData
+                          ? playerData[targetIndex].tile
+                          : { i, j };
+                        const [_, targetDirection] = getAdjacentTilesFromTile(
+                          nextTile,
+                          targetTile,
+                          scale,
+                          1
+                        );
+                        direction = targetDirection;
+                      }
+                      const _count =
+                        count -
+                        getRandomIntInRange({
+                          min: count - 2,
+                          max: count - 1
+                        });
+                      const nextTileCount =
+                        _statuses[nextTile.i][nextTile.j][k] &&
+                        _statuses[nextTile.i][nextTile.j][k].count
+                          ? _statuses[nextTile.i][nextTile.j][k].count
+                          : 0;
+                      _statuses[nextTile.i][nextTile.j][k] = {
+                        dirs: direction,
+                        count:
+                          k === "isWooded" && // this is broken nextTile
+                          dirs.length > 1 &&
+                          l > 0 &&
+                          nextTileCount < _count - 1
+                            ? _count - 1
+                            : count - 1,
+                        playerIndex: playerIndex,
+                        startCount,
+                        isInManaPool
+                      };
+                      const nextTilesStatus = solveForStatus(
+                        _statuses[nextTile.i][nextTile.j]
+                      );
+                      _statuses[nextTile.i][nextTile.j] = nextTilesStatus;
+                      _statuses[nextTile.i][nextTile.j].updateKey = updateKey;
+                    }
+                    // 3. erase current tile's state if not: isElectrified
+                    const doNotErase = [
+                      "isElectrified",
+                      "isShielded",
+                      "isWooded"
+                    ];
+                    const playerOnTileStatus = playerData.find(
+                      ({ tile }) => tile.i === i && tile.j === j
+                    );
+                    playerOnTileStatus &&
+                      deathTiles.includes(k) &&
+                      incrementPlayerLives(playerOnTileStatus.i);
+                    _statuses[i][j][k] =
+                      !doNotErase.includes(k) ||
+                      (k === "isWooded" && count === startCount) ||
+                      (k === "isOnFire" && count === startCount) ||
+                      playerOnTileStatus
+                        ? undefined
+                        : {
+                            ...tileStatus[k],
+                            count: 0
+                          };
+                    _statuses[i][j].updateKey = updateKey;
+                  });
+              } else {
+                Array.isArray(dirs) &&
+                  dirs.forEach(d => {
+                    // 3. erase current tile's state.
+                    const doNotErase = [("isShielded", "isWooded")];
+                    const playerOnTileStatus = playerData.find(
+                      ({ tile }) => tile.i === i && tile.j === j
+                    );
+                    playerOnTileStatus &&
+                      deathTiles.includes(k) &&
+                      incrementPlayerLives(playerOnTileStatus.i);
+                    _statuses[i][j][k] =
+                      !doNotErase.includes(k) || playerOnTileStatus
+                        ? undefined
+                        : {
+                            ...tileStatus[k],
+                            count: 0
+                          };
+                  });
+              }
+            }
+            _statuses[i][j].updateKey = updateKey;
+          }
+        }
+      }
+      return _statuses;
+    } else {
+      return _statuses;
+    }
+  });
+};
 export const isTileOnGameBoard = tile => {
   return PENINSULA_TILE_LOOKUP
     ? Object.keys(PENINSULA_TILE_LOOKUP).includes(`${tile.i} ${tile.j}`)
