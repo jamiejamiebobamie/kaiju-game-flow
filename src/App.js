@@ -15,7 +15,8 @@ import {
   spawnPowerUp,
   updateTileState,
   redrawTiles,
-  updateHighlightedTiles
+  updateHighlightedTiles,
+  spawnGraveyards
 } from "./Utils/utils";
 import "./App.css";
 const GameTitle = styled.div`
@@ -36,9 +37,8 @@ const App = () => {
         1. teammate a.i.
         2. graveyard placement.
         3. home screen.
-        4. pause game on key presses. pause modal.
-        5. tutorial.
-        6. have powers attack the closest monster.
+        4. tutorial.
+        5. have powers attack the closest monster.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
@@ -66,10 +66,12 @@ const App = () => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
+  const [isPaused, setIsPaused] = useState(false);
   const [intervalTime, setIntervalTime] = useState(100);
   const [accTime, setAccTime] = useState(0);
   const [playerData, setPlayerData] = useState([]);
   const [winner, setWinner] = useState(null);
+  const [graveyardTiles, setGraveyardTiles] = useState(null);
   const [graveyardData, setGraveyardData] = useState([]);
   const [graveyardTileKeys, setGraveyardTileKeys] = useState([]);
   const [powerUpData, setPowerUpData] = useState([]);
@@ -97,59 +99,19 @@ const App = () => {
     );
   };
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
-  // useKeyPress(
-  //   code => {
-  //     let offset = { i: 0, j: 0 };
-  //     switch (code) {
-  //       case "KeyW":
-  //         offset = { i: 0, j: -1 }; // up
-  //         break;
-  //       case "KeyS":
-  //         offset = { i: 0, j: 1 }; // down
-  //         break;
-  //       case "KeyD":
-  //         offset = { i: 1, j: 0 }; // down left
-  //         break;
-  //       case "KeyA":
-  //         offset = { i: -1, j: 0 }; // up left
-  //         break;
-  //       default:
-  //         offset = { i: 0, j: 0 };
-  //     }
-  //     setPlayerData(_players =>
-  //       _players.map((p, i) => {
-  //         if (i === 0 && p.isThere) {
-  //           const nextTile = {
-  //             i: p.tile.i + offset.i,
-  //             j: p.tile.j + offset.j
-  //           };
-  //           return PENINSULA_TILE_LOOKUP &&
-  //             PENINSULA_TILE_LOOKUP[`${nextTile.i} ${nextTile.j}`] &&
-  //             graveyardTileKeys.every(
-  //               key => key !== `${nextTile.i} ${nextTile.j}`
-  //             )
-  //             ? {
-  //                 ...p,
-  //                 moveToLocation: getCharXAndY({
-  //                   ...nextTile,
-  //                   scale
-  //                 }),
-  //                 isThere: false,
-  //                 moveFromLocation: p.charLocation,
-  //                 tile: {
-  //                   i: p.tile.i + offset.i,
-  //                   j: p.tile.j + offset.j
-  //                 }
-  //               }
-  //             : p;
-  //         } else {
-  //           return p;
-  //         }
-  //       })
-  //     );
-  //   },
-  //   ["KeyW", "KeyA", "KeyS", "KeyD"]
-  // );
+  useKeyPress(
+    code => {
+      switch (code) {
+        case "Escape":
+          setIsPaused(_isPaused => !_isPaused);
+          setIntervalTime(_intervalTime =>
+            _intervalTime === null ? 100 : null
+          );
+          break;
+      }
+    },
+    ["Escape"]
+  );
   useEffect(() => {
     const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
     // PLAYERS - - - - - - - - - - - -
@@ -188,34 +150,35 @@ const App = () => {
     setPlayerData(_players);
     // PLAYERS    - - - - - - - - - -
     // GRAVEYARDS - - - - - - - - - -
-    const _graveyards = [];
-    for (let k = 0; k < 10; k++) {
-      _max -= k;
-      const bridgeTiles = Object.values(BRIDGE_TILES);
-      const bridgeTile = bridgeTiles[bridgeTiles.length - 1];
-      let key = `${bridgeTile.i} ${bridgeTile.j}`;
-      let randTile, randomInt;
-      while (BRIDGE_TILES[key]) {
-        randomInt = getRandomIntInRange({
-          max: _max
-        });
-        randTile = tileIndices[randomInt];
-        key = `${randTile.i} ${randTile.j}`;
-      }
-      const { i, j } = randTile;
-      const storeItem = tileIndices.length - k;
-      tileIndices[tileIndices.length - k] = tileIndices[randomInt];
-      tileIndices[randomInt] = storeItem;
-      const charLocation = getCharXAndY({ i, j, scale });
-      const { x, y } = charLocation;
-      _graveyards.push({
-        charLocation,
-        tile: { i, j },
-        isUsed: false
-      });
-    }
-    setGraveyardData(_graveyards);
-    setGraveyardTileKeys(_graveyards.map(({ tile }) => `${tile.i} ${tile.j}`));
+    // const _graveyards = [];
+    // for (let k = 0; k < 10; k++) {
+    //   _max -= k;
+    //   const bridgeTiles = Object.values(BRIDGE_TILES);
+    //   const bridgeTile = bridgeTiles[bridgeTiles.length - 1];
+    //   let key = `${bridgeTile.i} ${bridgeTile.j}`;
+    //   let randTile, randomInt;
+    //   while (BRIDGE_TILES[key]) {
+    //     randomInt = getRandomIntInRange({
+    //       max: _max
+    //     });
+    //     randTile = tileIndices[randomInt];
+    //     key = `${randTile.i} ${randTile.j}`;
+    //   }
+    //   const { i, j } = randTile;
+    //   const storeItem = tileIndices.length - k;
+    //   tileIndices[tileIndices.length - k] = tileIndices[randomInt];
+    //   tileIndices[randomInt] = storeItem;
+    //   const charLocation = getCharXAndY({ i, j, scale });
+    //   const { x, y } = charLocation;
+    //   _graveyards.push({
+    //     charLocation,
+    //     tile: { i, j },
+    //     isUsed: false
+    //   });
+    // }
+    // setGraveyardData(_graveyards);
+    // setGraveyardTileKeys(_graveyards.map(({ tile }) => `${tile.i} ${tile.j}`));
+    spawnGraveyards(setGraveyardTiles);
     // GRAVEYARDS - - - - - - - - - -
     // TILES      - - - - - - - - - -
     redrawTiles([]);
@@ -334,11 +297,30 @@ const App = () => {
     // );
     setAccTime(accTime + intervalTime);
   }, intervalTime);
+  useEffect(() => {
+    console.log(graveyardTiles);
+
+    if (graveyardTiles) {
+      const _graveyards = [];
+      graveyardTiles.forEach(gt =>
+        _graveyards.push({
+          charLocation: getCharXAndY({ ...gt, scale }),
+          tile: gt,
+          isUsed: false
+        })
+      );
+      setGraveyardData(_graveyards);
+      setGraveyardTileKeys(
+        _graveyards.map(({ tile }) => `${tile.i} ${tile.j}`)
+      );
+    }
+  }, [graveyardTiles]);
   // <GameTitle>Kaiju City</GameTitle>
   return (
     <>
       <div className="App">
         <GameBoard
+          isPaused={isPaused}
           powerUpData={powerUpData}
           playerData={playerData}
           kaijuData={kaijuData}

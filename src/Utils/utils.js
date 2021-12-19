@@ -1,10 +1,49 @@
 import { useState, useEffect, useRef } from "react";
 import {
   PENINSULA_TILE_LOOKUP,
+  BRIDGE_TILES,
   PLAYER_ABILITIES,
   PERIMETER_TILES
 } from "./gameState";
 import { HexagonTile } from "../GameBoard/Tile/HexagonTile";
+export const spawnGraveyards = setGraveyardTiles => {
+  // find a random tile that is not a bridge tile
+  const notBridgeTiles = Object.values(PENINSULA_TILE_LOOKUP).filter(
+    val => !BRIDGE_TILES[`${val.i} ${val.j}`]
+  );
+  const randomInt = getRandomIntInRange({
+    max: notBridgeTiles.length - 1
+  });
+  const randStartingTile = notBridgeTiles[randomInt];
+  // from that starting tile recur outward,
+  // adding all adjacent tiles for each adjacent tile to a result array.
+  const _flattenedArray = [randStartingTile];
+  const result = { isFound: false, tiles: [] };
+  const recur = (tile, flattenedArray, remainingTiles, result) => {
+    if (result.isFound) return;
+    if (!remainingTiles.length) {
+      result.isFound = true;
+      result.tiles = flattenedArray;
+    }
+    const tiles = getAdjacentTiles(tile).filter(t =>
+      flattenedArray.every(entry => !(entry.i === t.i && entry.j === t.j))
+    );
+    for (let i = 0; i < tiles.length; i++) {
+      recur(
+        tiles[i],
+        [...flattenedArray, tiles[i]],
+        remainingTiles.filter(t => tiles[i].i !== t.i && tiles[i].j !== t.j),
+        result
+      );
+    }
+  };
+  recur(randStartingTile, _flattenedArray, notBridgeTiles, result);
+  console.log(result.tiles);
+  const graveyardTiles = [];
+  result.tiles.forEach((t, i) => !(i % 12) && graveyardTiles.push(t));
+  console.log(graveyardTiles);
+  setGraveyardTiles(graveyardTiles);
+};
 export const spawnPowerUp = (
   powerUpData,
   setPowerUpData,
@@ -844,129 +883,6 @@ const getDistance = (to, from) => {
     (to.x - from.x) * (to.x - from.x) + (to.y - from.y) * (to.y - from.y)
   );
 };
-// export const movePiece = (
-//   data,
-//   setData,
-//   kaijuData,
-//   setKaijuData,
-//   setTileStatuses,
-//   graveyardTileKeys,
-//   scale
-// ) => {
-//   const _data = [...data];
-//   for (let i = 0; i < _data.length; i++) {
-//     // set logic for enemy player
-//     if (i === 1)
-//       if (kaijuData.length) {
-//         // find the closest kaiju
-//         const closetKaiju = kaijuData.reduce(
-//           (acc, kaiju, j) => {
-//             const distToKaiju = getDistance(
-//               getCharXAndY({ ...kaiju.tile, scale }),
-//               getCharXAndY({ ..._data[1].tile, scale })
-//             );
-//             if (acc.distance && distToKaiju < acc.distance) {
-//               return {
-//                 distance: distToKaiju,
-//                 tile: kaiju.tile
-//               };
-//             } else return acc;
-//           },
-//           { distance: Number.MAX_SAFE_INTEGER }
-//         );
-//         // get path
-//         const moveToTiles =
-//           _data[1].tile &&
-//           closetKaiju.tile &&
-//           findPath(_data[1].tile, closetKaiju.tile, scale, graveyardTileKeys);
-//         _data[i].moveToTiles = moveToTiles;
-//       }
-//     // use powers
-//     if (Array.isArray(_data[i].abilities) && _data[i].abilities.length) {
-//       const numTilesFromPlayer =
-//         _data[1].tile &&
-//         _data[0].tile &&
-//         findPath(_data[1].tile, _data[0].tile, scale, graveyardTileKeys).length;
-//       if (numTilesFromPlayer !== undefined) {
-//         const powersToFire = _data[i].abilities.forEach((a, j) => {
-//           if (
-//             a.type === "offensive" &&
-//             a.count <= numTilesFromPlayer &&
-//             _data[1].abilityCooldowns[j] === false
-//           ) {
-//             console.log(a.element, _data[1].abilityCooldowns);
-//             a.activateActive(1, setData, setTileStatuses, scale);
-//             _data[1].abilityCooldowns[j] = true;
-//             setTimeout(() =>
-//               setData(
-//                 _players =>
-//                   _players.map((p, i) => {
-//                     if (i === 1) {
-//                       const cooldowns = [...p.abilityCooldowns];
-//                       cooldowns[j] = false;
-//                       return { ...p, abilityCooldowns: cooldowns };
-//                     } else {
-//                       return p;
-//                     }
-//                   }),
-//                 a.cooldownTime
-//               )
-//             );
-//           }
-//         });
-//       }
-//     }
-//     // - - - - - - - - - - -
-//     if (
-//       _data[i].charLocation &&
-//       _data[i].moveFromLocation &&
-//       _data[i].moveToLocation &&
-//       (!_data[i].isThere || _data[i].moveToTiles.length)
-//     ) {
-//       const { newLocation, hasArrived } = moveTo({
-//         currentLocation: _data[i].charLocation,
-//         moveFromLocation: _data[i].moveFromLocation,
-//         moveToLocation: _data[i].moveToLocation,
-//         moveSpeed: _data[i].moveSpeed
-//       });
-//       _data[i].charLocation = newLocation;
-//       _data[i].isThere = hasArrived;
-//       // check tile for kaiju
-//       const kaiju = kaijuData.find(
-//         ({ tile }) => tile.i === _data[i].tile.i && tile.j === _data[i].tile.j
-//       );
-//       if (kaiju) {
-//         _data[i].abilities.push(PLAYER_ABILITIES[kaiju.element]);
-//         _data[i].abilityCooldowns.push(false);
-//         setKaijuData(_kaiju => _kaiju.filter(k => k !== kaiju));
-//       }
-//       // - - - - - - - - - - -
-//       if (_data[i].isThere && _data[i].moveToTiles.length) {
-//         const [nextTile, ...tiles] = _data[i].moveToTiles;
-//         if (!tiles.length) {
-//           _data[i].moveToLocation =
-//             getCharXAndY({
-//               ...nextTile,
-//               scale
-//             }) || _data[i].moveToLocation;
-//           _data[i].tile = nextTile;
-//           _data[i].moveFromLocation = _data[i].charLocation;
-//           _data[i].moveToTiles = [];
-//           _data[i].isThere = false;
-//         } else {
-//           _data[i].tile = nextTile;
-//           _data[i].moveToTiles = tiles;
-//           _data[i].moveFromLocation = newLocation;
-//           _data[i].moveToLocation = getCharXAndY({
-//             ...nextTile,
-//             scale
-//           });
-//         }
-//       }
-//     }
-//   }
-//   setData(_data);
-// };
 export const movePiece = (
   data,
   setData,
@@ -1052,14 +968,12 @@ export const movePiece = (
           }
         }
         // - - - - - - - - - - -
-
         // if Kaiju, and at the tile, cast power.
         if (
           _data[i].isKaiju &&
           _data[i].isThere &&
           !_data[i].moveToTiles.length
         ) {
-          // console.log("utils movepiece", i);
           _data[i].abilities[0]();
         }
         // - - - - - - - - - - -
@@ -1156,12 +1070,12 @@ export const useHover = () => {
   }, [ref.current]);
   return [saveRef, value];
 };
-export const useKeyPress = (callback, keyCode) => {
+export const useKeyPress = (callback, keyCodes, state) => {
   const handler = ({ code }) => {
-    if (Array.isArray(keyCode) && keyCode.includes(code)) {
-      callback(code);
-    } else if (keyCode === code) {
-      callback(code);
+    if (Array.isArray(keyCodes) && keyCodes.includes(code)) {
+      state ? callback(code, state) : callback(code);
+    } else if (keyCodes === code) {
+      state ? callback(code, state) : callback(code);
     }
   };
   useEffect(() => {

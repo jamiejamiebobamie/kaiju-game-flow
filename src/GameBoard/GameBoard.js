@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Player } from "./Player";
 import { Kaiju } from "./Kaiju";
 import { PowerUp } from "./PowerUp";
+import { PauseModal } from "./PauseModal";
 const Board = styled.div`
   width: ${props => props.width}px;
   min-width: ${props => props.width}px;
@@ -25,6 +26,7 @@ const BackgroundImage = styled.img`
   background-repeat: no-repeat;
 `;
 export const GameBoard = ({
+  isPaused,
   powerUpData,
   playerData,
   kaijuData,
@@ -77,6 +79,7 @@ export const GameBoard = ({
   ));
   return (
     <Board width={width} height={height}>
+      {isPaused && <PauseModal />}
       <ShiftContentOver scale={scale}>
         {tiles}
         {powerUps}
