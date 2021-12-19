@@ -735,6 +735,8 @@ export const PLAYER_ABILITIES = {
     element: "ice",
     isPassive: false,
     isActive: false,
+    accTime: 0,
+
     cooldownTime: 2000
   },
   glass: {
@@ -790,6 +792,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     // cooldownTime: 25000
+    accTime: 0,
+
     cooldownTime: 3000
   },
   fire: {
@@ -818,6 +822,8 @@ export const PLAYER_ABILITIES = {
     element: "fire",
     isPassive: false,
     isActive: false,
+    accTime: 0,
+
     cooldownTime: 6000
   },
   wood: {
@@ -847,6 +853,8 @@ export const PLAYER_ABILITIES = {
     element: "wood",
     isPassive: false,
     isActive: false,
+    accTime: 0,
+
     cooldownTime: 6000
   },
   lightning: {
@@ -879,6 +887,8 @@ export const PLAYER_ABILITIES = {
     element: "lightning",
     isPassive: false,
     isActive: false,
+    accTime: 0,
+
     cooldownTime: 7000
   },
   death: {
@@ -908,6 +918,8 @@ export const PLAYER_ABILITIES = {
     element: "death",
     isPassive: false,
     isActive: false,
+    accTime: 0,
+
     cooldownTime: 15000
   },
   bubble: {
@@ -940,6 +952,7 @@ export const PLAYER_ABILITIES = {
     element: "bubble",
     isPassive: false,
     isActive: false,
+    accTime: 0,
     cooldownTime: 8000
   },
   metal: {
@@ -967,6 +980,7 @@ export const PLAYER_ABILITIES = {
     element: "metal",
     isPassive: false,
     isActive: false,
+    accTime: 0,
     cooldownTime: 4000
   },
   kaiju: (key, dir, i, setKaijuData, setTileStatuses, scale) => {

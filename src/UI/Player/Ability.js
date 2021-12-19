@@ -136,7 +136,8 @@ export const Ability = ({
     activateActive,
     cooldownTime,
     displayLookup,
-    element
+    element,
+    accTime
   } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
   // useEffect(() => {
@@ -148,7 +149,7 @@ export const Ability = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
   useKeyPress(
-    () => handleClick(),
+    () => playerIndex === 0 && handleClick(),
 
     // {
     // console.log(getPlayerIndex, keyNum);
@@ -160,7 +161,8 @@ export const Ability = ({
   );
   useEffect(() => {
     if (isActive) {
-      activateActive(playerIndex, setPlayerData, setTileStatuses, scale);
+      playerIndex === 0 &&
+        activateActive(playerIndex, setPlayerData, setTileStatuses, scale);
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
       setTimeout(() => {
@@ -169,13 +171,16 @@ export const Ability = ({
       }, cooldownTime);
     }
   }, [isActive]);
+  useEffect(() => playerIndex === 1 && setIsActive(true), [accTime]);
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
   const handleClick = () => !isActive && setIsActive(true);
   return (
     <Wrapper
-      onClick={handleClick}
+      onClick={() => {
+        playerIndex === 0 && handleClick();
+      }}
       isAnimating={isAnimating}
       ref={setHoverRef(`${displayLookup}Active`)}
       title={activeName}

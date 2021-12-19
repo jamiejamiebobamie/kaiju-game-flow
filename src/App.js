@@ -150,35 +150,35 @@ const App = () => {
     setPlayerData(_players);
     // PLAYERS    - - - - - - - - - -
     // GRAVEYARDS - - - - - - - - - -
-    // const _graveyards = [];
-    // for (let k = 0; k < 10; k++) {
-    //   _max -= k;
-    //   const bridgeTiles = Object.values(BRIDGE_TILES);
-    //   const bridgeTile = bridgeTiles[bridgeTiles.length - 1];
-    //   let key = `${bridgeTile.i} ${bridgeTile.j}`;
-    //   let randTile, randomInt;
-    //   while (BRIDGE_TILES[key]) {
-    //     randomInt = getRandomIntInRange({
-    //       max: _max
-    //     });
-    //     randTile = tileIndices[randomInt];
-    //     key = `${randTile.i} ${randTile.j}`;
-    //   }
-    //   const { i, j } = randTile;
-    //   const storeItem = tileIndices.length - k;
-    //   tileIndices[tileIndices.length - k] = tileIndices[randomInt];
-    //   tileIndices[randomInt] = storeItem;
-    //   const charLocation = getCharXAndY({ i, j, scale });
-    //   const { x, y } = charLocation;
-    //   _graveyards.push({
-    //     charLocation,
-    //     tile: { i, j },
-    //     isUsed: false
-    //   });
-    // }
-    // setGraveyardData(_graveyards);
-    // setGraveyardTileKeys(_graveyards.map(({ tile }) => `${tile.i} ${tile.j}`));
-    spawnGraveyards(setGraveyardTiles);
+    const _graveyards = [];
+    for (let k = 0; k < 10; k++) {
+      _max -= k;
+      const bridgeTiles = Object.values(BRIDGE_TILES);
+      const bridgeTile = bridgeTiles[bridgeTiles.length - 1];
+      let key = `${bridgeTile.i} ${bridgeTile.j}`;
+      let randTile, randomInt;
+      while (BRIDGE_TILES[key]) {
+        randomInt = getRandomIntInRange({
+          max: _max
+        });
+        randTile = tileIndices[randomInt];
+        key = `${randTile.i} ${randTile.j}`;
+      }
+      const { i, j } = randTile;
+      const storeItem = tileIndices.length - k;
+      tileIndices[tileIndices.length - k] = tileIndices[randomInt];
+      tileIndices[randomInt] = storeItem;
+      const charLocation = getCharXAndY({ i, j, scale });
+      const { x, y } = charLocation;
+      _graveyards.push({
+        charLocation,
+        tile: { i, j },
+        isUsed: false
+      });
+    }
+    setGraveyardData(_graveyards);
+    setGraveyardTileKeys(_graveyards.map(({ tile }) => `${tile.i} ${tile.j}`));
+    // spawnGraveyards(setGraveyardTiles);
     // GRAVEYARDS - - - - - - - - - -
     // TILES      - - - - - - - - - -
     redrawTiles([]);
@@ -226,7 +226,8 @@ const App = () => {
       setPowerUpData,
       setTileStatuses,
       graveyardTileKeys,
-      scale
+      scale,
+      accTime
     );
     // move monsters
     // (monsters become tile statuses when they reach the tiles.)
@@ -238,7 +239,8 @@ const App = () => {
         undefined,
         setTileStatuses,
         graveyardTileKeys,
-        scale
+        scale,
+        accTime
       );
     // powerup spawning.
     if (shouldUpdate(accTime, 5000))
@@ -295,26 +297,28 @@ const App = () => {
     //   setWinner,
     //   scale
     // );
-    setAccTime(accTime + intervalTime);
+    setAccTime(
+      accTime > Number.MAX_SAFE_INTEGER - 10000 ? 0 : accTime + intervalTime
+    );
   }, intervalTime);
-  useEffect(() => {
-    console.log(graveyardTiles);
-
-    if (graveyardTiles) {
-      const _graveyards = [];
-      graveyardTiles.forEach(gt =>
-        _graveyards.push({
-          charLocation: getCharXAndY({ ...gt, scale }),
-          tile: gt,
-          isUsed: false
-        })
-      );
-      setGraveyardData(_graveyards);
-      setGraveyardTileKeys(
-        _graveyards.map(({ tile }) => `${tile.i} ${tile.j}`)
-      );
-    }
-  }, [graveyardTiles]);
+  // useEffect(() => {
+  //   console.log(graveyardTiles);
+  //
+  //   if (graveyardTiles) {
+  //     const _graveyards = [];
+  //     graveyardTiles.forEach(gt =>
+  //       _graveyards.push({
+  //         charLocation: getCharXAndY({ ...gt, scale }),
+  //         tile: gt,
+  //         isUsed: false
+  //       })
+  //     );
+  //     setGraveyardData(_graveyards);
+  //     setGraveyardTileKeys(
+  //       _graveyards.map(({ tile }) => `${tile.i} ${tile.j}`)
+  //     );
+  //   }
+  // }, [graveyardTiles]);
   // <GameTitle>Kaiju City</GameTitle>
   return (
     <>

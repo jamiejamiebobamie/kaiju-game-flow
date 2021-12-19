@@ -890,56 +890,63 @@ export const movePiece = (
   setPowerUpData,
   setTileStatuses,
   graveyardTileKeys,
-  scale
+  scale,
+  accTime
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
       // set logic for enemy player
-      // if (i === 1) {
-      // if (kaijuData.length) {
-      //   // find the closest kaiju
-      //   const closetKaiju = kaijuData.reduce(
-      //     (acc, kaiju, j) => {
-      //       const distToKaiju = getDistance(
-      //         getCharXAndY({ ...kaiju.tile, scale }),
-      //         getCharXAndY({ ..._data[1].tile, scale })
-      //       );
-      //       if (acc.distance && distToKaiju < acc.distance) {
-      //         return {
-      //           distance: distToKaiju,
-      //           tile: kaiju.tile
-      //         };
-      //       } else return acc;
-      //     },
-      //     { distance: Number.MAX_SAFE_INTEGER }
-      //   );
-      //   // get path
-      //   const moveToTiles =
-      //     _data[1].tile &&
-      //     closetKaiju.tile &&
-      //     findPath(_data[1].tile, closetKaiju.tile, scale, graveyardTileKeys);
-      //   _data[i].moveToTiles = moveToTiles;
-      // }
-      // use powers
-      // if (_data[1].abilities.length) {
-      //   const numTilesFromPlayer =
-      //     _data[1].tile &&
-      //     _data[0].tile &&
-      //     findPath(_data[1].tile, _data[0].tile, scale, graveyardTileKeys)
-      //       .length;
-      //   if (numTilesFromPlayer !== undefined) {
-      //     const powersToFire = _data[1].abilities.forEach((a, j) => {
-      //       if (
-      //         a.type === "offensive" &&
-      //         a.count >= numTilesFromPlayer &&
-      //         Math.random() < 0.2
-      //       ) {
-      //         a.activateActive(1, setData, setTileStatuses, scale);
-      //       }
-      //     });
-      //   }
-      // }
-      // }
+      if (i === 1) {
+        if (powerUpData && powerUpData.length) {
+          // find the closest kaiju
+          const closetPowerUp = powerUpData.reduce(
+            (acc, powerUp, j) => {
+              const distToPowerUp = getDistance(
+                getCharXAndY({ ...powerUp.tile, scale }),
+                getCharXAndY({ ..._data[1].tile, scale })
+              );
+              if (acc.distance && distToPowerUp < acc.distance) {
+                return {
+                  distance: distToPowerUp,
+                  tile: powerUp.tile
+                };
+              } else return acc;
+            },
+            { distance: Number.MAX_SAFE_INTEGER }
+          );
+          // get path
+          const moveToTiles =
+            _data[1].tile &&
+            closetPowerUp.tile &&
+            findPath(
+              _data[1].tile,
+              closetPowerUp.tile,
+              scale,
+              graveyardTileKeys
+            );
+          _data[i].moveToTiles = moveToTiles;
+        }
+        // use powers
+        if (_data[1].abilities.length) {
+          const numTilesFromPlayer =
+            _data[1].tile &&
+            _data[0].tile &&
+            findPath(_data[1].tile, _data[0].tile, scale, graveyardTileKeys)
+              .length;
+          if (numTilesFromPlayer !== undefined) {
+            const powersToFire = _data[1].abilities.forEach((a, j) => {
+              if (
+                a.type === "offensive" &&
+                a.count >= numTilesFromPlayer &&
+                Math.abs(accTime - a.accTime) >= a.cooldownTime
+              ) {
+                _data[1].abilities[j].accTime = accTime;
+                a.activateActive(1, setData, setTileStatuses, scale);
+              }
+            });
+          }
+        }
+      }
       // - - - - - - - - - - -
       if (
         _data[i].charLocation &&
