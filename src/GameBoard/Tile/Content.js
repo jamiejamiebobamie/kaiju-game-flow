@@ -30,7 +30,7 @@ const Image = styled.div`
   height: 100%;
   background-repeat: no-repeat;
   background-position: 50%;
-  ${props => props.isKaiju && "background-image: url(testKaijuTile.png);"}
+  // ${props => props.isKaiju && "background-image: url(testKaijuTile.png);"}
   visibility: visible;
   -webkit-transform: rotate(-60deg);
   -moz-transform: rotate(-60deg);
@@ -40,17 +40,20 @@ const Image = styled.div`
   ${props =>
     props.isHighlighted &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: #495a6e;opacity: 0.5;"}
+    "background-color: #495a6e;opacity: 0.5;"};
+    ${props =>
+      props.isKaiju &&
+      (props.isPlayer !== 0 || props.isPlayer !== 1) &&
+      "background-color: #BF40BF; opacity: 0.5;"};
   ${props =>
     props.isPlayer === 0
       ? "background-color: #495a6e;opacity: .7;"
       : props.isPlayer === 1
       ? "background-color: #FFA836;opacity: .2;"
-      : null}
+      : null};
 `;
 export const Content = ({
   isHighlighted = false,
-  isKaiju,
   onClick,
   index,
   setHoverRef,
@@ -63,7 +66,7 @@ export const Content = ({
         <Image
           ref={setHoverRef(`${i} ${j}`)}
           onClick={onClick}
-          isKaiju={isKaiju}
+          isKaiju={status.isKaiju}
           isHighlighted={isHighlighted}
           isPlayer={status.isPlayer}
         />

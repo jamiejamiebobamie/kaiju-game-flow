@@ -30,7 +30,6 @@ export const GameBoard = ({
   powerUpData,
   playerData,
   kaijuData,
-  graveyardTileKeys,
   setPlayerMoveToTiles,
   tileStatuses,
   setTileStatuses,
@@ -46,8 +45,7 @@ export const GameBoard = ({
   useEffect(() => {
     const { i, j } = clickedTile;
     if (i !== -1) {
-      if (!graveyardTileKeys.find(key => key === `${i} ${j}`))
-        setPlayerMoveToTiles(path);
+      setPlayerMoveToTiles(path);
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);

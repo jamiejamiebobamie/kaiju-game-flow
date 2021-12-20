@@ -42,7 +42,6 @@ export const HexagonTile = ({
         }
         index={{ i, j }}
         setHoverRef={setHoverRef}
-        isKaiju={status.isKaiju}
         isHighlighted={isHighlighted}
         status={status}
       />

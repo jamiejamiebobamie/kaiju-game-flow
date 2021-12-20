@@ -1,266 +1,4 @@
 import { shootPower, shootKaijuPower, getCharXAndY } from "./utils";
-
-export const STARTING_KAIJU_CHOICES = [
-  { element: "Glass", name: "Moth", lvl: 1 },
-  { element: "Fire", name: "Salamander", lvl: 1 },
-  { element: "Wood", name: "Garden Snake", lvl: 1 },
-  { element: "Lightning", name: "Tarantula", lvl: 1 },
-  { element: "Death", name: "Albino Mantis", lvl: 1 },
-  { element: "Bubble", name: "Balloon Animal", lvl: 1 },
-  { element: "Metal", name: "RC Car", lvl: 1 }
-];
-
-/*
-EFFECT CALLBACKS:
-    onAttack
-    onManaWellGain
-    onManaWellLose
-    onStart
-    onDeath
-*/
-export const ACCESSORIES = {
-  Compass: {
-    key: "Compass",
-    name: "Compass",
-    onStart: () => {},
-    description: `All players start with this. The compass will point in the
-                    direction of the closest mana well.`
-  },
-  Cigarette: {
-    key: "Cigarette",
-    name: "Cigarette",
-    onStart: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Fire") ? 4 : 0;
-      setStats(stats => {
-        return stats.Cigarette && modifier === 4
-          ? stats
-          : {
-              ...stats,
-              Cigarette: !stats.Cigarette && modifier === 4,
-              dmg: stats.dmg + modifier
-            };
-      });
-    },
-    onManaWellGain: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Fire") ? 4 : 0;
-      setStats(stats => {
-        return stats.Cigarette && modifier === 4
-          ? stats
-          : {
-              ...stats,
-              Cigarette: !stats.Cigarette && modifier === 4,
-              dmg: stats.dmg + modifier
-            };
-      });
-    },
-    onManaWellLose: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Fire") ? 4 : 0;
-      setStats(stats => {
-        return stats.Cigarette && modifier === 4
-          ? stats
-          : {
-              ...stats,
-              Cigarette: !(stats.Cigarette && modifier === 0),
-              dmg: stats.dmg + modifier
-            };
-      });
-    },
-    description: `Increased fire damage.`
-  },
-  Unicorn: {
-    key: "Unicorn",
-    name: "Unicorn",
-    onStart: ({ setStats }) => {
-      setStats(stats => {
-        return { ...stats, moveSpeed: stats.moveSpeed + 7 };
-      });
-    },
-    onAttack: ({ setAccessory }) => {
-      setAccessory(accessories => {
-        if (accessories.includes(accessory => accessory.key === "Unicorn")) {
-          const _accessories = [...accessories];
-          const i = accessories.indexOf(
-            accessory => accessory.key === "Unicorn"
-          );
-          _accessories.splice(i, 0); // need to test.
-          return _accessories;
-        } else {
-          return accessories;
-        }
-      });
-    },
-    description: `Player starts with a ridable Pegasus mount that confers a
-                  large speed increase, but a speed increase that goes away
-                  after the first encounter with another player. In game, the
-                  unicorn will throw the player off of it and run away.`
-  },
-  CoolJacket: {
-    key: "CoolJacket",
-    name: "Cool Jacket",
-    onStart: () => {},
-    description: `Just a really cool jacket.`
-  },
-  MetalBat: {
-    key: "MetalBat",
-    name: "Metal Bat",
-    onAttack: ({ setStats, kaiju }) => {
-      setStats(stats => {
-        // set stats to what they were originally after attack is over.
-        setTimeout(() => setStats(stats), 2000); // needs to be tested.
-        let modifier =
-          kaiju.filter(
-            k =>
-              k.element === "Lightning" ||
-              k.element === "Fire" ||
-              k.element === "Wood"
-          ).length *
-            2 +
-          5;
-        return { ...stats, dmg: stats.dmg + modifier };
-      });
-    },
-    description: `A metal baseball bat. In game: a melee weapon. Headshots
-                  with it are lethal, but here it just confers a damage modifer.
-                  The bat is further modified (in game and here) with the
-                  addition of the Wood, Fire, and/or Lightning Kaiju.
-                  Wood: The bat becomes "Shillelagh" and casts Wood's active on
-                        hit. The bat is covered in ivy.
-                  Fire: The bat becomes "Firebrand" and casts Fire's active on
-                        hit. The bat is glowing, orange metal.
-                  Lightning: The bat becomes "Lightning Rod" and casts
-                        Lightning's active on hit. The bat is electrified,
-                        crackling with live electricity.
-                  These modifiers allow the bat to hit wraiths.`
-  },
-  WingedNikes: {
-    key: "WingedNikes",
-    name: "Winged Nikes",
-    onStart: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Lightning") ? 5 : 0;
-      // console.log("modifier", modifier, kaiju);
-      setStats(stats => {
-        return stats.WingedNikes && modifier === 5
-          ? stats
-          : {
-              ...stats,
-              WingedNikes: !stats.WingedNikes && modifier === 5,
-              moveSpeed: stats.moveSpeed + modifier
-            };
-      });
-    },
-    onManaWellGain: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Lightning") ? 5 : 0;
-      setStats(stats => {
-        return stats.WingedNikes && modifier === 5
-          ? stats
-          : {
-              ...stats,
-              WingedNikes: !stats.WingedNikes && modifier === 5,
-              moveSpeed: stats.moveSpeed + modifier
-            };
-      });
-    },
-    onManaWellLose: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Lightning") ? 5 : 0;
-      setStats(stats => {
-        return stats.WingedNikes && modifier === 5
-          ? stats
-          : {
-              ...stats,
-              WingedNikes: !(stats.WingedNikes && modifier === 0),
-              moveSpeed: stats.moveSpeed + modifier
-            };
-      });
-    },
-    description: `If player has Lightning Kaiju, his moveSpeed increases a
-                  a moderate amount. In "real" game, the speed increase will
-                  only be applied with Lightning passive enabled.`
-  },
-  MagicBeans: {
-    key: "MagicBeans",
-    name: "5 Magic Beans",
-    onStart: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Wood") ? 4 : 0;
-      setStats(stats => {
-        return stats.MagicBeans && modifier === 4
-          ? stats
-          : {
-              ...stats,
-              MagicBeans: !stats.MagicBeans && modifier === 4,
-              dmg: stats.dmg + modifier
-            };
-      });
-    },
-    onManaWellGain: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Wood") ? 4 : 0;
-      setStats(stats => {
-        return stats.MagicBeans && modifier === 4
-          ? stats
-          : {
-              ...stats,
-              MagicBeans: !stats.MagicBeans && modifier === 4,
-              dmg: stats.dmg + modifier
-            };
-      });
-    },
-    onManaWellLose: ({ kaiju, setStats }) => {
-      let modifier = kaiju.find(k => k.element === "Wood") ? 4 : 0;
-      setStats(stats => {
-        return stats.MagicBeans && modifier === 4
-          ? stats
-          : {
-              ...stats,
-              MagicBeans: !(stats.MagicBeans && modifier === 0),
-              dmg: stats.dmg + modifier
-            };
-      });
-    },
-    description: `Plant one of these to create an ivy-tree. Enemies around an
-                  ivy-tree have their movement slowed considerably. Here for
-                  simplicity it will confer a damage modifier if the player has
-                  the Wood Kaiju.`
-  },
-  SkullRing: {
-    key: "SkullRing",
-    name: "Skull Ring",
-    onDeath: ({ setStats }) => {
-      setStats(stats => {
-        const modifier = Math.random() > 0.8 ? 1 : 0;
-        return { ...stats, lives: stats.lives + modifier };
-      });
-    },
-    description: `Small chance of conferring one wraith on respawn.`
-  },
-  Revolver: {
-    key: "Revolver",
-    name: "Revolver",
-    onAttack: ({ setStats }) => {
-      setStats(stats => {
-        setTimeout(() => setStats(stats), 2000); // needs to be tested.
-        const modifier = Math.random() > 0.5 ? 5 : 0;
-        return { ...stats, dmg: stats.dmg + modifier };
-      });
-    },
-    description: `In game, player starts with a revolver with six bullets. Ammo
-                  is found on ocassion. Here, a damage modifier is randomly
-                  applied.`
-  }
-  // SemiAutomatic: {
-  //   key: "SemiAutomatic",
-  //   name: "Semi-automatic",
-  //   onAttack: ({ setStats }) => {
-  //     setStats(stats => {
-  //       setTimeout(() => setStats(stats), 2000); // needs to be tested.
-  //       const modifier = Math.random() > 0.7 ? 7 : 0;
-  //       return { ...stats, dmg: stats.dmg + modifier };
-  //     });
-  //   },
-  //   description: `In game, player starts with a one-handed Semi Automatic
-  //                 weapon with 50 bullets. Ammo is found rarely. Here, a damage
-  //                 modifier is randomly applied.`
-  // }
-};
-
 export const PENINSULA_TILE_LOOKUP = {
   "14 26": { i: 14, j: 26 },
   "3 31": { i: 3, j: 31 },
@@ -712,41 +450,29 @@ export const PLAYER_ABILITIES = {
   ice: {
     passiveName: "Cold Shoulder",
     activeName: "Ice Slice",
-    // activatePassive: k => {
-    //   setPlayerData(_players =>
-    //     _players.map(p => (k === p.i ? { ...p, lives: p.lives + 1 } : p))
-    //   );
-    // },
-    count: 20,
+    count: 3,
     type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) =>
       shootPower({
         setPlayerData,
         setTileStatuses,
         scale,
-        count: 20,
+        count: 35,
         statusKey: "isCold",
         numTiles: 6,
         sideEffectObject: {},
         playerIndex: k
       }),
-    // getPlayerIndex: k => k,
     displayLookup: "abilityIce",
     element: "ice",
     isPassive: false,
     isActive: false,
     accTime: 0,
-
     cooldownTime: 2000
   },
   glass: {
     passiveName: "Shatter Shot",
     activeName: "Shatter Travel",
-    // activatePassive: k => {
-    //   setPlayerData(_players =>
-    //     _players.map(p => (k === p.i ? { ...p, curveBullets: true } : p))
-    //   );
-    // },
     count: 30,
     type: "escape",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
@@ -764,7 +490,6 @@ export const PLAYER_ABILITIES = {
               moveFromLocation: location,
               tile,
               moveToTiles: []
-              // isThere: true
             };
           } else {
             return p;
@@ -791,49 +516,34 @@ export const PLAYER_ABILITIES = {
     element: "glass",
     isPassive: false,
     isActive: false,
-    // cooldownTime: 25000
     accTime: 0,
-
     cooldownTime: 3000
   },
   fire: {
     passiveName: "Campfire",
     activeName: "Dragon's Breath",
-    // activatePassive: k => {
-    //   setPlayerData(_players =>
-    //     _players.map(p => (k === p.i ? { ...p, immuneToGhosts: true } : p))
-    //   );
-    // },
-    count: 7,
+    count: 20,
     type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) =>
       shootPower({
         setPlayerData,
         setTileStatuses,
         scale,
-        count: 7,
+        count: 20,
         statusKey: "isOnFire",
         numTiles: 3,
-        // sideEffectObject: {},
         playerIndex: k
       }),
-    // getPlayerIndex: k => k,
     displayLookup: "abilityFire",
     element: "fire",
     isPassive: false,
     isActive: false,
     accTime: 0,
-
     cooldownTime: 6000
   },
   wood: {
     passiveName: "Barkskin",
     activeName: "Overgrowth",
-    // activatePassive: () => {
-    //   setPlayerData(_players =>
-    //     _players.map(p => (k === p.i ? { ...p, immuneToMelee: true } : p))
-    //   );
-    // },
     type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       shootPower({
@@ -843,30 +553,20 @@ export const PLAYER_ABILITIES = {
         count: 10,
         statusKey: "isWooded",
         numTiles: 3,
-        // sideEffectObject: {},
         playerIndex: k
       });
     },
     count: 10,
-    // getPlayerIndex: k => k,
     displayLookup: "abilityWood",
     element: "wood",
     isPassive: false,
     isActive: false,
     accTime: 0,
-
     cooldownTime: 6000
   },
   lightning: {
     passiveName: "Charged Step",
     activeName: "Discharge",
-    // activatePassive: k => {
-    //   setPlayerData(_players =>
-    //     _players.map(p =>
-    //       k === p.i ? { ...p, moveSpeed: p.moveSpeed + 4 } : p
-    //     )
-    //   );
-    // },
     type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) =>
       shootPower({
@@ -874,31 +574,21 @@ export const PLAYER_ABILITIES = {
         setTileStatuses,
         scale,
         count: 30,
-
         statusKey: "isElectrified",
         numTiles: 3,
-        // sideEffectObject: {},
         playerIndex: k
       }),
     count: 30,
-
-    // getPlayerIndex: k => k,
     displayLookup: "abilityLightning",
     element: "lightning",
     isPassive: false,
     isActive: false,
     accTime: 0,
-
-    cooldownTime: 7000
+    cooldownTime: 2000
   },
   death: {
     passiveName: "Reaper",
     activeName: "Haunt",
-    // activatePassive: k => {
-    //   setPlayerData(_players =>
-    //     _players.map(p => (k === p.i ? { ...p, isGrimReaper: true } : p))
-    //   );
-    // },
     count: 30,
     type: "offensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
@@ -908,46 +598,33 @@ export const PLAYER_ABILITIES = {
         scale,
         count: 30,
         statusKey: "isGhosted",
-        numTiles: 1, //ghosts,
-        // sideEffectObject: { lives: 1 },
+        numTiles: 1,
         playerIndex: k
       });
     },
-    // getPlayerIndex: k => k,
     displayLookup: "abilityDeath",
     element: "death",
     isPassive: false,
     isActive: false,
     accTime: 0,
-
     cooldownTime: 15000
   },
   bubble: {
     passiveName: "Shelter",
     activeName: "Dispel",
-    // activatePassive: k => {
-    //   setPlayerData(_players =>
-    //     _players.map(p =>
-    //       k === p.i ? { ...p, immuneToFire: true, immuneToIvy: true } : p
-    //     )
-    //   );
-    // },
     type: "defensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       shootPower({
         setPlayerData,
         setTileStatuses,
         scale,
-        count: 4,
-
+        count: 7,
         statusKey: "isBubble",
-        numTiles: 5,
-        // sideEffectObject: {},
+        numTiles: 6,
         playerIndex: k
       });
     },
     count: 4,
-    // getPlayerIndex: k => k,
     displayLookup: "abilityBubble",
     element: "bubble",
     isPassive: false,
@@ -958,11 +635,6 @@ export const PLAYER_ABILITIES = {
   metal: {
     passiveName: "Aegis Armor",
     activeName: "Aegis",
-    // activatePassive: (k, setPlayerData) => {
-    //   setPlayerData(_players =>
-    //     _players.map(p => (k === p.i ? { ...p, immuneToBullets: true } : p))
-    //   );
-    // },
     type: "defensive",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       shootPower({
@@ -984,7 +656,6 @@ export const PLAYER_ABILITIES = {
     cooldownTime: 4000
   },
   kaiju: (key, dir, i, setKaijuData, setTileStatuses, scale) => {
-    // console.log("gameState", dir, i, setKaijuData, setTileStatuses, scale);
     shootKaijuPower({
       setKaijuData,
       setTileStatuses,
@@ -1000,3 +671,21 @@ export const PLAYER_ABILITIES = {
     });
   }
 };
+/*
+stats that can be increased / decreased:
+moveSpeed,
+tilecount,
+numTiles,
+lives,
+inManaPool status
+
+PASSIVES:
+glass -> random teleport away instead of [ dmg / lives-- ]
+fire -> "fuel", all power count++
+wood -> lives++
+lightning -> moveSpeed
+death -> lives++ (upon enemy death?)
+bubble -> "eightball" random chance of triggering "inManaPool" status on loss of life.
+metal ->
+ice -> "cold shoulder" chance of ignoring a successful kaiju's attack (do not take dmg).
+*/

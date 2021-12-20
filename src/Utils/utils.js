@@ -6,64 +6,23 @@ import {
   PERIMETER_TILES
 } from "./gameState";
 import { HexagonTile } from "../GameBoard/Tile/HexagonTile";
-export const spawnGraveyards = setGraveyardTiles => {
-  // find a random tile that is not a bridge tile
-  const notBridgeTiles = Object.values(PENINSULA_TILE_LOOKUP).filter(
-    val => !BRIDGE_TILES[`${val.i} ${val.j}`]
-  );
-  const randomInt = getRandomIntInRange({
-    max: notBridgeTiles.length - 1
-  });
-  const randStartingTile = notBridgeTiles[randomInt];
-  // from that starting tile recur outward,
-  // adding all adjacent tiles for each adjacent tile to a result array.
-  const _flattenedArray = [randStartingTile];
-  const result = { isFound: false, tiles: [] };
-  const recur = (tile, flattenedArray, remainingTiles, result) => {
-    if (result.isFound) return;
-    if (!remainingTiles.length) {
-      result.isFound = true;
-      result.tiles = flattenedArray;
-    }
-    const tiles = getAdjacentTiles(tile).filter(t =>
-      flattenedArray.every(entry => !(entry.i === t.i && entry.j === t.j))
-    );
-    for (let i = 0; i < tiles.length; i++) {
-      recur(
-        tiles[i],
-        [...flattenedArray, tiles[i]],
-        remainingTiles.filter(t => tiles[i].i !== t.i && tiles[i].j !== t.j),
-        result
-      );
-    }
-  };
-  recur(randStartingTile, _flattenedArray, notBridgeTiles, result);
-  console.log(result.tiles);
-  const graveyardTiles = [];
-  result.tiles.forEach((t, i) => !(i % 12) && graveyardTiles.push(t));
-  console.log(graveyardTiles);
-  setGraveyardTiles(graveyardTiles);
-};
 export const spawnPowerUp = (
   powerUpData,
   setPowerUpData,
   elementPickUps,
   setElementPickUps,
-  graveyardTileKeys,
   playerData,
   scale
 ) => {
   if (powerUpData.length < 2 && elementPickUps.length) {
-    const freeTiles = Object.entries(PENINSULA_TILE_LOOKUP).filter(
-      (k, v) =>
-        k !== graveyardTileKeys.every(key => key !== k) &&
-        playerData.every(
-          ({ tile }) =>
-            `${tile.i} ${tile.j}` !== k &&
-            playerData.every(({ tile }) =>
-              getAdjacentTiles(tile).every(t => `${t.i} ${t.j}` !== k)
-            )
-        )
+    const freeTiles = Object.entries(PENINSULA_TILE_LOOKUP).filter((k, v) =>
+      playerData.every(
+        ({ tile }) =>
+          `${tile.i} ${tile.j}` !== k &&
+          playerData.every(({ tile }) =>
+            getAdjacentTiles(tile).every(t => `${t.i} ${t.j}` !== k)
+          )
+      )
     );
     const randInt = getRandomIntInRange({ max: freeTiles.length - 1 });
     const randInt2 = getRandomIntInRange({
@@ -132,7 +91,7 @@ export const spawnKaiju = (
       tile: kaijuTile,
       color: "purple",
       isThere: false,
-      moveSpeed: 14,
+      moveSpeed: 5,
       abilities: [
         () =>
           PLAYER_ABILITIES["kaiju"](
@@ -144,14 +103,14 @@ export const spawnKaiju = (
             scale
           )
       ],
-      isKaiju: true
+      isKaiju: true,
+      onTiles: false
     }
   ]);
 };
 export const updateHighlightedTiles = (
   setHighlightedTiles,
   playerData,
-  graveyardTileKeys,
   hoverLookupString,
   path,
   setPath,
@@ -174,12 +133,11 @@ export const updateHighlightedTiles = (
         _highlightedTiles = path.map(t => {
           return { h_i: t.i, h_j: t.j };
         });
-      } else if (!graveyardTileKeys.find(key => key === hoverLookupString)) {
+      } else {
         const _path = findPath(
           playerData[0].tile,
           { i: Number(i), j: Number(j) },
-          scale,
-          graveyardTileKeys
+          scale
         );
         _highlightedTiles = _path.map(t => {
           return { h_i: t.i, h_j: t.j };
@@ -204,7 +162,7 @@ export const redrawTiles = (
   setClickedTile,
   setTiles,
   playerData,
-  graveyardTileKeys,
+  kaijuData,
   tileStatuses,
   setTileStatuses,
   incrementPlayerLives,
@@ -239,7 +197,9 @@ export const redrawTiles = (
                 isPlayer:
                   playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
                   playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
-                isGraveyard: graveyardTileKeys.find(key => key === `${i} ${j}`)
+                isKaiju: kaijuData
+                  .filter(k => k.onTiles)
+                  .find(({ tile }) => tile.i === i && tile.j === j)
               }}
             />
           );
@@ -470,62 +430,6 @@ export const getClosestPlayerFromTile = (currTile, playerData, scale) => {
   });
   return closest.playerIndex;
 };
-export const respawnPlayers = (
-  setPlayerData,
-  graveyardData,
-  setGraveyardData,
-  setWinner,
-  scale
-) => {
-  setPlayerData(_players => {
-    return _players.map((p, k) => {
-      if (p.lives < 1) {
-        const enemyPlayer = k === 0 ? _players[1] : _players[0];
-        if (Array.isArray(graveyardData) && graveyardData.length) {
-          const distances = graveyardData.map(g =>
-            getDistance(
-              getCharXAndY({ ...g.tile, scale }),
-              enemyPlayer.charLocation
-            )
-          );
-          const farthestGraveyard = distances.reduce(
-            (acc, distance, j) =>
-              distance > acc.distance
-                ? { j, tile: graveyardData[j].tile, distance }
-                : acc,
-            { j: 0, tile: graveyardData[0].tile, distance: distances[0] }
-          );
-          if (farthestGraveyard) {
-            const { tile } = farthestGraveyard;
-            const location = getCharXAndY({ ...tile, scale });
-            setGraveyardData(graveyards =>
-              farthestGraveyard
-                ? graveyards.filter((g, j) => j !== farthestGraveyard.j)
-                : graveyards
-            );
-            return {
-              ...p,
-              lives: 1,
-              moveToTiles: [],
-              tile: farthestGraveyard.tile,
-              charLocation: location,
-              moveToLocation: location,
-              moveFromLocation: location,
-              isThere: true
-            };
-          } else {
-            return p;
-          }
-        } else {
-          setWinner(enemyPlayer);
-          return p;
-        }
-      } else {
-        return p;
-      }
-    });
-  });
-};
 export const shootPower = ({
   setPlayerData,
   setTileStatuses,
@@ -652,13 +556,7 @@ export const setTileWithStatus = (
   });
 };
 export const solveForStatus = tile => {
-  if (tile.isGraveyard) {
-    return {
-      isGraveyard: tile.isGraveyard
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
-    };
-  } else if (tile.isBubble) {
+  if (tile.isBubble) {
     return {
       isBubble: tile.isBubble
       // count: tile.count,
@@ -889,9 +787,9 @@ export const movePiece = (
   powerUpData,
   setPowerUpData,
   setTileStatuses,
-  graveyardTileKeys,
   scale,
-  accTime
+  accTime,
+  playerData
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -918,12 +816,7 @@ export const movePiece = (
           const moveToTiles =
             _data[1].tile &&
             closetPowerUp.tile &&
-            findPath(
-              _data[1].tile,
-              closetPowerUp.tile,
-              scale,
-              graveyardTileKeys
-            );
+            findPath(_data[1].tile, closetPowerUp.tile, scale);
           _data[i].moveToTiles = moveToTiles;
         }
         // use powers
@@ -931,8 +824,7 @@ export const movePiece = (
           const numTilesFromPlayer =
             _data[1].tile &&
             _data[0].tile &&
-            findPath(_data[1].tile, _data[0].tile, scale, graveyardTileKeys)
-              .length;
+            findPath(_data[1].tile, _data[0].tile, scale).length;
           if (numTilesFromPlayer !== undefined) {
             const powersToFire = _data[1].abilities.forEach((a, j) => {
               if (
@@ -946,6 +838,28 @@ export const movePiece = (
             });
           }
         }
+      }
+      // - - - - - - - - - - -
+      // if Kaiju, and at the tile, cast power.
+      if (
+        _data[i].isKaiju &&
+        _data[i].isThere &&
+        !_data[i].moveToTiles.length
+      ) {
+        // _data[i].abilities[0]();
+        _data[i].onTiles = true;
+      }
+      // - - - - - - - - - - -
+      // if Kaiju, and at the tile, cast power.
+      if (_data[i].isKaiju && _data[i].onTiles) {
+        const [p1Distance, p2Distance] = playerData.map(p =>
+          getDistance(getCharXAndY({ ...p.tile, scale }), _data[i].charLocation)
+        );
+        const moveToTiles =
+          p1Distance < p2Distance
+            ? findPath(_data[i].tile, playerData[0].tile, scale)
+            : findPath(_data[i].tile, playerData[1].tile, scale);
+        _data[i].moveToTiles = moveToTiles;
       }
       // - - - - - - - - - - -
       if (
@@ -973,15 +887,6 @@ export const movePiece = (
               _data[i].abilities.push(PLAYER_ABILITIES[powerup.element]);
             setPowerUpData(_powerups => _powerups.filter(k => k !== powerup));
           }
-        }
-        // - - - - - - - - - - -
-        // if Kaiju, and at the tile, cast power.
-        if (
-          _data[i].isKaiju &&
-          _data[i].isThere &&
-          !_data[i].moveToTiles.length
-        ) {
-          _data[i].abilities[0]();
         }
         // - - - - - - - - - - -
         if (_data[i].isThere && _data[i].moveToTiles.length) {
@@ -1187,7 +1092,7 @@ export const getAdjacentTiles = tile => {
     })
     .filter(t => PENINSULA_TILE_LOOKUP[`${t.i} ${t.j}`]);
 };
-export const findPath = (start, goal, scale, graveyardTileKeys) => {
+export const findPath = (start, goal, scale) => {
   let count = 0;
   // const duplicateLookup = {};
   return recur(start, [], count);
@@ -1217,10 +1122,7 @@ export const findPath = (start, goal, scale, graveyardTileKeys) => {
         shortest.distance = distance;
       }
     });
-    if (
-      (shortest.tile.i === currTile.i && shortest.tile.j === currTile.j) ||
-      graveyardTileKeys.includes(`${shortest.tile.i} ${shortest.tile.j}`)
-    ) {
+    if (shortest.tile.i === currTile.i && shortest.tile.j === currTile.j) {
       // const randTile = getRandAdjacentTile(currTile);
       const keyedArr = arr.map(({ i, j }) => `${i} ${j}`);
       const remainingTiles = adjacentTiles.filter(
