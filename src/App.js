@@ -198,7 +198,8 @@ const App = () => {
       setPowerUpData,
       setTileStatuses,
       scale,
-      accTime
+      accTime,
+      kaijuData
     );
     // move monsters
     // if (shouldUpdate(accTime, 400))
@@ -291,6 +292,7 @@ const App = () => {
         />
         <UI
           playerData={playerData}
+          kaijuData={kaijuData}
           setPlayerData={setPlayerData}
           setTileStatuses={setTileStatuses}
           scale={scale}

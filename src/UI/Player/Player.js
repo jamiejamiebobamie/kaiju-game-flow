@@ -49,7 +49,11 @@ const AccessoryPicture = styled.i`
   align-items: center;
 `;
 export const Player = ({
-  playerData = [{}, {}],
+  playerData = [
+    { lives: 0, abilities: [], accessory: { displayLookup: "" } },
+    { lives: 0, abilities: [], accessory: { displayLookup: "" } }
+  ],
+  kaijuData = [],
   isReversed,
   setDisplayString,
   setPlayerData,
@@ -67,17 +71,17 @@ export const Player = ({
       {isReversed ? (
         <>
           <Abilities
-            setPlayerData={setPlayerData}
+            playerData={playerData}
+            kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
-            abilities={playerData.abilities}
+            abilities={(playerData.length && playerData[1].abilities) || []}
             setDisplayString={setDisplayString}
             isReversed={isReversed}
-            ghosts={playerData.lives - 1}
             playerIndex={1}
           />
           <HealthBar
-            health={playerData.lives}
+            health={(playerData.length && playerData[1].lives) || 0}
             setDisplayString={setDisplayString}
           />
           <Kaiju isReversed={isReversed} setDisplayString={setDisplayString} />
@@ -86,16 +90,16 @@ export const Player = ({
         <>
           <Kaiju setDisplayString={setDisplayString} />
           <HealthBar
-            health={playerData.lives}
+            health={(playerData.length && playerData[0].lives) || 0}
             setDisplayString={setDisplayString}
           />
           <Abilities
-            setPlayerData={setPlayerData}
+            playerData={playerData}
+            kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
-            abilities={playerData.abilities}
+            abilities={(playerData.length && playerData[0].abilities) || []}
             setDisplayString={setDisplayString}
-            ghosts={playerData.lives - 1}
             playerIndex={0}
           />
         </>
@@ -104,7 +108,10 @@ export const Player = ({
         <PlayerPicture className="fa fa-user-circle" />
         <AccessoryPicture
           ref={setHoverRef(
-            playerData.accessory && playerData.accessory.displayLookup
+            ""
+            // isReversed
+            //   ? playerData[1].accessory && playerData[1].accessory.displayLookup
+            //   : playerData[0].accessory && playerData[0].accessory.displayLookup
           )}
           className="fa fa-wrench"
           isReversed={isReversed}
@@ -113,7 +120,13 @@ export const Player = ({
       <PassiveAbilities
         setDisplayString={setDisplayString}
         isReversed={isReversed}
-        abilities={playerData.abilities}
+        abilities={
+          playerData.length
+            ? isReversed
+              ? playerData[1].abilities
+              : playerData[0].abilities
+            : []
+        }
       />
     </Wrapper>
   );

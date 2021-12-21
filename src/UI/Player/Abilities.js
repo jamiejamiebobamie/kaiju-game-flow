@@ -14,8 +14,8 @@ const Wrapper = styled.div`
 `;
 export const Abilities = ({
   playerIndex,
-  ghosts,
-  setPlayerData,
+  kaijuData,
+  playerData,
   setTileStatuses,
   scale,
   setDisplayString,
@@ -68,13 +68,13 @@ export const Abilities = ({
   const abilityButtons = abilities.map((abilityData, i) => (
     <Ability
       key={i}
-      setPlayerData={setPlayerData}
+      playerData={playerData}
+      kaijuData={kaijuData}
       setTileStatuses={setTileStatuses}
       scale={scale}
       setDisplayString={setDisplayString}
       abilityData={abilityData}
       keyNum={i + 1}
-      ghosts={ghosts}
       playerIndex={playerIndex}
     />
   ));

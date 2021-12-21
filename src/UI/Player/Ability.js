@@ -122,17 +122,17 @@ const AbilityNum = styled.div`
 export const Ability = ({
   playerIndex,
   abilityData,
+  playerData,
+  kaijuData,
   setPlayerData,
   setTileStatuses,
   scale,
   setDisplayString,
-  keyNum,
-  ghosts
+  keyNum
 }) => {
   const {
     passiveName,
     activeName,
-    // activatePassive,
     activateActive,
     cooldownTime,
     displayLookup,
@@ -140,29 +140,22 @@ export const Ability = ({
     accTime
   } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
-  // useEffect(() => {
-  //   activatePassive && activatePassive();
-  // }, []);
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const [isPassive, setIsPassive] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
-  useKeyPress(
-    () => playerIndex === 0 && handleClick(),
-
-    // {
-    // console.log(getPlayerIndex, keyNum);
-    // if (getPlayerIndex && getPlayerIndex() === 0) {
-    //   console.log(keyNum);
-    // }
-    // }
-    `Digit${keyNum}`
-  );
+  useKeyPress(() => playerIndex === 0 && handleClick(), `Digit${keyNum}`);
   useEffect(() => {
     if (isActive) {
       playerIndex === 0 &&
-        activateActive(playerIndex, setPlayerData, setTileStatuses, scale);
+        activateActive(
+          playerIndex,
+          playerData,
+          kaijuData,
+          setTileStatuses,
+          scale
+        );
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
       setTimeout(() => {

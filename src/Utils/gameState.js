@@ -450,18 +450,18 @@ export const PLAYER_ABILITIES = {
   ice: {
     passiveName: "Cold Shoulder",
     activeName: "Ice Slice",
-    count: 3,
+    range: 3,
     type: "offensive",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) =>
+    activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
-        setPlayerData,
-        setTileStatuses,
+        data,
+        dataIndex: k,
+        targetData,
         scale,
         count: 35,
         statusKey: "isCold",
         numTiles: 6,
-        sideEffectObject: {},
-        playerIndex: k
+        setTileStatuses
       }),
     displayLookup: "abilityIce",
     element: "ice",
@@ -473,7 +473,7 @@ export const PLAYER_ABILITIES = {
   glass: {
     passiveName: "Shatter Shot",
     activeName: "Shatter Travel",
-    count: 30,
+    range: 30,
     type: "escape",
     activateActive: (k, setPlayerData, setTileStatuses, scale) => {
       setPlayerData(_players =>
@@ -522,18 +522,31 @@ export const PLAYER_ABILITIES = {
   fire: {
     passiveName: "Campfire",
     activeName: "Dragon's Breath",
-    count: 20,
+    range: 20,
     type: "offensive",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) =>
+
+    activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
-        setPlayerData,
-        setTileStatuses,
+        data,
+        dataIndex: k,
+        targetData,
         scale,
         count: 20,
         statusKey: "isOnFire",
         numTiles: 3,
-        playerIndex: k
+        setTileStatuses
       }),
+
+    // activateActive: (k, setPlayerData, setTileStatuses, scale) =>
+    //   shootPower({
+    //     setPlayerData,
+    //     setTileStatuses,
+    //     scale,
+    //     count: 20,
+    //     statusKey: "isOnFire",
+    //     numTiles: 3,
+    //     playerIndex: k
+    // }),
     displayLookup: "abilityFire",
     element: "fire",
     isPassive: false,
@@ -545,18 +558,31 @@ export const PLAYER_ABILITIES = {
     passiveName: "Barkskin",
     activeName: "Overgrowth",
     type: "offensive",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+
+    activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
-        setPlayerData,
-        setTileStatuses,
+        data,
+        dataIndex: k,
+        targetData,
         scale,
         count: 10,
         statusKey: "isWooded",
         numTiles: 3,
-        playerIndex: k
-      });
-    },
-    count: 10,
+        setTileStatuses
+      }),
+
+    // activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+    //   shootPower({
+    //     setPlayerData,
+    //     setTileStatuses,
+    //     scale,
+    //     count: 10,
+    //     statusKey: "isWooded",
+    //     numTiles: 3,
+    //     playerIndex: k
+    //   });
+    // },
+    range: 10,
     displayLookup: "abilityWood",
     element: "wood",
     isPassive: false,
@@ -568,17 +594,30 @@ export const PLAYER_ABILITIES = {
     passiveName: "Charged Step",
     activeName: "Discharge",
     type: "offensive",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) =>
+
+    activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
-        setPlayerData,
-        setTileStatuses,
+        data,
+        dataIndex: k,
+        targetData,
         scale,
         count: 30,
         statusKey: "isElectrified",
         numTiles: 3,
-        playerIndex: k
+        setTileStatuses
       }),
-    count: 30,
+
+    // activateActive: (k, setPlayerData, setTileStatuses, scale) =>
+    //   shootPower({
+    //     setPlayerData,
+    //     setTileStatuses,
+    //     scale,
+    //     count: 30,
+    //     statusKey: "isElectrified",
+    //     numTiles: 3,
+    //     playerIndex: k
+    //   }),
+    range: 30,
     displayLookup: "abilityLightning",
     element: "lightning",
     isPassive: false,
@@ -589,19 +628,32 @@ export const PLAYER_ABILITIES = {
   death: {
     passiveName: "Reaper",
     activeName: "Haunt",
-    count: 30,
+    range: 30,
     type: "offensive",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+
+    activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
-        setPlayerData,
-        setTileStatuses,
+        data,
+        dataIndex: k,
+        targetData,
         scale,
         count: 30,
         statusKey: "isGhosted",
         numTiles: 1,
-        playerIndex: k
-      });
-    },
+        setTileStatuses
+      }),
+
+    // activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+    //   shootPower({
+    //     setPlayerData,
+    //     setTileStatuses,
+    //     scale,
+    //     count: 30,
+    //     statusKey: "isGhosted",
+    //     numTiles: 1,
+    //     playerIndex: k
+    //   });
+    // },
     displayLookup: "abilityDeath",
     element: "death",
     isPassive: false,
@@ -613,18 +665,31 @@ export const PLAYER_ABILITIES = {
     passiveName: "Shelter",
     activeName: "Dispel",
     type: "defensive",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+
+    activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
-        setPlayerData,
-        setTileStatuses,
+        data,
+        dataIndex: k,
+        targetData,
         scale,
         count: 7,
         statusKey: "isBubble",
         numTiles: 6,
-        playerIndex: k
-      });
-    },
-    count: 4,
+        setTileStatuses
+      }),
+
+    // activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+    //   shootPower({
+    //     setPlayerData,
+    //     setTileStatuses,
+    //     scale,
+    //     count: 7,
+    //     statusKey: "isBubble",
+    //     numTiles: 6,
+    //     playerIndex: k
+    //   });
+    // },
+    range: 4,
     displayLookup: "abilityBubble",
     element: "bubble",
     isPassive: false,
@@ -636,39 +701,37 @@ export const PLAYER_ABILITIES = {
     passiveName: "Aegis Armor",
     activeName: "Aegis",
     type: "defensive",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+
+    activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
-        setPlayerData,
-        setTileStatuses,
+        data,
+        dataIndex: k,
+        targetData,
         scale,
         count: 4,
         statusKey: "isShielded",
         numTiles: 3,
-        playerIndex: k
-      });
-    },
-    count: 2,
+        setTileStatuses
+      }),
+
+    // activateActive: (k, setPlayerData, setTileStatuses, scale) => {
+    //   shootPower({
+    //     setPlayerData,
+    //     setTileStatuses,
+    //     scale,
+    //     count: 4,
+    //     statusKey: "isShielded",
+    //     numTiles: 3,
+    //     playerIndex: k
+    //   });
+    // },
+    range: 2,
     displayLookup: "abilityMetal",
     element: "metal",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 4000
-  },
-  kaiju: (key, dir, i, setKaijuData, setTileStatuses, scale) => {
-    shootKaijuPower({
-      setKaijuData,
-      setTileStatuses,
-      scale,
-      count: 30,
-      statusKey: "isMonster",
-      numTiles: 1,
-      index: i,
-      dir
-    });
-    setKaijuData(_kaiju => {
-      return _kaiju.filter(k => k.key !== key);
-    });
   }
 };
 /*

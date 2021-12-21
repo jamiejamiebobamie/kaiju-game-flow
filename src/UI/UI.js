@@ -12,12 +12,19 @@ const Wrapper = styled.div`
   width: 500px;
   height: 800px;
 `;
-export const UI = ({ playerData, setPlayerData, setTileStatuses, scale }) => {
+export const UI = ({
+  playerData,
+  kaijuData,
+  setPlayerData,
+  setTileStatuses,
+  scale
+}) => {
   const [displayString, setDisplayString] = useState(null);
   return (
     <Wrapper>
       <Player
-        playerData={playerData[0]}
+        playerData={playerData}
+        kaijuData={kaijuData}
         setPlayerData={setPlayerData}
         setTileStatuses={setTileStatuses}
         scale={scale}
@@ -25,7 +32,8 @@ export const UI = ({ playerData, setPlayerData, setTileStatuses, scale }) => {
       />
       <Display displayString={displayString} />
       <Player
-        playerData={playerData[1]}
+        playerData={playerData}
+        kaijuData={kaijuData}
         setPlayerData={setPlayerData}
         setTileStatuses={setTileStatuses}
         scale={scale}
