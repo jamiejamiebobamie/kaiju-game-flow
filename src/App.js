@@ -83,7 +83,7 @@ const App = () => {
   const [tileStatuses, setTileStatuses] = useState(null);
   const [elementPickUps, setElementPickUps] = useState([
     "ice",
-    "glass",
+    // "glass",
     "fire",
     "wood",
     "lightning",
@@ -214,15 +214,15 @@ const App = () => {
       playerData
     );
     // powerup spawning.
-    if (shouldUpdate(accTime, 5000))
-      spawnPowerUp(
-        powerUpData,
-        setPowerUpData,
-        elementPickUps,
-        setElementPickUps,
-        playerData,
-        scale
-      );
+    // if (shouldUpdate(accTime, 5000))
+    //   spawnPowerUp(
+    //     powerUpData,
+    //     setPowerUpData,
+    //     elementPickUps,
+    //     setElementPickUps,
+    //     playerData,
+    //     scale
+    //   );
     // spawn monsters on gameboard
     if (shouldUpdate(accTime, 5000))
       spawnKaiju(playerData, setKaijuData, setTileStatuses, scale);
@@ -244,6 +244,7 @@ const App = () => {
     if (shouldUpdate(accTime, 100))
       updateTileState(
         playerData,
+        kaijuData,
         setTileStatuses,
         incrementPlayerLives,
         width,
