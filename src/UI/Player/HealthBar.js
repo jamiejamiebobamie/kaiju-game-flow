@@ -22,10 +22,8 @@ const Bar = styled.div`
   border-radius: 30px;
   border-style: solid;
   border-width: thin;
-  ${props =>
-    props.isGhost
-      ? "background: linear-gradient(45deg, #AFE1AF, #AAFF00 ); border-color: #AFE1AF;"
-      : "background: linear-gradient(45deg, #D22B2B, #880808); border-color: #880808;"};
+  background: linear-gradient(45deg, #d22b2b, #880808);
+  border-color: #880808;
 `;
 export const HealthBar = ({ setDisplayString, health = 1 }) => {
   const [setHoverRef, hoverLookupString] = useHover();

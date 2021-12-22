@@ -35,13 +35,11 @@ const App = () => {
   /*
         1. home screen.
         2. teammate a.i.
-        3. monster a.i.
-        4. have powers attack the closest monster.
-        5. have a death array that records monster / player death.
-        6. have death array as a param to movePiece to have that method
+        3. have a dmg array that records monster / player dmg.
+        4. have dmg array as a param to movePiece to have that method
             update the the state variable.
-        7. fix teleport power.
-        8. tutorial.
+        5. fix teleport power.
+        6. tutorial.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
@@ -70,6 +68,7 @@ const App = () => {
   const height = 800;
   const scale = 0.3;
   const [isPaused, setIsPaused] = useState(false);
+  const [dmgArray, setDmgArray] = useState(false);
   const [intervalTime, setIntervalTime] = useState(100);
   const [accTime, setAccTime] = useState(0);
   const [playerData, setPlayerData] = useState([]);
@@ -128,6 +127,7 @@ const App = () => {
       tileIndices[randomInt] = storeItem;
       const location = getCharXAndY({ i, j, scale });
       _players.push({
+        key: k,
         isInManaPool: false,
         color: k ? "salmon" : "blue",
         charLocation: location,
@@ -199,7 +199,8 @@ const App = () => {
       setTileStatuses,
       scale,
       accTime,
-      kaijuData
+      kaijuData,
+      dmgArray
     );
     // move monsters
     // if (shouldUpdate(accTime, 400))
@@ -211,7 +212,8 @@ const App = () => {
       setTileStatuses,
       scale,
       accTime,
-      playerData
+      playerData,
+      dmgArray
     );
     // powerup spawning.
     // if (shouldUpdate(accTime, 5000))
@@ -245,11 +247,13 @@ const App = () => {
       updateTileState(
         playerData,
         kaijuData,
+        setDmgArray,
         setTileStatuses,
         incrementPlayerLives,
         width,
         height,
-        scale
+        scale,
+        accTime
       );
     // if (shouldUpdate(accTime, 100))
     updateHighlightedTiles(
@@ -267,6 +271,12 @@ const App = () => {
     //   setWinner,
     //   scale
     // );
+    // if (shouldUpdate(accTime, 3000))
+    //   setKaijuData(_kaiju =>
+    //     _kaiju.map(k => {
+    //       return { ...k, lives: k.lives - 1 };
+    //     })
+    //   );
     setAccTime(
       accTime > Number.MAX_SAFE_INTEGER - 10000 ? 0 : accTime + intervalTime
     );

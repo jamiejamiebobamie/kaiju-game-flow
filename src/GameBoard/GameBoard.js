@@ -55,6 +55,7 @@ export const GameBoard = ({
       charLocation={k.charLocation}
       color={k.color}
       scale={scale}
+      lives={k.lives}
     />
   ));
   const powerUps = powerUpData.map((k, i) => (

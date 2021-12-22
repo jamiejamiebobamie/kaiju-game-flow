@@ -91,6 +91,7 @@ export const spawnKaiju = (
       tile: kaijuTile,
       color: "purple",
       isThere: false,
+      lives: 3,
       moveSpeed: 5,
       abilities: [{ ...PLAYER_ABILITIES["fire"] }],
       isKaiju: true,
@@ -203,11 +204,13 @@ export const redrawTiles = (
 export const updateTileState = (
   playerData,
   kaijuData,
+  setDmgArray,
   setTileStatuses,
   incrementPlayerLives,
   width,
   height,
-  scale
+  scale,
+  accTime
 ) => {
   setTileStatuses(_statuses => {
     if (_statuses) {
@@ -221,6 +224,13 @@ export const updateTileState = (
             let tileStatus = solveForStatus(_statuses[i][j]);
             const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
             if (entry) {
+              const entityOnTileStatus =
+                playerData.find(({ tile }) => tile.i === i && tile.j === j) ||
+                kaijuData.find(({ tile }) => tile.i === i && tile.j === j);
+              const playerKaijuConflictKey =
+                playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
+                kaijuData.find(({ tile }) => tile.i === i && tile.j === j) &&
+                playerData.find(({ tile }) => tile.i === i && tile.j === j).key;
               const [k, data] = entry;
               const {
                 dirs,
@@ -230,17 +240,6 @@ export const updateTileState = (
                 startCount,
                 isInManaPool
               } = data;
-              const deathTiles =
-                startCount - 1 > count
-                  ? [
-                      // "isElectrified",
-                      // "isOnFire",
-                      // "isGhosted",
-                      // "isWooded",
-                      // "isCold"
-                      "isMonster"
-                    ]
-                  : [];
               if (count) {
                 Array.isArray(dirs) &&
                   dirs.forEach((d, l) => {
@@ -334,17 +333,11 @@ export const updateTileState = (
                       "isShielded",
                       "isWooded"
                     ];
-                    const playerOnTileStatus = playerData.find(
-                      ({ tile }) => tile.i === i && tile.j === j
-                    );
-                    playerOnTileStatus &&
-                      deathTiles.includes(k) &&
-                      incrementPlayerLives(playerOnTileStatus.i);
                     _statuses[i][j][k] =
                       !doNotErase.includes(k) ||
                       (k === "isWooded" && count === startCount) ||
                       (k === "isOnFire" && count === startCount) ||
-                      playerOnTileStatus
+                      entityOnTileStatus
                         ? undefined
                         : {
                             ...tileStatus[k],
@@ -357,14 +350,8 @@ export const updateTileState = (
                   dirs.forEach(d => {
                     // 3. erase current tile's state.
                     const doNotErase = [("isShielded", "isWooded")];
-                    const playerOnTileStatus = playerData.find(
-                      ({ tile }) => tile.i === i && tile.j === j
-                    );
-                    playerOnTileStatus &&
-                      deathTiles.includes(k) &&
-                      incrementPlayerLives(playerOnTileStatus.i);
                     _statuses[i][j][k] =
-                      !doNotErase.includes(k) || playerOnTileStatus
+                      !doNotErase.includes(k) || entityOnTileStatus
                         ? undefined
                         : {
                             ...tileStatus[k],
@@ -372,6 +359,73 @@ export const updateTileState = (
                           };
                   });
               }
+              const deathTiles =
+                startCount - 1 > count
+                  ? [
+                      "isElectrified",
+                      "isOnFire",
+                      "isGhosted",
+                      "isWooded",
+                      "isCold"
+                    ]
+                  : [];
+              const healthTiles = ["isSalve"];
+              const newDmg = [];
+              if (deathTiles.includes(k) || healthTiles.includes(k)) {
+                const entityOnTile = isKaiju
+                  ? playerData.find(({ tile }) => tile.i === i && tile.j === j)
+                  : kaijuData.find(({ tile }) => tile.i === i && tile.j === j);
+                if (entityOnTile) {
+                  const dmgObj = {
+                    isKaiju, // to determine correct state array
+                    key: entityOnTile.key, // to determine correct entity in array
+                    lifeDecrement: deathTiles.includes(k) ? 1 : -1, //lives + or - // possible healing ability...
+                    accTime // to remove stale data from the dmgArray
+                  };
+                  newDmg.push(dmgObj);
+                }
+
+                /*
+                first:  determine if the tile is a deathTile or healthTile, if so...
+                second: determine if tileStatus isKaiju or not:
+                    third_a: if isKaiju, look to see if any players are on the tile.
+                    third_b: if !isKaiju, look to see if any Kaiju are on the tile.
+                fourth: if either entity on the tile from the third step,
+                            add this object to setDmgArray:
+                            {
+                                isKaiju // to determine correct state array
+                                key // to determine correct entity in array
+                                lives + or - // possible healing ability...
+                                accTime // to remove stale data from the dmgArray
+                            }
+                fifth: lastly, if any Kaiju tile is the same as a player tile,
+                            decrement that player's lives.
+                sixth: set the setDmgArray with new data.
+                seventh: clear stale data from
+                (only set the array once...)
+                */
+              }
+              if (playerKaijuConflictKey) {
+                const dmgObj = {
+                  isKaiju: false, // to determine correct state array
+                  key: playerKaijuConflictKey.key, // to determine correct entity in array
+                  lifeDecrement: 1, //lives + or - // possible healing ability...
+                  accTime // to remove stale data from the dmgArray
+                };
+                newDmg.push(dmgObj);
+              }
+              setDmgArray(
+                // _dmgArray => {
+                // _dmgArray: need to account for old data vs old data that
+                // hasn't been accounted for in the movePiece function.
+                // (e.g. dmg that hasn't decremented entities lives)
+                // should be ok atm. since this updates slower than
+                // the movePiece function. no data should go unaccounted for...
+                // can overwrite old data...
+                // return [...newDmg];
+                // }
+                newDmg
+              );
             }
             _statuses[i][j].updateKey = updateKey;
           }
@@ -715,7 +769,8 @@ export const movePiece = (
   setTileStatuses,
   scale,
   accTime,
-  enemyData
+  enemyData,
+  dmgArray
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -859,6 +914,8 @@ export const movePiece = (
         }
       }
     }
+    // dmgArray
+    console.log(dmgArray);
     return _data;
   });
 export const moveTo = ({
