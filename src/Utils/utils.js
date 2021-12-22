@@ -217,6 +217,8 @@ export const updateTileState = (
       const rowLength = Math.ceil(width / (70 * scale));
       const colLength = Math.ceil(height / (75 * scale));
       const updateKey = Math.random();
+
+      const newDmg = [];
       for (let i = 0; i < rowLength; i++) {
         for (let j = 0; j < colLength; j++) {
           // 1. solve what should be on the tile
@@ -240,6 +242,17 @@ export const updateTileState = (
                 startCount,
                 isInManaPool
               } = data;
+              const deathTiles =
+                startCount - 1 > count
+                  ? [
+                      "isElectrified",
+                      "isOnFire",
+                      "isGhosted",
+                      "isWooded",
+                      "isCold"
+                    ]
+                  : [];
+              const healthTiles = ["isSalve"];
               if (count) {
                 Array.isArray(dirs) &&
                   dirs.forEach((d, l) => {
@@ -359,25 +372,13 @@ export const updateTileState = (
                           };
                   });
               }
-              const deathTiles =
-                startCount - 1 > count
-                  ? [
-                      "isElectrified",
-                      "isOnFire",
-                      "isGhosted",
-                      "isWooded",
-                      "isCold"
-                    ]
-                  : [];
-              const healthTiles = ["isSalve"];
-              const newDmg = [];
               if (deathTiles.includes(k) || healthTiles.includes(k)) {
                 const entityOnTile = isKaiju
                   ? playerData.find(({ tile }) => tile.i === i && tile.j === j)
                   : kaijuData.find(({ tile }) => tile.i === i && tile.j === j);
                 if (entityOnTile) {
                   const dmgObj = {
-                    isKaiju, // to determine correct state array
+                    isKaiju: !isKaiju, // to determine correct state array
                     key: entityOnTile.key, // to determine correct entity in array
                     lifeDecrement: deathTiles.includes(k) ? 1 : -1, //lives + or - // possible healing ability...
                     accTime // to remove stale data from the dmgArray
@@ -408,29 +409,24 @@ export const updateTileState = (
               if (playerKaijuConflictKey) {
                 const dmgObj = {
                   isKaiju: false, // to determine correct state array
-                  key: playerKaijuConflictKey.key, // to determine correct entity in array
+                  key: playerKaijuConflictKey, // to determine correct entity in array
                   lifeDecrement: 1, //lives + or - // possible healing ability...
                   accTime // to remove stale data from the dmgArray
                 };
                 newDmg.push(dmgObj);
               }
-              setDmgArray(
-                // _dmgArray => {
-                // _dmgArray: need to account for old data vs old data that
-                // hasn't been accounted for in the movePiece function.
-                // (e.g. dmg that hasn't decremented entities lives)
-                // should be ok atm. since this updates slower than
-                // the movePiece function. no data should go unaccounted for...
-                // can overwrite old data...
-                // return [...newDmg];
-                // }
-                newDmg
-              );
             }
             _statuses[i][j].updateKey = updateKey;
           }
         }
       }
+      // _dmgArray: need to account for old data vs old data that
+      // hasn't been accounted for in the movePiece function?
+      // (e.g. dmg that hasn't decremented entities lives)
+      // should be ok atm. since this updates slower than
+      // the movePiece function. no data should go unaccounted for...
+      // can overwrite old data?
+      setDmgArray(newDmg);
       return _statuses;
     } else {
       return _statuses;
@@ -913,9 +909,24 @@ export const movePiece = (
           }
         }
       }
+      // dmgArray
+      // console.log(dmgArray);
+      // console.log(dmgArray);
+      dmgArray
+        .filter(({ isKaiju }) => !!isKaiju === !!_data[i].isKaiju)
+        .forEach(dmg => {
+          if (
+            _data[i].key === dmg.key &&
+            (accTime - _data[i].lastDmg > 1000 ||
+              accTime - _data[i].lastDmg < 0)
+          ) {
+            // can only get damaged once every 3 seconds.
+            // also accTime might reset to zero, so check for that.
+            _data[i].lastDmg = accTime;
+            _data[i].lives -= dmg.lifeDecrement;
+          }
+        });
     }
-    // dmgArray
-    console.log(dmgArray);
     return _data;
   });
 export const moveTo = ({

@@ -74,6 +74,7 @@ export const GameBoard = ({
       color={p.color}
       scale={scale}
       isInManaPool={p.isInManaPool}
+      lives={p.lives}
     />
   ));
   return (

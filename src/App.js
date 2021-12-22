@@ -35,11 +35,12 @@ const App = () => {
   /*
         1. home screen.
         2. teammate a.i.
-        3. have a dmg array that records monster / player dmg.
-        4. have dmg array as a param to movePiece to have that method
-            update the the state variable.
-        5. fix teleport power.
-        6. tutorial.
+        4. fix teleport power.
+        5. tutorial.
+        6. fix dmgArray. cannot dmgKaiju.
+        7. Implement "classes" determined by power choice. class symbol and info
+            is shown where accessory icon is.
+        8. Determine class compliments for teammate so gameplay feels balanced.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
@@ -68,7 +69,7 @@ const App = () => {
   const height = 800;
   const scale = 0.3;
   const [isPaused, setIsPaused] = useState(false);
-  const [dmgArray, setDmgArray] = useState(false);
+  const [dmgArray, setDmgArray] = useState([]);
   const [intervalTime, setIntervalTime] = useState(100);
   const [accTime, setAccTime] = useState(0);
   const [playerData, setPlayerData] = useState([]);
@@ -127,7 +128,7 @@ const App = () => {
       tileIndices[randomInt] = storeItem;
       const location = getCharXAndY({ i, j, scale });
       _players.push({
-        key: k,
+        key: Math.random(),
         isInManaPool: false,
         color: k ? "salmon" : "blue",
         charLocation: location,
@@ -139,6 +140,8 @@ const App = () => {
         isThere: true,
         moveSpeed: k === 0 ? 14 : 9,
         lives: 3,
+        isKaiju: false,
+        lastDmg: 0,
         abilities: [],
         abilityCooldowns: [],
         accessory: {
@@ -216,15 +219,15 @@ const App = () => {
       dmgArray
     );
     // powerup spawning.
-    // if (shouldUpdate(accTime, 5000))
-    //   spawnPowerUp(
-    //     powerUpData,
-    //     setPowerUpData,
-    //     elementPickUps,
-    //     setElementPickUps,
-    //     playerData,
-    //     scale
-    //   );
+    if (shouldUpdate(accTime, 5000))
+      spawnPowerUp(
+        powerUpData,
+        setPowerUpData,
+        elementPickUps,
+        setElementPickUps,
+        playerData,
+        scale
+      );
     // spawn monsters on gameboard
     if (shouldUpdate(accTime, 5000))
       spawnKaiju(playerData, setKaijuData, setTileStatuses, scale);

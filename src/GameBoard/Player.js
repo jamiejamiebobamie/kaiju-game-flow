@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.i`
@@ -27,6 +27,44 @@ const Character = styled.img`
     z-index: 1;
   ${props => props.isInManaPool && "animation: blinking 5s infinite;"}
   pointer-events: none;
+
+  animation-iteration-count: 2s;
+  ${props => props.isDamaged && "animation: shake 0.5s;"};
+  @keyframes shake {
+    0% {
+      transform: translate(1px, 1px) rotate(0deg);
+    }
+    10% {
+      transform: translate(-1px, -2px) rotate(-1deg);
+    }
+    20% {
+      transform: translate(-3px, 0px) rotate(1deg);
+    }
+    30% {
+      transform: translate(3px, 2px) rotate(0deg);
+    }
+    40% {
+      transform: translate(1px, -1px) rotate(1deg);
+    }
+    50% {
+      transform: translate(-1px, 2px) rotate(-1deg);
+    }
+    60% {
+      transform: translate(-3px, 1px) rotate(0deg);
+    }
+    70% {
+      transform: translate(3px, 1px) rotate(-1deg);
+    }
+    80% {
+      transform: translate(-1px, -1px) rotate(1deg);
+    }
+    90% {
+      transform: translate(1px, 2px) rotate(0deg);
+    }
+    100% {
+      transform: translate(1px, -2px) rotate(-1deg);
+    }
+  }
 }
 @keyframes blinking{
   0%		{filter: invert(25%);}
@@ -36,10 +74,18 @@ const Character = styled.img`
   100%	{filter: invert(25%);}
 }
 `;
-export const Player = ({ charLocation, isInManaPool, color, i = 0 }) => {
+export const Player = ({ lives, charLocation, isInManaPool, color, i = 0 }) => {
+  const [isDamaged, setIsDamaged] = useState(false);
+  useEffect(() => {
+    if (lives < 3) {
+      setIsDamaged(true);
+      setTimeout(() => setIsDamaged(false), 2000);
+    }
+  }, [lives]);
   return (
     <Wrapper charLocation={charLocation}>
       <Character
+        isDamaged={isDamaged}
         color={color}
         isInManaPool={isInManaPool}
         src={color === "blue" ? "player.png" : "enemy.png"}
