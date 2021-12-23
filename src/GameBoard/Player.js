@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.i`
+  display: ${props => (props.lives > 0 ? "flex" : "none")};
   position: absolute;
   z-index: 20001;
   left: ${props => `${props.charLocation.x + 3.5}px`};
@@ -83,7 +84,7 @@ export const Player = ({ lives, charLocation, isInManaPool, color, i = 0 }) => {
     }
   }, [lives]);
   return (
-    <Wrapper charLocation={charLocation}>
+    <Wrapper lives={lives} charLocation={charLocation}>
       <Character
         isDamaged={isDamaged}
         color={color}

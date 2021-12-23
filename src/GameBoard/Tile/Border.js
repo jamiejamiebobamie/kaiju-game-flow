@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 const HexagonHalf = styled.div`
   position: absolute;
+  pointer-events: none;
   z-index: ${props => (props.isFlipped ? 2 : 1)};
   ${props =>
     props.isFlipped
@@ -41,6 +42,7 @@ const Line = styled.div`
   height: 50px;
   border: 0.5px;
   border-radius: 50px;
+  pointer-events: none;
 `;
 export const Border = () => {
   return (

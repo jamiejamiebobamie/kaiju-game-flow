@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 const Monster = styled.div`
     position: absolute;
-    display: flex;
+    display: ${props => (props.lives > 0 ? "flex" : "none")};
     justify-content: center;
     flex-direction:column;
     margin-left: -15px;
@@ -23,6 +23,7 @@ const Monster = styled.div`
     pointer-events: none;
 }`;
 const MonsterImg = styled.img`
+  display: ${props => (props.lives > 0 ? "flex" : "none")};
   width: 40px;
   height: 40px;
   animation-iteration-count: 2s;
@@ -64,11 +65,12 @@ const MonsterImg = styled.img`
   }
 `;
 const HealthBarWrapper = styled.div`
-  display: flex;
+  display: ${props => (props.lives > 0 ? "flex" : "none")};
   width: 40px;
   justify-content: center;
 `;
 const Bar = styled.div`
+  display: ${props => (props.lives > 0 ? "flex" : "none")};
   width: 7px;
   height: 3px;
   margin: 1px;
@@ -91,11 +93,11 @@ export const Kaiju = ({ charLocation, element, color, lives }) => {
     }
   }, [lives]);
   const bars = [];
-  for (let i = 0; i < lives; i++) bars.push(<Bar key={i} />);
+  for (let i = 0; i < lives; i++) bars.push(<Bar lives={lives} key={i} />);
   return (
-    <Monster charLocation={charLocation}>
-      <HealthBarWrapper>{bars}</HealthBarWrapper>
-      <MonsterImg isDamaged={isDamaged} src={"kaiju.png"} />
+    <Monster lives={lives} charLocation={charLocation}>
+      <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
+      <MonsterImg lives={lives} isDamaged={isDamaged} src={"kaiju.png"} />
     </Monster>
   );
 };

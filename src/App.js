@@ -2,7 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
-import { PENINSULA_TILE_LOOKUP, BRIDGE_TILES } from "./Utils/gameState";
+import {
+  PENINSULA_TILE_LOOKUP,
+  BRIDGE_TILES,
+  PLAYER_ABILITIES
+} from "./Utils/gameState";
 import {
   getCharXAndY,
   getRandomIntInRange,
@@ -35,12 +39,13 @@ const App = () => {
   /*
         1. home screen.
         2. teammate a.i.
-        4. fix teleport power.
-        5. tutorial.
-        6. fix dmgArray. cannot dmgKaiju.
-        7. Implement "classes" determined by power choice. class symbol and info
+        3. fix teleport power.
+        4. tutorial.
+        5. fix dmgArray. cannot dmgKaiju.
+        6. Implement "classes" determined by power choice. class symbol and info
             is shown where accessory icon is.
-        8. Determine class compliments for teammate so gameplay feels balanced.
+        7. Determine class compliments for teammate so gameplay feels balanced.
+        8. Have teammate use "defensive" powers from tileStatuses.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
@@ -138,11 +143,27 @@ const App = () => {
         tile: { i, j },
         i: k,
         isThere: true,
-        moveSpeed: k === 0 ? 14 : 9,
-        lives: 3,
+        moveSpeed: k === 0 ? 10 : 9,
+        lives: 4,
+        isOnTiles: true,
         isKaiju: false,
         lastDmg: 0,
-        abilities: [],
+        abilities: [
+          // "ice",
+          // // "glass",
+          // "fire",
+          // "wood",
+          // "lightning",
+          // "death",
+          // "bubble",
+          // "metal"
+          PLAYER_ABILITIES["ice"],
+          PLAYER_ABILITIES["fire"],
+          PLAYER_ABILITIES["wood"],
+          PLAYER_ABILITIES["lightning"],
+          PLAYER_ABILITIES["bubble"],
+          PLAYER_ABILITIES["death"]
+        ],
         abilityCooldowns: [],
         accessory: {
           displayLookup: "testAccessoryLookup",
@@ -166,7 +187,7 @@ const App = () => {
             playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
             playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
           isKaiju: kaijuData
-            .filter(k => k.onTiles)
+            .filter(k => k.isOnTiles)
             .find(key => key === `${i} ${j}`)
         });
       }
@@ -185,12 +206,6 @@ const App = () => {
       setPlayerMoveToTiles(null);
     }
   }, [playerMoveToTiles]);
-  useEffect(() => {
-    if (winner) {
-      console.log(winner.i === 0 ? "You won!" : "Other guy won.");
-      setIntervalTime(null);
-    }
-  }, [winner]);
   useInterval(() => {
     // move players
     // if (shouldUpdate(accTime, 100))
@@ -199,6 +214,7 @@ const App = () => {
       setPlayerData,
       powerUpData,
       setPowerUpData,
+      tileStatuses,
       setTileStatuses,
       scale,
       accTime,
@@ -212,6 +228,7 @@ const App = () => {
       setKaijuData,
       undefined,
       undefined,
+      tileStatuses,
       setTileStatuses,
       scale,
       accTime,
@@ -219,19 +236,19 @@ const App = () => {
       dmgArray
     );
     // powerup spawning.
-    if (shouldUpdate(accTime, 5000))
-      spawnPowerUp(
-        powerUpData,
-        setPowerUpData,
-        elementPickUps,
-        setElementPickUps,
-        playerData,
-        scale
-      );
+    // if (shouldUpdate(accTime, 5000))
+    //   spawnPowerUp(
+    //     powerUpData,
+    //     setPowerUpData,
+    //     elementPickUps,
+    //     setElementPickUps,
+    //     playerData,
+    //     scale
+    //   );
     // spawn monsters on gameboard
-    if (shouldUpdate(accTime, 5000))
-      spawnKaiju(playerData, setKaijuData, setTileStatuses, scale);
-    if (shouldUpdate(accTime, 100))
+    // if (shouldUpdate(accTime, 5000))
+    //   spawnKaiju(playerData, setKaijuData, setTileStatuses, scale);
+    if (shouldUpdate(accTime, 200))
       redrawTiles(
         highlightedTiles,
         setHoverRef,
@@ -246,7 +263,7 @@ const App = () => {
         height,
         scale
       );
-    if (shouldUpdate(accTime, 100))
+    if (shouldUpdate(accTime, 200))
       updateTileState(
         playerData,
         kaijuData,

@@ -522,7 +522,7 @@ export const PLAYER_ABILITIES = {
   fire: {
     passiveName: "Campfire",
     activeName: "Dragon's Breath",
-    range: 20,
+    range: 10,
     type: "offensive",
     activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
@@ -530,7 +530,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 20,
+        count: 10,
         statusKey: "isOnFire",
         numTiles: 3,
         setTileStatuses
@@ -580,7 +580,7 @@ export const PLAYER_ABILITIES = {
         numTiles: 3,
         setTileStatuses
       }),
-    range: 30,
+    range: 10,
     displayLookup: "abilityLightning",
     element: "lightning",
     isPassive: false,
@@ -591,7 +591,7 @@ export const PLAYER_ABILITIES = {
   death: {
     passiveName: "Reaper",
     activeName: "Haunt",
-    range: 30,
+    range: 10,
     type: "offensive",
     activateActive: (k, data, targetData, setTileStatuses, scale) =>
       shootPower({
