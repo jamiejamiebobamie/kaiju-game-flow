@@ -3,6 +3,11 @@ import styled from "styled-components";
 import { useHover, useKeyPress } from "../../Utils/utils";
 
 const ICON_LOOKUP = {
+  heart: {
+    passive: "fa-gratipay",
+    active: "fa-heart",
+    loader: "fa-spinner"
+  },
   glass: {
     passive: "fa-tencent-weibo",
     active: "fa-ravelry",
@@ -125,6 +130,7 @@ export const Ability = ({
   playerData,
   kaijuData,
   setPlayerData,
+  setTeleportData,
   setTileStatuses,
   scale,
   setDisplayString,
@@ -152,6 +158,7 @@ export const Ability = ({
         activateActive(
           playerIndex,
           playerData,
+          setTeleportData,
           kaijuData,
           setTileStatuses,
           scale

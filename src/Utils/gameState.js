@@ -452,7 +452,14 @@ export const PLAYER_ABILITIES = {
     activeName: "Ice Slice",
     range: 3,
     type: "offensive",
-    activateActive: (k, data, targetData, setTileStatuses, scale) =>
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -474,57 +481,36 @@ export const PLAYER_ABILITIES = {
     passiveName: "Shatter Shot",
     activeName: "Shatter Travel",
     range: 30,
-    type: "escape",
-    activateActive: (k, setPlayerData, setTileStatuses, scale) => {
-      setPlayerData(_players =>
-        _players.map(p => {
-          if (k === p.i) {
-            const tile = p.moveToTiles.length
-              ? p.moveToTiles[p.moveToTiles.length - 1]
-              : p.tile;
-            const location = getCharXAndY({ ...tile, scale });
-            return {
-              ...p,
-              charLocation: location,
-              moveToLocation: location,
-              moveFromLocation: location,
-              tile,
-              moveToTiles: []
-            };
-          } else {
-            return p;
-          }
-        })
-      );
-      setTimeout(
-        () =>
-          setPlayerData(_players =>
-            _players.map(p =>
-              k === p.i
-                ? {
-                    ...p,
-                    moveSpeed: p.moveSpeed - 20
-                  }
-                : p
-            )
-          ),
-        4000
-      );
-    },
+    type: "utility",
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) => setTeleportData(_teleportData => [..._teleportData, k]),
     getPlayerIndex: k => k,
     displayLookup: "abilityGlass",
     element: "glass",
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 3000
+    cooldownTime: 12000
   },
   fire: {
     passiveName: "Campfire",
     activeName: "Dragon's Breath",
     range: 10,
     type: "offensive",
-    activateActive: (k, data, targetData, setTileStatuses, scale) =>
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -546,7 +532,14 @@ export const PLAYER_ABILITIES = {
     passiveName: "Barkskin",
     activeName: "Overgrowth",
     type: "offensive",
-    activateActive: (k, data, targetData, setTileStatuses, scale) =>
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -569,7 +562,14 @@ export const PLAYER_ABILITIES = {
     passiveName: "Charged Step",
     activeName: "Discharge",
     type: "offensive",
-    activateActive: (k, data, targetData, setTileStatuses, scale) =>
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -593,7 +593,14 @@ export const PLAYER_ABILITIES = {
     activeName: "Haunt",
     range: 10,
     type: "offensive",
-    activateActive: (k, data, targetData, setTileStatuses, scale) =>
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -615,7 +622,14 @@ export const PLAYER_ABILITIES = {
     passiveName: "Shelter",
     activeName: "Dispel",
     type: "defensive",
-    activateActive: (k, data, targetData, setTileStatuses, scale) =>
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -638,15 +652,22 @@ export const PLAYER_ABILITIES = {
     passiveName: "Aegis Armor",
     activeName: "Aegis",
     type: "defensive",
-    activateActive: (k, data, targetData, setTileStatuses, scale) =>
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
       shootPower({
         data,
         dataIndex: k,
         targetData,
         scale,
-        count: 4,
+        count: 2,
         statusKey: "isShielded",
-        numTiles: 3,
+        numTiles: 6,
         setTileStatuses
       }),
     range: 2,
@@ -655,7 +676,67 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 4000
+    cooldownTime: 10000
+  },
+  heart: {
+    passiveName: "Good Vibes",
+    activeName: "Heal",
+    type: "offensive", // change this.
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
+      shootPower({
+        data,
+        dataIndex: k,
+        targetData,
+        scale,
+        count: 20,
+        statusKey: "isHealing",
+        numTiles: 1,
+        setTileStatuses
+      }),
+    range: 10,
+    displayLookup: "abilityHeart",
+    element: "heart",
+    isPassive: false,
+    isActive: false,
+    accTime: 0,
+    cooldownTime: 10000
+  },
+  kaijuFire: {
+    passiveName: "Campfire",
+    activeName: "Dragon's Breath",
+    range: 30,
+    type: "offensive",
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
+      shootPower({
+        data,
+        dataIndex: k,
+        targetData,
+        scale,
+        count: 20,
+        statusKey: "isOnFire",
+        numTiles: 3,
+        setTileStatuses
+      }),
+    displayLookup: "abilityFire",
+    element: "fire",
+    isPassive: false,
+    isActive: false,
+    accTime: 0,
+    cooldownTime: 8000
   }
 };
 /*

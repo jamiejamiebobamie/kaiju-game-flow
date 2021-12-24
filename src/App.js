@@ -39,13 +39,14 @@ const App = () => {
   /*
         1. home screen.
         2. teammate a.i.
-        3. fix teleport power.
+        3. have smarter ai for teammate lightning power... (like a rook queen or bishop in chess)
         4. tutorial.
-        5. fix dmgArray. cannot dmgKaiju.
         6. Implement "classes" determined by power choice. class symbol and info
             is shown where accessory icon is.
         7. Determine class compliments for teammate so gameplay feels balanced.
-        8. Have teammate use "defensive" powers from tileStatuses.
+        8. Have teammate use "defensive" and "utility" powers from tileStatuses.
+        9. make the tile statuses "sticky" = have tile statuses have a count of
+            3 and follow the target if they touch an entity to ensure it damages entity.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
@@ -78,6 +79,7 @@ const App = () => {
   const [intervalTime, setIntervalTime] = useState(100);
   const [accTime, setAccTime] = useState(0);
   const [playerData, setPlayerData] = useState([]);
+  const [teleportData, setTeleportData] = useState([]);
   const [winner, setWinner] = useState(null);
   const [powerUpData, setPowerUpData] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
@@ -143,20 +145,16 @@ const App = () => {
         tile: { i, j },
         i: k,
         isThere: true,
-        moveSpeed: k === 0 ? 10 : 9,
+        moveSpeed: 6,
         lives: 4,
         isOnTiles: true,
         isKaiju: false,
         lastDmg: 0,
+        isInManaPoolAccTime: 0,
         abilities: [
-          // "ice",
-          // // "glass",
-          // "fire",
-          // "wood",
-          // "lightning",
-          // "death",
-          // "bubble",
-          // "metal"
+          PLAYER_ABILITIES["metal"],
+          PLAYER_ABILITIES["glass"],
+          PLAYER_ABILITIES["heart"],
           PLAYER_ABILITIES["ice"],
           PLAYER_ABILITIES["fire"],
           PLAYER_ABILITIES["wood"],
@@ -219,7 +217,9 @@ const App = () => {
       scale,
       accTime,
       kaijuData,
-      dmgArray
+      dmgArray,
+      teleportData,
+      setTeleportData
     );
     // move monsters
     // if (shouldUpdate(accTime, 400))
@@ -236,19 +236,44 @@ const App = () => {
       dmgArray
     );
     // powerup spawning.
-    // if (shouldUpdate(accTime, 5000))
-    //   spawnPowerUp(
-    //     powerUpData,
-    //     setPowerUpData,
-    //     elementPickUps,
-    //     setElementPickUps,
-    //     playerData,
-    //     scale
-    //   );
+    if (shouldUpdate(accTime, 30000))
+      spawnPowerUp(
+        powerUpData,
+        setPowerUpData,
+        elementPickUps,
+        setElementPickUps,
+        playerData,
+        scale
+      );
     // spawn monsters on gameboard
     // if (shouldUpdate(accTime, 5000))
     //   spawnKaiju(playerData, setKaijuData, setTileStatuses, scale);
-    if (shouldUpdate(accTime, 200))
+
+    // if (shouldUpdate(accTime, 100))
+
+    updateHighlightedTiles(
+      setHighlightedTiles,
+      playerData,
+      hoverLookupString,
+      path,
+      setPath,
+      scale
+    );
+
+    if (shouldUpdate(accTime, 400))
+      updateTileState(
+        playerData,
+        kaijuData,
+        setDmgArray,
+        setTileStatuses,
+        incrementPlayerLives,
+        width,
+        height,
+        scale,
+        accTime
+      );
+
+    if (shouldUpdate(accTime, 300))
       redrawTiles(
         highlightedTiles,
         setHoverRef,
@@ -263,27 +288,7 @@ const App = () => {
         height,
         scale
       );
-    if (shouldUpdate(accTime, 200))
-      updateTileState(
-        playerData,
-        kaijuData,
-        setDmgArray,
-        setTileStatuses,
-        incrementPlayerLives,
-        width,
-        height,
-        scale,
-        accTime
-      );
-    // if (shouldUpdate(accTime, 100))
-    updateHighlightedTiles(
-      setHighlightedTiles,
-      playerData,
-      hoverLookupString,
-      path,
-      setPath,
-      scale
-    );
+
     // respawnPlayers(
     //   setPlayerData,
     //   graveyardData,
@@ -325,6 +330,7 @@ const App = () => {
           playerData={playerData}
           kaijuData={kaijuData}
           setPlayerData={setPlayerData}
+          setTeleportData={setTeleportData}
           setTileStatuses={setTileStatuses}
           scale={scale}
         />

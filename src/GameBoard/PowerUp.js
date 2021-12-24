@@ -38,11 +38,7 @@ const Ripple = styled.i`
 `;
 export const PowerUp = ({ charLocation, element, color }) => {
   return (
-    <Ripple
-      className="fa fa-chain-broken"
-      charLocation={charLocation}
-      color={color}
-    >
+    <Ripple className="fa fa-magic" charLocation={charLocation} color={color}>
       <div className="lds-ripple">
         <div></div>
         <div></div>

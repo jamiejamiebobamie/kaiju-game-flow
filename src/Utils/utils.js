@@ -14,7 +14,7 @@ export const spawnPowerUp = (
   playerData,
   scale
 ) => {
-  if (powerUpData.length < 2 && elementPickUps.length) {
+  if (powerUpData.length < 1 && getRandBool()) {
     const freeTiles = Object.entries(PENINSULA_TILE_LOOKUP).filter((k, v) =>
       playerData.every(
         ({ tile }) =>
@@ -25,14 +25,6 @@ export const spawnPowerUp = (
       )
     );
     const randInt = getRandomIntInRange({ max: freeTiles.length - 1 });
-    const randInt2 = getRandomIntInRange({
-      max: elementPickUps.length - 1
-    });
-    const ability = elementPickUps[randInt2];
-    setElementPickUps(_pickups => {
-      _pickups.splice(randInt2, 1);
-      return _pickups;
-    });
     const [k, v] = freeTiles[randInt];
     const location = getCharXAndY({ ...v, scale });
     setPowerUpData(_powerUps => {
@@ -42,21 +34,13 @@ export const spawnPowerUp = (
           charLocation: location,
           key: k,
           tile: v,
-          element: ability,
           color: "white"
         }
       ];
     });
   }
 };
-export const spawnKaiju = (
-  kaijuData,
-  playerData,
-
-  // setKaijuData,
-  // setTileStatuses,
-  scale
-) => {
+export const spawnKaiju = (kaijuData, playerData, scale) => {
   const minX = 0;
   const minY = 30;
   const maxX = 490;
@@ -82,26 +66,6 @@ export const spawnKaiju = (
   );
   const [_, dirs] = getAdjacentTilesFromNormVec(kaijuTile, normVec, scale, 1);
   const key = Math.random();
-  // setKaijuData(_kaiju => [
-  //   ..._kaiju,
-  //   {
-  //     key,
-  //     charLocation: location,
-  //     moveFromLocation: location,
-  //     moveToLocation: location,
-  //     moveToTiles: [kaijuTile],
-  //     tile: kaijuTile,
-  //     color: "purple",
-  //     isThere: false,
-  //     lives: 3,
-  //     moveSpeed: 1,
-  //     lastDmg: 0,
-  //     abilities: [{ ...PLAYER_ABILITIES["fire"] }],
-  //     isKaiju: true,
-  //     onTiles: false,
-  //     i: _kaiju.length
-  //   }
-  // ]);
   return {
     key,
     charLocation: location,
@@ -112,9 +76,9 @@ export const spawnKaiju = (
     color: "purple",
     isThere: false,
     lives: 5,
-    moveSpeed: 3,
+    moveSpeed: 4,
     lastDmg: 0,
-    abilities: [{ ...PLAYER_ABILITIES["fire"] }],
+    abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
     isKaiju: true,
     isOnTiles: false,
     i: kaijuData.length
@@ -272,7 +236,7 @@ export const updateTileState = (
                 "isWooded",
                 "isCold"
               ];
-              const healthTiles = ["isSalve"];
+              const healthTiles = ["isHealing"];
               if (count) {
                 Array.isArray(dirs) &&
                   dirs.forEach((d, l) => {
@@ -317,7 +281,11 @@ export const updateTileState = (
                         k === "isShielded"
                       ) {
                         direction = dirs;
-                      } else if (k === "isGhosted" || k === "isWooded") {
+                      } else if (
+                        k === "isGhosted" ||
+                        k === "isWooded" ||
+                        k === "isHealing"
+                      ) {
                         const targetTile = isKaiju
                           ? playerData[targetIndex] &&
                             playerData[targetIndex].tile
@@ -384,7 +352,7 @@ export const updateTileState = (
                 Array.isArray(dirs) &&
                   dirs.forEach(d => {
                     // 3. erase current tile's state.
-                    const doNotErase = [("isShielded", "isWooded")];
+                    const doNotErase = ["isShielded", "isWooded"];
                     _statuses[i][j][k] =
                       !doNotErase.includes(k) || entityOnTileStatus
                         ? undefined
@@ -407,26 +375,6 @@ export const updateTileState = (
                   };
                   newDmg.push(dmgObj);
                 }
-
-                /*
-                first:  determine if the tile is a deathTile or healthTile, if so...
-                second: determine if tileStatus isKaiju or not:
-                    third_a: if isKaiju, look to see if any players are on the tile.
-                    third_b: if !isKaiju, look to see if any Kaiju are on the tile.
-                fourth: if either entity on the tile from the third step,
-                            add this object to setDmgArray:
-                            {
-                                isKaiju // to determine correct state array
-                                key // to determine correct entity in array
-                                lives + or - // possible healing ability...
-                                accTime // to remove stale data from the dmgArray
-                            }
-                fifth: lastly, if any Kaiju tile is the same as a player tile,
-                            decrement that player's lives.
-                sixth: set the setDmgArray with new data.
-                seventh: clear stale data from
-                (only set the array once...)
-                */
               }
               if (playerKaijuConflictKey) {
                 const dmgObj = {
@@ -442,12 +390,6 @@ export const updateTileState = (
           }
         }
       }
-      // _dmgArray: need to account for old data vs old data that
-      // hasn't been accounted for in the movePiece function?
-      // (e.g. dmg that hasn't decremented entities lives)
-      // should be ok atm. since this updates slower than
-      // the movePiece function. no data should go unaccounted for...
-      // can overwrite old data?
       setDmgArray(newDmg);
       return _statuses;
     } else {
@@ -492,26 +434,24 @@ export const shootPower = ({
   data.forEach(d => {
     if (dataIndex === d.i) {
       const originTile = d.tile;
-      // const enemyIndex = p.i === 0 ? 1 : 0;
-      const [targetTile, targetIndex] = getClosestEntityFromTile(
-        targetData,
-        originTile,
-        scale
-      );
+      const [targetTile, targetIndex] =
+        statusKey === "isHealing"
+          ? [data[dataIndex === 0 ? 1 : 0].tile, dataIndex === 0 ? 1 : 0]
+          : getClosestEntityFromTile(targetData, originTile, scale);
       if (originTile && targetTile) {
         const [manaPoolCount, manaPoolNumTiles] = d.isInManaPool
           ? statusKey === "isShielded"
-            ? [3, 5]
+            ? [4, 6]
             : statusKey === "isWooded"
             ? [20, 3]
             : statusKey === "isOnFire"
             ? [30, 3]
-            : // : statusKey === "isElectrified"
-            // ? [60, 5]
-            statusKey === "isGhosted"
+            : statusKey === "isGhosted"
             ? [60, 3]
             : statusKey === "isBubble"
             ? [7, 6]
+            : statusKey === "isHealing"
+            ? [30, 6]
             : [null, null]
           : [null, null];
         const [tile, dirs] = getAdjacentTilesFromTile(
@@ -525,9 +465,9 @@ export const shootPower = ({
             ..._tiles[tile.i][tile.j],
             [statusKey]: {
               dirs,
-              count,
+              count: manaPoolCount ? manaPoolCount : count,
               targetIndex,
-              isKaiju: d.isKaiju,
+              isKaiju: d.isKaiju || statusKey === "isHealing",
               startCount: count,
               isInManaPool: d.isInManaPool
             }
@@ -539,7 +479,9 @@ export const shootPower = ({
   });
 };
 export const solveForStatus = tile => {
-  if (tile.isBubble) {
+  if (tile.isHealing) {
+    return { isHealing: tile.isHealing };
+  } else if (tile.isBubble) {
     return {
       isBubble: tile.isBubble
       // count: tile.count,
@@ -781,23 +723,6 @@ const getClosestEntityFromTile = (entityData, tile, scale) => {
     ).j;
   return index !== -1 ? [entityData[index].tile, index] : [{ i: 0, j: 0 }, 0];
 };
-// const getClosestEntityFromTile = (entityData, tile, scale) => {
-//   const filteredEntities = entityData.filter(entity => entity.lives > 0 && entity.isOnTiles)
-//     const mappedEntities = filteredEntities.map(entity =>
-//       getDistance(getCharXAndY({ ...tile, scale }), entity.charLocation)
-//     )
-//     const reducedEntities = mappedEntities.reduce(
-//       (maxDistanceData, distance, j) => {
-//         return maxDistanceData.distance > distance
-//           ? { j, distance }
-//           : maxDistanceData;
-//       },
-//       { j: -1, distance: Number.MAX_SAFE_INTEGER }
-//     )
-//     const index =
-//     return reducedEntities.j;
-//   return index !== -1 ? [entityData[index].tile, index] : [{ i: 0, j: 0 }, 0];
-// };
 export const movePiece = (
   data,
   setData,
@@ -808,7 +733,9 @@ export const movePiece = (
   scale,
   accTime,
   enemyData,
-  dmgArray
+  dmgArray,
+  teleportData,
+  setTeleportData
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -873,7 +800,14 @@ export const movePiece = (
                 accTime < a.accTime
               ) {
                 _data[i].abilities[j].accTime = accTime;
-                a.activateActive(i, data, enemyData, setTileStatuses, scale);
+                a.activateActive(
+                  i,
+                  data,
+                  setTeleportData,
+                  enemyData,
+                  setTileStatuses,
+                  scale
+                );
               }
             });
           }
@@ -907,53 +841,72 @@ export const movePiece = (
           _data[i].moveToLocation &&
           (!_data[i].isThere || _data[i].moveToTiles.length)
         ) {
-          const { newLocation, hasArrived } = moveTo({
-            currentLocation: _data[i].charLocation,
-            moveFromLocation: _data[i].moveFromLocation,
-            moveToLocation: _data[i].moveToLocation,
-            moveSpeed: _data[i].moveSpeed
-          });
-          _data[i].charLocation = newLocation;
-          _data[i].isThere = hasArrived;
-          // check tile for powerups
-          if (powerUpData) {
-            const powerup = powerUpData.find(
-              ({ tile }) =>
-                tile.i === _data[i].tile.i && tile.j === _data[i].tile.j
-            );
-            if (powerup) {
-              if (!_data[i].abilities.find(a => a.element === powerup.element))
-                _data[i].abilities.push(PLAYER_ABILITIES[powerup.element]);
-              setPowerUpData(_powerups => _powerups.filter(k => k !== powerup));
+          const shouldTeleport = !!(teleportData && teleportData.includes(i));
+          powerUpData && console.log(shouldTeleport, teleportData, i);
+          if (shouldTeleport) {
+            const tile = _data[i].moveToTiles.length
+              ? _data[i].moveToTiles[_data[i].moveToTiles.length - 1]
+              : _data[i].tile;
+            const location = getCharXAndY({ ...tile, scale });
+            _data[i].tile = tile;
+            _data[i].charLocation = location; // || _data[i].moveToLocation;
+            _data[i].moveToLocation = location; // || _data[i].moveToLocation;
+            _data[i].moveFromLocation = location; // || _data[i].charLocation;
+            _data[i].moveToTiles = [];
+            _data[i].isThere = false;
+          } else {
+            const { newLocation, hasArrived } = moveTo({
+              currentLocation: _data[i].charLocation,
+              moveFromLocation: _data[i].moveFromLocation,
+              moveToLocation: _data[i].moveToLocation,
+              moveSpeed: _data[i].moveSpeed
+            });
+            _data[i].charLocation = newLocation;
+            _data[i].isThere = hasArrived;
+            // check tile for powerups
+            if (powerUpData) {
+              const powerup = powerUpData.find(
+                ({ tile }) =>
+                  tile.i === _data[i].tile.i && tile.j === _data[i].tile.j
+              );
+              if (powerup) {
+                _data[i].isInManaPool = true;
+                _data[i].isInManaPoolAccTime = accTime;
+                setPowerUpData(_powerups =>
+                  _powerups.filter(k => k !== powerup)
+                );
+              }
             }
-          }
-          // - - - - - - - - - - -
-          if (_data[i].isThere && _data[i].moveToTiles.length) {
-            const [nextTile, ...tiles] = _data[i].moveToTiles;
-            if (!tiles.length) {
-              _data[i].moveToLocation =
-                getCharXAndY({
+            // - - - - - - - - - - -
+            if (_data[i].isThere && _data[i].moveToTiles.length) {
+              const [nextTile, ...tiles] = _data[i].moveToTiles;
+              if (!tiles.length) {
+                _data[i].moveToLocation =
+                  getCharXAndY({
+                    ...nextTile,
+                    scale
+                  }) || _data[i].moveToLocation;
+                _data[i].tile = nextTile;
+                _data[i].moveFromLocation = _data[i].charLocation;
+                _data[i].moveToTiles = [];
+                _data[i].isThere = false;
+              } else {
+                _data[i].tile = nextTile;
+                _data[i].moveToTiles = tiles;
+                _data[i].moveFromLocation = newLocation;
+                _data[i].moveToLocation = getCharXAndY({
                   ...nextTile,
                   scale
-                }) || _data[i].moveToLocation;
-              _data[i].tile = nextTile;
-              _data[i].moveFromLocation = _data[i].charLocation;
-              _data[i].moveToTiles = [];
-              _data[i].isThere = false;
-            } else {
-              _data[i].tile = nextTile;
-              _data[i].moveToTiles = tiles;
-              _data[i].moveFromLocation = newLocation;
-              _data[i].moveToLocation = getCharXAndY({
-                ...nextTile,
-                scale
-              });
+                });
+              }
             }
           }
         }
-        // dmgArray
-        // console.log(dmgArray);
-        // console.log(dmgArray);
+        if (
+          _data[i].isInManaPool &&
+          5000 < accTime - _data[i].isInManaPoolAccTime
+        )
+          _data[i].isInManaPool = false;
         dmgArray
           .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju)
           .forEach(dmg => {
@@ -973,6 +926,7 @@ export const movePiece = (
           });
       }
     }
+    teleportData && teleportData.length && setTeleportData([]);
     const newKaiju =
       !powerUpData &&
       data.length < 10 &&

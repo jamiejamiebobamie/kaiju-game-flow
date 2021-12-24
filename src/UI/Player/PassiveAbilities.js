@@ -59,6 +59,7 @@ export const PassiveAbilities = ({
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const ICON_LOOKUP = {
+    heart: "fa-gratipay",
     glass: "fa-tencent-weibo",
     fire: "fa-fire",
     wood: "fa-tree",

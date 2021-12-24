@@ -57,6 +57,7 @@ export const Player = ({
   isReversed,
   setDisplayString,
   setPlayerData,
+  setTeleportData,
   setTileStatuses,
   scale
   // accessory = {
@@ -79,6 +80,8 @@ export const Player = ({
             setDisplayString={setDisplayString}
             isReversed={isReversed}
             playerIndex={1}
+            setPlayerData={setPlayerData}
+            setTeleportData={setTeleportData}
           />
           <HealthBar
             health={(playerData.length && playerData[1].lives) || 0}
@@ -101,6 +104,8 @@ export const Player = ({
             abilities={(playerData.length && playerData[0].abilities) || []}
             setDisplayString={setDisplayString}
             playerIndex={0}
+            setPlayerData={setPlayerData}
+            setTeleportData={setTeleportData}
           />
         </>
       )}

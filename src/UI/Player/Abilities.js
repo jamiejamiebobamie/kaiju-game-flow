@@ -16,6 +16,8 @@ export const Abilities = ({
   playerIndex,
   kaijuData,
   playerData,
+  setPlayerData,
+  setTeleportData,
   setTileStatuses,
   scale,
   setDisplayString,
@@ -69,6 +71,8 @@ export const Abilities = ({
     <Ability
       key={i}
       playerData={playerData}
+      setPlayerData={setPlayerData}
+      setTeleportData={setTeleportData}
       kaijuData={kaijuData}
       setTileStatuses={setTileStatuses}
       scale={scale}

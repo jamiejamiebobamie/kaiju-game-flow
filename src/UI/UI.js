@@ -16,6 +16,7 @@ export const UI = ({
   playerData,
   kaijuData,
   setPlayerData,
+  setTeleportData,
   setTileStatuses,
   scale
 }) => {
@@ -26,6 +27,7 @@ export const UI = ({
         playerData={playerData}
         kaijuData={kaijuData}
         setPlayerData={setPlayerData}
+        setTeleportData={setTeleportData}
         setTileStatuses={setTileStatuses}
         scale={scale}
         setDisplayString={setDisplayString}
@@ -35,6 +37,7 @@ export const UI = ({
         playerData={playerData}
         kaijuData={kaijuData}
         setPlayerData={setPlayerData}
+        setTeleportData={setTeleportData}
         setTileStatuses={setTileStatuses}
         scale={scale}
         setDisplayString={setDisplayString}

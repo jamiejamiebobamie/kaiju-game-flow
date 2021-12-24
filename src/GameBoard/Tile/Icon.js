@@ -6,9 +6,7 @@ const StyledIcon = styled.i`
   z-index: ${props => props.zIndex};
   width: 100%;
   height: 100%;
-  transform: scale(3)
-    translate(19px, ${props => (props.isGraveyard ? "30px" : "15px")})
-    rotate(${props => (props.isGraveyard ? "-90deg" : "0deg")});
+  transform: scale(3) translate(19px, 15px);
   pointer-events: none;
   color: ${props => props.color};
 `;
@@ -18,19 +16,20 @@ const StyledIcon = styled.i`
 // -o-transform: scale(3) translate(20px, 15px);
 export const Icon = ({ status, zIndex }) => {
   const ICON_LOOKUP = {
-    isOnFire: { className: "fa-free-code-camp", offset: 0, color: "tomato" },
-    isWooded: { className: "fa-leaf", offset: 45, color: "green" },
-    isElectrified: { className: "fa-bolt", offset: 180, color: "cyan" },
-    isGhosted: { className: "fa-snapchat-ghost", offset: 0, color: "white" },
-    isBubble: { className: "fa-question-circle-o", offset: 0, color: "white" },
-    isShielded: { className: "fa-shield", offset: 0, color: "black" },
-    isGraveyard: { className: "fa-toggle-off", offset: -90, color: "white" },
+    isOnFire: { className: "fa-free-code-camp", color: "tomato" },
+    isWooded: { className: "fa-leaf", color: "green" },
+    isElectrified: { className: "fa-bolt", color: "cyan" },
+    isGhosted: { className: "fa-snapchat-ghost", color: "white" },
+    isBubble: { className: "fa-question-circle-o", color: "white" },
+    isShielded: { className: "fa-shield", color: "black" },
+    isGraveyard: { className: "fa-toggle-off", color: "white" },
     isMonster: { className: "fa-optin-monster", color: "purple" },
-    isCold: { className: "fa-snowflake-o", color: "white" }
+    isCold: { className: "fa-snowflake-o", color: "white" },
+    isHealing: { className: "fa-heart", color: "pink" }
   };
   const determineIcon = status => {
-    if (status.isGraveyard) {
-      return ICON_LOOKUP["isGraveyard"];
+    if (status.isHealing) {
+      return ICON_LOOKUP["isHealing"];
     } else if (status.isBubble) {
       return ICON_LOOKUP["isBubble"];
     } else if (status.isGhosted) {
@@ -52,11 +51,9 @@ export const Icon = ({ status, zIndex }) => {
     }
   };
   const { className, color } = determineIcon(status);
-  const { isGraveyard } = status;
   return (
     <StyledIcon
       className={`fa ${className}`}
-      isGraveyard={isGraveyard}
       zIndex={zIndex + 1}
       color={color}
     />
