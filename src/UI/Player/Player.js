@@ -32,7 +32,7 @@ const PlayerPicture = styled.i`
   margin-left: 68px;
   transform: scale(10);
 `;
-const AccessoryPicture = styled.i`
+const ClassPicture = styled.i`
   display: flex;
   justify-content: center;
   position: absolute;
@@ -50,8 +50,24 @@ const AccessoryPicture = styled.i`
 `;
 export const Player = ({
   playerData = [
-    { lives: 0, abilities: [], accessory: { displayLookup: "" } },
-    { lives: 0, abilities: [], accessory: { displayLookup: "" } }
+    {
+      lives: 0,
+      playerClass: "",
+      moveSpeed: "",
+      modifiers: "",
+      abilities: [],
+      accessory: { displayLookup: "" },
+      abilities: []
+    },
+    {
+      lives: 0,
+      playerClass: "",
+      moveSpeed: "",
+      modifiers: "",
+      abilities: [],
+      accessory: { displayLookup: "" },
+      abilities: []
+    }
   ],
   kaijuData = [],
   isReversed,
@@ -59,6 +75,7 @@ export const Player = ({
   setPlayerData,
   setTeleportData,
   setTileStatuses,
+  playerIndex,
   scale
   // accessory = {
   //   displayLookup: "testAccessoryLookup",
@@ -76,24 +93,33 @@ export const Player = ({
             kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
-            abilities={(playerData.length && playerData[1].abilities) || []}
+            abilities={
+              (playerData.length && playerData[playerIndex].abilities) || []
+            }
             setDisplayString={setDisplayString}
             isReversed={isReversed}
-            playerIndex={1}
+            playerIndex={playerIndex}
             setPlayerData={setPlayerData}
             setTeleportData={setTeleportData}
           />
           <HealthBar
-            health={(playerData.length && playerData[1].lives) || 0}
+            health={(playerData.length && playerData[playerIndex].lives) || 0}
             setDisplayString={setDisplayString}
           />
-          <Kaiju isReversed={isReversed} setDisplayString={setDisplayString} />
+          <Kaiju
+            kaijuArr={kaijuData.filter(k => k.trophy === playerIndex)}
+            isReversed={isReversed}
+            setDisplayString={setDisplayString}
+          />
         </>
       ) : (
         <>
-          <Kaiju setDisplayString={setDisplayString} />
+          <Kaiju
+            kaijuArr={kaijuData.filter(k => k.trophy === playerIndex)}
+            setDisplayString={setDisplayString}
+          />
           <HealthBar
-            health={(playerData.length && playerData[0].lives) || 0}
+            health={(playerData.length && playerData[playerIndex].lives) || 0}
             setDisplayString={setDisplayString}
           />
           <Abilities
@@ -101,19 +127,29 @@ export const Player = ({
             kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
-            abilities={(playerData.length && playerData[0].abilities) || []}
+            abilities={
+              (playerData.length && playerData[playerIndex].abilities) || []
+            }
             setDisplayString={setDisplayString}
-            playerIndex={0}
+            playerIndex={playerIndex}
             setPlayerData={setPlayerData}
             setTeleportData={setTeleportData}
           />
         </>
       )}
       <PlayerBorder isReversed={isReversed}>
-        <PlayerPicture className="fa fa-user-circle" />
-        <AccessoryPicture
+        <PlayerPicture
           ref={setHoverRef(
-            ""
+            `modifiers ${playerIndex}`
+            // isReversed
+            //   ? playerData[1].accessory && playerData[1].accessory.displayLookup
+            //   : playerData[0].accessory && playerData[0].accessory.displayLookup
+          )}
+          className="fa fa-user-circle"
+        />
+        <ClassPicture
+          ref={setHoverRef(
+            `class ${playerIndex}`
             // isReversed
             //   ? playerData[1].accessory && playerData[1].accessory.displayLookup
             //   : playerData[0].accessory && playerData[0].accessory.displayLookup
@@ -126,11 +162,15 @@ export const Player = ({
         setDisplayString={setDisplayString}
         isReversed={isReversed}
         abilities={
-          playerData.length
-            ? isReversed
-              ? playerData[1].abilities
-              : playerData[0].abilities
-            : []
+          (playerData &&
+            playerData.length &&
+            playerData[playerIndex].abilities) ||
+          []
+          // playerData.length
+          //   ? isReversed
+          //     ? playerData[1].abilities
+          //     : playerData[0].abilities
+          //   : []
         }
       />
     </Wrapper>

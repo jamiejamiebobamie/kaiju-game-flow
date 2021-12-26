@@ -1,10 +1,7 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useHover } from "../../Utils/utils";
-/* border-style: solid;
-border-thickness: thin; */
 const Wrapper = styled.div`
-  /* background-color: red; */
   display: flex;
   padding-top: 10px;
   ${props =>
@@ -15,7 +12,6 @@ const Wrapper = styled.div`
   height: 60px;
   border-radius: 10px;
   overflow: scroll;
-  /* margin: 1px; */
 `;
 const KaijuIcon = styled.i`
   min-width: 30px;
@@ -31,7 +27,7 @@ export const Kaiju = ({
     { displayLookup: "kaijuWood", name: "Kudzu" },
     { displayLookup: "kaijuLightning", name: "Gargantula" },
     { displayLookup: "kaijuDeath", name: "Giant Mantis" },
-    { displayLookup: "kaijuBubble", name: "Bubbles" },
+    { displayLookup: "kaijuBubble", name: "Blimpy" },
     { displayLookup: "kaijuMetal", name: "Mechatron" }
   ],
   setDisplayString,
@@ -39,13 +35,13 @@ export const Kaiju = ({
 }) => {
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
-  const kaijuIcons = kaijuArr.map(({ displayLookup, name }) => (
+  const kaijuIcons = kaijuArr.map((kaiju, i) => (
     <KaijuIcon
-      key={displayLookup}
+      key={i}
       className="fa fa-optin-monster"
-      ref={setHoverRef(displayLookup)}
-      title={name}
-      alt={name}
+      ref={setHoverRef(`Kaiju #${i}`)}
+      title={`Kaiju #${i}`}
+      alt={""}
     />
   ));
   return <Wrapper isReversed={isReversed}>{kaijuIcons}</Wrapper>;

@@ -5,7 +5,8 @@ import { UI } from "./UI/UI";
 import {
   PENINSULA_TILE_LOOKUP,
   BRIDGE_TILES,
-  PLAYER_ABILITIES
+  PLAYER_ABILITIES,
+  PLAYER_CLASSES
 } from "./Utils/gameState";
 import {
   getCharXAndY,
@@ -41,12 +42,8 @@ const App = () => {
         2. teammate a.i.
         3. have smarter ai for teammate lightning power... (like a rook queen or bishop in chess)
         4. tutorial.
-        6. Implement "classes" determined by power choice. class symbol and info
-            is shown where accessory icon is.
-        7. Determine class compliments for teammate so gameplay feels balanced.
-        8. Have teammate use "defensive" and "utility" powers from tileStatuses.
-        9. make the tile statuses "sticky" = have tile statuses have a count of
-            3 and follow the target if they touch an entity to ensure it damages entity.
+        5. Determine class compliments for teammate so gameplay feels balanced.
+        6. Clean up code.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
@@ -77,7 +74,8 @@ const App = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
   const [intervalTime, setIntervalTime] = useState(100);
-  const [accTime, setAccTime] = useState(0);
+  // const [accTime, setAccTime] = useState(0);
+  const accTime = useRef(0);
   const [playerData, setPlayerData] = useState([]);
   const [teleportData, setTeleportData] = useState([]);
   const [winner, setWinner] = useState(null);
@@ -134,6 +132,41 @@ const App = () => {
       tileIndices[tileIndices.length - k] = tileIndices[randomInt];
       tileIndices[randomInt] = storeItem;
       const location = getCharXAndY({ i, j, scale });
+      const abilityOptions = [
+        PLAYER_ABILITIES["metal"],
+        PLAYER_ABILITIES["glass"],
+        PLAYER_ABILITIES["heart"],
+        PLAYER_ABILITIES["ice"],
+        PLAYER_ABILITIES["fire"],
+        PLAYER_ABILITIES["wood"],
+        PLAYER_ABILITIES["lightning"],
+        PLAYER_ABILITIES["bubble"],
+        PLAYER_ABILITIES["death"]
+      ];
+      let count = 0;
+      while (count < 3) {
+        const lastIndex = abilityOptions.length - count - 1;
+        const randInt = getRandomIntInRange({ max: lastIndex });
+        const savedAbility = abilityOptions[randInt];
+        abilityOptions[randInt] = abilityOptions[lastIndex];
+        abilityOptions[lastIndex] = savedAbility;
+        count++;
+      }
+      const abilities = [
+        abilityOptions[abilityOptions.length - 1],
+        abilityOptions[abilityOptions.length - 2],
+        abilityOptions[abilityOptions.length - 3]
+      ].sort((item1, item2) => item1.element.localeCompare(item2.element));
+      const classLookUpKey = [
+        abilities[0].Element,
+        abilities[1].Element,
+        abilities[2].Element
+      ].join(",");
+      const [_, playerClass] = PLAYER_CLASSES.find(pc => {
+        const [key, _class] = pc.split(" ");
+        return key === classLookUpKey;
+      }).split(" ");
+      console.log(playerClass);
       _players.push({
         key: Math.random(),
         isInManaPool: false,
@@ -151,18 +184,9 @@ const App = () => {
         isKaiju: false,
         lastDmg: 0,
         isInManaPoolAccTime: 0,
-        abilities: [
-          PLAYER_ABILITIES["metal"],
-          PLAYER_ABILITIES["glass"],
-          PLAYER_ABILITIES["heart"],
-          PLAYER_ABILITIES["ice"],
-          PLAYER_ABILITIES["fire"],
-          PLAYER_ABILITIES["wood"],
-          PLAYER_ABILITIES["lightning"],
-          PLAYER_ABILITIES["bubble"],
-          PLAYER_ABILITIES["death"]
-        ],
+        abilities,
         abilityCooldowns: [],
+        playerClass,
         accessory: {
           displayLookup: "testAccessoryLookup",
           accessoryImgFile: "fire_icon.png"
@@ -206,7 +230,6 @@ const App = () => {
   }, [playerMoveToTiles]);
   useInterval(() => {
     // move players
-    // if (shouldUpdate(accTime, 100))
     movePiece(
       playerData,
       setPlayerData,
@@ -215,14 +238,13 @@ const App = () => {
       tileStatuses,
       setTileStatuses,
       scale,
-      accTime,
+      accTime.current,
       kaijuData,
       dmgArray,
       teleportData,
       setTeleportData
     );
     // move monsters
-    // if (shouldUpdate(accTime, 400))
     movePiece(
       kaijuData,
       setKaijuData,
@@ -231,12 +253,12 @@ const App = () => {
       tileStatuses,
       setTileStatuses,
       scale,
-      accTime,
+      accTime.current,
       playerData,
       dmgArray
     );
     // powerup spawning.
-    if (shouldUpdate(accTime, 30000))
+    if (shouldUpdate(accTime.current, 30000))
       spawnPowerUp(
         powerUpData,
         setPowerUpData,
@@ -245,12 +267,6 @@ const App = () => {
         playerData,
         scale
       );
-    // spawn monsters on gameboard
-    // if (shouldUpdate(accTime, 5000))
-    //   spawnKaiju(playerData, setKaijuData, setTileStatuses, scale);
-
-    // if (shouldUpdate(accTime, 100))
-
     updateHighlightedTiles(
       setHighlightedTiles,
       playerData,
@@ -259,8 +275,7 @@ const App = () => {
       setPath,
       scale
     );
-
-    if (shouldUpdate(accTime, 400))
+    if (shouldUpdate(accTime.current, 400))
       updateTileState(
         playerData,
         kaijuData,
@@ -270,10 +285,9 @@ const App = () => {
         width,
         height,
         scale,
-        accTime
+        accTime.current
       );
-
-    if (shouldUpdate(accTime, 300))
+    if (shouldUpdate(accTime.current, 300))
       redrawTiles(
         highlightedTiles,
         setHoverRef,
@@ -289,22 +303,13 @@ const App = () => {
         scale
       );
 
-    // respawnPlayers(
-    //   setPlayerData,
-    //   graveyardData,
-    //   setGraveyardData,
-    //   setWinner,
-    //   scale
+    accTime.current =
+      accTime > Number.MAX_SAFE_INTEGER - 10000
+        ? 0
+        : accTime.current + intervalTime;
+    // setAccTime(
+    //   accTime > Number.MAX_SAFE_INTEGER - 10000 ? 0 : accTime + intervalTime
     // );
-    // if (shouldUpdate(accTime, 3000))
-    //   setKaijuData(_kaiju =>
-    //     _kaiju.map(k => {
-    //       return { ...k, lives: k.lives - 1 };
-    //     })
-    //   );
-    setAccTime(
-      accTime > Number.MAX_SAFE_INTEGER - 10000 ? 0 : accTime + intervalTime
-    );
   }, intervalTime);
   // <GameTitle>Kaiju City</GameTitle>
   return (

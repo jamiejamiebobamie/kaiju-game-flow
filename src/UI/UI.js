@@ -31,8 +31,9 @@ export const UI = ({
         setTileStatuses={setTileStatuses}
         scale={scale}
         setDisplayString={setDisplayString}
+        playerIndex={0}
       />
-      <Display displayString={displayString} />
+      <Display playerData={playerData} displayString={displayString} />
       <Player
         playerData={playerData}
         kaijuData={kaijuData}
@@ -42,6 +43,7 @@ export const UI = ({
         scale={scale}
         setDisplayString={setDisplayString}
         isReversed={true}
+        playerIndex={1}
       />
     </Wrapper>
   );

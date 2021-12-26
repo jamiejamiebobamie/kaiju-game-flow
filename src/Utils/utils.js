@@ -74,6 +74,7 @@ export const spawnKaiju = (kaijuData, playerData, scale) => {
     moveToTiles: [kaijuTile],
     tile: kaijuTile,
     color: "purple",
+    trophy: undefined,
     isThere: false,
     lives: 5,
     moveSpeed: 4,
@@ -227,7 +228,8 @@ export const updateTileState = (
                 targetIndex,
                 isKaiju,
                 startCount,
-                isInManaPool
+                isInManaPool,
+                playerIndex
               } = data;
               const deathTiles = [
                 "isElectrified",
@@ -322,7 +324,8 @@ export const updateTileState = (
                         targetIndex,
                         startCount,
                         isInManaPool,
-                        isKaiju
+                        isKaiju,
+                        playerIndex
                       };
                       const nextTilesStatus = solveForStatus(
                         _statuses[nextTile.i][nextTile.j]
@@ -371,7 +374,8 @@ export const updateTileState = (
                     isKaiju: !isKaiju, // to determine correct state array
                     key: entityOnTile.key, // to determine correct entity in array
                     lifeDecrement: deathTiles.includes(k) ? 1 : -1, //lives + or - // possible healing ability...
-                    accTime // to remove stale data from the dmgArray
+                    accTime, // to remove stale data from the dmgArray
+                    playerIndex // to determine who killed the Kaiju.
                   };
                   newDmg.push(dmgObj);
                 }
@@ -469,7 +473,8 @@ export const shootPower = ({
               targetIndex,
               isKaiju: d.isKaiju || statusKey === "isHealing",
               startCount: count,
-              isInManaPool: d.isInManaPool
+              isInManaPool: d.isInManaPool,
+              playerIndex: d.isKaiju ? undefined : dataIndex
             }
           };
           return _tiles;
@@ -921,7 +926,11 @@ export const movePiece = (
               // can only get damaged once every 1 second.
               // also accTime might reset to zero, so check for that.
               _data[i].lastDmg = accTime;
-              _data[i].lives -= dmg.lifeDecrement;
+              _data[i].lives =
+                _data[i].lives - dmg.lifeDecrement < 5
+                  ? _data[i].lives - dmg.lifeDecrement
+                  : _data[i].lives;
+              if (_data[i].isKaiju) _data[i].trophy = dmg.playerIndex;
             }
           });
       }
