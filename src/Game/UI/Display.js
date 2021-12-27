@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useInterval } from "../Utils/utils";
+import { useInterval } from "../../Utils/utils";
 
 const getDescription = (string, playerData, playerIndex) => {
   switch (string) {
@@ -19,8 +19,8 @@ const getDescription = (string, playerData, playerIndex) => {
           playerData[playerIndex] &&
           playerData[playerIndex].playerClass
             ? playerIndex === 1
-              ? `Your teamamte is a ${playerData[playerIndex].playerClass}.`
-              : `You are a ${playerData[playerIndex].playerClass}.`
+              ? `Class: ${playerData[playerIndex].playerClass}`
+              : `Class: ${playerData[playerIndex].playerClass}`
             : "",
         description: "",
         img: "",

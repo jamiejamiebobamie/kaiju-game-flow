@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Abilities } from "./Abilities";
 import { HealthBar } from "./HealthBar";
 import { Kaiju } from "./Kaiju";
-import { useHover } from "../../Utils/utils";
+import { useHover } from "../../../Utils/utils";
 import { PassiveAbilities } from "./PassiveAbilities";
 
 const Wrapper = styled.div`

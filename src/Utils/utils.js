@@ -3,14 +3,136 @@ import {
   PENINSULA_TILE_LOOKUP,
   BRIDGE_TILES,
   PLAYER_ABILITIES,
-  PERIMETER_TILES
+  PERIMETER_TILES,
+  PLAYER_CLASSES
 } from "./gameState";
-import { HexagonTile } from "../GameBoard/Tile/HexagonTile";
+import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
+export const initializeGameBoard = (
+  playerData,
+  setPlayerData,
+  kaijuData,
+  width,
+  height,
+  scale,
+  setTiles,
+  setClickedTile,
+  setHoverRef,
+  tileStatuses,
+  setTileStatuses
+) => {
+  const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
+  // PLAYERS - - - - - - - - - - - -
+  const _players = [];
+  let _max = tileIndices.length - 1;
+  for (let k = 0; k < 2; k++) {
+    _max -= k;
+    const randomInt = getRandomIntInRange({
+      max: _max
+    });
+    const { i, j } = tileIndices[randomInt];
+    const storeItem = tileIndices.length - k;
+    tileIndices[tileIndices.length - k] = tileIndices[randomInt];
+    tileIndices[randomInt] = storeItem;
+    const location = getCharXAndY({ i, j, scale });
+    const abilityOptions = [
+      PLAYER_ABILITIES["metal"],
+      PLAYER_ABILITIES["glass"],
+      PLAYER_ABILITIES["heart"],
+      PLAYER_ABILITIES["ice"],
+      PLAYER_ABILITIES["fire"],
+      PLAYER_ABILITIES["wood"],
+      PLAYER_ABILITIES["lightning"],
+      PLAYER_ABILITIES["bubble"],
+      PLAYER_ABILITIES["death"]
+    ];
+    let count = 0;
+    while (count < 3) {
+      const lastIndex = abilityOptions.length - count - 1;
+      const randInt = getRandomIntInRange({ max: lastIndex });
+      const savedAbility = abilityOptions[randInt];
+      abilityOptions[randInt] = abilityOptions[lastIndex];
+      abilityOptions[lastIndex] = savedAbility;
+      count++;
+    }
+    const abilities = [
+      abilityOptions[abilityOptions.length - 1],
+      abilityOptions[abilityOptions.length - 2],
+      abilityOptions[abilityOptions.length - 3]
+    ].sort((item1, item2) => item1.element.localeCompare(item2.element));
+    const classLookUpKey = [
+      abilities[0].Element,
+      abilities[1].Element,
+      abilities[2].Element
+    ].join(",");
+    const playerClassObj = PLAYER_CLASSES.find(
+      pc => pc.elems === classLookUpKey
+    );
+    _players.push({
+      key: Math.random(),
+      isInManaPool: false,
+      color: k ? "salmon" : "blue",
+      charLocation: location,
+      moveFromLocation: location,
+      moveToLocation: location,
+      moveToTiles: [],
+      tile: { i, j },
+      i: k,
+      isThere: true,
+      moveSpeed: 6,
+      lives: 4,
+      isOnTiles: true,
+      isKaiju: false,
+      lastDmg: 0,
+      isInManaPoolAccTime: 0,
+      abilities,
+      abilityCooldowns: [],
+      playerClass: playerClassObj && playerClassObj.class_name,
+      accessory: {
+        displayLookup: "testAccessoryLookup",
+        accessoryImgFile: "fire_icon.png"
+      }
+    });
+  }
+  setPlayerData(_players);
+  // PLAYERS    - - - - - - - - - -
+  // TILES      - - - - - - - - - -
+  redrawTiles(
+    [],
+    setHoverRef,
+    setClickedTile,
+    setTiles,
+    playerData,
+    kaijuData,
+    tileStatuses,
+    setTileStatuses,
+    width,
+    height,
+    scale
+  );
+  const status = [];
+  const rowLength = Math.ceil(width / (70 * scale));
+  const colLength = Math.ceil(height / (75 * scale));
+  for (let i = 0; i < rowLength; i++) {
+    const _status = [];
+    for (let j = 0; j < colLength; j++) {
+      _status.push({
+        updateKey: Math.random(),
+        isPlayer:
+          playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
+          playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
+        isKaiju: kaijuData
+          .filter(k => k.isOnTiles)
+          .find(key => key === `${i} ${j}`)
+      });
+    }
+    status.push(_status);
+  }
+  setTileStatuses(status);
+  // TILES      - - - - - - - - - -
+};
 export const spawnPowerUp = (
   powerUpData,
   setPowerUpData,
-  elementPickUps,
-  setElementPickUps,
   playerData,
   scale
 ) => {
@@ -142,7 +264,6 @@ export const redrawTiles = (
   kaijuData,
   tileStatuses,
   setTileStatuses,
-  incrementPlayerLives,
   width,
   height,
   scale
@@ -193,7 +314,6 @@ export const updateTileState = (
   kaijuData,
   setDmgArray,
   setTileStatuses,
-  incrementPlayerLives,
   width,
   height,
   scale,
