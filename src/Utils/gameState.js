@@ -476,7 +476,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 2000
+    cooldownTime: 4000
   },
   glass: {
     passiveName: "TBD",
@@ -529,7 +529,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 6000
+    cooldownTime: 4000
   },
   wood: {
     passiveName: "Crunchy Granola",
@@ -718,8 +718,8 @@ export const PLAYER_ABILITIES = {
     cooldownTime: 10000
   },
   kaijuFire: {
-    passiveName: "Campfire",
-    activeName: "Dragon's Breath",
+    passiveName: "",
+    activeName: "",
     range: 30,
     type: "offensive",
     activateActive: (
@@ -735,8 +735,8 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 20,
-        statusKey: "isOnFire",
+        count: 10,
+        statusKey: "isOnKaijuFire",
         numTiles: 3,
         setTileStatuses
       }),

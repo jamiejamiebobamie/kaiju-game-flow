@@ -201,7 +201,7 @@ export const spawnKaiju = (kaijuData, playerData, scale) => {
     lives: 5,
     moveSpeed: 4,
     lastDmg: 0,
-    abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
+    abilities: [PLAYER_ABILITIES["kaijuFire"]],
     isKaiju: true,
     isOnTiles: false,
     i: kaijuData.length
@@ -354,6 +354,7 @@ export const updateTileState = (
               const deathTiles = [
                 "isElectrified",
                 "isOnFire",
+                "isOnKaijuFire",
                 "isGhosted",
                 "isWooded",
                 "isCold"
@@ -397,6 +398,7 @@ export const updateTileState = (
                         );
                         direction = newDirs;
                       } else if (
+                        k === "isOnKaijuFire" ||
                         k === "isOnFire" ||
                         (k === "isBubble" && count === startCount) ||
                         (k === "isBubble" && isInManaPool) ||
@@ -463,6 +465,7 @@ export const updateTileState = (
                       !doNotErase.includes(k) ||
                       (k === "isWooded" && count === startCount) ||
                       (k === "isOnFire" && count === startCount) ||
+                      (k === "isOnKaijuFire" && count === startCount) ||
                       entityOnTileStatus
                         ? undefined
                         : {
@@ -604,59 +607,40 @@ export const shootPower = ({
   });
 };
 export const solveForStatus = tile => {
-  if (tile.isHealing) {
-    return { isHealing: tile.isHealing };
-  } else if (tile.isBubble) {
+  if (tile.isHealing) return { isHealing: tile.isHealing };
+  else if (tile.isBubble)
     return {
       isBubble: tile.isBubble
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
     };
-  } else if (tile.isGhosted) {
+  else if (tile.isGhosted)
     return {
       isGhosted: tile.isGhosted
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
     };
-  } else if (tile.isShielded) {
-    return {
-      isShielded: tile.isShielded
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
-    };
-  } else if (tile.isElectrified) {
+  else if (tile.isElectrified)
     return {
       isElectrified: tile.isElectrified
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
     };
-  } else if (tile.isCold) {
+  else if (tile.isShielded)
+    return {
+      isShielded: tile.isShielded
+    };
+  else if (tile.isOnKaijuFire)
+    return {
+      isOnKaijuFire: tile.isOnKaijuFire
+    };
+  else if (tile.isCold)
     return {
       isCold: tile.isCold
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
     };
-  } else if (tile.isOnFire) {
+  else if (tile.isOnFire)
     return {
       isOnFire: tile.isOnFire
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
     };
-  } else if (tile.isWooded) {
+  else if (tile.isWooded)
     return {
       isWooded: tile.isWooded
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
     };
-  } else if (tile.isMonster) {
-    return {
-      isMonster: tile.isMonster
-      // count: tile.count,
-      // playerIndex: tile.playerIndex
-    };
-  } else {
-    return tile;
-  }
+  else return tile;
 };
 export const getRandBool = () => {
   return Math.random() > 0.5;
@@ -860,7 +844,8 @@ export const movePiece = (
   enemyData,
   dmgArray,
   teleportData,
-  setTeleportData
+  setTeleportData,
+  setKaijuKillCount
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -967,7 +952,7 @@ export const movePiece = (
           (!_data[i].isThere || _data[i].moveToTiles.length)
         ) {
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
-          powerUpData && console.log(shouldTeleport, teleportData, i);
+          // powerUpData && console.log(shouldTeleport, teleportData, i);
           if (shouldTeleport) {
             const tile = _data[i].moveToTiles.length
               ? _data[i].moveToTiles[_data[i].moveToTiles.length - 1]
@@ -1050,7 +1035,10 @@ export const movePiece = (
                 _data[i].lives - dmg.lifeDecrement < 5
                   ? _data[i].lives - dmg.lifeDecrement
                   : _data[i].lives;
-              if (_data[i].isKaiju) _data[i].trophy = dmg.playerIndex;
+              if (_data[i].isKaiju && !_data[i].lives) {
+                console.log(typeof dmg.playerIndex, dmg.playerIndex);
+                setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
+              }
             }
           });
       }
@@ -1058,11 +1046,24 @@ export const movePiece = (
     teleportData && teleportData.length && setTeleportData([]);
     const newKaiju =
       !powerUpData &&
-      data.length < 10 &&
+      data.length < 5 &&
       accTime &&
       !(accTime % 5000) &&
       spawnKaiju(data, enemyData, scale);
-    return newKaiju ? [..._data, newKaiju] : _data;
+    let isKaijuRespawned = false;
+    const newKaijuData =
+      !powerUpData &&
+      !newKaiju &&
+      accTime &&
+      !(accTime % 5000) &&
+      _data.map(k =>
+        !isKaijuRespawned && !k.lives ? spawnKaiju(data, enemyData, scale) : k
+      );
+    return newKaiju
+      ? [..._data, newKaiju]
+      : newKaijuData
+      ? newKaijuData
+      : _data;
   });
 export const moveTo = ({
   currentLocation,

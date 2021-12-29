@@ -297,7 +297,7 @@ export const Display = ({
 }) => {
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
-  console.log(_string, playerIndex);
+  // console.log(_string, playerIndex);
   const { title, description, effect, img, formatData } = (displayString &&
     getDescription(_string, playerData, Number(playerIndex))) || {
     title: "",

@@ -76,12 +76,16 @@ export const Player = ({
   setTeleportData,
   setTileStatuses,
   playerIndex,
+  kaijuKillCount,
   scale
   // accessory = {
   //   displayLookup: "testAccessoryLookup",
   //   accessoryImgFile: "fire_icon.png"
   // }
 }) => {
+  useEffect(() => {
+    console.log(kaijuKillCount);
+  }, [kaijuKillCount]);
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const playerUI = (
@@ -107,7 +111,7 @@ export const Player = ({
             setDisplayString={setDisplayString}
           />
           <Kaiju
-            kaijuArr={kaijuData.filter(k => k.trophy === playerIndex)}
+            kaijuArr={kaijuKillCount.filter(c => c == playerIndex)}
             isReversed={isReversed}
             setDisplayString={setDisplayString}
           />
@@ -115,7 +119,7 @@ export const Player = ({
       ) : (
         <>
           <Kaiju
-            kaijuArr={kaijuData.filter(k => k.trophy === playerIndex)}
+            kaijuArr={kaijuKillCount.filter(c => c == playerIndex)}
             setDisplayString={setDisplayString}
           />
           <HealthBar

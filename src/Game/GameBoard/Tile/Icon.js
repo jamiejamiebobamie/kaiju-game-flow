@@ -16,6 +16,7 @@ const StyledIcon = styled.i`
 // -o-transform: scale(3) translate(20px, 15px);
 export const Icon = ({ status, zIndex }) => {
   const ICON_LOOKUP = {
+    isOnKaijuFire: { className: "fa-free-code-camp", color: "#df73ff" },
     isOnFire: { className: "fa-free-code-camp", color: "tomato" },
     isWooded: { className: "fa-leaf", color: "green" },
     isElectrified: { className: "fa-bolt", color: "cyan" },
@@ -38,6 +39,8 @@ export const Icon = ({ status, zIndex }) => {
       return ICON_LOOKUP["isShielded"];
     } else if (status.isElectrified) {
       return ICON_LOOKUP["isElectrified"];
+    } else if (status.isOnKaijuFire) {
+      return ICON_LOOKUP["isOnKaijuFire"];
     } else if (status.isCold) {
       return ICON_LOOKUP["isCold"];
     } else if (status.isOnFire) {

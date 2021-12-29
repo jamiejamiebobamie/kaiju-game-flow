@@ -15,6 +15,7 @@ const Wrapper = styled.div`
 export const UI = ({
   playerData,
   kaijuData,
+  kaijuKillCount,
   setPlayerData,
   setTeleportData,
   setTileStatuses,
@@ -26,6 +27,7 @@ export const UI = ({
       <Player
         playerData={playerData}
         kaijuData={kaijuData}
+        kaijuKillCount={kaijuKillCount}
         setPlayerData={setPlayerData}
         setTeleportData={setTeleportData}
         setTileStatuses={setTileStatuses}
@@ -37,6 +39,7 @@ export const UI = ({
       <Player
         playerData={playerData}
         kaijuData={kaijuData}
+        kaijuKillCount={kaijuKillCount}
         setPlayerData={setPlayerData}
         setTeleportData={setTeleportData}
         setTileStatuses={setTileStatuses}

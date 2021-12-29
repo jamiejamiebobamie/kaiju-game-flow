@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Game } from "./Game";
+import { Game } from "./Game/Game";
 import { Tutorial } from "./Tutorial";
 
 const App = () => {
@@ -10,6 +10,10 @@ const App = () => {
         4. tutorial.
         5. Determine class compliments for teammate so gameplay feels balanced.
         6. Clean up code.
+        7. Why is the Kaiju not using their ability after they respawn?
+        8. Why is a tile status missing on dmg sometimes?
+        9. Why does the game slow down as the player plays?
+        10. Why does the winner state var not trigger sometimes?
 
         - tileStatus updates.
         - make character move to the last tile on a path.

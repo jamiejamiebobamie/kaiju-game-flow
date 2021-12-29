@@ -19,6 +19,7 @@ export const HexagonTile = ({
   setClickedIndex = () => {},
   isHighlighted,
   status = {
+    isOnKaijuFire: false,
     isOnFire: false,
     isWooded: false,
     isElectrified: false,

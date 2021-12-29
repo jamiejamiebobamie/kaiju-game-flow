@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { GameBoard } from "./Game/GameBoard/GameBoard";
-import { UI } from "./Game/UI/UI";
+import { GameBoard } from "./GameBoard/GameBoard";
+import { UI } from "./UI/UI";
 import {
   PENINSULA_TILE_LOOKUP,
   BRIDGE_TILES,
   PLAYER_ABILITIES,
   PLAYER_CLASSES
-} from "./Utils/gameState";
+} from "../Utils/gameState";
 import {
   getCharXAndY,
   getRandomIntInRange,
@@ -22,8 +22,8 @@ import {
   redrawTiles,
   updateHighlightedTiles,
   initializeGameBoard
-} from "./Utils/utils";
-import "./App.css";
+} from "../Utils/utils";
+import "../App.css";
 const GameWrapper = styled.div`
   margin-top: 100px;
   display: flex;
@@ -47,13 +47,14 @@ export const Game = () => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
+  const [winner, setWinner] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
+  const [kaijuKillCount, setKaijuKillCount] = useState([]);
   const [intervalTime, setIntervalTime] = useState(100);
   const accTime = useRef(0);
   const [playerData, setPlayerData] = useState([]);
   const [teleportData, setTeleportData] = useState([]);
-  const [winner, setWinner] = useState(null);
   const [powerUpData, setPowerUpData] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
@@ -93,6 +94,26 @@ export const Game = () => {
     );
   }, []);
   useEffect(() => {
+    if (kaijuKillCount.length >= 7) {
+      if (
+        kaijuKillCount.filter(k => k == 0).length >= 7 ||
+        kaijuKillCount.filter(k => k == 1).length >= 7
+      ) {
+        const _winner =
+          kaijuKillCount.filter(k => k == 0).length >
+          kaijuKillCount.filter(k => k == 1).length
+            ? 0
+            : 1;
+        setWinner(_winner);
+      }
+    }
+  }, [kaijuKillCount]);
+  useEffect(() => {
+    if (winner) {
+      setIntervalTime(null);
+    }
+  }, [winner]);
+  useEffect(() => {
     if (playerMoveToTiles !== null) {
       setPlayerData(_playerData =>
         _playerData.map((p, i) =>
@@ -129,7 +150,10 @@ export const Game = () => {
       scale,
       accTime.current,
       playerData,
-      dmgArray
+      dmgArray,
+      undefined,
+      undefined,
+      setKaijuKillCount
     );
     // powerup spawning.
     if (shouldUpdate(accTime.current, 30000))
@@ -194,6 +218,7 @@ export const Game = () => {
         />
         <UI
           playerData={playerData}
+          kaijuKillCount={kaijuKillCount}
           kaijuData={kaijuData}
           setPlayerData={setPlayerData}
           setTeleportData={setTeleportData}
