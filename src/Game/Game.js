@@ -47,12 +47,12 @@ export const Game = () => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
+  const accTime = useRef(0);
   const [winner, setWinner] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
   const [kaijuKillCount, setKaijuKillCount] = useState([]);
   const [intervalTime, setIntervalTime] = useState(100);
-  const accTime = useRef(0);
   const [playerData, setPlayerData] = useState([]);
   const [teleportData, setTeleportData] = useState([]);
   const [powerUpData, setPowerUpData] = useState([]);
@@ -109,7 +109,7 @@ export const Game = () => {
     }
   }, [kaijuKillCount]);
   useEffect(() => {
-    if (winner) {
+    if (winner !== null) {
       setIntervalTime(null);
     }
   }, [winner]);
@@ -123,7 +123,41 @@ export const Game = () => {
       setPlayerMoveToTiles(null);
     }
   }, [playerMoveToTiles]);
+  useEffect(() => console.log(teleportData), [teleportData]);
   useInterval(() => {
+    updateHighlightedTiles(
+      setHighlightedTiles,
+      playerData,
+      hoverLookupString,
+      path,
+      setPath,
+      scale
+    );
+    if (shouldUpdate(accTime.current, 400))
+      updateTileState(
+        playerData,
+        kaijuData,
+        setDmgArray,
+        setTileStatuses,
+        width,
+        height,
+        scale,
+        accTime.current
+      );
+    if (shouldUpdate(accTime.current, 300))
+      redrawTiles(
+        highlightedTiles,
+        setHoverRef,
+        setClickedTile,
+        setTiles,
+        playerData,
+        kaijuData,
+        tileStatuses,
+        setTileStatuses,
+        width,
+        height,
+        scale
+      );
     // move players
     movePiece(
       playerData,
@@ -158,39 +192,6 @@ export const Game = () => {
     // powerup spawning.
     if (shouldUpdate(accTime.current, 30000))
       spawnPowerUp(powerUpData, setPowerUpData, playerData, scale);
-    updateHighlightedTiles(
-      setHighlightedTiles,
-      playerData,
-      hoverLookupString,
-      path,
-      setPath,
-      scale
-    );
-    if (shouldUpdate(accTime.current, 400))
-      updateTileState(
-        playerData,
-        kaijuData,
-        setDmgArray,
-        setTileStatuses,
-        width,
-        height,
-        scale,
-        accTime.current
-      );
-    if (shouldUpdate(accTime.current, 300))
-      redrawTiles(
-        highlightedTiles,
-        setHoverRef,
-        setClickedTile,
-        setTiles,
-        playerData,
-        kaijuData,
-        tileStatuses,
-        setTileStatuses,
-        width,
-        height,
-        scale
-      );
     accTime.current =
       accTime > Number.MAX_SAFE_INTEGER - 10000
         ? 0

@@ -6,14 +6,13 @@ const App = () => {
   /*
         1. home screen.
         2. teammate a.i.
-        3. have smarter ai for teammate lightning power... (like a rook queen or bishop in chess)
         4. tutorial.
         5. Determine class compliments for teammate so gameplay feels balanced.
         6. Clean up code.
-        7. Why is the Kaiju not using their ability after they respawn?
         8. Why is a tile status missing on dmg sometimes?
         9. Why does the game slow down as the player plays?
-        10. Why does the winner state var not trigger sometimes?
+        10. Write method to return ideal tile to escape to (kaiju + tileStatuses)
+        11. Code passives: single, start-of-game stat modifiers (some bad, and some that are shared between powers)
 
         - tileStatus updates.
         - make character move to the last tile on a path.

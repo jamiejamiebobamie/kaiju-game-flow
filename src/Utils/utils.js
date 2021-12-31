@@ -4,6 +4,7 @@ import {
   BRIDGE_TILES,
   PLAYER_ABILITIES,
   PERIMETER_TILES,
+  DEATH_TILE_STATUSES,
   PLAYER_CLASSES
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
@@ -162,7 +163,7 @@ export const spawnPowerUp = (
     });
   }
 };
-export const spawnKaiju = (kaijuData, playerData, scale) => {
+export const spawnKaiju = (kaijuData, playerData, scale, isRespawn) => {
   const minX = 0;
   const minY = 30;
   const maxX = 490;
@@ -188,24 +189,35 @@ export const spawnKaiju = (kaijuData, playerData, scale) => {
   );
   const [_, dirs] = getAdjacentTilesFromNormVec(kaijuTile, normVec, scale, 1);
   const key = Math.random();
-  return {
-    key,
-    charLocation: location,
-    moveFromLocation: location,
-    moveToLocation: location,
-    moveToTiles: [kaijuTile],
-    tile: kaijuTile,
-    color: "purple",
-    trophy: undefined,
-    isThere: false,
-    lives: 5,
-    moveSpeed: 4,
-    lastDmg: 0,
-    abilities: [PLAYER_ABILITIES["kaijuFire"]],
-    isKaiju: true,
-    isOnTiles: false,
-    i: kaijuData.length
-  };
+  return isRespawn
+    ? {
+        key,
+        charLocation: location,
+        moveFromLocation: location,
+        moveToLocation: location,
+        moveToTiles: [kaijuTile],
+        tile: kaijuTile,
+        isThere: false,
+        lives: 5,
+        isOnTiles: false
+      }
+    : {
+        key,
+        charLocation: location,
+        moveFromLocation: location,
+        moveToLocation: location,
+        moveToTiles: [kaijuTile],
+        tile: kaijuTile,
+        color: "purple",
+        isThere: false,
+        lives: 5,
+        moveSpeed: 4,
+        lastDmg: 0,
+        abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
+        isKaiju: true,
+        isOnTiles: false,
+        i: kaijuData.length
+      };
 };
 export const updateHighlightedTiles = (
   setHighlightedTiles,
@@ -351,14 +363,14 @@ export const updateTileState = (
                 isInManaPool,
                 playerIndex
               } = data;
-              const deathTiles = [
-                "isElectrified",
-                "isOnFire",
-                "isOnKaijuFire",
-                "isGhosted",
-                "isWooded",
-                "isCold"
-              ];
+              // const deathTiles = [
+              //   "isElectrified",
+              //   "isOnFire",
+              //   "isOnKaijuFire",
+              //   "isGhosted",
+              //   "isWooded",
+              //   "isCold"
+              // ];
               const healthTiles = ["isHealing"];
               if (count) {
                 Array.isArray(dirs) &&
@@ -488,7 +500,7 @@ export const updateTileState = (
                           };
                   });
               }
-              if (deathTiles.includes(k) || healthTiles.includes(k)) {
+              if (DEATH_TILE_STATUSES.includes(k) || healthTiles.includes(k)) {
                 const entityOnTile = isKaiju
                   ? playerData.find(({ tile }) => tile.i === i && tile.j === j)
                   : kaijuData.find(({ tile }) => tile.i === i && tile.j === j);
@@ -496,7 +508,7 @@ export const updateTileState = (
                   const dmgObj = {
                     isKaiju: !isKaiju, // to determine correct state array
                     key: entityOnTile.key, // to determine correct entity in array
-                    lifeDecrement: deathTiles.includes(k) ? 1 : -1, //lives + or - // possible healing ability...
+                    lifeDecrement: DEATH_TILE_STATUSES.includes(k) ? 1 : -1, //lives + or - // possible healing ability...
                     accTime, // to remove stale data from the dmgArray
                     playerIndex // to determine who killed the Kaiju.
                   };
@@ -624,17 +636,25 @@ export const solveForStatus = tile => {
     return {
       isShielded: tile.isShielded
     };
-  else if (tile.isOnKaijuFire)
-    return {
-      isOnKaijuFire: tile.isOnKaijuFire
-    };
   else if (tile.isCold)
     return {
       isCold: tile.isCold
     };
+  else if (tile.isOnFire && tile.isOnKaijuFire)
+    return getRandBool()
+      ? {
+          isOnFire: tile.isOnFire
+        }
+      : {
+          isOnKaijuFire: tile.isOnKaijuFire
+        };
   else if (tile.isOnFire)
     return {
       isOnFire: tile.isOnFire
+    };
+  else if (tile.isOnKaijuFire)
+    return {
+      isOnKaijuFire: tile.isOnKaijuFire
     };
   else if (tile.isWooded)
     return {
@@ -850,19 +870,20 @@ export const movePiece = (
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
       if (_data[i].lives) {
-        // set logic for enemy player
-        if (i === 1) {
-          if (powerUpData) {
-            // find the closest kaiju
-            const [targetTile, _] = getClosestEntityFromTile(
-              enemyData,
-              _data[i].tile,
-              scale
-            );
-            if (targetTile.i !== 0) {
-              const attackPowersCount = _data[i].abilities.filter(
-                ({ type }) => type === "offensive"
-              ).length;
+        // set logic for teammate
+        if (powerUpData && i === 1) {
+          // find the closest kaiju
+          const [targetTile, _] = getClosestEntityFromTile(
+            enemyData,
+            _data[i].tile,
+            scale
+          );
+          if (targetTile.i !== 0) {
+            const attackPowersCount = _data[i].abilities.filter(
+              ({ type }) => type === "offensive"
+            ).length;
+            // teammate should do his own thing and attack kaiju
+            if (attackPowersCount) {
               const attackPowersRangeAcc = _data[i].abilities
                 .filter(({ type }) => type === "offensive")
                 .map(({ range }) => range)
@@ -875,10 +896,24 @@ export const movePiece = (
                 _data[1].tile &&
                 targetTile &&
                 findPath(_data[1].tile, targetTile, scale);
-              _data[i].moveToTiles =
-                moveToTiles.length > powerRangeAvg
+              _data[i].moveToTiles = !_data[i].moveToTiles.length
+                ? moveToTiles.length < powerRangeAvg - 1
+                  ? findPath(_data[1].tile, getRandomTileOnBoard(scale), scale)
+                  : moveToTiles.length > powerRangeAvg + 10
                   ? moveToTiles.slice(0, moveToTiles.length - powerRangeAvg)
-                  : getRandomTileOnBoard(scale);
+                  : findPath(_data[1].tile, getRandomTileOnBoard(scale), scale)
+                : _data[i].moveToTiles;
+            } else {
+              // teammate should stay by player to protect him.
+              // get path
+              const moveToTiles =
+                _data[1].tile &&
+                _data[0].tile &&
+                findPath(_data[1].tile, _data[0].tile, scale);
+              _data[i].moveToTiles =
+                moveToTiles.length > 3
+                  ? moveToTiles.slice(0, moveToTiles.length - 3)
+                  : [];
             }
           }
         }
@@ -888,26 +923,44 @@ export const movePiece = (
             (_data[i].isKaiju && _data[i].isOnTiles)) &&
           _data[i].abilities.length
         ) {
-          const [targetTile, _] = getClosestEntityFromTile(
-            enemyData,
-            _data[i].tile,
-            scale
-          );
-          // const numTilesFromPlayer =
-          //   _data[1].tile &&
-          //   _data[0].tile &&
-          //   findPath(_data[1].tile, _data[0].tile, scale).length;
-          const numTilesFromTarget =
-            _data[i].tile &&
-            targetTile &&
-            findPath(_data[i].tile, targetTile, scale).length;
-          if (numTilesFromTarget !== undefined) {
-            const powersToFire = _data[i].abilities.forEach((a, j) => {
+          const powersToFire = _data[i].abilities.forEach((a, j) => {
+            const isCooldownOver =
+              accTime - a.accTime >= a.cooldownTime || accTime < a.accTime;
+            if (isCooldownOver) {
+              const [targetTile, _] = getClosestEntityFromTile(
+                enemyData,
+                _data[i].tile,
+                scale
+              );
+              const numTilesFromTarget =
+                _data[i].tile &&
+                targetTile &&
+                findPath(_data[i].tile, targetTile, scale).length;
+              const surroundingTiles = [
+                _data[i].tile,
+                ...getAdjacentTiles(_data[i].tile)
+              ];
+              const isInDanger = surroundingTiles.some(
+                t =>
+                  tileStatuses[t.i] &&
+                  tileStatuses[t.i][t.j] &&
+                  Object.keys(tileStatuses[t.i][t.j]).includes("isOnKaijuFire")
+              );
+              const isOffensivePowerAndTargetInRange =
+                a.type === "offensive" &&
+                numTilesFromTarget &&
+                a.range >= numTilesFromTarget;
+              const isDefensivePowerAndIsInDanger =
+                a.type === "defensive" && isInDanger;
+              const isEscapePowerAndIsInDanger =
+                a.type === "escape" && numTilesFromTarget <= 2;
+              const isHealPowerAndIsTeammateHealthLow =
+                a.type === "heal" && powerUpData && data[0].lives <= 2;
               if (
-                (a.type === "offensive" &&
-                  a.range >= numTilesFromTarget &&
-                  accTime - a.accTime >= a.cooldownTime) ||
-                accTime < a.accTime
+                isOffensivePowerAndTargetInRange ||
+                isDefensivePowerAndIsInDanger ||
+                isEscapePowerAndIsInDanger ||
+                isHealPowerAndIsTeammateHealthLow
               ) {
                 _data[i].abilities[j].accTime = accTime;
                 a.activateActive(
@@ -919,10 +972,9 @@ export const movePiece = (
                   scale
                 );
               }
-            });
-          }
+            }
+          });
         }
-
         // - - - - - - - - - - -
         // if Kaiju, and just spawned set isOnTiles to true when they reach the tiles
         if (
@@ -949,19 +1001,20 @@ export const movePiece = (
           _data[i].charLocation &&
           _data[i].moveFromLocation &&
           _data[i].moveToLocation &&
-          (!_data[i].isThere || _data[i].moveToTiles.length)
+          (!_data[i].isThere ||
+            _data[i].moveToTiles.length ||
+            (teleportData && teleportData.length))
         ) {
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
-          // powerUpData && console.log(shouldTeleport, teleportData, i);
           if (shouldTeleport) {
             const tile = _data[i].moveToTiles.length
               ? _data[i].moveToTiles[_data[i].moveToTiles.length - 1]
-              : _data[i].tile;
+              : getRandomTileOnBoard(scale); // fix this so that it is not random...
             const location = getCharXAndY({ ...tile, scale });
             _data[i].tile = tile;
-            _data[i].charLocation = location; // || _data[i].moveToLocation;
-            _data[i].moveToLocation = location; // || _data[i].moveToLocation;
-            _data[i].moveFromLocation = location; // || _data[i].charLocation;
+            _data[i].charLocation = location;
+            _data[i].moveToLocation = location;
+            _data[i].moveFromLocation = location;
             _data[i].moveToTiles = [];
             _data[i].isThere = false;
           } else {
@@ -1036,7 +1089,6 @@ export const movePiece = (
                   ? _data[i].lives - dmg.lifeDecrement
                   : _data[i].lives;
               if (_data[i].isKaiju && !_data[i].lives) {
-                console.log(typeof dmg.playerIndex, dmg.playerIndex);
                 setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
               }
             }
@@ -1051,13 +1103,16 @@ export const movePiece = (
       !(accTime % 5000) &&
       spawnKaiju(data, enemyData, scale);
     let isKaijuRespawned = false;
+    let isRespawn = true;
     const newKaijuData =
       !powerUpData &&
       !newKaiju &&
       accTime &&
       !(accTime % 5000) &&
       _data.map(k =>
-        !isKaijuRespawned && !k.lives ? spawnKaiju(data, enemyData, scale) : k
+        !isKaijuRespawned && !k.lives
+          ? { ...k, ...spawnKaiju(data, enemyData, scale, isRespawn) }
+          : k
       );
     return newKaiju
       ? [..._data, newKaiju]

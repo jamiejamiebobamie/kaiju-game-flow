@@ -482,7 +482,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "TBD",
     activeName: "Teleport",
     range: 30,
-    type: "utility",
+    type: "escape",
     activateActive: (
       k,
       data,
@@ -689,7 +689,7 @@ export const PLAYER_ABILITIES = {
   heart: {
     passiveName: "Good Vibes",
     activeName: "Heal",
-    type: "offensive", // change this.
+    type: "heal", // change this.
     activateActive: (
       k,
       data,
@@ -729,7 +729,7 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-    ) =>
+    ) => {
       shootPower({
         data,
         dataIndex: k,
@@ -739,17 +739,25 @@ export const PLAYER_ABILITIES = {
         statusKey: "isOnKaijuFire",
         numTiles: 3,
         setTileStatuses
-      }),
-    displayLookup: "abilityFire",
-    Element: "Fire",
-    element: "fire",
+      });
+    },
+    displayLookup: "",
+    Element: "",
+    element: "",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 8000
   }
 };
-
+export const DEATH_TILE_STATUSES = [
+  "isElectrified",
+  "isOnFire",
+  "isOnKaijuFire",
+  "isGhosted",
+  "isWooded",
+  "isCold"
+];
 export const PLAYER_CLASSES = [
   { elems: "Bubble,Death,Fire", class_name: "Dark Wizard" },
   { elems: "Bubble,Death,Glass", class_name: "Dark Fairy" },

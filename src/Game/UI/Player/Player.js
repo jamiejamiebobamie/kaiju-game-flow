@@ -83,9 +83,6 @@ export const Player = ({
   //   accessoryImgFile: "fire_icon.png"
   // }
 }) => {
-  useEffect(() => {
-    console.log(kaijuKillCount);
-  }, [kaijuKillCount]);
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const playerUI = (
