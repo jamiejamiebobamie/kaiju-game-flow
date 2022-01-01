@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   PENINSULA_TILE_LOOKUP,
   BRIDGE_TILES,
+  NOT_BRIDGE_TILES,
   PLAYER_ABILITIES,
   PERIMETER_TILES,
   DEATH_TILE_STATUSES,
@@ -306,12 +307,15 @@ export const redrawTiles = (
                 ...tileStatuses[i][j],
                 isPlayer:
                   playerData.find(
-                    ({ tile, lives }) => lives && tile.i === i && tile.j === j
+                    ({ tile, lives }) =>
+                      tile && lives && tile.i === i && tile.j === j
                   ) &&
-                  playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
+                  playerData.find(
+                    ({ tile }) => tile && tile.i === i && tile.j === j
+                  ).i,
                 isKaiju: kaijuData
                   .filter(k => k.isOnTiles && k.lives)
-                  .find(({ tile }) => tile.i === i && tile.j === j)
+                  .find(({ tile }) => tile && tile.i === i && tile.j === j)
               }}
             />
           );
@@ -345,14 +349,23 @@ export const updateTileState = (
             const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
             if (entry) {
               const entityOnTileStatus =
-                playerData.find(({ tile }) => tile.i === i && tile.j === j) ||
-                kaijuData.find(({ tile }) => tile.i === i && tile.j === j);
-              const playerKaijuConflictKey =
-                playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
+                playerData.find(
+                  ({ tile }) => tile && tile.i === i && tile.j === j
+                ) ||
                 kaijuData.find(
-                  ({ tile, lives }) => tile.i === i && tile.j === j && lives
+                  ({ tile }) => tile && tile.i === i && tile.j === j
+                );
+              const playerKaijuConflictKey =
+                playerData.find(
+                  ({ tile }) => tile && tile.i === i && tile.j === j
                 ) &&
-                playerData.find(({ tile }) => tile.i === i && tile.j === j).key;
+                kaijuData.find(
+                  ({ tile, lives }) =>
+                    tile && tile.i === i && tile.j === j && lives
+                ) &&
+                playerData.find(
+                  ({ tile }) => tile && tile.i === i && tile.j === j
+                ).key;
               const [k, data] = entry;
               const {
                 dirs,
@@ -896,13 +909,24 @@ export const movePiece = (
                 _data[1].tile &&
                 targetTile &&
                 findPath(_data[1].tile, targetTile, scale);
-              _data[i].moveToTiles = !_data[i].moveToTiles.length
-                ? moveToTiles.length < powerRangeAvg - 1
-                  ? findPath(_data[1].tile, getRandomTileOnBoard(scale), scale)
+              _data[i].moveToTiles =
+                // !_data[i].moveToTiles.length
+                //   ?
+                moveToTiles.length < powerRangeAvg - 1
+                  ? // findPath(_data[1].tile, getRandomTileOnBoard(scale, scale)
+                    findPath(
+                      _data[1].tile,
+                      getSafeTile(enemyData, tileStatuses, scale),
+                      scale
+                    )
                   : moveToTiles.length > powerRangeAvg + 10
                   ? moveToTiles.slice(0, moveToTiles.length - powerRangeAvg)
-                  : findPath(_data[1].tile, getRandomTileOnBoard(scale), scale)
-                : _data[i].moveToTiles;
+                  : findPath(
+                      _data[1].tile,
+                      getSafeTile(enemyData, tileStatuses, scale),
+                      scale
+                    );
+              // : _data[i].moveToTiles;
             } else {
               // teammate should stay by player to protect him.
               // get path
@@ -1007,14 +1031,19 @@ export const movePiece = (
         ) {
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
-            const tile = _data[i].moveToTiles.length
-              ? _data[i].moveToTiles[_data[i].moveToTiles.length - 1]
-              : getRandomTileOnBoard(scale); // fix this so that it is not random...
+            const _path = findPath(
+              _data[1].tile,
+              getSafeTile(enemyData, tileStatuses, scale),
+              scale
+            );
+            const tile = _path[_path.length - 1];
             const location = getCharXAndY({ ...tile, scale });
-            _data[i].tile = tile;
-            _data[i].charLocation = location;
-            _data[i].moveToLocation = location;
-            _data[i].moveFromLocation = location;
+            _data[i].tile = tile || _data[i].tile;
+            _data[i].charLocation = tile ? location : _data[i].charLocation;
+            _data[i].moveToLocation = tile ? location : _data[i].moveToLocation;
+            _data[i].moveFromLocation = tile
+              ? location
+              : _data[i].moveFromLocation;
             _data[i].moveToTiles = [];
             _data[i].isThere = false;
           } else {
@@ -1237,6 +1266,39 @@ export const getRandomTileOnBoard = scale => {
   const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
   const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
   return tileIndices[randomInt];
+};
+export const getSafeTile = (kaijuData, tileStatuses, scale) => {
+  const kaijuLocations = kaijuData.map(({ charLocation }) => charLocation);
+  const allTiles = Object.values(NOT_BRIDGE_TILES);
+  let safeTileObj = {
+    distance: Number.MIN_SAFE_INTEGER,
+    index: getRandomTileOnBoard(scale)
+  };
+  kaijuData.length &&
+    allTiles.forEach(currTile => {
+      const currTileXY = getCharXAndY({ ...currTile, scale });
+      const testSafeTileObj = kaijuLocations.reduce(
+        (acc, kaijuLocation) => {
+          const testDist = getDistance(currTileXY, kaijuLocation);
+          return acc.distance < testDist &&
+            tileStatuses &&
+            tileStatuses[currTile.i] &&
+            tileStatuses[currTile.i][currTile.j] &&
+            Object.keys(tileStatuses[currTile.i][currTile.j]).every(
+              k => !DEATH_TILE_STATUSES.includes(k)
+            )
+            ? { distance: testDist, index: currTile }
+            : acc;
+        },
+        {
+          distance: Number.MIN_SAFE_INTEGER,
+          index: getRandomTileOnBoard(scale)
+        }
+      );
+      if (safeTileObj.distance < testSafeTileObj.distance)
+        safeTileObj = testSafeTileObj;
+    });
+  return safeTileObj.index;
 };
 export const checkIsInManaPool = ({
   setPlayerData,

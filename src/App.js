@@ -4,15 +4,13 @@ import { Tutorial } from "./Tutorial";
 
 const App = () => {
   /*
-        1. home screen.
-        2. teammate a.i.
-        4. tutorial.
-        5. Determine class compliments for teammate so gameplay feels balanced.
-        6. Clean up code.
-        8. Why is a tile status missing on dmg sometimes?
-        9. Why does the game slow down as the player plays?
-        10. Write method to return ideal tile to escape to (kaiju + tileStatuses)
-        11. Code passives: single, start-of-game stat modifiers (some bad, and some that are shared between powers)
+        1. Code passives: single, start-of-game stat modifiers (some bad, and some that are shared between powers)
+        2. Determine class compliments for teammate so gameplay feels balanced.
+        3. Why is a tile status missing on dmg sometimes?
+        4. Why does the game slow down as the player plays?
+        5. Clean up code.
+        6. tutorial.
+        7. home screen.
 
         - tileStatus updates.
         - make character move to the last tile on a path.
