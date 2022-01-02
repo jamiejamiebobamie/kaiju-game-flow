@@ -1204,7 +1204,7 @@ export const PLAYER_CLASSES = [
   { elems: "Glass,Lightning,Wood", class_name: "Druid" },
   { elems: "Glass,Metal,Wood", class_name: "Gardener" },
   { elems: "Heart,Ice,Lightning", class_name: "Soothsayer" },
-  { elems: "Heart,Ice,Metal", class_name: "Icy Architect" },
+  { elems: "Heart,Ice,Metal", class_name: "Icy Settler" },
   { elems: "Heart,Ice,Wood ", class_name: "Hedge Witch" },
   { elems: "Heart,Lightning,Metal", class_name: "Enchanted Archer" },
   { elems: "Heart,Lightning,Wood", class_name: "Nurturing Druid" },

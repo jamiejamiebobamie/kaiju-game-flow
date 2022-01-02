@@ -72,6 +72,8 @@ export const initializeGameBoard = (
     const baseStats = {
       key: Math.random(),
       isInManaPool: false,
+      isHealed: false,
+      isTeleported: false,
       color: k ? "salmon" : "blue",
       charLocation: location,
       moveFromLocation: location,
@@ -227,7 +229,9 @@ export const spawnKaiju = (kaijuData, playerData, scale, isRespawn) => {
         isOnTiles: false,
         i: kaijuData.length,
         tileCountModifier: 0,
-        tileCountModifier: 0
+        tileCountModifier: 0,
+        isHealed: false,
+        isTeleported: false
       };
 };
 export const updateHighlightedTiles = (
@@ -1076,8 +1080,10 @@ export const movePiece = (
         ) {
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
+            _data[i].isTeleported = !_data[i].isTeleported;
+            console.log(_data[i].isTeleported);
             const _path = findPath(
-              _data[1].tile,
+              _data[i].tile,
               getSafeTile(enemyData, tileStatuses, scale),
               scale
             );
@@ -1162,6 +1168,7 @@ export const movePiece = (
                 dmg.lifeDecrement > 0 || _data[i].lives - dmg.lifeDecrement < 5
                   ? _data[i].lives - dmg.lifeDecrement
                   : _data[i].lives;
+              if (dmg.lifeDecrement < 0) _data[i].isHealed = !_data[i].isHealed;
               if (_data[i].isKaiju && !_data[i].lives) {
                 setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
               }

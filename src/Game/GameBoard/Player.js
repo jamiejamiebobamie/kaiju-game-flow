@@ -28,7 +28,6 @@ const Character = styled.img`
     z-index: 1;
   ${props => props.isInManaPool && "animation: blinking 5s infinite;"}
   pointer-events: none;
-
   animation-iteration-count: 2s;
   ${props => props.isDamaged && "animation: shake 0.5s;"};
   @keyframes shake {
@@ -75,16 +74,106 @@ const Character = styled.img`
   100%	{filter: invert(25%);}
 }
 `;
-export const Player = ({ lives, charLocation, isInManaPool, color, i = 0 }) => {
+const Particle = styled.i`
+color: ${props => props.color};
+
+    animation: rise 5s infinite;
+    position: absolute;
+    z-index:2;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+    transform: scale(.1);
+    ${props => `@keyframes rise {
+      0% {
+        transform: translate(${props.x}px, ${props.y}px) scale(.5);
+      }
+      100% {
+        transform: translate(${props.x}px, ${props.y - 500}px) scale(.5);
+      }
+    }`};
+}
+`;
+export const Player = ({
+  lives,
+  charLocation,
+  isInManaPool,
+  isHealed,
+  isTeleported,
+  color,
+  i = 0
+}) => {
   const [isDamaged, setIsDamaged] = useState(false);
+  const [_isHealed, _setIsHealed] = useState(false);
+  const [_isTeleported, _setIsTeleported] = useState(false);
+  const [particles, setParticles] = useState([]);
   useEffect(() => {
-    if (lives < 3) {
+    if (!isHealed) {
       setIsDamaged(true);
-      setTimeout(() => setIsDamaged(false), 2000);
+      setTimeout(() => setIsDamaged(false), 4000);
     }
   }, [lives]);
+  useEffect(() => {
+    if (!_isHealed) {
+      _setIsHealed(true);
+      const _particles = [];
+      console.log(charLocation);
+      for (let i = 0; i < 5; i++) {
+        _particles.push(
+          <Particle
+            x={
+              Math.random() > 0.5
+                ? -1 * Math.random() + charLocation.x
+                : Math.random() + charLocation.x
+            }
+            y={
+              Math.random() > 0.5
+                ? -1 * Math.random() + charLocation.y
+                : Math.random() + charLocation.y
+            }
+            className={`fa ${
+              _isTeleported ? "fa-angle-double-up" : "fa-heart-o"
+            }`}
+            color={_isTeleported ? "maroon" : "pink"}
+          />
+        );
+      }
+      setParticles(_particles);
+      setTimeout(() => _setIsHealed(false), 2000);
+    }
+  }, [isHealed]);
+  useEffect(() => {
+    console.log(isTeleported);
+    if (!_isTeleported) {
+      _setIsTeleported(true);
+      const _particles = [];
+      for (let i = 0; i < 5; i++) {
+        _particles.push(
+          <Particle
+            x={
+              Math.random() > 0.5
+                ? -1 * Math.random() + charLocation.x
+                : Math.random() + charLocation.x
+            }
+            y={
+              Math.random() > 0.5
+                ? -1 * Math.random() + charLocation.y
+                : Math.random() + charLocation.y
+            }
+            className={`fa ${
+              _isTeleported ? "fa-angle-double-up" : "fa-heart-o"
+            }`}
+            color={_isTeleported ? "maroon" : "pink"}
+          />
+        );
+      }
+      setParticles(_particles);
+      setTimeout(() => _setIsTeleported(false), 2000);
+    }
+  }, [isTeleported]);
   return (
     <Wrapper lives={lives} charLocation={charLocation}>
+      {(_isTeleported || _isHealed) && particles}
       <Character
         isDamaged={isDamaged}
         color={color}

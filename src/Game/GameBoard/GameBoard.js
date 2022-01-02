@@ -25,6 +25,20 @@ const BackgroundImage = styled.img`
   height: 100%;
   background-repeat: no-repeat;
 `;
+const TestMoon = styled.i`
+  position: absolute;
+  /* margin-top: -50px;
+  margin-left: 520px; */
+  pointer-events: none;
+  left: 600px;
+  top: 200px;
+  opacity: 0.3;
+  z-index: 1;
+  width: 120px;
+  height: 120px;
+  color: yellow;
+  transform: rotate(250deg) scale(5);
+`;
 export const GameBoard = ({
   isPaused,
   powerUpData,
@@ -75,6 +89,8 @@ export const GameBoard = ({
       scale={scale}
       isInManaPool={p.isInManaPool}
       lives={p.lives}
+      isHealed={p.isHealed}
+      isTeleported={p.isTeleported}
     />
   ));
   return (
@@ -86,6 +102,7 @@ export const GameBoard = ({
         {kaiju}
         {players}
       </ShiftContentOver>
+      <TestMoon className="fa fa-moon-o" />
       <BackgroundImage src={"test_map.png"} />
     </Board>
   );
