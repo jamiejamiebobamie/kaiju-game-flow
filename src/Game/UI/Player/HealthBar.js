@@ -6,15 +6,18 @@ const Wrapper = styled.div`
   display: flex;
   overflow: scroll;
   justify-content: flex-start;
-  width: 70%;
+  width: 60%;
   height: 50px;
+  /* background-color: red; */
   /* border-radius: 10px; */
   /* border-style: solid;
   border-thickness: thin; */
 `;
 const Bar = styled.div`
-  width: 60px;
-  min-width: 60px;
+  ${props =>
+    props.numHealth < 5
+      ? "min-width: 60px;width: 60px;"
+      : "min-width: 35px;width: 35px;"};
   height: 15px;
   min-height: 10px;
   margin-left: 10px;
@@ -30,7 +33,9 @@ export const HealthBar = ({ setDisplayString, health = 1 }) => {
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const bars = [];
   for (let i = 0; i < health; i++) {
-    bars.push(<Bar key={i} ref={setHoverRef("healthBar")} isGhost={false} />);
+    bars.push(
+      <Bar key={i} ref={setHoverRef("healthBar")} numHealth={health} />
+    );
   }
   return <Wrapper>{bars}</Wrapper>;
 };

@@ -69,7 +69,7 @@ export const initializeGameBoard = (
     const playerClassObj = PLAYER_CLASSES.find(
       pc => pc.elems === classLookUpKey
     );
-    _players.push({
+    const baseStats = {
       key: Math.random(),
       isInManaPool: false,
       color: k ? "salmon" : "blue",
@@ -88,12 +88,20 @@ export const initializeGameBoard = (
       isInManaPoolAccTime: 0,
       abilities,
       abilityCooldowns: [],
-      playerClass: playerClassObj && playerClassObj.class_name,
-      accessory: {
-        displayLookup: "testAccessoryLookup",
-        accessoryImgFile: "fire_icon.png"
-      }
-    });
+      numTilesModifier: 0,
+      tileCountModifier: 0,
+      playerClass: playerClassObj && playerClassObj.class_name
+    };
+    console.log(k, abilities, baseStats);
+    const newPlayer = {
+      ...baseStats,
+      ...abilities.reduce(
+        (acc, ability) => ability.activatePassive(acc),
+        baseStats
+      )
+    };
+    console.log(k, newPlayer);
+    _players.push(newPlayer);
   }
   setPlayerData(_players);
   // PLAYERS    - - - - - - - - - -
@@ -217,7 +225,9 @@ export const spawnKaiju = (kaijuData, playerData, scale, isRespawn) => {
         abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
         isKaiju: true,
         isOnTiles: false,
-        i: kaijuData.length
+        i: kaijuData.length,
+        tileCountModifier: 0,
+        tileCountModifier: 0
       };
 };
 export const updateHighlightedTiles = (
@@ -359,10 +369,12 @@ export const updateTileState = (
                 playerData.find(
                   ({ tile }) => tile && tile.i === i && tile.j === j
                 ) &&
-                kaijuData.find(
-                  ({ tile, lives }) =>
-                    tile && tile.i === i && tile.j === j && lives
-                ) &&
+                kaijuData
+                  .filter(k => k.isOnTiles)
+                  .find(
+                    ({ tile, lives }) =>
+                      tile && tile.i === i && tile.j === j && lives
+                  ) &&
                 playerData.find(
                   ({ tile }) => tile && tile.i === i && tile.j === j
                 ).key;
@@ -606,18 +618,51 @@ export const shootPower = ({
             ? [30, 6]
             : [null, null]
           : [null, null];
+        // const deathTiles = [
+        //   "isElectrified",
+        //   "isOnFire",
+        //   "isGhosted",
+        //   "isWooded",
+        // "isShielded",
+        // "isBubble"
+        // ];
+        const tileStatusesCountModifier = [
+          "isWooded",
+          "isOnFire",
+          "isShielded",
+          // "isBubble",
+          // "isCold",
+          "isHealing"
+        ];
+        const tileStatusesNumTilesModifier = [
+          "isWooded",
+          "isGhosted",
+          "isShielded",
+          // "isBubble",
+          "isHealing"
+        ];
         const [tile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
-          manaPoolNumTiles ? manaPoolNumTiles : numTiles
+          manaPoolNumTiles
+            ? manaPoolNumTiles
+            : data[dataIndex].numTilesModifier &&
+              tileStatusesNumTilesModifier.includes(statusKey)
+            ? numTiles + data[dataIndex].numTilesModifier
+            : numTiles
         );
         setTileStatuses(_tiles => {
           _tiles[tile.i][tile.j] = {
             ..._tiles[tile.i][tile.j],
             [statusKey]: {
               dirs,
-              count: manaPoolCount ? manaPoolCount : count,
+              count: manaPoolCount
+                ? manaPoolCount
+                : data[dataIndex].tileCountModifier &&
+                  tileStatusesCountModifier.includes(statusKey)
+                ? count + data[dataIndex].tileCountModifier
+                : count,
               targetIndex,
               isKaiju: d.isKaiju || statusKey === "isHealing",
               startCount: count,
@@ -1114,7 +1159,7 @@ export const movePiece = (
               // also accTime might reset to zero, so check for that.
               _data[i].lastDmg = accTime;
               _data[i].lives =
-                _data[i].lives - dmg.lifeDecrement < 5
+                dmg.lifeDecrement > 0 || _data[i].lives - dmg.lifeDecrement < 5
                   ? _data[i].lives - dmg.lifeDecrement
                   : _data[i].lives;
               if (_data[i].isKaiju && !_data[i].lives) {

@@ -78,10 +78,6 @@ export const Player = ({
   playerIndex,
   kaijuKillCount,
   scale
-  // accessory = {
-  //   displayLookup: "testAccessoryLookup",
-  //   accessoryImgFile: "fire_icon.png"
-  // }
 }) => {
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
@@ -140,21 +136,11 @@ export const Player = ({
       )}
       <PlayerBorder isReversed={isReversed}>
         <PlayerPicture
-          ref={setHoverRef(
-            `modifiers ${playerIndex}`
-            // isReversed
-            //   ? playerData[1].accessory && playerData[1].accessory.displayLookup
-            //   : playerData[0].accessory && playerData[0].accessory.displayLookup
-          )}
+          ref={setHoverRef(`modifiers ${playerIndex}`)}
           className="fa fa-user-circle"
         />
         <ClassPicture
-          ref={setHoverRef(
-            `class ${playerIndex}`
-            // isReversed
-            //   ? playerData[1].accessory && playerData[1].accessory.displayLookup
-            //   : playerData[0].accessory && playerData[0].accessory.displayLookup
-          )}
+          ref={setHoverRef(`class ${playerIndex}`)}
           className="fa fa-wrench"
           isReversed={isReversed}
         />
@@ -167,11 +153,6 @@ export const Player = ({
             playerData.length &&
             playerData[playerIndex].abilities) ||
           []
-          // playerData.length
-          //   ? isReversed
-          //     ? playerData[1].abilities
-          //     : playerData[0].abilities
-          //   : []
         }
       />
     </Wrapper>

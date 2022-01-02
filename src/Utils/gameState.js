@@ -764,10 +764,13 @@ export const PERIMETER_TILES = {
 };
 export const PLAYER_ABILITIES = {
   ice: {
-    passiveName: "Cold Shoulder",
+    passiveName: "Frozen Joints",
     activeName: "Ice Slice",
     range: 3,
     type: "offensive",
+    activatePassive: baseStats => {
+      return { ...baseStats, moveSpeed: baseStats.moveSpeed - 1 };
+    },
     activateActive: (
       k,
       data,
@@ -795,10 +798,19 @@ export const PLAYER_ABILITIES = {
     cooldownTime: 4000
   },
   glass: {
-    passiveName: "TBD",
-    activeName: "Teleport",
+    passiveName: "Teleport Sickness",
+    activeName: "Escape",
     range: 30,
     type: "escape",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        moveSpeed:
+          baseStats.moveSpeed - 2 <= 4
+            ? baseStats.moveSpeed
+            : baseStats.moveSpeed - 2
+      };
+    },
     activateActive: (
       k,
       data,
@@ -817,10 +829,17 @@ export const PLAYER_ABILITIES = {
     cooldownTime: 12000
   },
   fire: {
-    passiveName: "Campfire",
-    activeName: "Brush Fire",
+    passiveName: "Fuel to Burn",
+    activeName: "Wildfire",
     range: 10,
     type: "offensive",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        tileCountModifier:
+          baseStats.tileCountModifier > 1 ? baseStats.tileCountModifier : 1
+      };
+    },
     activateActive: (
       k,
       data,
@@ -851,6 +870,12 @@ export const PLAYER_ABILITIES = {
     passiveName: "Crunchy Granola",
     activeName: "Overgrowth",
     type: "offensive",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        lives: baseStats.lives + 2
+      };
+    },
     activateActive: (
       k,
       data,
@@ -882,6 +907,12 @@ export const PLAYER_ABILITIES = {
     passiveName: "Charged Step",
     activeName: "Discharge",
     type: "offensive",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        moveSpeed: baseStats.moveSpeed + 4
+      };
+    },
     activateActive: (
       k,
       data,
@@ -910,10 +941,16 @@ export const PLAYER_ABILITIES = {
     cooldownTime: 2000
   },
   death: {
-    passiveName: "Reaper",
+    passiveName: "One Foot in the Grave",
     activeName: "Haunt",
     range: 10,
     type: "offensive",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        lives: baseStats.lives - 2
+      };
+    },
     activateActive: (
       k,
       data,
@@ -941,9 +978,16 @@ export const PLAYER_ABILITIES = {
     cooldownTime: 15000
   },
   bubble: {
-    passiveName: "Shelter",
+    passiveName: "So Many Bubbles",
     activeName: "Dispel",
     type: "defensive",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        numTilesModifier:
+          baseStats.numTilesModifier > 1 ? baseStats.numTilesModifier : 1
+      };
+    },
     activateActive: (
       k,
       data,
@@ -972,9 +1016,18 @@ export const PLAYER_ABILITIES = {
     cooldownTime: 8000
   },
   metal: {
-    passiveName: "Aegis Armor",
+    passiveName: "Builder",
     activeName: "Aegis",
     type: "defensive",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        numTilesModifier:
+          baseStats.numTilesModifier > 1 ? baseStats.numTilesModifier : 1,
+        tileCountModifier:
+          baseStats.tileCountModifier > 1 ? baseStats.tileCountModifier : 1
+      };
+    },
     activateActive: (
       k,
       data,
@@ -1005,7 +1058,8 @@ export const PLAYER_ABILITIES = {
   heart: {
     passiveName: "Good Vibes",
     activeName: "Heal",
-    type: "heal", // change this.
+    type: "heal",
+    activatePassive: baseStats => baseStats,
     activateActive: (
       k,
       data,
@@ -1051,7 +1105,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 10,
+        count: 20,
         statusKey: "isOnKaijuFire",
         numTiles: 3,
         setTileStatuses
@@ -1078,25 +1132,25 @@ export const PLAYER_CLASSES = [
   { elems: "Bubble,Death,Fire", class_name: "Dark Wizard" },
   { elems: "Bubble,Death,Glass", class_name: "Dark Fairy" },
   { elems: "Bubble,Death,Heart", class_name: "Wild Mage" },
-  { elems: "Bubble,Death,Ice", class_name: "Sorcerer" },
+  { elems: "Bubble,Death,Ice", class_name: "Dark Ice Fairy" },
   { elems: "Bubble,Death,Lightning", class_name: "Dark Wizard" },
   { elems: "Bubble,Death,Metal", class_name: "Undead Provisioner" },
   { elems: "Bubble,Death,Wood", class_name: "Undead Fairy" },
-  { elems: "Bubble,Fire,Glass", class_name: "High wizard" },
-  { elems: "Bubble,Fire,Heart", class_name: "Sorcerer" },
-  { elems: "Bubble,Fire,Ice", class_name: "Sorcerer" },
+  { elems: "Bubble,Fire,Glass", class_name: "High Wizard" },
+  { elems: "Bubble,Fire,Heart", class_name: "Fire Sorcerer" },
+  { elems: "Bubble,Fire,Ice", class_name: "War Wizard" },
   { elems: "Bubble,Fire,Lightning", class_name: "High Wizard" },
   { elems: "Bubble,Fire,Metal", class_name: "General" },
   { elems: "Bubble,Fire,Wood", class_name: "Charred Fairy" },
   { elems: "Bubble,Glass,Heart", class_name: "Light Fairy" },
-  { elems: "Bubble,Glass,Ice", class_name: "Escapist" },
+  { elems: "Bubble,Glass,Ice", class_name: "Slow Escapist" },
   { elems: "Bubble,Glass,Lightning", class_name: "High Wizard" },
   { elems: "Bubble,Glass,Metal", class_name: "Dispeller" },
   { elems: "Bubble,Glass,Wood", class_name: "Fairy" },
   { elems: "Bubble,Heart,Ice", class_name: "Alchemist" },
   { elems: "Bubble,Heart,Lightning", class_name: "Genie" },
   { elems: "Bubble,Heart,Metal", class_name: "Healer" },
-  { elems: "Bubble,Heart,Wood", class_name: "Druid" },
+  { elems: "Bubble,Heart,Wood", class_name: "Archdruid" },
   { elems: "Bubble,Ice,Lightning", class_name: "Fury" },
   { elems: "Bubble,Ice,Metal", class_name: "Cold King" },
   { elems: "Bubble,Ice,Wood", class_name: "Trapper" },
@@ -1104,7 +1158,7 @@ export const PLAYER_CLASSES = [
   { elems: "Bubble,Lightning,Wood", class_name: "Stormcaller" },
   { elems: "Bubble,Metal,Wood", class_name: "Scientist" },
   { elems: "Death,Fire,Glass", class_name: "Infernalist" },
-  { elems: "Death,Fire,Heart", class_name: "Sorcerer" },
+  { elems: "Death,Fire,Heart", class_name: "Chaos Sorcerer" },
   { elems: "Death,Fire,Ice", class_name: "Horseman" },
   { elems: "Death,Fire,Lightning", class_name: "Warlock" },
   { elems: "Death,Fire,Metal", class_name: "Death Knight" },
@@ -1115,14 +1169,14 @@ export const PLAYER_CLASSES = [
   { elems: "Death,Glass,Metal", class_name: "Death Knight" },
   { elems: "Death,Glass,Wood", class_name: "Grim Reaper" },
   { elems: "Death,Heart,Ice", class_name: "Ferryman" },
-  { elems: "Death,Heart,Lightning", class_name: "Sorcerer" },
+  { elems: "Death,Heart,Lightning", class_name: "Dark Sorcerer" },
   { elems: "Death,Heart,Metal", class_name: "Forsaken Paladin" },
-  { elems: "Death,Heart,Wood", class_name: "Shaman" },
+  { elems: "Death,Heart,Wood", class_name: "Undead Shaman" },
   { elems: "Death,Ice,Lightning", class_name: "Undead Pirate" },
   { elems: "Death,Ice,Metal", class_name: "Draugr" },
   { elems: "Death,Ice,Wood", class_name: "Undertaker" },
   { elems: "Death,Lightning,Metal", class_name: "Undead Archer" },
-  { elems: "Death,Lightning,Wood", class_name: "Shaman" },
+  { elems: "Death,Lightning,Wood", class_name: "Sky Shaman" },
   { elems: "Death,Metal,Wood", class_name: "Vale Knight" },
   { elems: "Fire,Glass,Heart", class_name: "Bard" },
   { elems: "Fire,Glass,Ice", class_name: "Wizard" },
@@ -1151,118 +1205,12 @@ export const PLAYER_CLASSES = [
   { elems: "Glass,Metal,Wood", class_name: "Gardener" },
   { elems: "Heart,Ice,Lightning", class_name: "Soothsayer" },
   { elems: "Heart,Ice,Metal", class_name: "Icy Architect" },
-  { elems: "Heart,Ice,Wood ", class_name: "edge Witch" },
+  { elems: "Heart,Ice,Wood ", class_name: "Hedge Witch" },
   { elems: "Heart,Lightning,Metal", class_name: "Enchanted Archer" },
-  { elems: "Heart,Lightning,Wood", class_name: "Druid" },
+  { elems: "Heart,Lightning,Wood", class_name: "Nurturing Druid" },
   { elems: "Heart,Metal,Wood", class_name: "Ranger" },
   { elems: "Ice,Lightning,Metal", class_name: "Stormcaller" },
-  { elems: "Ice,Lightning,Wood", class_name: "Druid" },
-  { elems: "Ice,Metal,Wood", class_name: "Ranger" },
-  { elems: "Lightning,Metal,Wood", class_name: "Ranger" }
+  { elems: "Ice,Lightning,Wood", class_name: "Vengeful Druid" },
+  { elems: "Ice,Metal,Wood", class_name: "Tundra Ranger" },
+  { elems: "Lightning,Metal,Wood", class_name: "Urban Ranger" }
 ];
-// bubble, death, fire, glass, heart, ice, lightning, metal, wood
-// export const PLAYER_CLASSES = [
-//   "Glass,Fire,Wood Charred Fairy",
-//   "Glass,Fire,Lightning Wizard",
-//   "Glass,Fire,Death Infernalist",
-//   "Glass,Fire,Bubble High wizard",
-//   "Glass,Fire,Metal Archon",
-//   "Glass,Fire,Ice Wizard",
-//   "Glass,Fire,Heart Bard",
-//   "Glass,Wood,Lightning Druid",
-//   "Glass,Wood,Death Grim Reaper",
-//   "Glass,Wood,Bubble Fairy",
-//   "Glass,Wood,Metal Gardener",
-//   "Glass,Wood,Ice Trapper",
-//   "Glass,Wood,Heart Sprite",
-//   "Glass,Lightning,Death Duelist",
-//   "Glass,Lightning,Bubble High Wizard",
-//   "Glass,Lightning,Metal Phalanx",
-//   "Glass,Lightning,Ice Weather Witch",
-//   "Glass,Lightning,Heart Valkyrie",
-//   "Glass,Death,Bubble Dark Fairy",
-//   "Glass,Death,Metal Death Knight",
-//   "Glass,Death,Ice Necromancer",
-//   "Glass,Death,Heart Psychopomp",
-//   "Glass,Bubble,Metal Dispeller",
-//   "Glass,Bubble,Ice Escapist",
-//   "Glass,Bubble,Heart Light Fairy",
-//   "Glass,Metal,Ice Sherpa",
-//   "Glass,Metal,Heart Cleric",
-//   "Glass,Ice,Heart Interloper",
-//   "Fire,Wood,Lightning Naturalist",
-//   "Fire,Wood,Death Unkempt Druid",
-//   "Fire,Wood,Bubble Charred Fairy",
-//   "Fire,Wood,Metal Blacksmith",
-//   "Fire,Wood,Ice Hag",
-//   "Fire,Wood,Heart Bard",
-//   "Fire,Lightning,Death Warlock",
-//   "Fire,Lightning,Bubble High Wizard",
-//   "Fire,Lightning,Metal Battlemage",
-//   "Fire,Lightning,Ice Elementalist",
-//   "Fire,Lightning,Heart Shaman",
-//   "Fire,Death,Bubble Dark Wizard",
-//   "Fire,Death,Metal Death Knight",
-//   "Fire,Death,Ice Horseman",
-//   "Fire,Death,Heart Sorcerer",
-//   "Fire,Bubble,Metal General",
-//   "Fire,Bubble,Ice Sorcerer",
-//   "Fire,Bubble,Heart Sorcerer",
-//   "Fire,Metal,Ice Enchanter",
-//   "Fire,Metal,Heart Crusader",
-//   "Fire,Ice,Heart Sorcerer",
-//   "Wood,Lightning,Death Shaman",
-//   "Wood,Lightning,Bubble Stormcaller",
-//   "Wood,Lightning,Metal Ranger",
-//   "Wood,Lightning,Ice Druid",
-//   "Wood,Lightning,Heart Druid",
-//   "Wood,Death,Bubble Undead Fairy",
-//   "Wood,Death,Metal Vale Knight",
-//   "Wood,Death,Ice Undertaker",
-//   "Wood,Death,Heart Shaman",
-//   "Wood,Bubble,Metal Scientist",
-//   "Wood,Bubble,Ice Trapper",
-//   "Wood,Bubble,Heart Druid",
-//   "Wood,Metal,Ice Ranger",
-//   "Wood,Metal,Heart Ranger",
-//   "Wood,Ice,Heart Hedge Witch",
-//   "Lightning,Death,Bubble Dark Wizard",
-//   "Lightning,Death,Metal Undead Archer",
-//   "Lightning,Death,Ice Undead Pirate",
-//   "Lightning,Death,Heart Sorcerer",
-//   "Lightning,Bubble,Metal Elemental Archer",
-//   "Lightning,Bubble,Ice Fury",
-//   "Lightning,Bubble,Heart Genie",
-//   "Lightning,Metal,Ice Stormcaller",
-//   "Lightning,Metal,Heart Enchanted Archer",
-//   "Lightning,Ice,Heart Soothsayer",
-//   "Death,Bubble,Metal Undead Provisioner",
-//   "Death,Bubble,Ice Sorcerer",
-//   "Death,Bubble,Heart Wild Mage",
-//   "Death,Metal,Ice Draugr",
-//   "Death,Metal,Heart Forsaken Paladin",
-//   "Death,Ice,Heart Ferryman",
-//   "Bubble,Metal,Ice Cold King",
-//   "Bubble,Metal,Heart Healer",
-//   "Bubble,Ice,Heart Alchemist",
-//   "Metal,Ice,Heart Icy Architect"
-// ];
-
-/*
-stats that can be increased / decreased:
-moveSpeed,
-tilecount,
-numTiles,
-lives,
-inManaPool status
-
-PASSIVES:
-glass -> random teleport away instead of [ dmg / lives-- ]
-fire -> "fuel", all power count++
-wood -> lives++
-lightning -> moveSpeed
-death -> lives++ (upon enemy death?)
-bubble -> "eightball" random chance of triggering "inManaPool" status on loss of life.
-metal ->
-ice -> "cold shoulder" chance of ignoring a successful kaiju's attack (do not take dmg).
-*/

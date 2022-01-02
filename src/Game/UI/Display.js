@@ -8,6 +8,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: playerIndex === 1 ? "Your teammate" : "You",
         description: "",
+        effect1: "",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -23,69 +25,8 @@ const getDescription = (string, playerData, playerIndex) => {
               : `Class: ${playerData[playerIndex].playerClass}`
             : "",
         description: "",
-        img: "",
-        formatData: {}
-      };
-      break;
-    case "kaijuDeath":
-      return {
-        title: "Giant Mantis",
-        description:
-          "A giant, albino preying mantis with crimson eyes. Its scythes rend human souls from their flesh.",
-        img: "",
-        formatData: {}
-      };
-      break;
-    case "kaijuBubble":
-      return {
-        title: "Blimpy",
-        description: "A parade float.",
-        effect: "Enchants all who see it, to their deaths!",
-        img: "",
-        formatData: {}
-      };
-      break;
-    case "kaijuFire":
-      return {
-        title: "Not-Godzilla",
-        description: "It's not Godzilla.",
-        effect: "Enchants all who see it, to their deaths!",
-        img: "",
-        formatData: {}
-      };
-      break;
-    case "kaijuGlass":
-      return {
-        title: "Not-Mothra",
-        description: "A giant moth that is not Mothra.",
-        effect: "Enchants all who see it, to their deaths!",
-        img: "",
-        formatData: {}
-      };
-      break;
-    case "kaijuWood":
-      return {
-        title: "Kudzu",
-        description: "A giant, ivy-covered python.",
-        effect: "Enchants all who see it, to their deaths!",
-        img: "",
-        formatData: {}
-      };
-      break;
-    case "kaijuLightning":
-      return {
-        title: "Gargantula",
-        description: "A giant tarantula that attacks with lightning speed.",
-        effect: "Enchants all who see it, to their deaths!",
-        img: "",
-        formatData: {}
-      };
-      break;
-    case "kaijuMetal":
-      return {
-        title: "Mechatron",
-        description: "A giant mech. Wasn't it suppoed to be on our side?",
-        effect: "Enchants all who see it, to their deaths!",
+        effect1: "",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -94,7 +35,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Heal",
         description: "Heal your teammate up to maximum health.",
-        effect: "Heal will follow its target between tiles.",
+        effect1: "Heal will follow its target between tiles.",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -103,17 +45,18 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Good Vibes",
         description: "You send out good vibes.",
-        effect: "",
+        effect1: "",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityMetalPassive":
       return {
-        title: "Aegis Armor",
-        description:
-          "Fashion armor out of nearby cars, street signs, and street lights.",
-        effect: "TBD",
+        title: "Builder",
+        description: "Your magic is larger, goes farther, and lasts longer.",
+        effect1: "+1 number of tiles modifier",
+        effect2: "+1 tile count modifier",
         img: "",
         formatData: {}
       };
@@ -123,36 +66,38 @@ const getDescription = (string, playerData, playerIndex) => {
         title: "Aegis",
         description:
           "Create a large area of protection around you. Blocking many ranged attacks.",
-        effect: "Status remains on the tile until walked on.",
+        effect1: "Status remains on the tile until walked on.",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityGlassPassive":
       return {
-        title: "Shatter Shot",
-        description:
-          "Shoot out street lights to curve your bullets around them.",
-        effect: "TBD",
+        title: "Teleport Sickness",
+        description: "Zipping through space-time makes you nauseous.",
+        effect1: "-2 to move speed",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityGlassActive":
       return {
-        title: "Teleport",
-        description: "Travel instantly to your desired location.",
-        effect:
-          "Select a hexagon to travel to and then activate the ability to teleport.",
+        title: "Escape",
+        description: "Instantly travel to a safe tile.",
+        effect1: "",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityIcePassive":
       return {
-        title: "Cold Shoulder",
-        description: "Your shoulders are cold and all feel your chill.",
-        effect: "TBD",
+        title: "Inclement Weather",
+        description: "The forecast calls for snow.",
+        effect1: "-1 to move speed",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -160,28 +105,30 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityIceActive":
       return {
         title: "Ice Slice",
-        description: "Conjure a stationary vortex of ice",
-        effect:
+        description: "Conjure a stationary vortex of ice.",
+        effect1:
           "Enemies are only damaged if standing on the periphery of the vortex.",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityFirePassive":
       return {
-        title: "Campfire",
-        description:
-          "A warm glow emanates from you. A flame burns in your palm.",
-        effect: "TBD",
+        title: "Fuel to Burn",
+        description: "All of your magic goes farther and lasts longer.",
+        effect1: "+1 tile count modifier",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityFireActive":
       return {
-        title: "Brush Fire",
+        title: "Wildfire",
         description: "Fire travels in the direction of your closest enemy.",
-        effect: "Creates a single, lateral line of fire.",
+        effect1: "Creates a single, lateral line of fire.",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -190,7 +137,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Crunchy Granola",
         description: "You're extra healthy.",
-        effect: "+1 max lives.",
+        effect1: "+2 to starting lives.",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -200,7 +148,8 @@ const getDescription = (string, playerData, playerIndex) => {
         title: "Overgrowth",
         description:
           "Poison ivy travels in the direction of your closest enemy.",
-        effect: "Status remains on the tile until walked on.",
+        effect1: "Status remains on the tile until walked on.",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -209,7 +158,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Charged Step",
         description: "Electrical energy courses through your body.",
-        effect: "+7 to move speed.",
+        effect1: "+4 to move speed",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -219,16 +169,18 @@ const getDescription = (string, playerData, playerIndex) => {
         title: "Discharge",
         description:
           "Cast 3 bolts of lightning in the direction of your closest enemy.",
-        effect: "Bolts travel forward and diagonally from point of cast.",
+        effect1: "Bolts travel forward and diagonally from point of cast.",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityDeathPassive":
       return {
-        title: "Reaper",
-        description: "Harvest any souls trying to pass on.",
-        effect: "Gain an extra life every time your opponent dies.",
+        title: "One Foot in the Grave",
+        description: "Communing with death has brought you closer to it...",
+        effect1: "-2 to starting health",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -237,16 +189,19 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Haunt",
         description: "Shoot a ghost at your closest enemy.",
-        effect: "Ghost will follow your enemy between tiles.",
+        effect1: "Ghost will follow the enemy between tiles.",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "abilityBubblePassive":
       return {
-        title: "Shelter",
-        description: "A giant bubble surrounds you.",
-        effect: "TBD",
+        title: "So Many Bubbles",
+        description:
+          "Dispelling magic has taught you how to increase the effectiveness of your own.",
+        effect1: "+1 number of tiles modifier",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -255,16 +210,18 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Dispel",
         description: "Send out bubbles to dispel all tile effects in the area.",
-        effect: "Will clear both positive and negative tile statuses.",
+        effect1: "Will clear both positive and negative tile statuses.",
+        effect2: "",
         img: "",
         formatData: {}
       };
       break;
     case "healthBar":
       return {
-        title: "Life",
-        description: "You're healthbar.",
-        effect: "If your life reaches 0, it's gameover.",
+        title: "Health Bar",
+        description: "You're health bar.",
+        effect1: "",
+        effect2: "",
         img: "",
         formatData: {}
       };
@@ -298,7 +255,14 @@ export const Display = ({
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
   // console.log(_string, playerIndex);
-  const { title, description, effect, img, formatData } = (displayString &&
+  const {
+    title,
+    description,
+    effect1,
+    effect2,
+    img,
+    formatData
+  } = (displayString &&
     getDescription(_string, playerData, Number(playerIndex))) || {
     title: "",
     description: "",
@@ -309,7 +273,8 @@ export const Display = ({
     <Wrapper>
       <h2>{title}</h2>
       <p>{description}</p>
-      <p>{effect}</p>
+      <p>{effect1}</p>
+      <p>{effect2}</p>
       <img src={img} />
     </Wrapper>
   );
