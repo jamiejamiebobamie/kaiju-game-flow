@@ -92,7 +92,9 @@ export const initializeGameBoard = (
       abilityCooldowns: [],
       numTilesModifier: 0,
       tileCountModifier: 0,
-      playerClass: playerClassObj && playerClassObj.class_name
+      playerClass: playerClassObj && playerClassObj.class_name,
+      playerClassDescription:
+        playerClassObj && playerClassObj.player_class_description
     };
     console.log(k, abilities, baseStats);
     const newPlayer = {

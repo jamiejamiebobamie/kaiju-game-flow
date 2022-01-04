@@ -1129,88 +1129,472 @@ export const DEATH_TILE_STATUSES = [
   "isCold"
 ];
 export const PLAYER_CLASSES = [
-  { elems: "Bubble,Death,Fire", class_name: "Dark Wizard" },
-  { elems: "Bubble,Death,Glass", class_name: "Dark Fairy" },
-  { elems: "Bubble,Death,Heart", class_name: "Wild Mage" },
-  { elems: "Bubble,Death,Ice", class_name: "Dark Ice Fairy" },
-  { elems: "Bubble,Death,Lightning", class_name: "Dark Wizard" },
-  { elems: "Bubble,Death,Metal", class_name: "Undead Provisioner" },
-  { elems: "Bubble,Death,Wood", class_name: "Undead Fairy" },
-  { elems: "Bubble,Fire,Glass", class_name: "High Wizard" },
-  { elems: "Bubble,Fire,Heart", class_name: "Fire Sorcerer" },
-  { elems: "Bubble,Fire,Ice", class_name: "War Wizard" },
-  { elems: "Bubble,Fire,Lightning", class_name: "High Wizard" },
-  { elems: "Bubble,Fire,Metal", class_name: "General" },
-  { elems: "Bubble,Fire,Wood", class_name: "Charred Fairy" },
-  { elems: "Bubble,Glass,Heart", class_name: "Light Fairy" },
-  { elems: "Bubble,Glass,Ice", class_name: "Slow Escapist" },
-  { elems: "Bubble,Glass,Lightning", class_name: "High Wizard" },
-  { elems: "Bubble,Glass,Metal", class_name: "Dispeller" },
-  { elems: "Bubble,Glass,Wood", class_name: "Fairy" },
-  { elems: "Bubble,Heart,Ice", class_name: "Alchemist" },
-  { elems: "Bubble,Heart,Lightning", class_name: "Genie" },
-  { elems: "Bubble,Heart,Metal", class_name: "Healer" },
-  { elems: "Bubble,Heart,Wood", class_name: "Archdruid" },
-  { elems: "Bubble,Ice,Lightning", class_name: "Fury" },
-  { elems: "Bubble,Ice,Metal", class_name: "Cold King" },
-  { elems: "Bubble,Ice,Wood", class_name: "Trapper" },
-  { elems: "Bubble,Lightning,Metal", class_name: "Elemental Archer" },
-  { elems: "Bubble,Lightning,Wood", class_name: "Stormcaller" },
-  { elems: "Bubble,Metal,Wood", class_name: "Scientist" },
-  { elems: "Death,Fire,Glass", class_name: "Infernalist" },
-  { elems: "Death,Fire,Heart", class_name: "Chaos Sorcerer" },
-  { elems: "Death,Fire,Ice", class_name: "Horseman" },
-  { elems: "Death,Fire,Lightning", class_name: "Warlock" },
-  { elems: "Death,Fire,Metal", class_name: "Death Knight" },
-  { elems: "Death,Fire,Wood", class_name: "Unkempt Druid" },
-  { elems: "Death,Glass,Heart", class_name: "Psychopomp" },
-  { elems: "Death,Glass,Ice", class_name: "Necromancer" },
-  { elems: "Death,Glass,Lightning", class_name: "Duelist" },
-  { elems: "Death,Glass,Metal", class_name: "Death Knight" },
-  { elems: "Death,Glass,Wood", class_name: "Grim Reaper" },
-  { elems: "Death,Heart,Ice", class_name: "Ferryman" },
-  { elems: "Death,Heart,Lightning", class_name: "Dark Sorcerer" },
-  { elems: "Death,Heart,Metal", class_name: "Forsaken Paladin" },
-  { elems: "Death,Heart,Wood", class_name: "Undead Shaman" },
-  { elems: "Death,Ice,Lightning", class_name: "Undead Pirate" },
-  { elems: "Death,Ice,Metal", class_name: "Draugr" },
-  { elems: "Death,Ice,Wood", class_name: "Undertaker" },
-  { elems: "Death,Lightning,Metal", class_name: "Undead Archer" },
-  { elems: "Death,Lightning,Wood", class_name: "Sky Shaman" },
-  { elems: "Death,Metal,Wood", class_name: "Vale Knight" },
-  { elems: "Fire,Glass,Heart", class_name: "Bard" },
-  { elems: "Fire,Glass,Ice", class_name: "Wizard" },
-  { elems: "Fire,Glass,Lightning", class_name: "Wizard" },
-  { elems: "Fire,Glass,Metal", class_name: "Archon" },
-  { elems: "Fire,Glass,Wood", class_name: "Charred Fairy" },
-  { elems: "Fire,Heart,Ice", class_name: "Sorcerer" },
-  { elems: "Fire,Heart,Lightning", class_name: "Shaman" },
-  { elems: "Fire,Heart,Metal", class_name: "Crusader" },
-  { elems: "Fire,Heart,Wood", class_name: "Bard" },
-  { elems: "Fire,Ice,Lightning", class_name: "Elementalist" },
-  { elems: "Fire,Ice,Metal", class_name: "Enchanter" },
-  { elems: "Fire,Ice,Wood", class_name: "Hag" },
-  { elems: "Fire,Lightning,Metal", class_name: "Battlemage" },
-  { elems: "Fire,Lightning,Wood", class_name: "Naturalist" },
-  { elems: "Fire,Metal,Wood", class_name: "Blacksmith" },
-  { elems: "Glass,Heart,Ice", class_name: "Interloper" },
-  { elems: "Glass,Heart,Lightning", class_name: "Valkyrie" },
-  { elems: "Glass,Heart,Metal", class_name: "Cleric" },
-  { elems: "Glass,Heart,Wood", class_name: "Sprite" },
-  { elems: "Glass,Ice,Lightning", class_name: "Weather Witch" },
-  { elems: "Glass,Ice,Metal", class_name: "Sherpa" },
-  { elems: "Glass,Ice,Wood", class_name: "Trapper" },
-  { elems: "Glass,Lightning,Metal", class_name: "Phalanx" },
-  { elems: "Glass,Lightning,Wood", class_name: "Druid" },
-  { elems: "Glass,Metal,Wood", class_name: "Gardener" },
-  { elems: "Heart,Ice,Lightning", class_name: "Soothsayer" },
-  { elems: "Heart,Ice,Metal", class_name: "Icy Settler" },
-  { elems: "Heart,Ice,Wood ", class_name: "Hedge Witch" },
-  { elems: "Heart,Lightning,Metal", class_name: "Enchanted Archer" },
-  { elems: "Heart,Lightning,Wood", class_name: "Nurturing Druid" },
-  { elems: "Heart,Metal,Wood", class_name: "Ranger" },
-  { elems: "Ice,Lightning,Metal", class_name: "Stormcaller" },
-  { elems: "Ice,Lightning,Wood", class_name: "Vengeful Druid" },
-  { elems: "Ice,Metal,Wood", class_name: "Tundra Ranger" },
-  { elems: "Lightning,Metal,Wood", class_name: "Urban Ranger" }
+  {
+    elems: "Bubble,Death,Fire",
+    class_name: "Dark Wizard",
+    player_class_description:
+      "You know fire and death magic and can dispell the magic of others. Some say you make deals with devils, but you will not tell!"
+  },
+  {
+    elems: "Bubble,Death,Glass",
+    class_name: "Dark Fairy",
+    player_class_description:
+      "You hail from the forest and send the souls of those you've killed after your enemies, disappearing from sight and dispelling any magic when threatened."
+  },
+  {
+    elems: "Bubble,Death,Heart",
+    class_name: "Wild Mage",
+    player_class_description:
+      "Your magic deals with life and death ...and bubbles? You're wild, baby!"
+  },
+  {
+    elems: "Bubble,Death,Ice",
+    class_name: "Dark Ice Fairy",
+    player_class_description:
+      "You hail from the frosty climbs of the northern moutains. You rain ice and death down on your enemies."
+  },
+  {
+    elems: "Bubble,Death,Lightning",
+    class_name: "Dark Wizard",
+    player_class_description:
+      "You know lightning and death magic and can dispell the magic of others. Some say you make deals with devils, but you will not tell!"
+  },
+  {
+    elems: "Bubble,Death,Metal",
+    class_name: "Undead Provisioner",
+    player_class_description:
+      "Even armies of the dead need provisions, like rotting meat and calcified cartilage. You can set-up barriers and dismantle them at a moments notice."
+  },
+  {
+    elems: "Bubble,Death,Wood",
+    class_name: "Undead Fairy",
+    player_class_description:
+      "You were a fairy and then you died. Now you're an undead fairy. What else did you need to know?"
+  },
+  {
+    elems: "Bubble,Fire,Glass",
+    class_name: "High Wizard",
+    player_class_description:
+      "Your magic is of the highest caliber. None may cross you."
+  },
+  {
+    elems: "Bubble,Fire,Heart",
+    class_name: "Fire Sorcerer",
+    player_class_description:
+      "Pyromaniac, anyone? At least you can heal any allies that get burnt too."
+  },
+  {
+    elems: "Bubble,Fire,Ice",
+    class_name: "War Wizard",
+    player_class_description: "You were made for war."
+  },
+  {
+    elems: "Bubble,Fire,Lightning",
+    class_name: "High Wizard",
+    player_class_description:
+      "Your magic is of the highest caliber. None may cross you."
+  },
+  {
+    elems: "Bubble,Fire,Metal",
+    class_name: "General",
+    player_class_description:
+      "You command... no one, but yourself. A master of fire and metal. You've got gumption and grit, and bubbles too. Are you ready soldier?"
+  },
+  {
+    elems: "Bubble,Fire,Wood",
+    class_name: "Charred Fairy",
+    player_class_description:
+      "Your forest burnt down and charred your pretty face. Now someone's gonna pay!"
+  },
+  {
+    elems: "Bubble,Glass,Heart",
+    class_name: "Light Fairy",
+    player_class_description: "You're one of the good ones."
+  },
+  {
+    elems: "Bubble,Glass,Ice",
+    class_name: "Slow Escapist",
+    player_class_description:
+      "Master of setting traps and running away. Bet you wish you were a bit faster though?"
+  },
+  {
+    elems: "Bubble,Glass,Lightning",
+    class_name: "High Wizard",
+    player_class_description:
+      "Your magic is of the highest caliber. None may cross you."
+  },
+  {
+    elems: "Bubble,Glass,Metal",
+    class_name: "Dispeller",
+    player_class_description:
+      "Full defensive build, eh? Hopefully your teammate can throw a fireball..."
+  },
+  {
+    elems: "Bubble,Glass,Wood",
+    class_name: "Fairy",
+    player_class_description: "Just a plain fairy. Nothing to see here..."
+  },
+  {
+    elems: "Bubble,Heart,Ice",
+    class_name: "Alchemist",
+    player_class_description:
+      "You build potions of healing and traps made of ice. And blow bubbles made of soap."
+  },
+  {
+    elems: "Bubble,Heart,Lightning",
+    class_name: "Genie",
+    player_class_description: "Will all your wishes be granted?"
+  },
+  {
+    elems: "Bubble,Heart,Metal",
+    class_name: "Healer",
+    player_class_description:
+      "Full defensive build, eh? Hopefully your teammate can throw a fireball..."
+  },
+  {
+    elems: "Bubble,Heart,Wood",
+    class_name: "Archdruid",
+    player_class_description:
+      "You're a druid with a title. Don't get snooty about it."
+  },
+  {
+    elems: "Bubble,Ice,Lightning",
+    class_name: "Fury",
+    player_class_description: "An Amazonian weather witch."
+  },
+  {
+    elems: "Bubble,Ice,Metal",
+    class_name: "Cold King",
+    player_class_description: "You rule an icy throne."
+  },
+  {
+    elems: "Bubble,Ice,Wood",
+    class_name: "Trapper",
+    player_class_description:
+      "Master of setting traps and running away. Bet you wish you were a bit faster though?"
+  },
+  {
+    elems: "Bubble,Lightning,Metal",
+    class_name: "Elemental Archer",
+    player_class_description:
+      "Your elemental arrows fly in all directions. Watch out!"
+  },
+  {
+    elems: "Bubble,Lightning,Wood",
+    class_name: "Stormcaller",
+    player_class_description: "You call the storms, but do they pick up?"
+  },
+  {
+    elems: "Bubble,Metal,Wood",
+    class_name: "Scientist",
+    player_class_description:
+      "You bend the artifical and the natural to your will!"
+  },
+  {
+    elems: "Death,Fire,Glass",
+    class_name: "Infernalist",
+    player_class_description: "Deals with devils? Yikes."
+  },
+  {
+    elems: "Death,Fire,Heart",
+    class_name: "Chaos Sorcerer",
+    player_class_description:
+      "You kiss boo-boos as much as you cause them. It's great to be chaotic neutral, amiright?"
+  },
+  {
+    elems: "Death,Fire,Ice",
+    class_name: "Horseman",
+    player_class_description: "Horseman of what? Can you be more specific?"
+  },
+  {
+    elems: "Death,Fire,Lightning",
+    class_name: "Warlock",
+    player_class_description: "Deals with devils? Yikes."
+  },
+  {
+    elems: "Death,Fire,Metal",
+    class_name: "Death Knight",
+    player_class_description: "A necromantic knight? Chivalry truly is dead."
+  },
+  {
+    elems: "Death,Fire,Wood",
+    class_name: "Unkempt Druid",
+    player_class_description:
+      "Sacrifical druids who kill those who cross nature? What happened to koombyah?"
+  },
+  {
+    elems: "Death,Glass,Heart",
+    class_name: "Psychopomp",
+    player_class_description:
+      "You travel between life and death, bringing messages between the two."
+  },
+  {
+    elems: "Death,Glass,Ice",
+    class_name: "Necromancer",
+    player_class_description: "Standard bastard."
+  },
+  {
+    elems: "Death,Glass,Lightning",
+    class_name: "Duelist",
+    player_class_description: "Ready for a fight."
+  },
+  {
+    elems: "Death,Glass,Metal",
+    class_name: "Death Knight",
+    player_class_description: "A necromantic knight? Chivalry truly is dead."
+  },
+  {
+    elems: "Death,Glass,Wood",
+    class_name: "Grim Reaper",
+    player_class_description:
+      "Not the real grim reaper, but your enemies can't tell the difference."
+  },
+  {
+    elems: "Death,Heart,Ice",
+    class_name: "Ferryman",
+    player_class_description: "Never met such a spooky boatman."
+  },
+  {
+    elems: "Death,Heart,Lightning",
+    class_name: "Dark Sorcerer",
+    player_class_description:
+      "For such a spooky personage, you certainly send a lot of love."
+  },
+  {
+    elems: "Death,Heart,Metal",
+    class_name: "Forsaken Paladin",
+    player_class_description:
+      "You were a good guy and then something happened? Dramaa!!"
+  },
+  {
+    elems: "Death,Heart,Wood",
+    class_name: "Undead Shaman",
+    player_class_description:
+      "You were a shaman and then you died and now you still are."
+  },
+  {
+    elems: "Death,Ice,Lightning",
+    class_name: "Undead Pirate",
+    player_class_description:
+      "You were a pirate and then you died and now you still are."
+  },
+  {
+    elems: "Death,Ice,Metal",
+    class_name: "Draugr",
+    player_class_description: "An icy undead warrior."
+  },
+  {
+    elems: "Death,Ice,Wood",
+    class_name: "Undertaker",
+    player_class_description: 'Some might say you\'re a real "Cememtary Man".'
+  },
+  {
+    elems: "Death,Lightning,Metal",
+    class_name: "Undead Archer",
+    player_class_description: "You were an archer and now you still are."
+  },
+  {
+    elems: "Death,Lightning,Wood",
+    class_name: "Sky Shaman",
+    player_class_description: "You priase the sky and draw powet from it."
+  },
+  {
+    elems: "Death,Metal,Wood",
+    class_name: "Vale Knight",
+    player_class_description: "You protect the land you were born on."
+  },
+  {
+    elems: "Fire,Glass,Heart",
+    class_name: "Bard",
+    player_class_description:
+      "Warmth and good cheer is all you share, that and cowardice. No one is better than at running away."
+  },
+  {
+    elems: "Fire,Glass,Ice",
+    class_name: "Wizard",
+    player_class_description: "You're a standard wizard. Pew pew."
+  },
+  {
+    elems: "Fire,Glass,Lightning",
+    class_name: "Wizard",
+    player_class_description:
+      "You're a standard wizard. 5 fire dmg, 5 fire dmg."
+  },
+  {
+    elems: "Fire,Glass,Metal",
+    class_name: "Archon",
+    player_class_description:
+      "You're one of the heavenly choir. A seraphim of fire, wielding a flamed sword and wreathed in fiery wings!"
+  },
+  {
+    elems: "Fire,Glass,Wood",
+    class_name: "Charred Fairy",
+    player_class_description:
+      "Your forest burnt down and charred your pretty face. Now someone's gonna pay!"
+  },
+  {
+    elems: "Fire,Heart,Ice",
+    class_name: "Sorcerer",
+    player_class_description: "You're a standard sorcerer."
+  },
+  {
+    elems: "Fire,Heart,Lightning",
+    class_name: "Shaman",
+    player_class_description: "You're a standard shaman."
+  },
+  {
+    elems: "Fire,Heart,Metal",
+    class_name: "Crusader",
+    player_class_description: "You're a standard crusader. For God's glory!"
+  },
+  {
+    elems: "Fire,Heart,Wood",
+    class_name: "Bard",
+    player_class_description:
+      "Warmth and good cheer is all you share, that and wood. You're good at growing wood."
+  },
+  {
+    elems: "Fire,Ice,Lightning",
+    class_name: "Elementalist",
+    player_class_description:
+      "They said you should just pick one. That you couldn't possibly master them all, but you did! Muahaha!"
+  },
+  {
+    elems: "Fire,Ice,Metal",
+    class_name: "Enchanter",
+    player_class_description:
+      "You build shields and barriers and lay down ice and fire like you got some real sore muscles."
+  },
+  {
+    elems: "Fire,Ice,Wood",
+    class_name: "Hag",
+    player_class_description: "Scary lady. You make a mean stew though."
+  },
+  {
+    elems: "Fire,Lightning,Metal",
+    class_name: "Battlemage",
+    player_class_description: "You were made for battle."
+  },
+  {
+    elems: "Fire,Lightning,Wood",
+    class_name: "Naturalist",
+    player_class_description: "Not a nudist!"
+  },
+  {
+    elems: "Fire,Metal,Wood",
+    class_name: "Blacksmith",
+    player_class_description:
+      "You use metal and wood and fire to shape the battlefield into your glorious creation!"
+  },
+  {
+    elems: "Glass,Heart,Ice",
+    class_name: "Interloper",
+    player_class_description:
+      "You insert yourself into battle for a moment cast a spell or two and then promptly run away. Rinse and repeat."
+  },
+  {
+    elems: "Glass,Heart,Lightning",
+    class_name: "Valkyrie",
+    player_class_description: "Sheild-maiden of Valahala! I salute you!"
+  },
+  {
+    elems: "Glass,Heart,Metal",
+    class_name: "Cleric",
+    player_class_description:
+      "Full defensive build, eh? Hopefully your teammate can throw a fireball..."
+  },
+  {
+    elems: "Glass,Heart,Wood",
+    class_name: "Sprite",
+    player_class_description:
+      "You're kind of like a fairy, but with a different name."
+  },
+  {
+    elems: "Glass,Ice,Lightning",
+    class_name: "Weather Witch",
+    player_class_description:
+      "Whether far aay or close up, weather witches always have a spell up their sleeve."
+  },
+  {
+    elems: "Glass,Ice,Metal",
+    class_name: "Sherpa",
+    player_class_description:
+      "You guide wayward travelers with love and built structures. And if something really goes awry, you always know the secret routes of escape."
+  },
+  {
+    elems: "Glass,Ice,Wood",
+    class_name: "Trapper",
+    player_class_description:
+      "Master of setting traps and running away. Bet you wish you were a bit faster though?"
+  },
+  {
+    elems: "Glass,Lightning,Metal",
+    class_name: "Phalanx",
+    player_class_description:
+      "Build barriers, attack through them, disappear in a blink of an eye. No one is getting through your defense."
+  },
+  {
+    elems: "Glass,Lightning,Wood",
+    class_name: "Druid",
+    player_class_description: "Just a standard druid."
+  },
+  {
+    elems: "Glass,Metal,Wood",
+    class_name: "Gardener",
+    player_class_description:
+      "You plant organized areas of growth on the battlefield, shaping the landscape to your green thumb's curve."
+  },
+  {
+    elems: "Heart,Ice,Lightning",
+    class_name: "Soothsayer",
+    player_class_description: "Do you really use bones to predict the future?"
+  },
+  {
+    elems: "Heart,Ice,Metal",
+    class_name: "Icy Settler",
+    player_class_description:
+      "You were built for icy endeavours across the arctic."
+  },
+  {
+    elems: "Heart,Ice,Wood ",
+    class_name: "Hedge Witch",
+    player_class_description:
+      "Your magic is as wild as nature, but you have a good heart."
+  },
+  {
+    elems: "Heart,Lightning,Metal",
+    class_name: "Enchanted Archer",
+    player_class_description: "Like all the other archers."
+  },
+  {
+    elems: "Heart,Lightning,Wood",
+    class_name: "Nurturing Druid",
+    player_class_description:
+      "You take the peace, love, and nature thing to its extreme."
+  },
+  {
+    elems: "Heart,Metal,Wood",
+    class_name: "Ranger",
+    player_class_description: "Strider? The ranger?"
+  },
+  {
+    elems: "Ice,Lightning,Metal",
+    class_name: "Stormcaller",
+    player_class_description: "You call the storms, but do they pick up?"
+  },
+  {
+    elems: "Ice,Lightning,Wood",
+    class_name: "Vengeful Druid",
+    player_class_description: "What girl kicked your hornet's nest? Jeez."
+  },
+  {
+    elems: "Ice,Metal,Wood",
+    class_name: "Tundra Ranger",
+    player_class_description: "A ranger, only colder."
+  },
+  {
+    elems: "Lightning,Metal,Wood",
+    class_name: "Urban Ranger",
+    player_class_description: "Only you can pull of urban camo. Congrats."
+  }
 ];

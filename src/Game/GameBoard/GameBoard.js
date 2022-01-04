@@ -102,8 +102,8 @@ export const GameBoard = ({
         {kaiju}
         {players}
       </ShiftContentOver>
-      <TestMoon className="fa fa-moon-o" />
       <BackgroundImage src={"test_map.png"} />
     </Board>
   );
 };
+// <TestMoon className="fa fa-moon-o" />

@@ -19,12 +19,13 @@ const getDescription = (string, playerData, playerIndex) => {
         title:
           playerData &&
           playerData[playerIndex] &&
-          playerData[playerIndex].playerClass
-            ? playerIndex === 1
-              ? `Class: ${playerData[playerIndex].playerClass}`
-              : `Class: ${playerData[playerIndex].playerClass}`
-            : "",
-        description: "",
+          playerData[playerIndex].playerClass &&
+          `Class: ${playerData[playerIndex].playerClass}`,
+        description:
+          playerData &&
+          playerData[playerIndex] &&
+          playerData[playerIndex].playerClassDescription &&
+          playerData[playerIndex].playerClassDescription,
         effect1: "",
         effect2: "",
         img: "",
