@@ -52,13 +52,14 @@ export const Game = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
   const [kaijuKillCount, setKaijuKillCount] = useState([]);
-  const [intervalTime, setIntervalTime] = useState(100);
+  const [intervalTime, setIntervalTime] = useState(1);
   const [playerData, setPlayerData] = useState([]);
   const [teleportData, setTeleportData] = useState([]);
   const [powerUpData, setPowerUpData] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
-  const [highlightedTiles, setHighlightedTiles] = useState([]);
+  const [highlightedTiles0, setHighlightedTiles0] = useState([]);
+  const [highlightedTiles1, setHighlightedTiles1] = useState([]);
   const [tiles, setTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
@@ -123,17 +124,27 @@ export const Game = () => {
       setPlayerMoveToTiles(null);
     }
   }, [playerMoveToTiles]);
-  useEffect(() => console.log(teleportData), [teleportData]);
   useInterval(() => {
     updateHighlightedTiles(
-      setHighlightedTiles,
+      setHighlightedTiles0,
       playerData,
       hoverLookupString,
       path,
       setPath,
-      scale
+      scale,
+      0
     );
-    if (shouldUpdate(accTime.current, 400))
+    if (playerData && playerData[1] && playerData[1].lives)
+      updateHighlightedTiles(
+        setHighlightedTiles1,
+        playerData,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        1
+      );
+    if (shouldUpdate(accTime.current, 2))
       updateTileState(
         playerData,
         kaijuData,
@@ -144,21 +155,23 @@ export const Game = () => {
         scale,
         accTime.current
       );
-    if (shouldUpdate(accTime.current, 300))
-      redrawTiles(
-        highlightedTiles,
-        setHoverRef,
-        setClickedTile,
-        setTiles,
-        playerData,
-        kaijuData,
-        tileStatuses,
-        setTileStatuses,
-        width,
-        height,
-        scale
-      );
+    // if (shouldUpdate(accTime.current, 100))
+    redrawTiles(
+      highlightedTiles0,
+      highlightedTiles1,
+      setHoverRef,
+      setClickedTile,
+      setTiles,
+      playerData,
+      kaijuData,
+      tileStatuses,
+      setTileStatuses,
+      width,
+      height,
+      scale
+    );
     // move players
+    // if (shouldUpdate(accTime.current, 25))
     movePiece(
       playerData,
       setPlayerData,
@@ -174,6 +187,7 @@ export const Game = () => {
       setTeleportData
     );
     // move monsters
+    // if (shouldUpdate(accTime.current, 200))
     movePiece(
       kaijuData,
       setKaijuData,

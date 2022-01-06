@@ -38,7 +38,11 @@ const Image = styled.div`
   -o-transform: rotate(-60deg);
   transform: rotate(-60deg);
   ${props =>
-    props.isHighlighted &&
+    props.isHighlighted1 &&
+    (props.isPlayer !== 0 || props.isPlayer !== 1) &&
+    "background-color: #FFA836;opacity: 0.2;"};
+  ${props =>
+    props.isHighlighted0 &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
     "background-color: #495a6e;opacity: 0.5;"};
     ${props =>
@@ -49,11 +53,12 @@ const Image = styled.div`
     props.isPlayer === 0
       ? "background-color: #495a6e;opacity: .7;"
       : props.isPlayer === 1
-      ? "background-color: #FFA836;opacity: .2;"
+      ? "background-color: #FFA836;opacity: .3;"
       : null};
 `;
 export const Content = ({
-  isHighlighted = false,
+  isHighlighted0 = false,
+  isHighlighted1 = false,
   onClick,
   index,
   setHoverRef,
@@ -67,7 +72,8 @@ export const Content = ({
           ref={setHoverRef(`${i} ${j}`)}
           onClick={onClick}
           isKaiju={status.isKaiju}
-          isHighlighted={isHighlighted}
+          isHighlighted0={isHighlighted0}
+          isHighlighted1={isHighlighted1}
           isPlayer={status.isPlayer}
         />
       </ImageWrapper>

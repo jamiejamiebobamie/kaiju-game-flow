@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import {
   PENINSULA_TILE_LOOKUP,
+  PENINSULA_TILE_LOOKUP_VALS,
   BRIDGE_TILES,
   NOT_BRIDGE_TILES,
+  NOT_BRIDGE_TILES_VALS,
   PLAYER_ABILITIES,
   PERIMETER_TILES,
+  PERIMETER_TILES_VALS,
   DEATH_TILE_STATUSES,
   PLAYER_CLASSES
 } from "./gameState";
@@ -22,7 +25,7 @@ export const initializeGameBoard = (
   tileStatuses,
   setTileStatuses
 ) => {
-  const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
+  const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
   let _max = tileIndices.length - 1;
@@ -111,6 +114,7 @@ export const initializeGameBoard = (
   // PLAYERS    - - - - - - - - - -
   // TILES      - - - - - - - - - -
   redrawTiles(
+    [],
     [],
     setHoverRef,
     setClickedTile,
@@ -242,50 +246,54 @@ export const updateHighlightedTiles = (
   hoverLookupString,
   path,
   setPath,
-  scale
+  scale,
+  i
 ) => {
   let _highlightedTiles = [];
-  if (playerData && playerData[0]) {
-    if (hoverLookupString) {
-      const [i, j] = hoverLookupString.split(" ");
-      const lastTile =
-        Array.isArray(path) && path[path.length - 1]
-          ? path[path.length - 1]
-          : { i: -1, j: -1 };
-      if (
-        playerData &&
-        playerData[0] &&
-        playerData[0].moveToTiles.length === 0 &&
-        `${lastTile.i} ${lastTile.j}` === hoverLookupString
-      ) {
-        _highlightedTiles = path.map(t => {
-          return { h_i: t.i, h_j: t.j };
-        });
-      } else {
-        const _path = findPath(
-          playerData[0].tile,
-          { i: Number(i), j: Number(j) },
-          scale
-        );
-        _highlightedTiles = _path.map(t => {
-          return { h_i: t.i, h_j: t.j };
-        });
-        setPath(_path);
-      }
-    } else if (
+  if (
+    hoverLookupString &&
+    Array.isArray(playerData[0].moveToTiles) &&
+    !playerData[0].moveToTiles.length
+  ) {
+    const [i, j] = hoverLookupString.split(" ");
+    const lastTile =
+      Array.isArray(path) && path[path.length - 1]
+        ? path[path.length - 1]
+        : { i: -1, j: -1 };
+    if (
       playerData &&
       playerData[0] &&
-      playerData[0].moveToTiles.length > 0
+      playerData[0].moveToTiles.length === 0 &&
+      `${lastTile.i} ${lastTile.j}` === hoverLookupString
     ) {
-      _highlightedTiles = playerData[0].moveToTiles.map(t => {
+      _highlightedTiles = path.map(t => {
         return { h_i: t.i, h_j: t.j };
       });
+    } else {
+      const _path = findPath(
+        playerData[0].tile,
+        { i: Number(i), j: Number(j) },
+        scale
+      );
+      _highlightedTiles = _path.map(t => {
+        return { h_i: t.i, h_j: t.j };
+      });
+      setPath(_path);
     }
+  } else if (
+    playerData &&
+    playerData[i] &&
+    playerData[i].moveToTiles.length > 0
+  ) {
+    _highlightedTiles = playerData[i].moveToTiles.map(t => {
+      return { h_i: t.i, h_j: t.j };
+    });
   }
   setHighlightedTiles(_highlightedTiles);
 };
 export const redrawTiles = (
-  highlightedTiles,
+  highlightedTiles0,
+  highlightedTiles1,
   setHoverRef,
   setClickedTile,
   setTiles,
@@ -316,7 +324,10 @@ export const redrawTiles = (
               scale={scale}
               setClickedIndex={setClickedTile}
               tileLocation={tileLocation}
-              isHighlighted={highlightedTiles.some(
+              isHighlighted0={highlightedTiles0.some(
+                ({ h_i, h_j }) => h_i === i && h_j === j
+              )}
+              isHighlighted1={highlightedTiles1.some(
                 ({ h_i, h_j }) => h_i === i && h_j === j
               )}
               status={{
@@ -394,14 +405,6 @@ export const updateTileState = (
                 isInManaPool,
                 playerIndex
               } = data;
-              // const deathTiles = [
-              //   "isElectrified",
-              //   "isOnFire",
-              //   "isOnKaijuFire",
-              //   "isGhosted",
-              //   "isWooded",
-              //   "isCold"
-              // ];
               const healthTiles = ["isHealing"];
               if (count) {
                 Array.isArray(dirs) &&
@@ -569,12 +572,12 @@ export const updateTileState = (
 };
 export const isTileOnGameBoard = tile => {
   return PENINSULA_TILE_LOOKUP
-    ? Object.keys(PENINSULA_TILE_LOOKUP).includes(`${tile.i} ${tile.j}`)
+    ? !!PENINSULA_TILE_LOOKUP[`${tile.i} ${tile.j}`]
     : false;
 };
 export const getClosestPerimeterTileFromLocation = ({ x, y, scale }) => {
   let closest = { distance: Number.MAX_SAFE_INTEGER, tile: { i: 0, j: 0 } };
-  Object.values(PERIMETER_TILES).forEach(({ i, j }) => {
+  PERIMETER_TILES_VALS.forEach(({ i, j }) => {
     const distance = getDistance(getCharXAndY({ i, j, scale }), { x, y });
     if (closest.distance > distance) closest = { distance, tile: { i, j } };
   });
@@ -624,27 +627,16 @@ export const shootPower = ({
             ? [30, 6]
             : [null, null]
           : [null, null];
-        // const deathTiles = [
-        //   "isElectrified",
-        //   "isOnFire",
-        //   "isGhosted",
-        //   "isWooded",
-        // "isShielded",
-        // "isBubble"
-        // ];
         const tileStatusesCountModifier = [
           "isWooded",
           "isOnFire",
           "isShielded",
-          // "isBubble",
-          // "isCold",
           "isHealing"
         ];
         const tileStatusesNumTilesModifier = [
           "isWooded",
           "isGhosted",
           "isShielded",
-          // "isBubble",
           "isHealing"
         ];
         const [tile, dirs] = getAdjacentTilesFromTile(
@@ -696,13 +688,13 @@ export const solveForStatus = tile => {
     return {
       isElectrified: tile.isElectrified
     };
-  else if (tile.isShielded)
-    return {
-      isShielded: tile.isShielded
-    };
   else if (tile.isCold)
     return {
       isCold: tile.isCold
+    };
+  else if (tile.isShielded && !tile.isOnFire && !tile.isWooded)
+    return {
+      isShielded: tile.isShielded
     };
   else if (tile.isOnFire && tile.isOnKaijuFire)
     return getRandBool()
@@ -863,9 +855,9 @@ export const getRandAdjacentTile = ({ i, j }) => {
 export const getRandomAdjacentLocation = (location, scale) => {
   const tile = getTileIAndJFromCharXAndY(location.x, location.y, scale);
   if (tile) {
-    const highlightedTiles = Object.values(PENINSULA_TILE_LOOKUP)
-      .map(v => (isAdjacent(tile, { i: v.i, j: v.j }) ? v : null))
-      .filter(v => v !== null);
+    const highlightedTiles = PENINSULA_TILE_LOOKUP_VALS.map(v =>
+      isAdjacent(tile, { i: v.i, j: v.j }) ? v : null
+    ).filter(v => v !== null);
     const randInt = getRandomIntInRange({
       max: highlightedTiles.length - 1
     });
@@ -888,7 +880,7 @@ export const getIAndJFromManaWellXAndY = ({ x, y, scale }) => {
   return { i: (x / scale - 20) / 42, j: (y / scale + 5) / 15 };
 };
 export const getTileIAndJFromCharXAndY = (xToFind, yToFind, scale) => {
-  return Object.values(PENINSULA_TILE_LOOKUP).find(tile => {
+  return PENINSULA_TILE_LOOKUP_VALS.find(tile => {
     const { i, j } = tile;
     const { x, y } = getCharXAndY({ i, j, scale });
     return x === xToFind && y === yToFind;
@@ -960,10 +952,8 @@ export const movePiece = (
                 _data[1].tile &&
                 targetTile &&
                 findPath(_data[1].tile, targetTile, scale);
-              _data[i].moveToTiles =
-                // !_data[i].moveToTiles.length
-                //   ?
-                moveToTiles.length < powerRangeAvg - 1
+              _data[i].moveToTiles = !_data[i].moveToTiles.length
+                ? moveToTiles.length < powerRangeAvg - 1
                   ? // findPath(_data[1].tile, getRandomTileOnBoard(scale, scale)
                     findPath(
                       _data[1].tile,
@@ -976,8 +966,8 @@ export const movePiece = (
                       _data[1].tile,
                       getSafeTile(enemyData, tileStatuses, scale),
                       scale
-                    );
-              // : _data[i].moveToTiles;
+                    )
+                : _data[i].moveToTiles;
             } else {
               // teammate should stay by player to protect him.
               // get path
@@ -1000,7 +990,7 @@ export const movePiece = (
         ) {
           const powersToFire = _data[i].abilities.forEach((a, j) => {
             const isCooldownOver =
-              accTime - a.accTime >= a.cooldownTime || accTime < a.accTime;
+              accTime - a.accTime >= a.cooldownTimeAI || accTime < a.accTime;
             if (isCooldownOver) {
               const [targetTile, _] = getClosestEntityFromTile(
                 enemyData,
@@ -1160,7 +1150,7 @@ export const movePiece = (
               _data[i].lives &&
               ((_data[i].isKaiju && _data[i].isOnTiles) ||
                 (!_data[i].isKaiju &&
-                  (accTime - _data[i].lastDmg > 1000 ||
+                  (accTime - _data[i].lastDmg > 20 ||
                     accTime - _data[i].lastDmg < 0)))
             ) {
               // can only get damaged once every 1 second.
@@ -1181,9 +1171,9 @@ export const movePiece = (
     teleportData && teleportData.length && setTeleportData([]);
     const newKaiju =
       !powerUpData &&
-      data.length < 5 &&
+      data.length < 3 &&
       accTime &&
-      !(accTime % 5000) &&
+      !(accTime % 3) &&
       spawnKaiju(data, enemyData, scale);
     let isKaijuRespawned = false;
     let isRespawn = true;
@@ -1191,7 +1181,7 @@ export const movePiece = (
       !powerUpData &&
       !newKaiju &&
       accTime &&
-      !(accTime % 5000) &&
+      !(accTime % 3) &&
       _data.map(k =>
         !isKaijuRespawned && !k.lives
           ? { ...k, ...spawnKaiju(data, enemyData, scale, isRespawn) }
@@ -1310,20 +1300,20 @@ export const isAdjacent = (tile1, tile2) => {
     : false;
 };
 export const getRandomCharacterLocation = scale => {
-  const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
+  const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
   const { i, j } = tileIndices[randomInt];
   const { x, y } = getCharXAndY({ i, j, scale });
   return { x, y };
 };
 export const getRandomTileOnBoard = scale => {
-  const tileIndices = Object.values(PENINSULA_TILE_LOOKUP);
+  const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
   return tileIndices[randomInt];
 };
 export const getSafeTile = (kaijuData, tileStatuses, scale) => {
   const kaijuLocations = kaijuData.map(({ charLocation }) => charLocation);
-  const allTiles = Object.values(NOT_BRIDGE_TILES);
+  const allTiles = NOT_BRIDGE_TILES_VALS;
   let safeTileObj = {
     distance: Number.MIN_SAFE_INTEGER,
     index: getRandomTileOnBoard(scale)

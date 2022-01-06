@@ -58,7 +58,13 @@ export const GameBoard = ({
   const [clickedTiles, setClickedTiles] = useState([]);
   useEffect(() => {
     const { i, j } = clickedTile;
-    if (i !== -1) {
+    if (
+      i !== -1 &&
+      playerData &&
+      playerData[0] &&
+      Array.isArray(playerData[0].moveToTiles) &&
+      !playerData[0].moveToTiles.length
+    ) {
       setPlayerMoveToTiles(path);
       setClickedTile({ i: -1, j: -1 });
     }
