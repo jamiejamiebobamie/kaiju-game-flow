@@ -1536,45 +1536,14 @@ export const PLAYER_ABILITIES = {
         setTileStatuses
       }),
     displayLookup: "abilityIce",
-    Element: "Ice",
+    elementUppercase: "Ice",
     element: "ice",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTimeAI: 40,
-    cooldownTime: 4000
-  },
-  glass: {
-    passiveName: "Teleport Sickness",
-    activeName: "Escape",
-    range: 30,
-    type: "escape",
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        moveSpeed:
-          baseStats.moveSpeed - 2 <= 4
-            ? baseStats.moveSpeed
-            : baseStats.moveSpeed - 2
-      };
-    },
-    activateActive: (
-      k,
-      data,
-      setTeleportData,
-      targetData,
-      setTileStatuses,
-      scale
-    ) => setTeleportData(_teleportData => [..._teleportData, k]),
-    getPlayerIndex: k => k,
-    displayLookup: "abilityGlass",
-    Element: "Glass",
-    element: "glass",
-    isPassive: false,
-    isActive: false,
-    accTime: 0,
-    cooldownTime: 12000,
-    cooldownTimeAI: 50
+    cooldownTime: 4000,
+    color: "PaleTurquoise"
   },
   fire: {
     passiveName: "Fuel to Burn",
@@ -1607,13 +1576,14 @@ export const PLAYER_ABILITIES = {
         setTileStatuses
       }),
     displayLookup: "abilityFire",
-    Element: "Fire",
+    elementUppercase: "Fire",
     element: "fire",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    cooldownTimeAI: 40
+    cooldownTimeAI: 40,
+    color: "tomato"
   },
   wood: {
     passiveName: "Crunchy Granola",
@@ -1645,13 +1615,14 @@ export const PLAYER_ABILITIES = {
       }),
     range: 10,
     displayLookup: "abilityWood",
-    Element: "Wood",
+    elementUppercase: "Wood",
     element: "wood",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 6000,
-    cooldownTimeAI: 60
+    cooldownTimeAI: 60,
+    color: "Chartreuse"
   },
   lightning: {
     passiveName: "Charged Step",
@@ -1683,13 +1654,14 @@ export const PLAYER_ABILITIES = {
       }),
     range: 10,
     displayLookup: "abilityLightning",
-    Element: "Lightning",
+    elementUppercase: "Lightning",
     element: "lightning",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 2000,
-    cooldownTimeAI: 20
+    cooldownTimeAI: 20,
+    color: "cyan"
   },
   death: {
     passiveName: "One Foot in the Grave",
@@ -1721,13 +1693,14 @@ export const PLAYER_ABILITIES = {
         setTileStatuses
       }),
     displayLookup: "abilityDeath",
-    Element: "Death",
+    elementUppercase: "Death",
     element: "death",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 15000,
-    cooldownTimeAI: 150
+    cooldownTimeAI: 150,
+    color: "GhostWhite"
   },
   bubble: {
     passiveName: "So Many Bubbles",
@@ -1760,13 +1733,14 @@ export const PLAYER_ABILITIES = {
       }),
     range: 4,
     displayLookup: "abilityBubble",
-    Element: "Bubble",
+    elementUppercase: "Bubble",
     element: "bubble",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 8000,
-    cooldownTimeAI: 80
+    cooldownTimeAI: 80,
+    color: "Thistle"
   },
   metal: {
     passiveName: "Builder",
@@ -1801,13 +1775,47 @@ export const PLAYER_ABILITIES = {
       }),
     range: 2,
     displayLookup: "abilityMetal",
-    Element: "Metal",
+    elementUppercase: "Metal",
     element: "metal",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 10000,
-    cooldownTimeAI: 100
+    cooldownTimeAI: 100,
+    color: "AntiqueWhite"
+  },
+  glass: {
+    passiveName: "Teleport Sickness",
+    activeName: "Escape",
+    range: 30,
+    type: "escape",
+    activatePassive: baseStats => {
+      return {
+        ...baseStats,
+        moveSpeed:
+          baseStats.moveSpeed - 2 <= 4
+            ? baseStats.moveSpeed
+            : baseStats.moveSpeed - 2
+      };
+    },
+    activateActive: (
+      k,
+      data,
+      setTeleportData,
+      targetData,
+      setTileStatuses,
+      scale
+    ) => setTeleportData(_teleportData => [..._teleportData, k]),
+    getPlayerIndex: k => k,
+    displayLookup: "abilityGlass",
+    elementUppercase: "Glass",
+    element: "glass",
+    isPassive: false,
+    isActive: false,
+    accTime: 0,
+    cooldownTime: 12000,
+    cooldownTimeAI: 50,
+    color: "BlueViolet"
   },
   heart: {
     passiveName: "Good Vibes",
@@ -1834,13 +1842,14 @@ export const PLAYER_ABILITIES = {
       }),
     range: 10,
     displayLookup: "abilityHeart",
-    Element: "Heart",
+    elementUppercase: "Heart",
     element: "heart",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTimeAI: 100,
-    cooldownTime: 10000
+    cooldownTime: 10000,
+    color: "pink"
   },
   kaijuFire: {
     passiveName: "",
@@ -1867,12 +1876,13 @@ export const PLAYER_ABILITIES = {
       });
     },
     displayLookup: "",
-    Element: "",
+    elementUppercase: "",
     element: "",
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 60
+    cooldownTimeAI: 60,
+    color: "#df73ff"
   }
 };
 export const DEATH_TILE_STATUSES = [
@@ -2224,7 +2234,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Fire,Ice,Wood",
     class_name: "Hag",
-    player_class_description: "Scary lady. You make a mean stew though."
+    player_class_description: "Scary lady. You make a mean stew."
   },
   {
     elems: "Fire,Lightning,Metal",
@@ -2341,7 +2351,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Ice,Lightning,Wood",
     class_name: "Vengeful Druid",
-    player_class_description: "What girl kicked your hornet's nest? Jeez."
+    player_class_description: "You are nature's wrath!."
   },
   {
     elems: "Ice,Metal,Wood",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { GameBoard } from "./GameBoard/GameBoard";
+import { ClassPicker } from "./ClassPicker/ClassPicker";
 import { UI } from "./UI/UI";
 import {
   PENINSULA_TILE_LOOKUP,
@@ -43,7 +44,7 @@ const GameTitle = styled.div`
     src: url(Datalegreya-Dot.otf);
   }
 `;
-export const Game = () => {
+export const Game = ({ is }) => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
@@ -52,7 +53,6 @@ export const Game = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
   const [kaijuKillCount, setKaijuKillCount] = useState([]);
-  const [intervalTime, setIntervalTime] = useState(1);
   const [playerData, setPlayerData] = useState([]);
   const [teleportData, setTeleportData] = useState([]);
   const [powerUpData, setPowerUpData] = useState([]);
@@ -65,6 +65,10 @@ export const Game = () => {
   const [tileStatuses, setTileStatuses] = useState(null);
   const [setHoverRef, hoverLookupString] = useHover();
   const [path, setPath] = useState(null);
+  const [isClassPickerModalOpen, setIsClassPickerModalOpen] = useState(true);
+  const [intervalTime, setIntervalTime] = useState(
+    !isClassPickerModalOpen && 1
+  );
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   useKeyPress(
     code => {
@@ -134,16 +138,6 @@ export const Game = () => {
       scale,
       0
     );
-    // if (playerData && playerData[1] && playerData[1].lives)
-    //   updateHighlightedTiles(
-    //     setHighlightedTiles1,
-    //     playerData,
-    //     undefined,
-    //     undefined,
-    //     undefined,
-    //     undefined,
-    //     1
-    //   );
     if (shouldUpdate(accTime.current, 2))
       updateTileState(
         playerData,
@@ -155,7 +149,6 @@ export const Game = () => {
         scale,
         accTime.current
       );
-    // if (shouldUpdate(accTime.current, 100))
     redrawTiles(
       highlightedTiles0,
       highlightedTiles1,
@@ -171,7 +164,6 @@ export const Game = () => {
       scale
     );
     // move players
-    // if (shouldUpdate(accTime.current, 25))
     movePiece(
       playerData,
       setPlayerData,
@@ -187,7 +179,6 @@ export const Game = () => {
       setTeleportData
     );
     // move monsters
-    // if (shouldUpdate(accTime.current, 200))
     movePiece(
       kaijuData,
       setKaijuData,
@@ -206,41 +197,41 @@ export const Game = () => {
     // powerup spawning.
     if (shouldUpdate(accTime.current, 30000))
       spawnPowerUp(powerUpData, setPowerUpData, playerData, scale);
+    // update accumulated time.
     accTime.current =
       accTime > Number.MAX_SAFE_INTEGER - 10000
         ? 0
         : accTime.current + intervalTime;
   }, intervalTime);
-  // <GameTitle>Kaiju City</GameTitle>
-  return (
-    <>
-      <GameWrapper>
-        <GameBoard
-          isPaused={isPaused}
-          powerUpData={powerUpData}
-          playerData={playerData}
-          kaijuData={kaijuData}
-          setPlayerMoveToTiles={setPlayerMoveToTiles}
-          tileStatuses={tileStatuses}
-          setTileStatuses={setTileStatuses}
-          clickedTile={clickedTile}
-          setClickedTile={setClickedTile}
-          tiles={tiles}
-          path={path}
-          width={width}
-          height={height}
-          scale={scale}
-        />
-        <UI
-          playerData={playerData}
-          kaijuKillCount={kaijuKillCount}
-          kaijuData={kaijuData}
-          setPlayerData={setPlayerData}
-          setTeleportData={setTeleportData}
-          setTileStatuses={setTileStatuses}
-          scale={scale}
-        />
-      </GameWrapper>
-    </>
+  return isClassPickerModalOpen ? (
+    <ClassPicker />
+  ) : (
+    <GameWrapper>
+      <GameBoard
+        isPaused={isPaused}
+        powerUpData={powerUpData}
+        playerData={playerData}
+        kaijuData={kaijuData}
+        setPlayerMoveToTiles={setPlayerMoveToTiles}
+        tileStatuses={tileStatuses}
+        setTileStatuses={setTileStatuses}
+        clickedTile={clickedTile}
+        setClickedTile={setClickedTile}
+        tiles={tiles}
+        path={path}
+        width={width}
+        height={height}
+        scale={scale}
+      />
+      <UI
+        playerData={playerData}
+        kaijuKillCount={kaijuKillCount}
+        kaijuData={kaijuData}
+        setPlayerData={setPlayerData}
+        setTeleportData={setTeleportData}
+        setTileStatuses={setTileStatuses}
+        scale={scale}
+      />
+    </GameWrapper>
   );
 };

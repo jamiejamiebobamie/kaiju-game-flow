@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Player } from "./Player";
-import { Kaiju } from "./Kaiju";
-import { PowerUp } from "./PowerUp";
+import { Player } from "./Pieces/PlayerPiece";
+import { Kaiju } from "./Pieces/KaijuPiece";
+import { PowerUp } from "./Pieces/PowerUpPiece";
 import { PauseModal } from "./PauseModal";
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -25,20 +25,6 @@ const BackgroundImage = styled.img`
   height: 100%;
   background-repeat: no-repeat;
 `;
-const TestMoon = styled.i`
-  position: absolute;
-  /* margin-top: -50px;
-  margin-left: 520px; */
-  pointer-events: none;
-  left: 600px;
-  top: 200px;
-  opacity: 0.3;
-  z-index: 1;
-  width: 120px;
-  height: 120px;
-  color: yellow;
-  transform: rotate(250deg) scale(5);
-`;
 export const GameBoard = ({
   isPaused,
   powerUpData,
@@ -58,14 +44,7 @@ export const GameBoard = ({
   const [clickedTiles, setClickedTiles] = useState([]);
   useEffect(() => {
     const { i, j } = clickedTile;
-    if (
-      i !== -1
-      // &&
-      // playerData &&
-      // playerData[0] &&
-      // Array.isArray(playerData[0].moveToTiles) &&
-      // !playerData[0].moveToTiles.length
-    ) {
+    if (i !== -1) {
       setPlayerMoveToTiles(path);
       setClickedTile({ i: -1, j: -1 });
     }
@@ -113,4 +92,3 @@ export const GameBoard = ({
     </Board>
   );
 };
-// <TestMoon className="fa fa-moon-o" />

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Player } from "./Player/Player";
-import { Display } from "./Display";
+import { PlayerUI } from "./PlayerUI/PlayerUI";
+import { DescriptionDisplay } from "./DescriptionDisplay";
 
 const Wrapper = styled.div`
   display: flex;
@@ -22,32 +22,41 @@ export const UI = ({
   scale
 }) => {
   const [displayString, setDisplayString] = useState(null);
+  const playerUI = (
+    <PlayerUI
+      playerData={playerData}
+      kaijuData={kaijuData}
+      kaijuKillCount={kaijuKillCount}
+      setPlayerData={setPlayerData}
+      setTeleportData={setTeleportData}
+      setTileStatuses={setTileStatuses}
+      scale={scale}
+      setDisplayString={setDisplayString}
+      playerIndex={0}
+    />
+  );
+  const teammateUI = (
+    <PlayerUI
+      playerData={playerData}
+      kaijuData={kaijuData}
+      kaijuKillCount={kaijuKillCount}
+      setPlayerData={setPlayerData}
+      setTeleportData={setTeleportData}
+      setTileStatuses={setTileStatuses}
+      scale={scale}
+      setDisplayString={setDisplayString}
+      isReversed={true}
+      playerIndex={1}
+    />
+  );
   return (
     <Wrapper>
-      <Player
+      {playerUI}
+      <DescriptionDisplay
         playerData={playerData}
-        kaijuData={kaijuData}
-        kaijuKillCount={kaijuKillCount}
-        setPlayerData={setPlayerData}
-        setTeleportData={setTeleportData}
-        setTileStatuses={setTileStatuses}
-        scale={scale}
-        setDisplayString={setDisplayString}
-        playerIndex={0}
+        displayString={displayString}
       />
-      <Display playerData={playerData} displayString={displayString} />
-      <Player
-        playerData={playerData}
-        kaijuData={kaijuData}
-        kaijuKillCount={kaijuKillCount}
-        setPlayerData={setPlayerData}
-        setTeleportData={setTeleportData}
-        setTileStatuses={setTileStatuses}
-        scale={scale}
-        setDisplayString={setDisplayString}
-        isReversed={true}
-        playerIndex={1}
-      />
+      {teammateUI}
     </Wrapper>
   );
 };

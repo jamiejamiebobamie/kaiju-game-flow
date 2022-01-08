@@ -26,7 +26,11 @@ const getDescription = (string, playerData, playerIndex) => {
           playerData[playerIndex] &&
           playerData[playerIndex].playerClassDescription &&
           playerData[playerIndex].playerClassDescription,
-        effect1: "",
+        effect1:
+          playerData &&
+          playerData[playerIndex] &&
+          playerData[playerIndex].elements &&
+          playerData[playerIndex].elements,
         effect2: "",
         img: "",
         formatData: {}
@@ -86,7 +90,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityGlassActive":
       return {
         title: "Escape",
-        description: "Instantly travel to a safe tile.",
+        description: 'Instantly travel to a "safe" tile.',
         effect1: "",
         effect2: "",
         img: "",
@@ -232,12 +236,14 @@ const getDescription = (string, playerData, playerIndex) => {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  max-width: 600px;
+  ${props =>
+    !props.isClassWrapper &&
+    "padding: 20px; border-style: solid; border-thickness: thin; max-width: 460px;"}
+
   width: 100%;
-  max-width: 460px;
   height: 300px;
-  border-style: solid;
-  border-thickness: thin;
+  /* border-thickness: thin; */
   border-radius: 10px;
   text-font: 30px;
   font-alignment: 30px;
@@ -248,14 +254,15 @@ const Wrapper = styled.div`
     src: url(Early_GameBoy.ttf);
   }
 `;
-export const Display = ({
+export const DescriptionDisplay = ({
   playerData,
   displayString,
-  hoveredContent = null
+  hoveredContent = null,
+  isClassWrapper,
+  pickedAbilities
 }) => {
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
-  // console.log(_string, playerIndex);
   const {
     title,
     description,
@@ -264,14 +271,30 @@ export const Display = ({
     img,
     formatData
   } = (displayString &&
-    getDescription(_string, playerData, Number(playerIndex))) || {
-    title: "",
-    description: "",
-    img: "",
-    formatData: {}
-  };
+    getDescription(_string, playerData, Number(playerIndex))) ||
+    (isClassWrapper &&
+      pickedAbilities &&
+      pickedAbilities.length === 3 &&
+      getDescription(
+        "class",
+        // [
+        //   {
+        //     playerClass: "Undead Pirate",
+        //     playerClassDescription:
+        //       "You were a pirate and then you died and now you still are.",
+        //     elements: "Death,Ice,Lightning"
+        //   }
+        // ],
+        playerData,
+        0
+      )) || {
+      title: "",
+      description: "",
+      img: "",
+      formatData: {}
+    };
   return (
-    <Wrapper>
+    <Wrapper isClassWrapper={isClassWrapper}>
       <h2>{title}</h2>
       <p>{description}</p>
       <p>{effect1}</p>

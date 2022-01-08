@@ -97,7 +97,8 @@ export const initializeGameBoard = (
       tileCountModifier: 0,
       playerClass: playerClassObj && playerClassObj.class_name,
       playerClassDescription:
-        playerClassObj && playerClassObj.player_class_description
+        playerClassObj && playerClassObj.player_class_description,
+      elements: classLookUpKey
     };
     console.log(k, abilities, baseStats);
     const newPlayer = {

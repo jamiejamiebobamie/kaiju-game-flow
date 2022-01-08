@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import { Content } from "./Content";
-import { Border } from "./Border";
-import { Icon } from "./Icon";
+import { Content } from "./Parts/Content";
+import { Border } from "./Parts/Border";
+import { Icon } from "./Parts/Icon";
 
 const Hexagon = styled.div`
   ${props =>

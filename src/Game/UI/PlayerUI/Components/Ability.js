@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useHover, useKeyPress } from "../../../Utils/utils";
+import { useHover, useKeyPress } from "../../../../Utils/utils";
 
 const ICON_LOOKUP = {
   heart: {

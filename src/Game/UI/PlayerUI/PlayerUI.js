@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import { Abilities } from "./Abilities";
-import { HealthBar } from "./HealthBar";
-import { Kaiju } from "./Kaiju";
+import { Abilities } from "./Components/Abilities";
+import { HealthBar } from "./Components/HealthBar";
+import { Kaiju } from "./Components/Kaiju";
+import { PassiveAbilities } from "./Components/PassiveAbilities";
 import { useHover } from "../../../Utils/utils";
-import { PassiveAbilities } from "./PassiveAbilities";
 
 const Wrapper = styled.div`
   position: relative;
@@ -48,7 +48,7 @@ const ClassPicture = styled.i`
   background-color: #f2e3cc;
   align-items: center;
 `;
-export const Player = ({
+export const PlayerUI = ({
   playerData = [
     {
       lives: 0,
@@ -81,7 +81,7 @@ export const Player = ({
 }) => {
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
-  const playerUI = (
+  const _playerUI = (
     <Wrapper>
       {isReversed ? (
         <>
@@ -157,5 +157,5 @@ export const Player = ({
       />
     </Wrapper>
   );
-  return playerUI;
+  return _playerUI;
 };
