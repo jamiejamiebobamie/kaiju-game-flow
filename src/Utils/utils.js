@@ -251,9 +251,10 @@ export const updateHighlightedTiles = (
 ) => {
   let _highlightedTiles = [];
   if (
-    hoverLookupString &&
-    Array.isArray(playerData[0].moveToTiles) &&
-    !playerData[0].moveToTiles.length
+    hoverLookupString
+    // &&
+    // Array.isArray(playerData[0].moveToTiles) &&
+    // !playerData[0].moveToTiles.length
   ) {
     const [i, j] = hoverLookupString.split(" ");
     const lastTile =
@@ -692,7 +693,7 @@ export const solveForStatus = tile => {
     return {
       isCold: tile.isCold
     };
-  else if (tile.isShielded && !tile.isOnFire && !tile.isWooded)
+  else if (tile.isShielded)
     return {
       isShielded: tile.isShielded
     };
@@ -952,8 +953,10 @@ export const movePiece = (
                 _data[1].tile &&
                 targetTile &&
                 findPath(_data[1].tile, targetTile, scale);
-              _data[i].moveToTiles = !_data[i].moveToTiles.length
-                ? moveToTiles.length < powerRangeAvg - 1
+              _data[i].moveToTiles =
+                // !_data[i].moveToTiles.length
+                //   ?
+                moveToTiles.length < powerRangeAvg - 1
                   ? // findPath(_data[1].tile, getRandomTileOnBoard(scale, scale)
                     findPath(
                       _data[1].tile,
@@ -966,8 +969,8 @@ export const movePiece = (
                       _data[1].tile,
                       getSafeTile(enemyData, tileStatuses, scale),
                       scale
-                    )
-                : _data[i].moveToTiles;
+                    );
+              // : _data[i].moveToTiles;
             } else {
               // teammate should stay by player to protect him.
               // get path

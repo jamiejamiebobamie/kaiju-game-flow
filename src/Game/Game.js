@@ -134,16 +134,16 @@ export const Game = () => {
       scale,
       0
     );
-    if (playerData && playerData[1] && playerData[1].lives)
-      updateHighlightedTiles(
-        setHighlightedTiles1,
-        playerData,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        1
-      );
+    // if (playerData && playerData[1] && playerData[1].lives)
+    //   updateHighlightedTiles(
+    //     setHighlightedTiles1,
+    //     playerData,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     1
+    //   );
     if (shouldUpdate(accTime.current, 2))
       updateTileState(
         playerData,

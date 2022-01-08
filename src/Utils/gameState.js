@@ -1574,7 +1574,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 12000,
-    cooldownTimeAI: 120
+    cooldownTimeAI: 50
   },
   fire: {
     passiveName: "Fuel to Burn",
@@ -2095,8 +2095,9 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Death,Glass,Metal",
-    class_name: "Death Knight",
-    player_class_description: "A necromantic knight? Chivalry truly is dead."
+    class_name: "Necromancer",
+    player_class_description:
+      "Hide in your keep and send out your undead minions to attack."
   },
   {
     elems: "Death,Glass,Wood",
@@ -2350,6 +2351,6 @@ export const PLAYER_CLASSES = [
   {
     elems: "Lightning,Metal,Wood",
     class_name: "Urban Ranger",
-    player_class_description: "Only you can pull of urban camo. Congrats."
+    player_class_description: "Only you can pull off urban camo. Congrats."
   }
 ];
