@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useHover, useKeyPress } from "../../../../Utils/utils";
+import { useHover, useKeyPress } from "../../../../../Utils/utils";
 
 const ICON_LOOKUP = {
   heart: {
@@ -49,7 +49,6 @@ const ICON_LOOKUP = {
     loader: "fa-spinner"
   }
 };
-
 const Wrapper = styled.div`
   position: relative;
   display: flex;
@@ -61,6 +60,8 @@ const Wrapper = styled.div`
   align-self: center;
   border-radius: 100%;
   border-style: solid;
+  /* border-color: ${props => props.color}; */
+  border-color: black;
   min-width: 50px;
   height: 50px;
   ${props => props.isAnimating && "animation: rotation linear .5s;"};
@@ -78,6 +79,7 @@ const Wrapper = styled.div`
   }
 `;
 const AbilityIcon = styled.i`
+  color: ${props => props.color};
   z-index: ${props => props.i};
   justify-self: center;
   align-self: center;
@@ -110,10 +112,11 @@ const AbilityNum = styled.div`
   border-radius: 100%;
   border-style: solid;
   border-thickness: thin;
-  border-color: black;
-  background-color: #f2e3cc;
+  border-color: ${props => props.color};
+  background-color: transparent;
   color: black;
-  text-align: center;
+  color: ${props => props.color};
+  text-align: right;
   align-content: center;
   align-items: center;
   justify-content: center;
@@ -143,7 +146,8 @@ export const Ability = ({
     cooldownTime,
     displayLookup,
     element,
-    accTime
+    accTime,
+    color
   } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
@@ -184,15 +188,18 @@ export const Ability = ({
       isAnimating={isAnimating}
       ref={setHoverRef(`${displayLookup}Active`)}
       title={activeName}
-      alt="test desc"
+      color={color}
     >
       <AbilityIcon
         disabled={true}
         className={`fa ${ICON_LOOKUP[element][iconLookupString]}`}
         isCoolDown={isActive}
         cooldownTime={cooldownTime}
+        color={color}
       />
-      <AbilityNum>{keyNum}</AbilityNum>
+      <AbilityNum color={color}>
+        <div style={{ marginLeft: "4px" }}>{keyNum}</div>
+      </AbilityNum>
     </Wrapper>
   );
 };

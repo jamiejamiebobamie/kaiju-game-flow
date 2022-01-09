@@ -26,6 +26,7 @@ const BackgroundImage = styled.img`
   background-repeat: no-repeat;
 `;
 export const GameBoard = ({
+  isClassWrapper = false,
   isPaused,
   powerUpData,
   playerData,

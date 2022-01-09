@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useInterval } from "../../Utils/utils";
+import { useInterval } from "../../../Utils/utils";
 
 const getDescription = (string, playerData, playerIndex) => {
   switch (string) {
@@ -275,19 +275,7 @@ export const DescriptionDisplay = ({
     (isClassWrapper &&
       pickedAbilities &&
       pickedAbilities.length === 3 &&
-      getDescription(
-        "class",
-        // [
-        //   {
-        //     playerClass: "Undead Pirate",
-        //     playerClassDescription:
-        //       "You were a pirate and then you died and now you still are.",
-        //     elements: "Death,Ice,Lightning"
-        //   }
-        // ],
-        playerData,
-        0
-      )) || {
+      getDescription("class", playerData, 0)) || {
       title: "",
       description: "",
       img: "",

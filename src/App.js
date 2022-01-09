@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Game } from "./Game/Game";
 import { Tutorial } from "./Tutorial";
+import "./App.css";
 
 const App = () => {
   /*

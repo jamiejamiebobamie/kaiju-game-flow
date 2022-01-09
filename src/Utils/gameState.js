@@ -2152,7 +2152,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Death,Ice,Wood",
     class_name: "Undertaker",
-    player_class_description: 'Some might say you\'re a real "Cememtary Man".'
+    player_class_description: "Your clients say you're a lively one!"
   },
   {
     elems: "Death,Lightning,Metal",
@@ -2162,7 +2162,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Death,Lightning,Wood",
     class_name: "Sky Shaman",
-    player_class_description: "You priase the sky and draw powet from it."
+    player_class_description: "You priase the sky and draw power from it."
   },
   {
     elems: "Death,Metal,Wood",
@@ -2308,7 +2308,7 @@ export const PLAYER_CLASSES = [
     elems: "Glass,Metal,Wood",
     class_name: "Gardener",
     player_class_description:
-      "You plant organized areas of growth on the battlefield, shaping the landscape to your green thumb's curve."
+      "You own the battlefield, shaping the landscape to your green thumb's curve!"
   },
   {
     elems: "Heart,Ice,Lightning",

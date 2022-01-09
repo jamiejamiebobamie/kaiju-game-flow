@@ -9,8 +9,8 @@ const Wrapper = styled.div`
   justify-content: flex-start;
   width: 65%;
   height: 100%;
-  overflow: scroll;
-  overflow-y: scroll;
+  overflow: none;
+  overflow-y: none;
 `;
 export const Abilities = ({
   playerIndex,

@@ -4,7 +4,7 @@ import { Abilities } from "./Components/Abilities";
 import { HealthBar } from "./Components/HealthBar";
 import { Kaiju } from "./Components/Kaiju";
 import { PassiveAbilities } from "./Components/PassiveAbilities";
-import { useHover } from "../../../Utils/utils";
+import { useHover } from "../../../../Utils/utils";
 
 const Wrapper = styled.div`
   position: relative;
