@@ -174,7 +174,8 @@ const getDescription = (string, playerData, playerIndex) => {
         title: "Discharge",
         description:
           "Cast 3 bolts of lightning in the direction of your closest enemy.",
-        effect1: "Bolts travel forward and diagonally from point of cast.",
+        effect1:
+          "Bolts travel forward and diagonally from point of cast and ricochet off the walls of the gameboard.",
         effect2: "",
         img: "",
         formatData: {}

@@ -43,6 +43,7 @@ export const initializeTutorialGameBoard = (
       moveToLocation: location,
       moveToTiles: [],
       tile,
+      dir: "idle",
       i: k,
       isThere: true,
       moveSpeed: 6,
@@ -112,6 +113,7 @@ export const initializeTutorialGameBoard = (
       moveToLocation: location,
       moveToTiles: [kaijuTile],
       tile: kaijuTile,
+      dir: "idle",
       color: "purple",
       isThere: false,
       lives: 5,
@@ -201,6 +203,7 @@ export const initializeGameBoard = (
       moveToLocation: location,
       moveToTiles: [],
       tile: { i, j },
+      dir: "idle",
       i: k,
       isThere: true,
       moveSpeed: 6,
@@ -531,6 +534,16 @@ export const updateTileState = (
                     // 2. move the status based on the direction
                     const offset = getTileOffsetFromDir(d, { i, j });
                     const nextTile = { i: i + offset.i, j: j + offset.j };
+                    const tileDirMapping = [
+                      "up",
+                      "up right",
+                      "down right",
+                      "down",
+                      "down left",
+                      "up left"
+                    ];
+                    let direction = [d];
+
                     if (
                       (isTutorial &&
                         isTileOnGameBoardTutorial({
@@ -542,16 +555,7 @@ export const updateTileState = (
                         j: nextTile.j
                       })
                     ) {
-                      let direction = [d];
                       if (count < startCount && k === "isCold") {
-                        const tileDirMapping = [
-                          "up",
-                          "up right",
-                          "down right",
-                          "down",
-                          "down left",
-                          "up left"
-                        ];
                         const newDir =
                           tileDirMapping[count % tileDirMapping.length];
                         direction = [newDir];
@@ -624,8 +628,70 @@ export const updateTileState = (
                       );
                       _statuses[nextTile.i][nextTile.j] = nextTilesStatus;
                       _statuses[nextTile.i][nextTile.j].updateKey = updateKey;
+                    } else if (k === "isElectrified") {
+                      // if at the end of the board and isElectrified
+                      // "ricochet" of the end of the board and reflect / bounce back.
+                      // 1. find next new tile that is ob board from current direction and current tile.
+                      // 1a. find new direction
+                      // 1b. from new direction find tile.
+                      // 1c. determine if tile is on board.
+                      // 1d. if on board update that new tile with status
+                      // const tileDirMapping = [
+                      //   "up",
+                      //   "up right",
+                      //   "down right",
+                      //   "down",
+                      //   "down left",
+                      //   "up left"
+                      // ];
+                      const dirMapIndex = tileDirMapping.indexOf(d);
+                      const newDirMapIndex =
+                        dirMapIndex > 2 ? dirMapIndex - 2 : dirMapIndex + 2;
+                      const newDir = tileDirMapping[newDirMapIndex];
+                      const nextTileOffsetFromCurrTile = getTileOffsetFromDir(
+                        newDir,
+                        { i, j }
+                      );
+                      const nextTileForLightning = {
+                        i: i + nextTileOffsetFromCurrTile.i,
+                        j: j + nextTileOffsetFromCurrTile.j
+                      };
+                      if (
+                        (isTutorial &&
+                          isTileOnGameBoardTutorial({
+                            i: nextTileForLightning.i,
+                            j: nextTileForLightning.j
+                          })) ||
+                        isTileOnGameBoard({
+                          i: nextTileForLightning.i,
+                          j: nextTileForLightning.j
+                        })
+                      ) {
+                        _statuses[nextTileForLightning.i][
+                          nextTileForLightning.j
+                        ][k] = {
+                          dirs: [newDir],
+                          count: count - 1,
+                          targetIndex,
+                          startCount,
+                          isInManaPool,
+                          isKaiju,
+                          playerIndex
+                        };
+                        const nextTilesStatus = solveForStatus(
+                          _statuses[nextTileForLightning.i][
+                            nextTileForLightning.j
+                          ]
+                        );
+                        _statuses[nextTileForLightning.i][
+                          nextTileForLightning.j
+                        ] = nextTilesStatus;
+                        _statuses[nextTileForLightning.i][
+                          nextTileForLightning.j
+                        ].updateKey = updateKey;
+                      }
                     }
-                    // 3. erase current tile's state if not: isElectrified
+                    // 3. erase current tile's state
                     const doNotErase = [
                       "isElectrified",
                       "isShielded",
@@ -897,6 +963,37 @@ export const getTileOffsetFromDir = (dir, currTile) => {
     default:
       return { i: 0, j: 0 };
   }
+};
+
+/*
+
+    0
+0       0
+0       0
+    0
+
+*/
+export const getDirFromTiles = (currTile, nextTile) => {
+  const offset = { i: nextTile.i - currTile.i, j: nextTile.j - currTile.j };
+  const lookup_key = `${offset.i} ${offset.j} ${currTile.i % 2}`;
+  const lookup = {
+    "0 -1 0": "up",
+    "0 -1 1": "up",
+    "0 1 1": "down",
+    "0 1 0": "down",
+    "0 0 0": "idle",
+    "0 0 1": "idle",
+    "1 0 1": "up right",
+    "1 -1 0": "up right",
+    "1 1 1": "down right",
+    "1 0 0": "down right",
+    "-1 1 1": "down left",
+    "-1 0 0": "down left",
+    "-1 0 1": "up left",
+    "-1 -1 0": "up left"
+  };
+  const dir = lookup[lookup_key];
+  return dir;
 };
 export const getAdjacentTilesFromNormVec = (
   currTile,
@@ -1372,6 +1469,8 @@ export const movePiece = (
             // - - - - - - - - - - -
             if (_data[i].isThere && _data[i].moveToTiles.length) {
               const [nextTile, ...tiles] = _data[i].moveToTiles;
+              const playerDirection = getDirFromTiles(_data[i].tile, nextTile);
+              _data[i].dir = playerDirection;
               if (!tiles.length) {
                 _data[i].moveToLocation =
                   getCharXAndY({
@@ -1684,7 +1783,7 @@ export const findPath = (start, goal, scale, isTutorial) => {
       return arr;
     // produce all possible adjacent tile indices to currTile
     const adjacentTiles = getAdjacentTiles(currTile, isTutorial);
-    console.log("lol", adjacentTiles);
+    // console.log("lol", adjacentTiles);
     // get all charXAndY for each confirmed adjacent tile
     const goalXY = getCharXAndY({ ...goal, scale });
     const test = getCharXAndY({ ...adjacentTiles[0], scale });

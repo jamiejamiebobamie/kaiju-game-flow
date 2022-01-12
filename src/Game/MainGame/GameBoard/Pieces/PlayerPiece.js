@@ -95,6 +95,7 @@ color: ${props => props.color};
 }
 `;
 export const Player = ({
+  dir,
   lives,
   charLocation,
   isInManaPool,
@@ -174,6 +175,7 @@ export const Player = ({
   return (
     <Wrapper lives={lives} charLocation={charLocation}>
       {(_isTeleported || _isHealed) && particles}
+      <p>{dir}</p>
       <Character
         isDamaged={isDamaged}
         color={color}

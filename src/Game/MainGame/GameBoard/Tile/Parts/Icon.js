@@ -14,18 +14,19 @@ const StyledIcon = styled.i`
 // -moz-transform: scale(3) translate(20px, 15px);
 // -ms-transform: scale(3) translate(20px, 15px);
 // -o-transform: scale(3) translate(20px, 15px);
+
 export const Icon = ({ status, zIndex }) => {
   const ICON_LOOKUP = {
     isOnKaijuFire: { className: "fa-free-code-camp", color: "#df73ff" },
     isOnFire: { className: "fa-free-code-camp", color: "tomato" },
-    isWooded: { className: "fa-leaf", color: "green" },
+    isWooded: { className: "fa-leaf", color: "Chartreuse" },
     isElectrified: { className: "fa-bolt", color: "cyan" },
-    isGhosted: { className: "fa-snapchat-ghost", color: "white" },
-    isBubble: { className: "fa-question-circle-o", color: "white" },
-    isShielded: { className: "fa-shield", color: "black" },
+    isGhosted: { className: "fa-snapchat-ghost", color: "GhostWhite" },
+    isBubble: { className: "fa-question-circle-o", color: "Thistle" },
+    isShielded: { className: "fa-shield", color: "AntiqueWhite" },
     isGraveyard: { className: "fa-toggle-off", color: "white" },
     isMonster: { className: "fa-optin-monster", color: "purple" },
-    isCold: { className: "fa-snowflake-o", color: "white" },
+    isCold: { className: "fa-snowflake-o", color: "PaleTurquoise" },
     isHealing: { className: "fa-heart", color: "pink" }
   };
   const determineIcon = status => {

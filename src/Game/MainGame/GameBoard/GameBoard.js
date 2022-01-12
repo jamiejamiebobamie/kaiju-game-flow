@@ -78,6 +78,7 @@ export const GameBoard = ({
       lives={p.lives}
       isHealed={p.isHealed}
       isTeleported={p.isTeleported}
+      dir={p.dir}
     />
   ));
   return (

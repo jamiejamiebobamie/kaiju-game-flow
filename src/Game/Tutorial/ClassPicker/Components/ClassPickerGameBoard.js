@@ -15,6 +15,7 @@ const Board = styled.div`
   border-radius: 10px; */
   margin-top: 40px;
   margin-bottom: 10px;
+  /* background-color: red; */
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;
@@ -22,7 +23,7 @@ const ShiftContentOver = styled.div`
   position: absolute;
 `;
 const AbilitiesWrapper = styled.div`
-  margin-top: 250px;
+  margin-top: 220px;
 `;
 export const ClassPickerGameBoard = ({
   isClassWrapper = false,
