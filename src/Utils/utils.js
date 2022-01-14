@@ -13,6 +13,52 @@ import {
 } from "./gameState";
 import { HexagonTile } from "../Game/MainGame/GameBoard/Tile/HexagonTile";
 
+export const lookupClass = (pickedAbilities, setPlayerData) => {
+  const classLookup =
+    pickedAbilities.length === 3 &&
+    pickedAbilities.reduce(
+      (acc, element, i) => (acc ? acc + "," + element : acc + element),
+      ""
+    );
+  const playerClassObj =
+    pickedAbilities.length === 3 &&
+    PLAYER_CLASSES.find(pc => pc.elems === classLookup);
+  const abilities = pickedAbilities.map(
+    ability => PLAYER_ABILITIES[ability.toLowerCase()]
+  );
+  if (setPlayerData)
+    setPlayerData(_player =>
+      _player.map((p, i) =>
+        i === 0
+          ? {
+              ...p,
+              playerClass: playerClassObj && playerClassObj.class_name,
+              playerClassDescription:
+                playerClassObj && playerClassObj.player_class_description,
+              elements: classLookup,
+              abilities
+            }
+          : p
+      )
+    );
+  else
+    return [
+      {
+        playerClass: playerClassObj && playerClassObj.class_name,
+        playerClassDescription:
+          playerClassObj && playerClassObj.player_class_description,
+        elements: classLookup,
+        abilities
+      },
+      {
+        playerClass: playerClassObj && playerClassObj.class_name,
+        playerClassDescription:
+          playerClassObj && playerClassObj.player_class_description,
+        elements: classLookup,
+        abilities
+      }
+    ];
+};
 export const initializeTutorialGameBoard = (
   playerData,
   setPlayerData,
@@ -82,8 +128,8 @@ export const initializeTutorialGameBoard = (
     isTutorial
   );
   const status = [];
-  const rowLength = Math.ceil(width / (70 * scale));
-  const colLength = Math.ceil(height / (75 * scale));
+  const rowLength = 24; // Math.ceil(width / (70 * scale));
+  const colLength = 10; // Math.ceil(height / (75 * scale));
   for (let i = 0; i < rowLength; i++) {
     const _status = [];
     for (let j = 0; j < colLength; j++) {
@@ -129,12 +175,12 @@ export const initializeTutorialGameBoard = (
       isTeleported: false
     }
   ]);
-
   // KAIJU      - - - - - - - - - -
 };
 export const initializeGameBoard = (
   playerData,
   setPlayerData,
+  pickedAbilities,
   kaijuData,
   width,
   height,
@@ -149,6 +195,8 @@ export const initializeGameBoard = (
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
   let _max = tileIndices.length - 1;
+  const test = lookupClass(pickedAbilities);
+
   for (let k = 0; k < 2; k++) {
     _max -= k;
     const randomInt = getRandomIntInRange({
@@ -159,39 +207,39 @@ export const initializeGameBoard = (
     tileIndices[tileIndices.length - k] = tileIndices[randomInt];
     tileIndices[randomInt] = storeItem;
     const location = getCharXAndY({ i, j, scale });
-    const abilityOptions = [
-      PLAYER_ABILITIES["metal"],
-      PLAYER_ABILITIES["glass"],
-      PLAYER_ABILITIES["heart"],
-      PLAYER_ABILITIES["ice"],
-      PLAYER_ABILITIES["fire"],
-      PLAYER_ABILITIES["wood"],
-      PLAYER_ABILITIES["lightning"],
-      PLAYER_ABILITIES["bubble"],
-      PLAYER_ABILITIES["death"]
-    ];
-    let count = 0;
-    while (count < 3) {
-      const lastIndex = abilityOptions.length - count - 1;
-      const randInt = getRandomIntInRange({ max: lastIndex });
-      const savedAbility = abilityOptions[randInt];
-      abilityOptions[randInt] = abilityOptions[lastIndex];
-      abilityOptions[lastIndex] = savedAbility;
-      count++;
-    }
-    const abilities = [
-      abilityOptions[abilityOptions.length - 1],
-      abilityOptions[abilityOptions.length - 2],
-      abilityOptions[abilityOptions.length - 3]
-    ].sort((item1, item2) => item1.element.localeCompare(item2.element));
-    const classLookUpKey = [
-      abilities[0].Element,
-      abilities[1].Element,
-      abilities[2].Element
-    ].join(",");
-    const playerClassObj = PLAYER_CLASSES.find(
-      pc => pc.elems === classLookUpKey
-    );
+    // const abilityOptions = [
+    //   PLAYER_ABILITIES["metal"],
+    //   PLAYER_ABILITIES["glass"],
+    //   PLAYER_ABILITIES["heart"],
+    //   PLAYER_ABILITIES["ice"],
+    //   PLAYER_ABILITIES["fire"],
+    //   PLAYER_ABILITIES["wood"],
+    //   PLAYER_ABILITIES["lightning"],
+    //   PLAYER_ABILITIES["bubble"],
+    //   PLAYER_ABILITIES["death"]
+    // ];
+    // let count = 0;
+    // while (count < 3) {
+    //   const lastIndex = abilityOptions.length - count - 1;
+    //   const randInt = getRandomIntInRange({ max: lastIndex });
+    //   const savedAbility = abilityOptions[randInt];
+    //   abilityOptions[randInt] = abilityOptions[lastIndex];
+    //   abilityOptions[lastIndex] = savedAbility;
+    //   count++;
+    // }
+    // const abilities = [
+    //   abilityOptions[abilityOptions.length - 1],
+    //   abilityOptions[abilityOptions.length - 2],
+    //   abilityOptions[abilityOptions.length - 3]
+    // ].sort((item1, item2) => item1.element.localeCompare(item2.element));
+    // const classLookUpKey = [
+    //   abilities[0].Element,
+    //   abilities[1].Element,
+    //   abilities[2].Element
+    // ].join(",");
+    // const playerClassObj = PLAYER_CLASSES.find(
+    //   pc => pc.elems === classLookUpKey
+    // );
     const baseStats = {
       key: Math.random(),
       isInManaPool: false,
@@ -212,24 +260,24 @@ export const initializeGameBoard = (
       isKaiju: false,
       lastDmg: 0,
       isInManaPoolAccTime: 0,
-      abilities,
+      // abilities: pickedAbilities,
       abilityCooldowns: [],
       numTilesModifier: 0,
       tileCountModifier: 0,
-      playerClass: playerClassObj && playerClassObj.class_name,
-      playerClassDescription:
-        playerClassObj && playerClassObj.player_class_description,
-      elements: classLookUpKey
+      // playerClass: playerClassObj && playerClassObj.class_name,
+      // playerClassDescription:
+      //   playerClassObj && playerClassObj.player_class_description,
+      // elements: classLookUpKey
+      ...test[k]
     };
-    console.log(k, abilities, baseStats);
+
     const newPlayer = {
       ...baseStats,
-      ...abilities.reduce(
+      ...baseStats.abilities.reduce(
         (acc, ability) => ability.activatePassive(acc),
         baseStats
       )
     };
-    console.log(k, newPlayer);
     _players.push(newPlayer);
   }
   setPlayerData(_players);
@@ -486,8 +534,8 @@ export const updateTileState = (
 ) => {
   setTileStatuses(_statuses => {
     if (_statuses) {
-      const rowLength = Math.ceil(width / (70 * scale));
-      const colLength = Math.ceil(height / (75 * scale));
+      const rowLength = isTutorial ? 24 : Math.ceil(width / (70 * scale));
+      const colLength = isTutorial ? 10 : Math.ceil(height / (75 * scale));
       const updateKey = Math.random();
       const newDmg = [];
       for (let i = 0; i < rowLength; i++) {
@@ -543,17 +591,17 @@ export const updateTileState = (
                       "up left"
                     ];
                     let direction = [d];
-
                     if (
                       (isTutorial &&
                         isTileOnGameBoardTutorial({
                           i: nextTile.i,
                           j: nextTile.j
                         })) ||
-                      isTileOnGameBoard({
-                        i: nextTile.i,
-                        j: nextTile.j
-                      })
+                      (!isTutorial &&
+                        isTileOnGameBoard({
+                          i: nextTile.i,
+                          j: nextTile.j
+                        }))
                     ) {
                       if (count < startCount && k === "isCold") {
                         const newDir =
@@ -629,21 +677,6 @@ export const updateTileState = (
                       _statuses[nextTile.i][nextTile.j] = nextTilesStatus;
                       _statuses[nextTile.i][nextTile.j].updateKey = updateKey;
                     } else if (k === "isElectrified") {
-                      // if at the end of the board and isElectrified
-                      // "ricochet" of the end of the board and reflect / bounce back.
-                      // 1. find next new tile that is ob board from current direction and current tile.
-                      // 1a. find new direction
-                      // 1b. from new direction find tile.
-                      // 1c. determine if tile is on board.
-                      // 1d. if on board update that new tile with status
-                      // const tileDirMapping = [
-                      //   "up",
-                      //   "up right",
-                      //   "down right",
-                      //   "down",
-                      //   "down left",
-                      //   "up left"
-                      // ];
                       const dirMapIndex = tileDirMapping.indexOf(d);
                       const newDirMapIndex =
                         dirMapIndex > 2 ? dirMapIndex - 2 : dirMapIndex + 2;
@@ -662,10 +695,11 @@ export const updateTileState = (
                             i: nextTileForLightning.i,
                             j: nextTileForLightning.j
                           })) ||
-                        isTileOnGameBoard({
-                          i: nextTileForLightning.i,
-                          j: nextTileForLightning.j
-                        })
+                        (!isTutorial &&
+                          isTileOnGameBoard({
+                            i: nextTileForLightning.i,
+                            j: nextTileForLightning.j
+                          }))
                       ) {
                         _statuses[nextTileForLightning.i][
                           nextTileForLightning.j
@@ -761,7 +795,7 @@ export const updateTileState = (
   });
 };
 export const isTileOnGameBoardTutorial = tile => {
-  return !!(0 <= tile.i && tile.i < 25 && tile.j <= 0 && tile.j < 11);
+  return !!(0 <= tile.i && tile.i < 24 && 0 <= tile.j && tile.j < 10);
 };
 export const isTileOnGameBoard = tile => {
   return PENINSULA_TILE_LOOKUP
@@ -964,15 +998,6 @@ export const getTileOffsetFromDir = (dir, currTile) => {
       return { i: 0, j: 0 };
   }
 };
-
-/*
-
-    0
-0       0
-0       0
-    0
-
-*/
 export const getDirFromTiles = (currTile, nextTile) => {
   const offset = { i: nextTile.i - currTile.i, j: nextTile.j - currTile.j };
   const lookup_key = `${offset.i} ${offset.j} ${currTile.i % 2}`;
@@ -1179,9 +1204,12 @@ export const movePieceTutorial = (
           const isTutorial = true;
           if (shouldTeleport) {
             _data[i].isTeleported = !_data[i].isTeleported;
+            const safeTile = getSafeTile(enemyData, tileStatuses, scale);
             const _path = findPath(
               _data[i].tile,
-              getSafeTile(enemyData, tileStatuses, scale),
+              _data[i].tile === safeTile
+                ? getRandomTileOnBoard(scale, true)
+                : safeTile,
               scale,
               isTutorial
             );
@@ -1492,6 +1520,12 @@ export const movePiece = (
               }
             }
           }
+        } else if (
+          _data[i].isThere &&
+          !_data[i].moveToTiles.length &&
+          _data[i].dir !== "idle"
+        ) {
+          _data[i].dir = "idle";
         }
         if (
           _data[i].isInManaPool &&
@@ -1662,10 +1696,17 @@ export const getRandomCharacterLocation = scale => {
   const { x, y } = getCharXAndY({ i, j, scale });
   return { x, y };
 };
-export const getRandomTileOnBoard = scale => {
-  const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
-  const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
-  return tileIndices[randomInt];
+export const getRandomTileOnBoard = (scale, isTutorial) => {
+  if (isTutorial) {
+    return {
+      i: getRandomIntInRange({ max: 24 }),
+      j: getRandomIntInRange({ max: 10 })
+    };
+  } else {
+    const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
+    const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
+    return tileIndices[randomInt];
+  }
 };
 export const getSafeTile = (kaijuData, tileStatuses, scale) => {
   const kaijuLocations = kaijuData.map(({ charLocation }) => charLocation);

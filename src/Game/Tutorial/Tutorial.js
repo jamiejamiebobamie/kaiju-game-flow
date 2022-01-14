@@ -11,7 +11,11 @@ import {
   initializeTutorialGameBoard
 } from "../../Utils/utils";
 
-export const Tutorial = ({ pickedAbilities, setPickedAbilities }) => {
+export const Tutorial = ({
+  pickedAbilities,
+  setPickedAbilities,
+  handeClickPlay
+}) => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
@@ -77,7 +81,8 @@ export const Tutorial = ({ pickedAbilities, setPickedAbilities }) => {
         width,
         height,
         scale,
-        accTime.current
+        accTime.current,
+        isTutorial
       );
     redrawTiles(
       highlightedTiles0,
@@ -133,6 +138,7 @@ export const Tutorial = ({ pickedAbilities, setPickedAbilities }) => {
     <ClassPicker
       pickedAbilities={pickedAbilities}
       setPickedAbilities={setPickedAbilities}
+      handeClickPlay={handeClickPlay}
       isPaused={false}
       powerUpData={[]}
       playerData={playerData}

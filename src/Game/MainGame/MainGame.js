@@ -72,6 +72,7 @@ export const MainGame = ({ pickedAbilities }) => {
     initializeGameBoard(
       playerData,
       setPlayerData,
+      pickedAbilities,
       kaijuData,
       width,
       height,

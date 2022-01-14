@@ -4,6 +4,7 @@ import { Abilities } from "./Components/Abilities";
 import { ClassPickerGameBoard } from "./Components/ClassPickerGameBoard";
 import { DescriptionDisplay } from "../../MainGame/UI/DescriptionDisplay";
 import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../../Utils/gameState";
+import { lookupClass } from "../../../Utils/utils";
 
 const ClassPickerWrapper = styled.div`
   display: flex;
@@ -80,6 +81,7 @@ const PlayButton = styled.div`
   border-radius: 5px;
   border-style: solid;
   border-thickness: thin;
+  border-bottom: 4px solid;
 
   font-size: 20px;
   font-family: gameboy;
@@ -91,6 +93,7 @@ const PlayButton = styled.div`
 export const ClassPicker = ({
   pickedAbilities,
   setPickedAbilities,
+  handeClickPlay,
   isPaused,
   powerUpData,
   playerData,
@@ -109,7 +112,6 @@ export const ClassPicker = ({
   scale
 }) => {
   const [displayString, setDisplayString] = useState(null);
-  // const [playerData, setPlayerData] = useState([]);
   const handleChange = element => {
     if (pickedAbilities.includes(element)) {
       const _pickedAbilities = [...pickedAbilities, element]
@@ -124,28 +126,7 @@ export const ClassPicker = ({
     }
   };
   useEffect(() => {
-    const classLookup = pickedAbilities.reduce(
-      (acc, element, i) => (acc ? acc + "," + element : acc + element),
-      ""
-    );
-    const playerClassObj = PLAYER_CLASSES.find(pc => pc.elems === classLookup);
-    const abilities = pickedAbilities.map(
-      ability => PLAYER_ABILITIES[ability.toLowerCase()]
-    );
-    setPlayerData(_player =>
-      _player.map((p, i) =>
-        i === 0
-          ? {
-              ...p,
-              playerClass: playerClassObj && playerClassObj.class_name,
-              playerClassDescription:
-                playerClassObj && playerClassObj.player_class_description,
-              elements: classLookup,
-              abilities
-            }
-          : p
-      )
-    );
+    lookupClass(pickedAbilities, setPlayerData);
   }, [pickedAbilities]);
   return (
     <ClassPickerWrapper>
@@ -182,7 +163,7 @@ export const ClassPicker = ({
           pickedAbilities={pickedAbilities}
           playerData={playerData}
         />
-        <PlayButton onClick={() => {}}>Play!</PlayButton>
+        <PlayButton onClick={handeClickPlay}>Play!</PlayButton>
       </DescriptionDisplayWrapper>
     </ClassPickerWrapper>
   );
