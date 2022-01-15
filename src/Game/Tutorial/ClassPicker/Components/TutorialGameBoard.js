@@ -8,14 +8,9 @@ const Board = styled.div`
   width: ${props => props.width}px;
   min-width: ${props => props.width}px;
   height: ${props => props.height}px;
-  minwidth: ${props => props.width}px;
-  /* overflow: hidden; */
-  /* border-style: solid;
-  border-thickness: medium;
-  border-radius: 10px; */
+  max-height: 300px;
   margin-top: 40px;
   margin-bottom: 10px;
-  /* background-color: red; */
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;
@@ -25,7 +20,8 @@ const ShiftContentOver = styled.div`
 const AbilitiesWrapper = styled.div`
   margin-top: 220px;
 `;
-export const ClassPickerGameBoard = ({
+export const TutorialGameBoard = ({
+  shiftContentOver,
   isClassWrapper = false,
   playerData,
   setPlayerData,
@@ -81,6 +77,7 @@ export const ClassPickerGameBoard = ({
       </ShiftContentOver>
       <AbilitiesWrapper>
         <Abilities
+          shiftContentOver={shiftContentOver}
           playerData={playerData}
           setPlayerData={setPlayerData}
           kaijuData={kaijuData}

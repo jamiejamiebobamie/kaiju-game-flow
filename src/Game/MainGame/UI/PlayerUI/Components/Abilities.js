@@ -7,12 +7,16 @@ const Wrapper = styled.div`
   ${props =>
     props.isReversed ? "flex-flow: row wrap;" : "flex-flow: row wrap-reverse;"}
   justify-content: flex-start;
-  width: 65%;
+  ${props =>
+    props.shiftContentOver
+      ? "width: 150%;margin-left:-125px;justify-content: center;"
+      : "width: 65%;"};
   height: 100%;
   overflow: none;
   overflow-y: none;
 `;
 export const Abilities = ({
+  shiftContentOver,
   playerIndex,
   kaijuData,
   playerData,
@@ -82,5 +86,9 @@ export const Abilities = ({
       playerIndex={playerIndex}
     />
   ));
-  return <Wrapper isReversed={isReversed}>{abilityButtons}</Wrapper>;
+  return (
+    <Wrapper shiftContentOver={shiftContentOver} isReversed={isReversed}>
+      {abilityButtons}
+    </Wrapper>
+  );
 };

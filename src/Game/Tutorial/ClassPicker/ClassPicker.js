@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Abilities } from "./Components/Abilities";
-import { ClassPickerGameBoard } from "./Components/ClassPickerGameBoard";
+import { TutorialGameBoard } from "./Components/TutorialGameBoard";
 import { DescriptionDisplay } from "../../MainGame/UI/DescriptionDisplay";
 import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../../Utils/gameState";
+import {
+  Wrapper,
+  TitleWrapper,
+  // Title,
+  ButtonsWrapper,
+  Button
+} from "./Components/StyledComponents";
 import { lookupClass } from "../../../Utils/utils";
 
 const ClassPickerWrapper = styled.div`
@@ -47,31 +54,21 @@ const DescriptionDisplayWrapper = styled.div`
   position: relative;
   justify-content: space-around;
   width: 100%;
-  /* background-color: red; */
-  /* margin-left: 100px; */
 `;
 const PlayButton = styled.div`
   position: absolute;
   z-index: 2;
-
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-content: flex-end;
   align-self: flex-end;
 
   min-width: 150px;
   height: 50px;
-  /* margin-bottom: 20px; */
-  /* margin-left: 500px; */
 
   right: 30px;
   bottom: 30px;
-
-  /* right: 200px;
-  margin-bottom: 20px; */
-  /* bottom: 5px; */
-
-  /* margin-right: 100px;
-  margin-bottom: 5px; */
 
   font-alignment: center;
   text-align: center;
@@ -109,7 +106,8 @@ export const ClassPicker = ({
   path,
   width,
   height,
-  scale
+  scale,
+  numAbilitiesToPick
 }) => {
   const [displayString, setDisplayString] = useState(null);
   const handleChange = element => {
@@ -131,14 +129,14 @@ export const ClassPicker = ({
   return (
     <ClassPickerWrapper>
       <AbilityButtonsWrapper>
-        <Title>Pick 3:</Title>
+        <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
         <Abilities
           handleChange={handleChange}
           pickedAbilities={pickedAbilities}
           setDisplayString={setDisplayString}
         />
       </AbilityButtonsWrapper>
-      <ClassPickerGameBoard
+      <TutorialGameBoard
         isPaused={isPaused}
         powerUpData={powerUpData}
         playerData={playerData}

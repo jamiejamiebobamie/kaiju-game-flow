@@ -1877,7 +1877,7 @@ export const PLAYER_ABILITIES = {
     },
     displayLookup: "",
     elementUppercase: "",
-    element: "",
+    element: "kaijuFire",
     isPassive: false,
     isActive: false,
     accTime: 0,

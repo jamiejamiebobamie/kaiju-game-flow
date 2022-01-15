@@ -47,6 +47,11 @@ const ICON_LOOKUP = {
     passive: "fa-thermometer-quarter",
     active: "fa-snowflake-o",
     loader: "fa-spinner"
+  },
+  kaijuFire: {
+    passive: "fa-free-code-camp",
+    active: "fa-free-code-camp",
+    loader: "fa-spinner"
   }
 };
 const Wrapper = styled.div`
