@@ -122,7 +122,8 @@ export const Tutorial = ({
           { i: 3, j: 3 }
         ];
         kaijuSpawnPositions = [{ i: 19, j: 3 }];
-        abilities = Object.values(PLAYER_ABILITIES);
+        abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
+        console.log(abilities);
         setBackButtonContent("Back");
         setNextButtonContent("Next");
         setTitle([
@@ -309,6 +310,7 @@ export const Tutorial = ({
     />
   ) : (
     <TutorialExplain
+      showCity={tutorialViewIndex === 1}
       shiftContentOver={tutorialViewIndex === 5}
       incrementTutorialViewIndex={incrementTutorialViewIndex}
       decrementTutorialViewIndex={decrementTutorialViewIndex}

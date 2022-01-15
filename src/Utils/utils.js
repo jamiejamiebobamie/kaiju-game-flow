@@ -100,7 +100,7 @@ export const initializeTutorialGameBoard = (
       isKaiju: false,
       lastDmg: 0,
       isInManaPoolAccTime: 0,
-      abilities: abilities ? abilities : [],
+      abilities: abilities && k === 1 ? abilities : [],
       abilityCooldowns: [],
       numTilesModifier: 0,
       tileCountModifier: 0,

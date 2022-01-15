@@ -12,11 +12,18 @@ import {
   ButtonsWrapper,
   Button
 } from "./Components/StyledComponents";
-
+const BackgroundImage = styled.img`
+  margin-top: -170px;
+  width: 478px;
+  height: 800px;
+  transform: scale(0.6);
+  background-repeat: no-repeat;
+`;
 export const TutorialExplain = ({
   title,
   title2,
   shiftContentOver,
+  showCity,
   backButtonContent,
   nextButtonContent,
   backButtonCallback,
@@ -65,25 +72,29 @@ export const TutorialExplain = ({
       <TitleWrapper>
         <Title>{title}</Title>
       </TitleWrapper>
-      <TutorialGameBoard
-        shiftContentOver={shiftContentOver}
-        isPaused={isPaused}
-        powerUpData={powerUpData}
-        playerData={playerData}
-        setPlayerData={setPlayerData}
-        setTeleportData={setTeleportData}
-        kaijuData={kaijuData}
-        setPlayerMoveToTiles={setPlayerMoveToTiles}
-        tileStatuses={tileStatuses}
-        setTileStatuses={setTileStatuses}
-        clickedTile={clickedTile}
-        setClickedTile={setClickedTile}
-        tiles={tiles}
-        path={path}
-        width={width}
-        height={height}
-        scale={scale}
-      />
+      {showCity ? (
+        <BackgroundImage src={"test_map.png"} />
+      ) : (
+        <TutorialGameBoard
+          shiftContentOver={shiftContentOver}
+          isPaused={isPaused}
+          powerUpData={powerUpData}
+          playerData={playerData}
+          setPlayerData={setPlayerData}
+          setTeleportData={setTeleportData}
+          kaijuData={kaijuData}
+          setPlayerMoveToTiles={setPlayerMoveToTiles}
+          tileStatuses={tileStatuses}
+          setTileStatuses={setTileStatuses}
+          clickedTile={clickedTile}
+          setClickedTile={setClickedTile}
+          tiles={tiles}
+          path={path}
+          width={width}
+          height={height}
+          scale={scale}
+        />
+      )}
       {title2 && (
         <TitleWrapper>
           <Title>{title2}</Title>
