@@ -10,8 +10,8 @@ const Monster = styled.div`
     margin-top: -25px;
     display: ${props =>
       props.charLocation.x < 0 ||
-      props.charLocation.x > 490 ||
-      props.charLocation.y < 30 ||
+      props.charLocation.x > 500 ||
+      props.charLocation.y < 0 ||
       props.charLocation.y > 800
         ? "none"
         : "flex"};
@@ -84,7 +84,7 @@ const Bar = styled.div`
   pointer-events: none;
   margin-top: -15px;
 `;
-export const Kaiju = ({ charLocation, element, color, lives }) => {
+export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
   const [isDamaged, setIsDamaged] = useState(false);
   useEffect(() => {
     if (lives < 3) {
@@ -96,6 +96,7 @@ export const Kaiju = ({ charLocation, element, color, lives }) => {
   for (let i = 0; i < lives; i++) bars.push(<Bar lives={lives} key={i} />);
   return (
     <Monster lives={lives} charLocation={charLocation}>
+      <p style={{ position: "absolute", zIndex: 3, color: "white" }}>{dir}</p>
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <MonsterImg lives={lives} isDamaged={isDamaged} src={"kaiju.png"} />
     </Monster>

@@ -42,7 +42,7 @@ const PassiveAbility = styled.div`
   border-radius: 100%;
   border-style: solid;
   border-thickness: thin;
-  background-color: #f2e3cc;
+  background-color: ${props => props.color};
   transform: rotate(
     ${props => (props.isReversed ? props.i * 18 - 90 : props.i * 18 - 30)}deg
   );
@@ -77,6 +77,7 @@ export const PassiveAbilities = ({
         isReversed={isReversed}
         i={i}
         title={data.passiveName}
+        color={data.color}
       >
         <PassiveIcon className={`fa ${ICON_LOOKUP[data.element]}`} />
       </PassiveAbility>

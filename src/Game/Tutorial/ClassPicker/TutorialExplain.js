@@ -4,7 +4,7 @@ import { Abilities } from "./Components/Abilities";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
 import { DescriptionDisplay } from "../../MainGame/UI/DescriptionDisplay";
 import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../../Utils/gameState";
-import { lookupClass } from "../../../Utils/utils";
+import { lookupClassAndOrSetPassives } from "../../../Utils/utils";
 import {
   Wrapper,
   TitleWrapper,
@@ -13,6 +13,9 @@ import {
   Button
 } from "./Components/StyledComponents";
 const BackgroundImage = styled.img`
+  border-radius: 5px;
+  border-style: solid;
+  border-thickness: thick;
   margin-top: -170px;
   width: 478px;
   height: 800px;
@@ -20,6 +23,7 @@ const BackgroundImage = styled.img`
   background-repeat: no-repeat;
 `;
 export const TutorialExplain = ({
+  animName,
   title,
   title2,
   shiftContentOver,
@@ -65,10 +69,10 @@ export const TutorialExplain = ({
     }
   };
   useEffect(() => {
-    pickedAbilities.length === 3 && lookupClass(pickedAbilities, setPlayerData);
+    lookupClassAndOrSetPassives(pickedAbilities, setPlayerData);
   }, [pickedAbilities]);
   return (
-    <Wrapper>
+    <Wrapper animName={animName}>
       <TitleWrapper>
         <Title>{title}</Title>
       </TitleWrapper>

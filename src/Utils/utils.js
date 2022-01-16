@@ -13,35 +13,39 @@ import {
 } from "./gameState";
 import { HexagonTile } from "../Game/MainGame/GameBoard/Tile/HexagonTile";
 
-export const lookupClass = (pickedAbilities, setPlayerData) => {
+export const lookupClassAndOrSetPassives = (pickedAbilities, setPlayerData) => {
   const classLookup =
     pickedAbilities.length === 3 &&
-    pickedAbilities.reduce(
-      (acc, element, i) => (acc ? acc + "," + element : acc + element),
-      ""
-    );
+    pickedAbilities
+      .slice(0, 3)
+      .reduce(
+        (acc, element, i) => (acc ? acc + "," + element : acc + element),
+        ""
+      );
   const playerClassObj =
     pickedAbilities.length === 3 &&
     PLAYER_CLASSES.find(pc => pc.elems === classLookup);
   const abilities = pickedAbilities.map(
     ability => PLAYER_ABILITIES[ability.toLowerCase()]
   );
-  if (setPlayerData)
-    setPlayerData(_player =>
-      _player.map((p, i) =>
-        i === 0
-          ? {
-              ...p,
-              playerClass: playerClassObj && playerClassObj.class_name,
-              playerClassDescription:
-                playerClassObj && playerClassObj.player_class_description,
-              elements: classLookup,
-              abilities
-            }
-          : p
-      )
-    );
-  else
+  if (setPlayerData) {
+    setPlayerData(_players => {
+      return _players.map((p, i) => {
+        const newPlayer = {
+          ...p,
+          ...abilities.reduce((acc, ability) => ability.activatePassive(acc), p)
+        };
+        return {
+          ...newPlayer,
+          playerClass: playerClassObj && playerClassObj.class_name,
+          playerClassDescription:
+            playerClassObj && playerClassObj.player_class_description,
+          elements: classLookup,
+          abilities
+        };
+      });
+    });
+  } else
     return [
       {
         playerClass: playerClassObj && playerClassObj.class_name,
@@ -74,7 +78,8 @@ export const initializeTutorialGameBoard = (
   setTileStatuses,
   playerSpawnPositions,
   kaijuSpawnPositions,
-  abilities
+  abilities,
+  kaijuMoveSpeed
 ) => {
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
@@ -164,7 +169,7 @@ export const initializeTutorialGameBoard = (
       color: "purple",
       isThere: true,
       lives: 5,
-      moveSpeed: 3,
+      moveSpeed: kaijuMoveSpeed !== undefined ? kaijuMoveSpeed : 3,
       lastDmg: 0,
       abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
       isKaiju: true,
@@ -198,8 +203,7 @@ export const initializeGameBoard = (
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
   let _max = tileIndices.length - 1;
-  const test = lookupClass(pickedAbilities);
-
+  const classDetails = lookupClassAndOrSetPassives(pickedAbilities);
   for (let k = 0; k < 2; k++) {
     _max -= k;
     const randomInt = getRandomIntInRange({
@@ -210,39 +214,6 @@ export const initializeGameBoard = (
     tileIndices[tileIndices.length - k] = tileIndices[randomInt];
     tileIndices[randomInt] = storeItem;
     const location = getCharXAndY({ i, j, scale });
-    // const abilityOptions = [
-    //   PLAYER_ABILITIES["metal"],
-    //   PLAYER_ABILITIES["glass"],
-    //   PLAYER_ABILITIES["heart"],
-    //   PLAYER_ABILITIES["ice"],
-    //   PLAYER_ABILITIES["fire"],
-    //   PLAYER_ABILITIES["wood"],
-    //   PLAYER_ABILITIES["lightning"],
-    //   PLAYER_ABILITIES["bubble"],
-    //   PLAYER_ABILITIES["death"]
-    // ];
-    // let count = 0;
-    // while (count < 3) {
-    //   const lastIndex = abilityOptions.length - count - 1;
-    //   const randInt = getRandomIntInRange({ max: lastIndex });
-    //   const savedAbility = abilityOptions[randInt];
-    //   abilityOptions[randInt] = abilityOptions[lastIndex];
-    //   abilityOptions[lastIndex] = savedAbility;
-    //   count++;
-    // }
-    // const abilities = [
-    //   abilityOptions[abilityOptions.length - 1],
-    //   abilityOptions[abilityOptions.length - 2],
-    //   abilityOptions[abilityOptions.length - 3]
-    // ].sort((item1, item2) => item1.element.localeCompare(item2.element));
-    // const classLookUpKey = [
-    //   abilities[0].Element,
-    //   abilities[1].Element,
-    //   abilities[2].Element
-    // ].join(",");
-    // const playerClassObj = PLAYER_CLASSES.find(
-    //   pc => pc.elems === classLookUpKey
-    // );
     const baseStats = {
       key: Math.random(),
       isInManaPool: false,
@@ -263,15 +234,10 @@ export const initializeGameBoard = (
       isKaiju: false,
       lastDmg: 0,
       isInManaPoolAccTime: 0,
-      // abilities: pickedAbilities,
       abilityCooldowns: [],
       numTilesModifier: 0,
       tileCountModifier: 0,
-      // playerClass: playerClassObj && playerClassObj.class_name,
-      // playerClassDescription:
-      //   playerClassObj && playerClassObj.player_class_description,
-      // elements: classLookUpKey
-      ...test[k]
+      ...classDetails[k]
     };
 
     const newPlayer = {
@@ -360,35 +326,29 @@ export const spawnKaiju = (
   isRespawn,
   isTutorial
 ) => {
-  let location = (kaijuData[0] && kaijuData[0].charLocation) || { x: 0, y: 0 };
-  let kaijuTile = (kaijuData[0] && kaijuData[0].tile) || { i: 0, j: 0 };
+  const minX = 0;
+  const minY = 30;
+  const maxX = 490;
+  const maxY = 800;
+  const randIntX = getRandomIntInRange({ min: minX, max: maxX });
+  const randIntY = getRandomIntInRange({ min: minY, max: maxY });
+  const randBool1 = Math.random() > 0.5;
+  const randBool2 = Math.random() > 0.5;
+  const randPlayerIndex = getRandomIntInRange({
+    max: playerData.length - 1
+  });
+  const location = isTutorial
+    ? getCharXAndY({ ...kaijuData[0].tile, scale })
+    : randBool1
+    ? { x: randIntX, y: randBool2 ? minY : maxY }
+    : { x: randBool2 ? minX : maxX, y: randIntY };
+  const kaijuTile = isTutorial
+    ? kaijuData[0].tile
+    : getClosestPerimeterTileFromLocation({
+        ...location,
+        scale
+      });
   const key = Math.random();
-  if (!isTutorial) {
-    const minX = 0;
-    const minY = 30;
-    const maxX = 490;
-    const maxY = 800;
-    const randIntX = getRandomIntInRange({ min: minX, max: maxX });
-    const randIntY = getRandomIntInRange({ min: minY, max: maxY });
-    const randBool1 = Math.random() > 0.5;
-    const randBool2 = Math.random() > 0.5;
-    const randPlayerIndex = getRandomIntInRange({
-      max: playerData.length - 1
-    });
-    const location = randBool1
-      ? { x: randIntX, y: randBool2 ? minY : maxY }
-      : { x: randBool2 ? minX : maxX, y: randIntY };
-    const kaijuTile = getClosestPerimeterTileFromLocation({
-      ...location,
-      scale
-    });
-    const normVec = getNormVecFromTiles(
-      kaijuTile,
-      playerData[randPlayerIndex].tile,
-      scale
-    );
-    const [_, dirs] = getAdjacentTilesFromNormVec(kaijuTile, normVec, scale, 1);
-  }
   return isRespawn
     ? {
         key,
@@ -440,26 +400,26 @@ export const updateHighlightedTiles = (
       Array.isArray(path) && path[path.length - 1]
         ? path[path.length - 1]
         : { i: -1, j: -1 };
-    if (
-      playerData &&
-      playerData[0] &&
-      playerData[0].moveToTiles.length === 0 &&
-      `${lastTile.i} ${lastTile.j}` === hoverLookupString
-    ) {
-      _highlightedTiles = path.map(t => {
-        return { h_i: t.i, h_j: t.j };
-      });
-    } else {
-      const _path = findPath(
-        playerData[0].tile,
-        { i: Number(i), j: Number(j) },
-        scale,
-        isTutorial
-      );
-      _highlightedTiles = _path.map(t => {
-        return { h_i: t.i, h_j: t.j };
-      });
-      setPath(_path);
+    if (playerData && playerData[0]) {
+      if (
+        playerData[0].moveToTiles.length === 0 &&
+        `${lastTile.i} ${lastTile.j}` === hoverLookupString
+      ) {
+        _highlightedTiles = path.map(t => {
+          return { h_i: t.i, h_j: t.j };
+        });
+      } else {
+        const _path = findPath(
+          playerData[0].tile,
+          { i: Number(i), j: Number(j) },
+          scale,
+          isTutorial
+        );
+        _highlightedTiles = _path.map(t => {
+          return { h_i: t.i, h_j: t.j };
+        });
+        setPath(_path);
+      }
     }
   } else if (
     playerData &&
@@ -1318,19 +1278,30 @@ export const movePiece = (
         }
         // - - - - - - - - - - -
         // if Kaiju and on tiles, move toward the closest player.
+        _data[i].isKaiju && console.log(_data[i].isOnTiles, _data[i].tile);
         if (_data[i].isKaiju && _data[i].isOnTiles) {
-          const [targetTile, _] = getClosestEntityFromTile(
-            enemyData,
-            _data[i].tile,
-            scale
-          );
-          const moveToTiles = findPath(
-            _data[i].tile,
-            targetTile,
-            scale,
-            isTutorial
-          );
-          _data[i].moveToTiles = moveToTiles;
+          if (enemyData.length) {
+            const [targetTile, _] = getClosestEntityFromTile(
+              enemyData,
+              _data[i].tile,
+              scale
+            );
+            const moveToTiles = findPath(
+              _data[i].tile,
+              targetTile,
+              scale,
+              isTutorial
+            );
+            _data[i].moveToTiles = moveToTiles;
+          } else if (_data[i].isThere) {
+            const moveToTiles = findPath(
+              _data[i].tile,
+              getRandAdjacentTile(_data[i].tile),
+              scale,
+              isTutorial
+            );
+            _data[i].moveToTiles = moveToTiles;
+          }
         }
         // - - - - - - - - - - -
         if (
@@ -1593,8 +1564,8 @@ export const getRandomCharacterLocation = scale => {
 export const getRandomTileOnBoard = (scale, isTutorial) => {
   if (isTutorial) {
     return {
-      i: getRandomIntInRange({ max: 24 }),
-      j: getRandomIntInRange({ max: 10 })
+      i: getRandomIntInRange({ max: 23 }),
+      j: getRandomIntInRange({ max: 9 })
     };
   } else {
     const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
@@ -1716,7 +1687,7 @@ export const findPath = (start, goal, scale, isTutorial) => {
     const goalXY = getCharXAndY({ ...goal, scale });
     const test = getCharXAndY({ ...adjacentTiles[0], scale });
     const shortest = {
-      tile: adjacentTiles[0] || { i: 0, j: 0 },
+      tile: adjacentTiles[0],
       distance: getDistance(test, goalXY)
     };
     adjacentTiles.forEach(t => {

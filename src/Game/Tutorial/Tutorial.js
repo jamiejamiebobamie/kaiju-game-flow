@@ -43,19 +43,29 @@ export const Tutorial = ({
   const [nextButtonContent, setNextButtonContent] = useState("");
   const [backButtonContent, setBackButtonContent] = useState("");
   const [backButtonCallback, setBackButtonCallback] = useState(() => {});
+  const [animName, setAnimName] = useState(null);
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const incrementTutorialViewIndex = () => {
+    // if (!animName) {
+    setAnimName("fadeInRight");
+    setTimeout(() => setAnimName(null), 3000);
     setTutorialViewIndex(_i =>
       _i + 1 <= MAX_TUTORIAL_VIEW_INDEX ? _i + 1 : 0
     );
+    // }
   };
   const decrementTutorialViewIndex = () => {
+    // if (!animName) {
+    setAnimName("fadeInLeft");
+    setTimeout(() => setAnimName(null), 3000);
     setTutorialViewIndex(_i => (_i - 1 >= 0 ? _i - 1 : 0));
+    // }
   };
   useEffect(() => {
     let playerSpawnPositions = [];
     let kaijuSpawnPositions = [];
     let abilities = [];
+    let kaijuMoveSpeed = undefined;
     switch (tutorialViewIndex) {
       case 0:
         playerSpawnPositions = [{ i: 11, j: 5 }];
@@ -87,16 +97,15 @@ export const Tutorial = ({
         break;
       case 3:
         playerSpawnPositions = [{ i: 11, j: 6 }];
+        // fix this... freezes witj Kaiju data.
         kaijuSpawnPositions = [
-          { i: 19, j: 3 },
-          { i: 3, j: 3 },
-          { i: 11, j: 1 }
+          // { i: 19, j: 3 }
+          // { i: 3, j: 3 },
+          // { i: 11, j: 1 }
         ];
         setBackButtonContent("Back");
         setNextButtonContent("Oh no!");
-        setTitle([
-          [`Kaiju want to eat you`, <br />, `and destroy Kaiju City!`]
-        ]);
+        setTitle([[`Kaiju want to eat you`, <br />, `and destroy the city!`]]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 4:
@@ -107,13 +116,7 @@ export const Tutorial = ({
         kaijuSpawnPositions = [];
         setBackButtonContent("Back");
         setNextButtonContent("Ok!");
-        setTitle([
-          [
-            `This is your teammate.`,
-            <br />,
-            `He will help you protect the city.`
-          ]
-        ]);
+        setTitle([`This is your teammate.`, `He will help you.`]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 5:
@@ -174,6 +177,7 @@ export const Tutorial = ({
           { i: 3, j: 3 }
         ];
         kaijuSpawnPositions = [{ i: 19, j: 3 }];
+        kaijuMoveSpeed = 0;
         break;
     }
     initializeTutorialGameBoard(
@@ -191,7 +195,8 @@ export const Tutorial = ({
       setTileStatuses,
       playerSpawnPositions,
       kaijuSpawnPositions,
-      abilities
+      abilities,
+      kaijuMoveSpeed
     );
   }, [tutorialViewIndex]);
   useEffect(() => {
@@ -257,7 +262,7 @@ export const Tutorial = ({
       dmgArray,
       teleportData,
       setTeleportData,
-      undefined,
+      () => {},
       isTutorial
     );
     // move monsters
@@ -285,6 +290,7 @@ export const Tutorial = ({
   }, intervalTime);
   return tutorialViewIndex === MAX_TUTORIAL_VIEW_INDEX ? (
     <ClassPicker
+      animName={animName}
       incrementTutorialViewIndex={incrementTutorialViewIndex}
       decrementTutorialViewIndex={decrementTutorialViewIndex}
       pickedAbilities={pickedAbilities}
@@ -310,6 +316,7 @@ export const Tutorial = ({
     />
   ) : (
     <TutorialExplain
+      animName={animName}
       showCity={tutorialViewIndex === 1}
       shiftContentOver={tutorialViewIndex === 5}
       incrementTutorialViewIndex={incrementTutorialViewIndex}

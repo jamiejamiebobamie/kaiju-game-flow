@@ -53,6 +53,7 @@ export const GameBoard = ({
   const kaiju = kaijuData.map((k, i) => (
     <Kaiju
       key={k.key}
+      dir={k.dir}
       charLocation={k.charLocation}
       color={k.color}
       scale={scale}

@@ -178,7 +178,8 @@ export const MainGame = ({ pickedAbilities }) => {
       dmgArray,
       undefined,
       undefined,
-      setKaijuKillCount
+      setKaijuKillCount,
+      false
     );
     // powerup spawning.
     if (shouldUpdate(accTime.current, 30000))

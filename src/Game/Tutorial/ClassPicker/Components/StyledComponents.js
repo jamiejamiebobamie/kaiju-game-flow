@@ -16,12 +16,37 @@ export const Wrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
-  /* background-color: blue; */
+  ${props =>
+    props.animName &&
+    `-webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-name: ${props.animName};
+    animation-name:  ${props.animName};`}
+  @keyframes fadeInLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes fadeInRight {
+    0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 `;
 export const ButtonsWrapper = styled.div`
   position: absolute;
   display: flex;
-  bottom: 150px;
+  bottom: 75px;
   justify-content: space-around;
   width: 100%;
   height: 100px;
@@ -30,6 +55,7 @@ export const ButtonsWrapper = styled.div`
 `;
 export const Button = styled.div`
   display: flex;
+  position: relative;
   flex-direction: column;
   justify-content: center;
 
@@ -46,8 +72,11 @@ export const Button = styled.div`
   border-radius: 5px;
   border-style: solid;
   border-thickness: thin;
-  border-bottom: 4px solid;
-
+  border-bottom: 5px solid;
+  &:hover {
+    border-bottom: 3px solid;
+    transform: translate(0px, 3px);
+  }
   font-size: 20px;
   font-family: gameboy;
   @font-face {
