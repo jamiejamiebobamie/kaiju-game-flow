@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { ClassPicker } from "./ClassPicker/ClassPicker";
 import { TutorialExplain } from "./ClassPicker/TutorialExplain";
 import { StyledIcon } from "./ClassPicker/Components/StyledComponents";
-import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../Utils/gameState";
+import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../Utils/gameState";
 import {
   useInterval,
   useHover,
@@ -13,14 +13,17 @@ import {
   redrawTiles,
   updateHighlightedTiles,
   initializeTutorialGameBoard
-} from "../../Utils/utils";
+} from "../Utils/utils";
 
 export const Tutorial = ({
   pickedAbilities,
   setPickedAbilities,
-  handeClickPlay
+  handeClickPlay,
+  handeClickHome,
+  maxTutorialViewIndex,
+  tutorialViewIndex,
+  setTutorialViewIndex
 }) => {
-  const MAX_TUTORIAL_VIEW_INDEX = 6;
   const width = 500;
   const height = 800;
   const scale = 0.3;
@@ -38,20 +41,17 @@ export const Tutorial = ({
   const [setHoverRef, hoverLookupString] = useHover();
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(1);
-  const [tutorialViewIndex, setTutorialViewIndex] = useState(0);
   const [title, setTitle] = useState([]);
   const [nextButtonContent, setNextButtonContent] = useState("");
   const [backButtonContent, setBackButtonContent] = useState("");
   const [backButtonCallback, setBackButtonCallback] = useState(() => {});
-  const [animName, setAnimName] = useState(null);
+  const [animName, setAnimName] = useState("fadeInRight");
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const incrementTutorialViewIndex = () => {
     // if (!animName) {
     setAnimName("fadeInRight");
     setTimeout(() => setAnimName(null), 3000);
-    setTutorialViewIndex(_i =>
-      _i + 1 <= MAX_TUTORIAL_VIEW_INDEX ? _i + 1 : 0
-    );
+    setTutorialViewIndex(_i => (_i + 1 <= maxTutorialViewIndex ? _i + 1 : 0));
     // }
   };
   const decrementTutorialViewIndex = () => {
@@ -76,7 +76,7 @@ export const Tutorial = ({
           ["This is you", <br />, "champion of Kaiju City."],
           "Click on a tile to walk to it."
         ]);
-        setBackButtonCallback(() => {}); // Toggle home screen
+        setBackButtonCallback(() => () => handeClickHome()); // Toggle home screen
         break;
       case 1:
         playerSpawnPositions = [];
@@ -84,12 +84,13 @@ export const Tutorial = ({
         // display map gif.
         setBackButtonContent("Back");
         setNextButtonContent("Yay!");
-        setTitle(["This is Kaiju City."]);
+        setTitle([["This is Kaiju City", <br />, "your home."]]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 2:
         playerSpawnPositions = [];
-        kaijuSpawnPositions = [{ i: 11, j: 5 }];
+        kaijuSpawnPositions = [{ i: 11, j: 4 }];
+        kaijuMoveSpeed = 0;
         setBackButtonContent("Back");
         setNextButtonContent("Ok...");
         setTitle(["This is a Kaiju."]);
@@ -99,10 +100,11 @@ export const Tutorial = ({
         playerSpawnPositions = [{ i: 11, j: 6 }];
         // fix this... freezes witj Kaiju data.
         kaijuSpawnPositions = [
-          // { i: 19, j: 3 }
-          // { i: 3, j: 3 },
-          // { i: 11, j: 1 }
+          { i: 19, j: 3 },
+          { i: 3, j: 3 },
+          { i: 11, j: 1 }
         ];
+        // kaijuMoveSpeed = 0;
         setBackButtonContent("Back");
         setNextButtonContent("Oh no!");
         setTitle([[`Kaiju want to eat you`, <br />, `and destroy the city!`]]);
@@ -171,7 +173,7 @@ export const Tutorial = ({
         ]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
-      case MAX_TUTORIAL_VIEW_INDEX:
+      case maxTutorialViewIndex:
         playerSpawnPositions = [
           { i: 11, j: 7 },
           { i: 3, j: 3 }
@@ -266,29 +268,32 @@ export const Tutorial = ({
       isTutorial
     );
     // move monsters
-    movePiece(
-      kaijuData,
-      setKaijuData,
-      undefined,
-      () => {},
-      tileStatuses,
-      setTileStatuses,
-      scale,
-      accTime.current,
-      playerData,
-      dmgArray,
-      undefined,
-      undefined,
-      undefined,
-      isTutorial
-    );
+    tutorialViewIndex !== 3 &&
+      tutorialViewIndex !== 2 &&
+      movePiece(
+        kaijuData,
+        setKaijuData,
+        undefined,
+        () => {},
+        tileStatuses,
+        setTileStatuses,
+        scale,
+        accTime.current,
+        playerData,
+        dmgArray,
+        undefined,
+        undefined,
+        () => {},
+        isTutorial
+      );
     // update accumulated time.
     accTime.current =
       accTime > Number.MAX_SAFE_INTEGER - 10000
         ? 0
         : accTime.current + intervalTime;
-  }, intervalTime);
-  return tutorialViewIndex === MAX_TUTORIAL_VIEW_INDEX ? (
+  });
+  // , intervalTime);
+  return tutorialViewIndex === maxTutorialViewIndex ? (
     <ClassPicker
       animName={animName}
       incrementTutorialViewIndex={incrementTutorialViewIndex}
@@ -318,7 +323,7 @@ export const Tutorial = ({
     <TutorialExplain
       animName={animName}
       showCity={tutorialViewIndex === 1}
-      shiftContentOver={tutorialViewIndex === 5}
+      shiftContentOver={tutorialViewIndex === 6}
       incrementTutorialViewIndex={incrementTutorialViewIndex}
       decrementTutorialViewIndex={decrementTutorialViewIndex}
       nextButtonContent={nextButtonContent}

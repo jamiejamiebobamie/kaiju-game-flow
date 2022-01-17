@@ -118,7 +118,6 @@ export const Player = ({
     if (!_isHealed) {
       _setIsHealed(true);
       const _particles = [];
-      console.log(charLocation);
       for (let i = 0; i < 5; i++) {
         _particles.push(
           <Particle
@@ -144,7 +143,6 @@ export const Player = ({
     }
   }, [isHealed]);
   useEffect(() => {
-    console.log(isTeleported);
     if (!_isTeleported) {
       _setIsTeleported(true);
       const _particles = [];

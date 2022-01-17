@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useInterval } from "../../../Utils/utils";
+import { useInterval } from "../../Utils/utils";
 
 const getDescription = (string, playerData, playerIndex) => {
   switch (string) {

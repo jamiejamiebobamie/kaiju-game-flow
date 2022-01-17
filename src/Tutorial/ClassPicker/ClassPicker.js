@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Abilities } from "./Components/Abilities";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
-import { DescriptionDisplay } from "../../MainGame/UI/DescriptionDisplay";
-import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../../Utils/gameState";
+import { DescriptionDisplay } from "../../Game/UI/DescriptionDisplay";
+import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../Utils/gameState";
 import {
   Wrapper,
   TitleWrapper,
@@ -11,7 +11,7 @@ import {
   ButtonsWrapper,
   Button
 } from "./Components/StyledComponents";
-import { lookupClassAndOrSetPassives } from "../../../Utils/utils";
+import { lookupClassAndOrSetPassives } from "../../Utils/utils";
 
 const ClassPickerWrapper = styled.div`
   display: flex;
@@ -112,12 +112,70 @@ const PlayButton = styled.div`
     border-bottom: 3px solid;
     transform: translate(0px, 3px);
   }
-
   font-size: 20px;
   font-family: gameboy;
   @font-face {
     font-family: gameboy;
     src: url(Early_GameBoy.ttf);
+  }
+`;
+const ClassTitlePopUp = styled.div`
+  /* position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  font-alignment: center;
+  align-content: center; */
+  position: absolute;
+  display: flex;
+
+  justify-content: center;
+  pointer-events: none;
+  /* left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+  width: 700px;  */
+  /* background-color: green; */
+  left: 50%;
+  top: 50%;
+
+  width: 900px;
+  height: 100px;
+  margin-left: -450px;
+  margin-top: -150px;
+
+  z-index: 9999999999;
+  opacity: 0;
+  font-size: 50px;
+  font-family: gameboy;
+  @font-face {
+    font-family: gameboy;
+    src: url(Early_GameBoy.ttf);
+  }
+  -webkit-animation-duration: 3s;
+  animation-duration: 3s;
+  -webkit-animation-name: fadeInFadeOutUp;
+  animation-name: fadeInRight;
+  @keyframes fadeInRight {
+    0% {
+      opacity: 0;
+      transform: translateY(0px);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(20px);
+    }
+    70% {
+      opacity: 1;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(0px);
+    }
   }
 `;
 export const ClassPicker = ({
@@ -144,6 +202,7 @@ export const ClassPicker = ({
   numAbilitiesToPick
 }) => {
   const [displayString, setDisplayString] = useState(null);
+  const [classTitle, setClassTitle] = useState("");
   const handleChange = element => {
     if (pickedAbilities.includes(element)) {
       const _pickedAbilities = [...pickedAbilities, element]
@@ -158,11 +217,18 @@ export const ClassPicker = ({
     }
   };
   useEffect(() => {
-    lookupClassAndOrSetPassives(pickedAbilities, setPlayerData);
+    lookupClassAndOrSetPassives(pickedAbilities, setPlayerData, setClassTitle);
   }, [pickedAbilities]);
+  useEffect(() => {
+    if (classTitle) setTimeout(() => setClassTitle(null), 3000);
+  }, [classTitle]);
   return (
     <ClassPickerWrapper animName={animName}>
+      {classTitle && <ClassTitlePopUp>{classTitle}</ClassTitlePopUp>}
       <AbilityButtonsWrapper>
+        <br />
+        <Title>What kind of champion are you?</Title>
+        <br />
         <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
         <Abilities
           handleChange={handleChange}

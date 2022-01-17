@@ -11,9 +11,13 @@ import {
   DEATH_TILE_STATUSES,
   PLAYER_CLASSES
 } from "./gameState";
-import { HexagonTile } from "../Game/MainGame/GameBoard/Tile/HexagonTile";
+import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 
-export const lookupClassAndOrSetPassives = (pickedAbilities, setPlayerData) => {
+export const lookupClassAndOrSetPassives = (
+  pickedAbilities,
+  setPlayerData,
+  setClassTitle
+) => {
   const classLookup =
     pickedAbilities.length === 3 &&
     pickedAbilities
@@ -28,6 +32,7 @@ export const lookupClassAndOrSetPassives = (pickedAbilities, setPlayerData) => {
   const abilities = pickedAbilities.map(
     ability => PLAYER_ABILITIES[ability.toLowerCase()]
   );
+  setClassTitle && playerClassObj && setClassTitle(playerClassObj.class_name);
   if (setPlayerData) {
     setPlayerData(_players => {
       return _players.map((p, i) => {
@@ -41,7 +46,7 @@ export const lookupClassAndOrSetPassives = (pickedAbilities, setPlayerData) => {
           playerClassDescription:
             playerClassObj && playerClassObj.player_class_description,
           elements: classLookup,
-          abilities
+          abilities: i === 0 ? abilities : []
         };
       });
     });
@@ -155,15 +160,16 @@ export const initializeTutorialGameBoard = (
   setTileStatuses(status);
   // TILES      - - - - - - - - - -
   // KAIJU      - - - - - - - - - -
-  const _kaiju = [];
+  const kaijuDataArr = [];
   for (let k = 0; k < kaijuSpawnPositions.length; k++) {
     const location = getCharXAndY({ ...kaijuSpawnPositions[k], scale });
-    const _k = {
-      key: "apple",
+    const key = Math.random();
+    const data = {
+      key,
       charLocation: location,
       moveFromLocation: location,
       moveToLocation: location,
-      moveToTiles: [kaijuSpawnPositions[k]],
+      moveToTiles: [],
       tile: kaijuSpawnPositions[k],
       dir: "idle",
       color: "purple",
@@ -180,9 +186,9 @@ export const initializeTutorialGameBoard = (
       isHealed: false,
       isTeleported: false
     };
-    _kaiju.push(_k);
+    kaijuDataArr.push(data);
   }
-  setKaijuData(_kai => _kaiju);
+  setKaijuData(kaijuDataArr);
   // KAIJU      - - - - - - - - - -
 };
 export const initializeGameBoard = (
@@ -1144,7 +1150,8 @@ export const movePiece = (
   teleportData,
   setTeleportData,
   setKaijuKillCount,
-  isTutorial
+  isTutorial,
+  shouldSpawnKaiju
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -1278,7 +1285,6 @@ export const movePiece = (
         }
         // - - - - - - - - - - -
         // if Kaiju and on tiles, move toward the closest player.
-        _data[i].isKaiju && console.log(_data[i].isOnTiles, _data[i].tile);
         if (_data[i].isKaiju && _data[i].isOnTiles) {
           if (enemyData.length) {
             const [targetTile, _] = getClosestEntityFromTile(
@@ -1431,6 +1437,7 @@ export const movePiece = (
     let isRespawn = true;
     const newKaijuData =
       !powerUpData &&
+      // !isTutorial &&
       !newKaiju &&
       accTime &&
       !(accTime % 3) &&

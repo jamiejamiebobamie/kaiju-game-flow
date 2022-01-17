@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Player } from "../../../MainGame/GameBoard/Pieces/PlayerPiece";
-import { Kaiju } from "../../../MainGame/GameBoard/Pieces/KaijuPiece";
-import { Abilities } from "../../../MainGame/UI/PlayerUI/Components/Abilities";
+import { Player } from "../../../Game/GameBoard/Pieces/PlayerPiece";
+import { Kaiju } from "../../../Game/GameBoard/Pieces/KaijuPiece";
+import { Abilities } from "../../../Game/UI/PlayerUI/Components/Abilities";
+// import { Title } from "./Components/StyledComponents";
 
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -18,7 +19,32 @@ const ShiftContentOver = styled.div`
   position: absolute;
 `;
 const AbilitiesWrapper = styled.div`
-  margin-top: 220px;
+  display: flex;
+
+  margin-left: 5px;
+  margin-top: 200px;
+  /* background-color: red; */
+  height: 105px;
+`;
+const Title = styled.div`
+  display: flex;
+  /* background-color: orange; */
+  align-self: flex-end;
+  align-content: flex-end;
+  font-alignment: flex-end;
+
+  width: 70px;
+  height: 70px;
+  margin-top: 40px;
+  pointer-events: none;
+  font-size: 13px;
+  z-index: 1;
+  color: black;
+  font-family: gameboy;
+  @font-face {
+    font-family: gameboy;
+    src: url(Early_GameBoy.ttf);
+  }
 `;
 export const TutorialGameBoard = ({
   shiftContentOver,
@@ -76,6 +102,11 @@ export const TutorialGameBoard = ({
         {players}
       </ShiftContentOver>
       <AbilitiesWrapper>
+        {playerData.length &&
+        Array.isArray(playerData[0].abilities) &&
+        playerData[0].abilities.length ? (
+          <Title>Click: </Title>
+        ) : null}
         <Abilities
           shiftContentOver={shiftContentOver}
           playerData={playerData}

@@ -2322,7 +2322,7 @@ export const PLAYER_CLASSES = [
       "You were built for icy endeavours across the arctic."
   },
   {
-    elems: "Heart,Ice,Wood ",
+    elems: "Heart,Ice,Wood",
     class_name: "Hedge Witch",
     player_class_description:
       "Your magic is as wild as nature, but you have a good heart."

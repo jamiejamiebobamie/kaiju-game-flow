@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Abilities } from "./Components/Abilities";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
-import { DescriptionDisplay } from "../../MainGame/UI/DescriptionDisplay";
-import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../../Utils/gameState";
-import { lookupClassAndOrSetPassives } from "../../../Utils/utils";
+import { DescriptionDisplay } from "../../Game/UI/DescriptionDisplay";
+import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../Utils/gameState";
+import { lookupClassAndOrSetPassives } from "../../Utils/utils";
 import {
   Wrapper,
   TitleWrapper,
@@ -54,6 +54,7 @@ export const TutorialExplain = ({
   height,
   scale
 }) => {
+  const [showGameboard, setShowGameboard] = useState(true);
   const [displayString, setDisplayString] = useState(null);
   const handleChange = element => {
     if (pickedAbilities.includes(element)) {

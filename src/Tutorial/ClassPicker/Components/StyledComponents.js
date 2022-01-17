@@ -18,12 +18,16 @@ export const Wrapper = styled.div`
   border-radius: 10px;
   ${props =>
     props.animName &&
-    `-webkit-animation-duration: 1s;
-    animation-duration: 1s;
+    `-webkit-animation-duration: 3s;
+    animation-duration: 3s;
     -webkit-animation-name: ${props.animName};
     animation-name:  ${props.animName};`}
   @keyframes fadeInLeft {
     0% {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    10% {
       opacity: 0;
       transform: translateX(-20px);
     }
@@ -34,6 +38,10 @@ export const Wrapper = styled.div`
   }
   @keyframes fadeInRight {
     0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    10% {
       opacity: 0;
       transform: translateX(20px);
     }

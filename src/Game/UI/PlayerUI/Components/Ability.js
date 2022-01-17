@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useHover, useKeyPress } from "../../../../../Utils/utils";
+import { useHover, useKeyPress } from "../../../../Utils/utils";
 
 const ICON_LOOKUP = {
   heart: {
@@ -80,6 +80,24 @@ const Wrapper = styled.div`
     }
     100% {
       transform: rotate3d(0, 1, 0, 0deg);
+    }
+  }
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-name: fadeInRightAbility;
+  animation-name: fadeInRightAbility;
+  @keyframes fadeInRightAbility {
+    0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    10% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 `;

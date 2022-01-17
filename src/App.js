@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Game } from "./Game/Game";
+import { Home } from "./Home";
+
 import "./App.css";
 
 const App = () => {
@@ -11,9 +13,10 @@ const App = () => {
     */
   return (
     <div className="App">
-      <Game />
+      <Home />
     </div>
   );
 };
 
 export default App;
+<Game />;
