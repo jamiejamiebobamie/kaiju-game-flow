@@ -86,10 +86,7 @@ export const Game = ({ pickedAbilities }) => {
   }, []);
   useEffect(() => {
     if (kaijuKillCount.length >= 7) {
-      if (
-        kaijuKillCount.filter(k => k == 0).length >= 7 ||
-        kaijuKillCount.filter(k => k == 1).length >= 7
-      ) {
+      if (kaijuKillCount.length >= 7) {
         const _winner =
           kaijuKillCount.filter(k => k == 0).length >
           kaijuKillCount.filter(k => k == 1).length
@@ -99,11 +96,11 @@ export const Game = ({ pickedAbilities }) => {
       }
     }
   }, [kaijuKillCount]);
-  // useEffect(() => {
-  //   if (winner !== null) {
-  //     setIntervalTime(null);
-  //   }
-  // }, [winner]);
+  useEffect(() => {
+    if (winner !== null) {
+      console.log("winner!", winner);
+    }
+  }, [winner]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
       setPlayerData(_playerData =>
@@ -162,7 +159,10 @@ export const Game = ({ pickedAbilities }) => {
       kaijuData,
       dmgArray,
       teleportData,
-      setTeleportData
+      setTeleportData,
+      undefined,
+      false,
+      winner
     );
     // move monsters
     movePiece(
@@ -179,7 +179,8 @@ export const Game = ({ pickedAbilities }) => {
       undefined,
       undefined,
       setKaijuKillCount,
-      false
+      false,
+      winner
     );
     // powerup spawning.
     if (shouldUpdate(accTime.current, 30000))

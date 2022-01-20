@@ -72,10 +72,7 @@ export const Tutorial = ({
         kaijuSpawnPositions = [];
         setBackButtonContent("Home");
         setNextButtonContent("Got it!");
-        setTitle([
-          ["This is you", <br />, "champion of Kaiju City."],
-          "Click on a tile to walk to it."
-        ]);
+        setTitle(["This is you.", "Click on a tile to walk to it."]);
         setBackButtonCallback(() => () => handeClickHome()); // Toggle home screen
         break;
       case 1:
@@ -84,7 +81,7 @@ export const Tutorial = ({
         // display map gif.
         setBackButtonContent("Back");
         setNextButtonContent("Yay!");
-        setTitle([["This is Kaiju City", <br />, "your home."]]);
+        setTitle(["This is Kaiju City."]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 2:
@@ -107,7 +104,7 @@ export const Tutorial = ({
         // kaijuMoveSpeed = 0;
         setBackButtonContent("Back");
         setNextButtonContent("Oh no!");
-        setTitle([[`Kaiju want to eat you`, <br />, `and destroy the city!`]]);
+        setTitle([`This is you and Kaiju.`]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 4:
@@ -118,7 +115,7 @@ export const Tutorial = ({
         kaijuSpawnPositions = [];
         setBackButtonContent("Back");
         setNextButtonContent("Ok!");
-        setTitle([`This is your teammate.`, `He will help you.`]);
+        setTitle([`This is your teammate.`]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 5:

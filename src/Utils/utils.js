@@ -13,6 +13,30 @@ import {
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 
+const getRandomAbilities = () => {
+  const chosen = [];
+  const possibilities = [
+    "Ice",
+    "Fire",
+    "Wood",
+    "Lightning",
+    "Death",
+    "Bubble",
+    "Metal",
+    "Glass",
+    "Heart"
+  ];
+  for (let i = 0; i < 3; i++) {
+    const currLastIndex = possibilities.length - i - 1;
+    const randIndex = getRandomIntInRange({ max: currLastIndex });
+    chosen.push(possibilities[randIndex]);
+    const savedOption = possibilities[randIndex];
+    possibilities[randIndex] = possibilities[currLastIndex];
+    possibilities[currLastIndex] = savedOption;
+  }
+  return chosen.sort((a1, a2) => a1.localeCompare(a2));
+};
+
 export const lookupClassAndOrSetPassives = (
   pickedAbilities,
   setPlayerData,
@@ -208,12 +232,15 @@ export const initializeGameBoard = (
   const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
-  let _max = tileIndices.length - 1;
-  const classDetails = lookupClassAndOrSetPassives(pickedAbilities);
+  // .filter(pickedElement => pickedElement !== element)
+  const teammateAbilities = getRandomAbilities();
+  console.log(teammateAbilities);
   for (let k = 0; k < 2; k++) {
-    _max -= k;
+    const classDetails = lookupClassAndOrSetPassives(
+      k === 0 ? pickedAbilities : teammateAbilities
+    );
     const randomInt = getRandomIntInRange({
-      max: _max
+      max: tileIndices.length - 1
     });
     const { i, j } = tileIndices[randomInt];
     const storeItem = tileIndices.length - k;
@@ -245,7 +272,6 @@ export const initializeGameBoard = (
       tileCountModifier: 0,
       ...classDetails[k]
     };
-
     const newPlayer = {
       ...baseStats,
       ...baseStats.abilities.reduce(
@@ -1151,7 +1177,7 @@ export const movePiece = (
   setTeleportData,
   setKaijuKillCount,
   isTutorial,
-  shouldSpawnKaiju
+  winner
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -1433,7 +1459,7 @@ export const movePiece = (
       accTime &&
       !(accTime % 3) &&
       spawnKaiju(data, enemyData, scale);
-    let isKaijuRespawned = false;
+    let isKaijuRespawned = false || winner !== null;
     let isRespawn = true;
     const newKaijuData =
       !powerUpData &&

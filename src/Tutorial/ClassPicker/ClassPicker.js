@@ -7,7 +7,6 @@ import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../Utils/gameState";
 import {
   Wrapper,
   TitleWrapper,
-  // Title,
   ButtonsWrapper,
   Button
 } from "./Components/StyledComponents";
@@ -128,6 +127,12 @@ const ClassTitlePopUp = styled.div`
   align-content: center; */
   position: absolute;
   display: flex;
+  flex-direction: column;
+
+  text-align: center;
+  /* font-alignment: center;
+  align-self: center;
+  align-content: center; */
 
   justify-content: center;
   pointer-events: none;
@@ -140,10 +145,10 @@ const ClassTitlePopUp = styled.div`
   width: 700px;  */
   /* background-color: green; */
   left: 50%;
-  top: 50%;
+  top: 45%;
 
   width: 900px;
-  height: 100px;
+  height: 200px;
   margin-left: -450px;
   margin-top: -150px;
 
@@ -218,16 +223,17 @@ export const ClassPicker = ({
   };
   useEffect(() => {
     lookupClassAndOrSetPassives(pickedAbilities, setPlayerData, setClassTitle);
+    console.log(pickedAbilities);
   }, [pickedAbilities]);
   useEffect(() => {
     if (classTitle) setTimeout(() => setClassTitle(null), 3000);
   }, [classTitle]);
   return (
     <ClassPickerWrapper animName={animName}>
-      {classTitle && <ClassTitlePopUp>{classTitle}</ClassTitlePopUp>}
+      {classTitle && <ClassTitlePopUp>You are a {classTitle}</ClassTitlePopUp>}
       <AbilityButtonsWrapper>
         <br />
-        <Title>What kind of champion are you?</Title>
+        <Title>Choose your abilities</Title>
         <br />
         <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
         <Abilities
