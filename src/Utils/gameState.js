@@ -1,4 +1,4 @@
-import { shootPower, shootKaijuPower, getCharXAndY } from "./utils";
+import { shootPower, shootKaijuPower } from "./utils";
 export const PENINSULA_TILE_LOOKUP = {
   "14 26": { i: 14, j: 26 },
   "3 31": { i: 3, j: 31 },

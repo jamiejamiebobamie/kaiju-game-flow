@@ -16,24 +16,30 @@ export const Home = () => {
   const [isTutorial, setIsTutorial] = useState(true);
   const [tutorialViewIndex, setTutorialViewIndex] = useState(-1);
   const [pickedAbilities, setPickedAbilities] = useState([]);
-  const handeClickPlay = () =>
+  const handleClickPlay = () =>
     pickedAbilities.length === 3 && setIsTutorial(false);
-  const handeClickHome = () => {
+  const handleClickHome = () => {
     setTutorialViewIndex(-1);
     setIsTutorial(true);
+    setPickedAbilities([]);
   };
-
+  const handleClickGame = () => {
+    setPickedAbilities([]);
+    setIsTutorial(true);
+    setTutorialViewIndex(MAX_TUTORIAL_VIEW_INDEX);
+  };
+  const handleClickTutorial = () => {
+    setTutorialViewIndex(0);
+  };
   return tutorialViewIndex === -1 ? (
     <Wrapper>
       <Title>Kaiju City</Title>
       <ButtonGroup>
         <ButtonsWrapper>
-          <Button onClick={() => setTutorialViewIndex(MAX_TUTORIAL_VIEW_INDEX)}>
-            Game
-          </Button>
+          <Button onClick={handleClickGame}>Game</Button>
         </ButtonsWrapper>
         <ButtonsWrapper>
-          <Button onClick={() => setTutorialViewIndex(0)}>Tutorial</Button>
+          <Button onClick={handleClickTutorial}>Tutorial</Button>
         </ButtonsWrapper>
         <ButtonsWrapper>
           <Button>
@@ -56,10 +62,14 @@ export const Home = () => {
       maxTutorialViewIndex={MAX_TUTORIAL_VIEW_INDEX}
       pickedAbilities={pickedAbilities}
       setPickedAbilities={setPickedAbilities}
-      handeClickPlay={handeClickPlay}
-      handeClickHome={handeClickHome}
+      handleClickPlay={handleClickPlay}
+      handleClickHome={handleClickHome}
     />
   ) : (
-    <Game pickedAbilities={pickedAbilities} />
+    <Game
+      pickedAbilities={pickedAbilities}
+      handleClickGame={handleClickGame}
+      handleClickHome={handleClickHome}
+    />
   );
 };

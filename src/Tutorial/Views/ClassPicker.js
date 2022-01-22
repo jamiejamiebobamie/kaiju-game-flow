@@ -187,7 +187,7 @@ export const ClassPicker = ({
   animName,
   pickedAbilities,
   setPickedAbilities,
-  handeClickPlay,
+  handleClickPlay,
   isPaused,
   powerUpData,
   playerData,
@@ -267,7 +267,7 @@ export const ClassPicker = ({
           pickedAbilities={pickedAbilities}
           playerData={playerData}
         />
-        <PlayButton onClick={handeClickPlay}>Play!</PlayButton>
+        <PlayButton onClick={handleClickPlay}>Play!</PlayButton>
       </DescriptionDisplayWrapper>
     </ClassPickerWrapper>
   );

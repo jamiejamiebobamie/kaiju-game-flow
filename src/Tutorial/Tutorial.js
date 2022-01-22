@@ -1,13 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import { ClassPicker } from "./ClassPicker/ClassPicker";
-import { TutorialExplain } from "./ClassPicker/TutorialExplain";
-import { StyledIcon } from "./ClassPicker/Components/StyledComponents";
+import { ClassPicker } from "./Views/ClassPicker";
+import { TutorialExplain } from "./Views/TutorialExplain";
+import { StyledIcon } from "./Views/Components/StyledComponents";
 import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../Utils/gameState";
 import {
   useInterval,
   useHover,
-  movePiece,
+  movePlayerPieces,
+  moveKaijuPieces,
   movePieceTutorial,
   updateTileState,
   redrawTiles,
@@ -18,8 +19,8 @@ import {
 export const Tutorial = ({
   pickedAbilities,
   setPickedAbilities,
-  handeClickPlay,
-  handeClickHome,
+  handleClickPlay,
+  handleClickHome,
   maxTutorialViewIndex,
   tutorialViewIndex,
   setTutorialViewIndex
@@ -29,6 +30,7 @@ export const Tutorial = ({
   const scale = 0.3;
   const accTime = useRef(0);
   const [playerData, setPlayerData] = useState([]);
+  const [shouldKaijuMove, setShouldKaijuMove] = useState(true);
   const [teleportData, setTeleportData] = useState([]);
   const [dmgArray, setDmgArray] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
@@ -48,18 +50,14 @@ export const Tutorial = ({
   const [animName, setAnimName] = useState("fadeInRight");
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const incrementTutorialViewIndex = () => {
-    // if (!animName) {
     setAnimName("fadeInRight");
     setTimeout(() => setAnimName(null), 3000);
     setTutorialViewIndex(_i => (_i + 1 <= maxTutorialViewIndex ? _i + 1 : 0));
-    // }
   };
   const decrementTutorialViewIndex = () => {
-    // if (!animName) {
     setAnimName("fadeInLeft");
     setTimeout(() => setAnimName(null), 3000);
     setTutorialViewIndex(_i => (_i - 1 >= 0 ? _i - 1 : 0));
-    // }
   };
   useEffect(() => {
     let playerSpawnPositions = [];
@@ -72,8 +70,8 @@ export const Tutorial = ({
         kaijuSpawnPositions = [];
         setBackButtonContent("Home");
         setNextButtonContent("Got it!");
-        setTitle(["This is you.", "Click on a tile to walk to it."]);
-        setBackButtonCallback(() => () => handeClickHome()); // Toggle home screen
+        setTitle(["This is you", "Click on a tile to walk to it"]);
+        setBackButtonCallback(() => () => handleClickHome()); // Toggle home screen
         break;
       case 1:
         playerSpawnPositions = [];
@@ -81,7 +79,7 @@ export const Tutorial = ({
         // display map gif.
         setBackButtonContent("Back");
         setNextButtonContent("Yay!");
-        setTitle(["This is Kaiju City."]);
+        setTitle(["This is Kaiju City"]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 2:
@@ -90,7 +88,8 @@ export const Tutorial = ({
         kaijuMoveSpeed = 0;
         setBackButtonContent("Back");
         setNextButtonContent("Ok...");
-        setTitle(["This is a Kaiju."]);
+        setTitle(["This is a Kaiju"]);
+        setShouldKaijuMove(false);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 3:
@@ -104,7 +103,8 @@ export const Tutorial = ({
         // kaijuMoveSpeed = 0;
         setBackButtonContent("Back");
         setNextButtonContent("Oh no!");
-        setTitle([`This is you and Kaiju.`]);
+        setTitle([`This is you and Kaiju`]);
+        setShouldKaijuMove(true);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 4:
@@ -115,7 +115,7 @@ export const Tutorial = ({
         kaijuSpawnPositions = [];
         setBackButtonContent("Back");
         setNextButtonContent("Ok!");
-        setTitle([`This is your teammate.`]);
+        setTitle([`This is your teammate`]);
         setBackButtonCallback(() => decrementTutorialViewIndex);
         break;
       case 5:
@@ -129,7 +129,7 @@ export const Tutorial = ({
         setBackButtonContent("Back");
         setNextButtonContent("Next");
         setTitle([
-          "You cast magic to attack, defend and more.",
+          "You cast magic to attack, defend and more",
           <div
             style={{
               width: "100%",
@@ -248,30 +248,29 @@ export const Tutorial = ({
       isTutorial
     );
     // move players
-    movePiece(
-      playerData,
-      setPlayerData,
-      [],
-      () => {},
-      tileStatuses,
-      setTileStatuses,
-      scale,
-      accTime.current,
-      kaijuData,
-      dmgArray,
-      teleportData,
-      setTeleportData,
-      () => {},
-      isTutorial
-    );
+    playerData.length &&
+      movePlayerPieces(
+        playerData,
+        setPlayerData,
+        tileStatuses,
+        setTileStatuses,
+        scale,
+        accTime.current,
+        kaijuData,
+        dmgArray,
+        () => {},
+        teleportData,
+        setTeleportData,
+        undefined,
+        true,
+        null
+      );
     // move monsters
-    tutorialViewIndex !== 3 &&
-      tutorialViewIndex !== 2 &&
-      movePiece(
+    kaijuData.length &&
+      shouldKaijuMove &&
+      moveKaijuPieces(
         kaijuData,
         setKaijuData,
-        undefined,
-        () => {},
         tileStatuses,
         setTileStatuses,
         scale,
@@ -279,9 +278,8 @@ export const Tutorial = ({
         playerData,
         dmgArray,
         undefined,
-        undefined,
-        () => {},
-        isTutorial
+        true,
+        null
       );
     // update accumulated time.
     accTime.current =
@@ -289,7 +287,6 @@ export const Tutorial = ({
         ? 0
         : accTime.current + intervalTime;
   });
-  // , intervalTime);
   return tutorialViewIndex === maxTutorialViewIndex ? (
     <ClassPicker
       animName={animName}
@@ -297,7 +294,7 @@ export const Tutorial = ({
       decrementTutorialViewIndex={decrementTutorialViewIndex}
       pickedAbilities={pickedAbilities}
       setPickedAbilities={setPickedAbilities}
-      handeClickPlay={handeClickPlay}
+      handleClickPlay={handleClickPlay}
       isPaused={false}
       powerUpData={[]}
       playerData={playerData}
@@ -330,7 +327,6 @@ export const Tutorial = ({
       title2={title.slice(1)}
       pickedAbilities={pickedAbilities}
       setPickedAbilities={setPickedAbilities}
-      handeClickPlay={handeClickPlay}
       isPaused={false}
       powerUpData={[]}
       playerData={playerData}

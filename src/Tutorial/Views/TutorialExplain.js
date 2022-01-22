@@ -36,7 +36,6 @@ export const TutorialExplain = ({
   setPickedAbilities,
   incrementTutorialViewIndex,
   decrementTutorialViewIndex,
-  handeClickPlay,
   isPaused,
   powerUpData,
   playerData,
