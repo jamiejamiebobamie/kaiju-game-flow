@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const port = 9000;
+// const port = 9000;
 
 app.use(express.static(path.join(__dirname, "build")));
 
@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
   // res.sendFile(path.join(__dirname, "dist", "index.js"));
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
-app.listen(port);
+app.listen(3000);
 
 // const express = require('express');
 // const path = require('path');
