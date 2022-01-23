@@ -30,7 +30,7 @@ const Image = styled.div`
   height: 100%;
   background-repeat: no-repeat;
   background-position: 50%;
-  // ${props => props.isKaiju && "background-image: url(testKaijuTile.png);"}
+  ${props => props.isKaiju && "background-image: url(testKaijuTile.png);"}
   visibility: visible;
   -webkit-transform: rotate(-60deg);
   -moz-transform: rotate(-60deg);
@@ -38,17 +38,13 @@ const Image = styled.div`
   -o-transform: rotate(-60deg);
   transform: rotate(-60deg);
   ${props =>
-    props.isHighlighted1 &&
-    (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: #FFA836;opacity: 0.2;"};
-  ${props =>
     props.isHighlighted0 &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
     "background-color: #495a6e;opacity: 0.5;"};
-    ${props =>
-      props.isKaiju &&
-      (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-      "background-color: #BF40BF; opacity: 0.5;"};
+  ${props =>
+    props.isKaiju &&
+    (props.isPlayer !== 0 || props.isPlayer !== 1) &&
+    "background-color: #BF40BF; opacity: 0.5;"};
   ${props =>
     props.isPlayer === 0
       ? "background-color: #495a6e;opacity: .7;"
@@ -58,7 +54,6 @@ const Image = styled.div`
 `;
 export const Content = ({
   isHighlighted0 = false,
-  isHighlighted1 = false,
   onClick,
   index,
   setHoverRef,
@@ -73,7 +68,6 @@ export const Content = ({
           onClick={onClick}
           isKaiju={status.isKaiju}
           isHighlighted0={isHighlighted0}
-          isHighlighted1={isHighlighted1}
           isPlayer={status.isPlayer}
         />
       </ImageWrapper>

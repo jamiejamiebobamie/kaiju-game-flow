@@ -8,10 +8,6 @@ const Wrapper = styled.div`
   justify-content: flex-start;
   width: 60%;
   height: 50px;
-  /* background-color: red; */
-  /* border-radius: 10px; */
-  /* border-style: solid;
-  border-thickness: thin; */
 `;
 const Bar = styled.div`
   ${props =>

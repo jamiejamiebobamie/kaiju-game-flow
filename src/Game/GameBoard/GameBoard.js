@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Player } from "./Pieces/PlayerPiece";
 import { Kaiju } from "./Pieces/KaijuPiece";
-import { PowerUp } from "./Pieces/PowerUpPiece";
 import { PauseModal } from "./PauseModal";
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -41,9 +40,8 @@ export const GameBoard = ({
   height,
   scale
 }) => {
-  const [clickedTiles, setClickedTiles] = useState([]);
   useEffect(() => {
-    const { i, j } = clickedTile;
+    const { i, _ } = clickedTile;
     if (i !== -1) {
       setPlayerMoveToTiles(path);
       setClickedTile({ i: -1, j: -1 });

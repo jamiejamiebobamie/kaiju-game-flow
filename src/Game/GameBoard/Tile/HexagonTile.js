@@ -18,7 +18,6 @@ export const HexagonTile = ({
   j = 0,
   setClickedIndex = () => {},
   isHighlighted0,
-  isHighlighted1,
   status = {
     isOnKaijuFire: false,
     isOnFire: false,
@@ -45,7 +44,6 @@ export const HexagonTile = ({
         index={{ i, j }}
         setHoverRef={setHoverRef}
         isHighlighted0={isHighlighted0}
-        isHighlighted1={isHighlighted1}
         status={status}
       />
       <Icon zIndex={zIndex} status={status} />

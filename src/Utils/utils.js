@@ -2,11 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import {
   PENINSULA_TILE_LOOKUP,
   PENINSULA_TILE_LOOKUP_VALS,
-  BRIDGE_TILES,
-  NOT_BRIDGE_TILES,
   NOT_BRIDGE_TILES_VALS,
   PLAYER_ABILITIES,
-  PERIMETER_TILES,
   PERIMETER_TILES_VALS,
   DEATH_TILE_STATUSES,
   PLAYER_CLASSES
@@ -128,7 +125,7 @@ export const initializeTutorialGameBoard = (
       dir: "idle",
       i: k,
       isThere: true,
-      moveSpeed: 8,
+      moveSpeed: 5,
       lives: Number.MAX_SAFE_INTEGER,
       isOnTiles: true,
       isKaiju: false,
@@ -149,7 +146,6 @@ export const initializeTutorialGameBoard = (
   // TILES      - - - - - - - - - -
   const isTutorial = true;
   redrawTiles(
-    [],
     [],
     setHoverRef,
     setClickedTile,
@@ -199,13 +195,13 @@ export const initializeTutorialGameBoard = (
       color: "purple",
       isThere: true,
       lives: 5,
-      moveSpeed: kaijuMoveSpeed !== undefined ? kaijuMoveSpeed : 3,
+      moveSpeed: kaijuMoveSpeed !== undefined ? kaijuMoveSpeed : 2,
       lastDmg: 0,
       abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
       isKaiju: true,
       isOnTiles: true,
       i: k,
-      tileCountModifier: 0,
+      numTilesModifier: 0,
       tileCountModifier: 0,
       isHealed: false,
       isTeleported: false
@@ -232,9 +228,7 @@ export const initializeGameBoard = (
   const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
-  // .filter(pickedElement => pickedElement !== element)
   const teammateAbilities = getRandomAbilities();
-  // console.log(teammateAbilities);
   for (let k = 0; k < 2; k++) {
     const classDetails = lookupClassAndOrSetPassives(
       k === 0 ? pickedAbilities : teammateAbilities
@@ -261,7 +255,7 @@ export const initializeGameBoard = (
       dir: "idle",
       i: k,
       isThere: true,
-      moveSpeed: 8,
+      moveSpeed: 5,
       lives: 4,
       isOnTiles: true,
       isKaiju: false,
@@ -285,7 +279,6 @@ export const initializeGameBoard = (
   // PLAYERS    - - - - - - - - - -
   // TILES      - - - - - - - - - -
   redrawTiles(
-    [],
     [],
     setHoverRef,
     setClickedTile,
@@ -334,9 +327,6 @@ export const spawnKaiju = (
   const randIntY = getRandomIntInRange({ min: minY, max: maxY });
   const randBool1 = Math.random() > 0.5;
   const randBool2 = Math.random() > 0.5;
-  const randPlayerIndex = getRandomIntInRange({
-    max: playerData.length - 1
-  });
   const location = isTutorial
     ? getCharXAndY({ ...kaijuData[0].tile, scale })
     : randBool1
@@ -371,13 +361,13 @@ export const spawnKaiju = (
         color: "purple",
         isThere: false,
         lives: 5,
-        moveSpeed: 4,
+        moveSpeed: 2,
         lastDmg: 0,
         abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
         isKaiju: true,
         isOnTiles: false,
         i: kaijuData.length,
-        tileCountModifier: 0,
+        numTilesModifier: 0,
         tileCountModifier: 0,
         isHealed: false,
         isTeleported: false
@@ -434,7 +424,6 @@ export const updateHighlightedTiles = (
 };
 export const redrawTiles = (
   highlightedTiles0,
-  highlightedTiles1,
   setHoverRef,
   setClickedTile,
   setTiles,
@@ -448,8 +437,8 @@ export const redrawTiles = (
   isTutorial
 ) => {
   if (tileStatuses) {
-    const rowLength = isTutorial ? 24 : Math.ceil(width / (70 * scale));
-    const colLength = isTutorial ? 10 : Math.ceil(height / (75 * scale));
+    const rowLength = isTutorial ? 24 : 24; // Math.ceil(width / (70 * scale));
+    const colLength = isTutorial ? 10 : 36; //Math.ceil(height / (75 * scale));
     const _tiles = [];
     for (let i = 0; i < rowLength; i++) {
       for (let j = 0; j < colLength; j++) {
@@ -467,9 +456,6 @@ export const redrawTiles = (
               setClickedIndex={setClickedTile}
               tileLocation={tileLocation}
               isHighlighted0={highlightedTiles0.some(
-                ({ h_i, h_j }) => h_i === i && h_j === j
-              )}
-              isHighlighted1={highlightedTiles1.some(
                 ({ h_i, h_j }) => h_i === i && h_j === j
               )}
               status={{
@@ -929,22 +915,16 @@ const getTileOffsetFromDir = (dir, currTile) => {
   switch (dir) {
     case "up":
       return { i: 0, j: -1 }; // up
-      break;
     case "up right":
       return { i: 1, j: currTile.i % 2 ? 0 : -1 }; // up right
-      break;
     case "down right":
       return { i: 1, j: currTile.i % 2 ? 1 : 0 }; // down right
-      break;
     case "down":
       return { i: 0, j: 1 }; // down
-      break;
     case "down left":
       return { i: -1, j: currTile.i % 2 ? 1 : 0 }; // down left
-      break;
     case "up left":
       return { i: -1, j: currTile.i % 2 ? 0 : -1 }; // up left
-      break;
     default:
       return { i: 0, j: 0 };
   }
@@ -1024,7 +1004,7 @@ const getAdjacentTilesFromNormVec = (currTile, normVec, scale, numTiles) => {
     return [spawnPowerTile, []];
   }
 };
-const getRandomIntInRange = ({ min = 0, max }) => {
+export const getRandomIntInRange = ({ min = 0, max }) => {
   const _min = Math.ceil(min);
   const _max = Math.floor(max + 1);
   const randomInt = Math.floor(Math.random() * (_max - _min) + _min);
@@ -1135,7 +1115,6 @@ export const movePlayerPieces = (
           } else {
             // teammate should stay by player to protect him.
             // get path
-            // console.log(_data[0].tile, _data[1].tile, isTutorial);
             const moveToTiles =
               _data[1].tile &&
               _data[0].tile &&
@@ -1146,7 +1125,7 @@ export const movePlayerPieces = (
                 : [];
           }
           // use powers
-          const powersToFire = _data[i].abilities.forEach((a, j) => {
+          _data[i].abilities.forEach((a, j) => {
             const isCooldownOver =
               accTime - a.accTime >= a.cooldownTimeAI || accTime < a.accTime;
             if (isCooldownOver) {
@@ -1311,7 +1290,7 @@ export const moveKaijuPieces = (
       if (_data[i].lives) {
         // use powers
         if (_data[i].isOnTiles && _data[i].abilities.length) {
-          const powersToFire = _data[i].abilities.forEach((a, j) => {
+          _data[i].abilities.forEach((a, j) => {
             const isCooldownOver =
               accTime - a.accTime >= a.cooldownTimeAI || accTime < a.accTime;
             if (isCooldownOver) {
@@ -1324,16 +1303,6 @@ export const moveKaijuPieces = (
                 _data[i].tile &&
                 targetTile &&
                 findPath(_data[i].tile, targetTile, scale, isTutorial).length;
-              const surroundingTiles = [
-                _data[i].tile,
-                ...getAdjacentTiles(_data[i].tile)
-              ];
-              const isInDanger = surroundingTiles.some(
-                t =>
-                  tileStatuses[t.i] &&
-                  tileStatuses[t.i][t.j] &&
-                  Object.keys(tileStatuses[t.i][t.j]).includes("isOnKaijuFire")
-              );
               const isOffensivePowerAndTargetInRange =
                 a.type === "offensive" &&
                 numTilesFromTarget &&
@@ -1443,16 +1412,23 @@ export const moveKaijuPieces = (
               _data[i].lives &&
               _data[i].isOnTiles
             ) {
-              // can only get damaged once every 1 second.
-              // also accTime might reset to zero, so check for that.
-              _data[i].lastDmg = accTime;
-              _data[i].lives =
-                dmg.lifeDecrement > 0 || _data[i].lives - dmg.lifeDecrement < 5
-                  ? _data[i].lives - dmg.lifeDecrement
-                  : _data[i].lives;
-              if (dmg.lifeDecrement < 0) _data[i].isHealed = !_data[i].isHealed;
-              if (!_data[i].lives) {
-                setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
+              if (
+                accTime - _data[i].lastDmg > 5 ||
+                accTime - _data[i].lastDmg < 0
+              ) {
+                // can only get damaged once every 1 second.
+                // also accTime might reset to zero, so check for that.
+                _data[i].lastDmg = accTime;
+                _data[i].lives =
+                  dmg.lifeDecrement > 0 ||
+                  _data[i].lives - dmg.lifeDecrement < 5
+                    ? _data[i].lives - dmg.lifeDecrement
+                    : _data[i].lives;
+                if (dmg.lifeDecrement < 0)
+                  _data[i].isHealed = !_data[i].isHealed;
+                if (!_data[i].lives) {
+                  setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
+                }
               }
             }
           });
@@ -1467,7 +1443,6 @@ export const moveKaijuPieces = (
     let isKaijuRespawned = false || winner !== null;
     let isRespawn = true;
     const newKaijuData =
-      // !isTutorial &&
       !newKaiju &&
       accTime &&
       !(accTime % 3) &&
@@ -1494,8 +1469,6 @@ export const moveTo = ({
   const distanceFromStart = getDistance(moveFromLocation, currentLocation);
   const distanceToFinish = getDistance(moveToLocation, currentLocation);
   const totalDistance = getDistance(moveFromLocation, moveToLocation);
-  const x_To = moveToLocation.x;
-  const y_To = moveToLocation.y;
   const { x, y } = currentLocation;
   const x_dir = distanceToFinish
     ? (moveToLocation.x - x) / distanceToFinish
@@ -1638,7 +1611,6 @@ const findPath = (start, goal, scale, isTutorial) => {
       return arr;
     // produce all possible adjacent tile indices to currTile
     const adjacentTiles = getAdjacentTiles(currTile, isTutorial);
-    // console.log("lol", adjacentTiles);
     // get all charXAndY for each confirmed adjacent tile
     const goalXY = getCharXAndY({ ...goal, scale });
     const test = getCharXAndY({ ...adjacentTiles[0], scale });

@@ -11,7 +11,6 @@ export const Wrapper = styled.div`
   min-width: 700px;
   min-height: 800px;
   margin-top: 5vh;
-  /* background-color: blue; */
   -webkit-animation-duration: 3s;
   animation-duration: 3s;
   -webkit-animation-name: fadeInUp;
@@ -40,7 +39,6 @@ export const Title = styled.div`
     src: url(Early_GameBoy.ttf);
   }
   margin-bottom: 100px;
-  /* background-color: green; */
 `;
 export const ButtonGroup = styled.div`
   display: flex;
@@ -49,7 +47,6 @@ export const ButtonGroup = styled.div`
   align-items: center;
   width: 500px;
   height: 500px;
-  /* background-color: red; */
 `;
 export const ButtonsWrapper = styled.div`
   display: flex;
@@ -57,7 +54,6 @@ export const ButtonsWrapper = styled.div`
   justify-content: flex-start;
   width: 100%;
   height: 50px;
-  /* background-color: yellow; */
 `;
 export const Button = styled.div`
   display: flex;
@@ -69,8 +65,6 @@ export const Button = styled.div`
   height: 100px;
 
   font-alignment: center;
-  /* text-align: center; */
-
   cursor: pointer;
 
   border-radius: 5px;

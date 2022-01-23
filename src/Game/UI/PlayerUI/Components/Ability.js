@@ -65,7 +65,6 @@ const Wrapper = styled.div`
   align-self: center;
   border-radius: 100%;
   border-style: solid;
-  /* border-color: ${props => props.color}; */
   border-color: black;
   min-width: 50px;
   height: 50px;
@@ -163,7 +162,6 @@ export const Ability = ({
   keyNum
 }) => {
   const {
-    passiveName,
     activeName,
     activateActive,
     cooldownTime,
@@ -174,7 +172,6 @@ export const Ability = ({
   } = abilityData;
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
-  const [isPassive, setIsPassive] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");

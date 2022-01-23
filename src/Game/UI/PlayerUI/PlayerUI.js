@@ -56,8 +56,7 @@ export const PlayerUI = ({
       moveSpeed: "",
       modifiers: "",
       abilities: [],
-      accessory: { displayLookup: "" },
-      abilities: []
+      accessory: { displayLookup: "" }
     },
     {
       lives: 0,
@@ -65,8 +64,7 @@ export const PlayerUI = ({
       moveSpeed: "",
       modifiers: "",
       abilities: [],
-      accessory: { displayLookup: "" },
-      abilities: []
+      accessory: { displayLookup: "" }
     }
   ],
   kaijuData = [],
@@ -104,7 +102,7 @@ export const PlayerUI = ({
             setDisplayString={setDisplayString}
           />
           <Kaiju
-            kaijuArr={kaijuKillCount.filter(c => c == playerIndex)}
+            kaijuArr={kaijuKillCount.filter(c => c === playerIndex)}
             isReversed={isReversed}
             setDisplayString={setDisplayString}
           />
@@ -112,7 +110,7 @@ export const PlayerUI = ({
       ) : (
         <>
           <Kaiju
-            kaijuArr={kaijuKillCount.filter(c => c == playerIndex)}
+            kaijuArr={kaijuKillCount.filter(c => c === playerIndex)}
             setDisplayString={setDisplayString}
           />
           <HealthBar

@@ -3,13 +3,6 @@ import styled from "styled-components";
 import { Abilities } from "./Components/Abilities";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
 import { DescriptionDisplay } from "../../Game/UI/DescriptionDisplay";
-import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../Utils/gameState";
-import {
-  Wrapper,
-  TitleWrapper,
-  ButtonsWrapper,
-  Button
-} from "./Components/StyledComponents";
 import { lookupClassAndOrSetPassives } from "../../Utils/utils";
 
 const ClassPickerWrapper = styled.div`
@@ -119,31 +112,12 @@ const PlayButton = styled.div`
   }
 `;
 const ClassTitlePopUp = styled.div`
-  /* position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-self: center;
-  font-alignment: center;
-  align-content: center; */
   position: absolute;
   display: flex;
   flex-direction: column;
-
   text-align: center;
-  /* font-alignment: center;
-  align-self: center;
-  align-content: center; */
-
   justify-content: center;
   pointer-events: none;
-  /* left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: auto;
-  margin-bottom: auto;
-  width: 700px;  */
-  /* background-color: green; */
   left: 50%;
   top: 45%;
 
@@ -223,7 +197,6 @@ export const ClassPicker = ({
   };
   useEffect(() => {
     lookupClassAndOrSetPassives(pickedAbilities, setPlayerData, setClassTitle);
-    console.log(pickedAbilities);
   }, [pickedAbilities]);
   useEffect(() => {
     if (classTitle) setTimeout(() => setClassTitle(null), 3000);

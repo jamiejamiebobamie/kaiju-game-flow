@@ -1,15 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
-import styled from "styled-components";
 import { ClassPicker } from "./Views/ClassPicker";
 import { TutorialExplain } from "./Views/TutorialExplain";
 import { StyledIcon } from "./Views/Components/StyledComponents";
-import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../Utils/gameState";
+import { PLAYER_ABILITIES } from "../Utils/gameState";
 import {
   useInterval,
   useHover,
   movePlayerPieces,
   moveKaijuPieces,
-  movePieceTutorial,
   updateTileState,
   redrawTiles,
   updateHighlightedTiles,
@@ -36,7 +34,6 @@ export const Tutorial = ({
   const [kaijuData, setKaijuData] = useState([]);
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
   const [highlightedTiles0, setHighlightedTiles0] = useState([]);
-  const [highlightedTiles1, setHighlightedTiles1] = useState([]);
   const [tiles, setTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
@@ -100,7 +97,6 @@ export const Tutorial = ({
           { i: 3, j: 3 },
           { i: 11, j: 1 }
         ];
-        // kaijuMoveSpeed = 0;
         setBackButtonContent("Back");
         setNextButtonContent("Oh no!");
         setTitle([`This is you and Kaiju`]);
@@ -125,7 +121,6 @@ export const Tutorial = ({
         ];
         kaijuSpawnPositions = [{ i: 19, j: 3 }];
         abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
-        console.log(abilities);
         setBackButtonContent("Back");
         setNextButtonContent("Next");
         setTitle([
@@ -176,7 +171,6 @@ export const Tutorial = ({
           { i: 3, j: 3 }
         ];
         kaijuSpawnPositions = [{ i: 19, j: 3 }];
-        // kaijuMoveSpeed = 0;
         break;
     }
     initializeTutorialGameBoard(
@@ -220,7 +214,7 @@ export const Tutorial = ({
       0,
       isTutorial
     );
-    if (shouldUpdate(accTime.current, 2))
+    if (shouldUpdate(accTime.current, 3))
       updateTileState(
         playerData,
         kaijuData,
@@ -234,7 +228,6 @@ export const Tutorial = ({
       );
     redrawTiles(
       highlightedTiles0,
-      highlightedTiles1,
       setHoverRef,
       setClickedTile,
       setTiles,

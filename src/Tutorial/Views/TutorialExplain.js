@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
-import { Abilities } from "./Components/Abilities";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
-import { DescriptionDisplay } from "../../Game/UI/DescriptionDisplay";
-import { PLAYER_CLASSES, PLAYER_ABILITIES } from "../../Utils/gameState";
 import { lookupClassAndOrSetPassives } from "../../Utils/utils";
 import {
   Wrapper,
@@ -53,21 +50,6 @@ export const TutorialExplain = ({
   height,
   scale
 }) => {
-  const [showGameboard, setShowGameboard] = useState(true);
-  const [displayString, setDisplayString] = useState(null);
-  const handleChange = element => {
-    if (pickedAbilities.includes(element)) {
-      const _pickedAbilities = [...pickedAbilities, element]
-        .filter(pickedElement => pickedElement !== element)
-        .splice((a1, a2) => a1.localeCompare(a2));
-      setPickedAbilities(_pickedAbilities);
-    } else if (pickedAbilities.length < 3) {
-      const _pickedAbilities = [...pickedAbilities, element].sort((a1, a2) =>
-        a1.localeCompare(a2)
-      );
-      setPickedAbilities(_pickedAbilities);
-    }
-  };
   useEffect(() => {
     lookupClassAndOrSetPassives(pickedAbilities, setPlayerData);
   }, [pickedAbilities]);

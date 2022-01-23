@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Player } from "../../../Game/GameBoard/Pieces/PlayerPiece";
 import { Kaiju } from "../../../Game/GameBoard/Pieces/KaijuPiece";
 import { Abilities } from "../../../Game/UI/PlayerUI/Components/Abilities";
-// import { Title } from "./Components/StyledComponents";
 
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -20,19 +19,15 @@ const ShiftContentOver = styled.div`
 `;
 const AbilitiesWrapper = styled.div`
   display: flex;
-
   margin-left: 5px;
   margin-top: 200px;
-  /* background-color: red; */
   height: 105px;
 `;
 const Title = styled.div`
   display: flex;
-  /* background-color: orange; */
   align-self: flex-end;
   align-content: flex-end;
   font-alignment: flex-end;
-
   width: 70px;
   height: 70px;
   margin-top: 40px;
@@ -64,9 +59,8 @@ export const TutorialGameBoard = ({
   height,
   scale
 }) => {
-  const [clickedTiles, setClickedTiles] = useState([]);
   useEffect(() => {
-    const { i, j } = clickedTile;
+    const { i, _ } = clickedTile;
     if (i !== -1) {
       setPlayerMoveToTiles(path);
       setClickedTile({ i: -1, j: -1 });

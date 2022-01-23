@@ -9,26 +9,16 @@ const Wrapper = styled.div`
   position: absolute;
   ${props => (props.isReversed ? "top: 86px;" : "top: 79px;")};
   ${props => (props.isReversed ? "right: 85px;" : "right: 77px;")};
-  /* background-color: orange; */
   width: 50px;
   height: 50px;
-  transform:
-  /* translate(${props => props.i * 15}px, ${props => props.i * 15}px) */
-    rotate(${props => (props.isReversed ? 90 : 30)}deg);
-  /* margin-top: -50px; */
+  transform: rotate(${props => (props.isReversed ? 90 : 30)}deg);
 `;
 const PassiveAbilityWrapper = styled.div`
   position: absolute;
-  /* background-color: red; */
   right: 20px;
   width: 100px;
-  /* // ${props => 100 - (7 - props.i) * 4}px; */
   height: 0px;
-  /* border-style: solid; */
-  /* border-thickness: thin; */
-  transform:
-  /* translate(${props => props.i * 15}px, ${props => props.i * 15}px) */
-    rotate(${props => props.i * -18}deg);
+  transform: rotate(${props => props.i * -18}deg);
   transform-origin: top right;
 `;
 const PassiveAbility = styled.div`

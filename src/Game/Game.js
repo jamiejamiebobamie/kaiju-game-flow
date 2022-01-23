@@ -20,19 +20,6 @@ const GameWrapper = styled.div`
   justify-content: space-between;
   width: 1200px;
 `;
-// const GameTitle = styled.div`
-//   display: flex;
-//   margin-top: 40px;
-//   margin-left: 40px;
-//   margin-bottom: -50px;
-//   color: black;
-//   font-family: data;
-//   /* font-size: 40px; */
-//   @font-face {
-//     font-family: data;
-//     src: url(Datalegreya-Dot.otf);
-//   }
-// `;
 const ButtonsWrapper = styled.div`
   position: absolute;
   display: flex;
@@ -40,8 +27,6 @@ const ButtonsWrapper = styled.div`
   justify-content: space-around;
   width: 100%;
   height: 100px;
-  /* background-color: blue; */
-  /* padding-bottom: 100px; */
 `;
 const Button = styled.div`
   display: flex;
@@ -51,8 +36,6 @@ const Button = styled.div`
 
   min-width: 180px;
   height: 60px;
-  /* right: 30px;
-  bottom: 30px; */
 
   font-alignment: center;
   text-align: center;
@@ -92,7 +75,6 @@ const ReplayModal = styled.div`
   min-width: 750px;
   min-height: 550px;
 
-  /* margin-top: 5vh; */
   left: 250px;
 
   border-radius: 10px;
@@ -101,7 +83,6 @@ const ReplayModal = styled.div`
   border-radius: 10px;
 
   background-color: #152642;
-  /* background-color: red; */
 
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
@@ -144,7 +125,6 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   const [kaijuData, setKaijuData] = useState([]);
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
   const [highlightedTiles0, setHighlightedTiles0] = useState([]);
-  const [highlightedTiles1, setHighlightedTiles1] = useState([]);
   const [tiles, setTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
@@ -183,17 +163,15 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
     );
   }, []);
   useEffect(() => {
-    if (kaijuKillCount.length >= 5) {
+    if (kaijuKillCount.length >= 7) {
       const _winner =
-        kaijuKillCount.filter(k => k == 0).length >
-        kaijuKillCount.filter(k => k == 1).length
+        kaijuKillCount.filter(k => k === 0).length >
+        kaijuKillCount.filter(k => k === 1).length
           ? 0
           : 1;
       setWinner(_winner);
     }
     if (playerKillCount > 1) setWinner(-1);
-    // if (playerKillCount >= 2) setWinner(-1);
-    console.log(playerKillCount);
   }, [kaijuKillCount, playerKillCount]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
@@ -252,11 +230,7 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
         scale,
         0
       );
-      // if (shouldUpdate(accTime.current, 5)) {
-      //   // console.log("hey");
-      //   if (playerData.every(p => !p.lives)) setWinner(-1);
-      // }
-      if (shouldUpdate(accTime.current, 2))
+      if (shouldUpdate(accTime.current, 3))
         updateTileState(
           playerData,
           kaijuData,
@@ -269,7 +243,6 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
         );
       redrawTiles(
         highlightedTiles0,
-        highlightedTiles1,
         setHoverRef,
         setClickedTile,
         setTiles,
@@ -319,7 +292,6 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
           : accTime.current + intervalTime;
     }
   });
-  // , intervalTime);
   return (
     <GameWrapper>
       {replayModalMessage && (

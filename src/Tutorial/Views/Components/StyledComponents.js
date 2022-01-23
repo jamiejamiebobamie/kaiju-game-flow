@@ -58,8 +58,6 @@ export const ButtonsWrapper = styled.div`
   justify-content: space-around;
   width: 100%;
   height: 100px;
-  /* background-color: blue; */
-  /* padding-bottom: 100px; */
 `;
 export const Button = styled.div`
   display: flex;
@@ -98,14 +96,11 @@ export const TitleWrapper = styled.div`
   justify-content: center;
   width: 100%;
   height: 130px;
-  /* background-color: green; */
 `;
 export const Title = styled.div`
   display: flex;
   justify-content: center;
   align-self: center;
-  /* padding: 50px; */
-  /* height: 100%; */
   font-size: 20px;
   text-align: center;
   color: black;
@@ -121,8 +116,6 @@ export const StyledIcon = styled.i`
   width: 50px;
   height: 50px;
   transform: scale(2);
-  /* translate(19px, 15px); */
   pointer-events: none;
   color: ${props => props.color};
-  /* color: black; */
 `;

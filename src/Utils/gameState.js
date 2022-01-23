@@ -1,4 +1,4 @@
-import { shootPower, shootKaijuPower } from "./utils";
+import { shootPower } from "./utils";
 export const PENINSULA_TILE_LOOKUP = {
   "14 26": { i: 14, j: 26 },
   "3 31": { i: 3, j: 31 },
@@ -1671,7 +1671,7 @@ export const PLAYER_ABILITIES = {
     activatePassive: baseStats => {
       return {
         ...baseStats,
-        lives: baseStats.lives - 2
+        lives: baseStats.lives - 1
       };
     },
     activateActive: (
@@ -1881,7 +1881,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 60,
+    cooldownTimeAI: 150,
     color: "#df73ff"
   }
 };

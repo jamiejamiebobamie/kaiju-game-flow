@@ -178,7 +178,7 @@ export const Player = ({
         isDamaged={isDamaged}
         color={color}
         isInManaPool={isInManaPool}
-        src={color === "blue" ? "player.png" : "enemy.png"}
+        src={color === "blue" ? "player.png" : "teammate.png"}
       />
     </Wrapper>
   );

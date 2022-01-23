@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import React, { useState } from "react";
 import { Tutorial } from "./Tutorial/Tutorial";
 import { Game } from "./Game/Game";
 import {

@@ -40,7 +40,7 @@ export const Kaiju = ({
       key={i}
       className="fa fa-optin-monster"
       ref={setHoverRef(`Kaiju #${i}`)}
-      title={`Kaiju #${i}`}
+      title={`Kaiju #${i + 1}`}
       alt={""}
     />
   ));
