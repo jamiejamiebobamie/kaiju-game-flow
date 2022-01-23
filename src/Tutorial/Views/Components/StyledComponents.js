@@ -58,7 +58,7 @@ export const ButtonsWrapper = styled.div`
   justify-content: space-around;
   width: 100%;
   height: 100px;
-  background-color: blue;
+  /* background-color: blue; */
   /* padding-bottom: 100px; */
 `;
 export const Button = styled.div`

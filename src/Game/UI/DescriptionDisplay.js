@@ -50,8 +50,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Good Vibes",
         description: "You send out good vibes.",
-        effect1: "",
-        effect2: "",
+        effect1: "Does nothing. Or does it?",
+        effect2: "It doesn't.",
         img: "",
         formatData: {}
       };
@@ -111,8 +111,7 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Ice Slice",
         description: "Conjure a stationary vortex of ice.",
-        effect1:
-          "Enemies are only damaged if standing on the periphery of the vortex.",
+        effect1: "",
         effect2: "",
         img: "",
         formatData: {}
@@ -163,7 +162,7 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Charged Step",
         description: "Electrical energy courses through your body.",
-        effect1: "+4 to move speed",
+        effect1: "+2 to move speed",
         effect2: "",
         img: "",
         formatData: {}
@@ -174,8 +173,7 @@ const getDescription = (string, playerData, playerIndex) => {
         title: "Discharge",
         description:
           "Cast 3 bolts of lightning in the direction of your closest enemy.",
-        effect1:
-          "Bolts travel forward and diagonally from point of cast and ricochet off the walls of the gameboard.",
+        effect1: "Bolts ricochet off the walls of the map.",
         effect2: "",
         img: "",
         formatData: {}
@@ -204,8 +202,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityBubblePassive":
       return {
         title: "So Many Bubbles",
-        description:
-          "Dispelling magic has taught you how to increase the effectiveness of your own.",
+        description: "Your magic is more effective.",
         effect1: "+1 number of tiles modifier",
         effect2: "",
         img: "",
@@ -215,8 +212,8 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityBubbleActive":
       return {
         title: "Dispel",
-        description: "Send out bubbles to dispel all tile effects in the area.",
-        effect1: "Will clear both positive and negative tile statuses.",
+        description: "Dispel all tile effects around you.",
+        effect1: "Clears both positive and negative statuses.",
         effect2: "",
         img: "",
         formatData: {}

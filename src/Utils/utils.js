@@ -128,7 +128,7 @@ export const initializeTutorialGameBoard = (
       dir: "idle",
       i: k,
       isThere: true,
-      moveSpeed: 6,
+      moveSpeed: 8,
       lives: Number.MAX_SAFE_INTEGER,
       isOnTiles: true,
       isKaiju: false,
@@ -261,7 +261,7 @@ export const initializeGameBoard = (
       dir: "idle",
       i: k,
       isThere: true,
-      moveSpeed: 6,
+      moveSpeed: 8,
       lives: 4,
       isOnTiles: true,
       isKaiju: false,
@@ -1135,6 +1135,7 @@ export const movePlayerPieces = (
           } else {
             // teammate should stay by player to protect him.
             // get path
+            // console.log(_data[0].tile, _data[1].tile, isTutorial);
             const moveToTiles =
               _data[1].tile &&
               _data[0].tile &&
@@ -1266,25 +1267,25 @@ export const movePlayerPieces = (
           _data[i].dir = "idle";
         }
         dmgArray
-          .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju)
+          .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju) // what does this do...
           .forEach(dmg => {
-            if (
-              _data[i].key === dmg.key &&
-              _data[i].lives &&
-              (accTime - _data[i].lastDmg > 20 ||
-                accTime - _data[i].lastDmg < 0)
-            ) {
-              // can only get damaged once every 1 second.
-              // also accTime might reset to zero, so check for that.
-              _data[i].lastDmg = accTime;
-              _data[i].lives =
-                dmg.lifeDecrement > 0 || _data[i].lives - dmg.lifeDecrement < 5
-                  ? _data[i].lives - dmg.lifeDecrement
-                  : _data[i].lives;
-              if (dmg.lifeDecrement < 0) _data[i].isHealed = !_data[i].isHealed;
-              if (!_data[i].lives) {
-                setPlayerKillCount(p => [...p, 1]);
+            if (_data[i].key === dmg.key && _data[i].lives) {
+              if (
+                accTime - _data[i].lastDmg > 20 ||
+                accTime - _data[i].lastDmg < 0
+              ) {
+                // can only get damaged once every 1 second.
+                // also accTime might reset to zero, so check for that.
+                _data[i].lastDmg = accTime;
+                _data[i].lives =
+                  dmg.lifeDecrement > 0 ||
+                  _data[i].lives - dmg.lifeDecrement < 5
+                    ? _data[i].lives - dmg.lifeDecrement
+                    : _data[i].lives;
+                if (dmg.lifeDecrement < 0)
+                  _data[i].isHealed = !_data[i].isHealed;
               }
+              if (!_data[i].lives) setPlayerKillCount(count => count + 1);
             }
           });
       }
@@ -1440,7 +1441,6 @@ export const moveKaijuPieces = (
             if (
               _data[i].key === dmg.key &&
               _data[i].lives &&
-              _data[i].isKaiju &&
               _data[i].isOnTiles
             ) {
               // can only get damaged once every 1 second.
@@ -1654,7 +1654,11 @@ const findPath = (start, goal, scale, isTutorial) => {
         shortest.distance = distance;
       }
     });
-    if (shortest.tile.i === currTile.i && shortest.tile.j === currTile.j) {
+    if (
+      shortest.tile &&
+      shortest.tile.i === currTile.i &&
+      shortest.tile.j === currTile.j
+    ) {
       const keyedArr = arr.map(({ i, j }) => `${i} ${j}`);
       const remainingTiles = adjacentTiles.filter(
         ({ i, j }) => !keyedArr.includes(`${i} ${j}`)
@@ -1667,5 +1671,12 @@ const findPath = (start, goal, scale, isTutorial) => {
       const _arr = [...arr, shortest.tile];
       return recur(shortest.tile, _arr, count + 1);
     }
+    // } else if (shortest.tile) {
+    //   const _arr = [...arr, shortest.tile];
+    //   return recur(shortest.tile, _arr, count + 1);
+    // } else {
+    //   // const _arr = [...arr, shortest.tile];
+    //   return recur(currTile, arr, count + 1);
+    // }
   }
 };

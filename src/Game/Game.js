@@ -20,19 +20,19 @@ const GameWrapper = styled.div`
   justify-content: space-between;
   width: 1200px;
 `;
-const GameTitle = styled.div`
-  display: flex;
-  margin-top: 40px;
-  margin-left: 40px;
-  margin-bottom: -50px;
-  color: black;
-  font-family: data;
-  font-size: 40px;
-  @font-face {
-    font-family: data;
-    src: url(Datalegreya-Dot.otf);
-  }
-`;
+// const GameTitle = styled.div`
+//   display: flex;
+//   margin-top: 40px;
+//   margin-left: 40px;
+//   margin-bottom: -50px;
+//   color: black;
+//   font-family: data;
+//   /* font-size: 40px; */
+//   @font-face {
+//     font-family: data;
+//     src: url(Datalegreya-Dot.otf);
+//   }
+// `;
 const ButtonsWrapper = styled.div`
   position: absolute;
   display: flex;
@@ -74,9 +74,7 @@ const Button = styled.div`
     src: url(Early_GameBoy.ttf);
   }
 `;
-const ReplayTitle = styled.div`
-  margin-top: -50px;
-`;
+const ReplayTitle = styled.div``;
 const ReplayModal = styled.div`
   position: absolute;
   z-index: 9999999999;
@@ -105,8 +103,8 @@ const ReplayModal = styled.div`
   background-color: #152642;
   /* background-color: red; */
 
-  -webkit-animation-duration: 3s;
-  animation-duration: 3s;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
   -webkit-animation-name: fadeInUp;
   animation-name: fadeInUp;
   @keyframes fadeInUp {
@@ -123,7 +121,8 @@ const ReplayModal = styled.div`
       transform: translateY(0);
     }
   }
-  font-size: 25px;
+  ${props =>
+    props.fontSize ? `font-size:${props.fontSize}px;` : "font-size:25px;"}
   font-family: gameboy;
   @font-face {
     font-family: gameboy;
@@ -136,14 +135,12 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   const scale = 0.3;
   const accTime = useRef(0);
   const [winner, setWinner] = useState(null);
-  const [loser, setLoser] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
   const [kaijuKillCount, setKaijuKillCount] = useState([]);
-  const [playerKillCount, setPlayerKillCount] = useState([]);
   const [playerData, setPlayerData] = useState([]);
   const [teleportData, setTeleportData] = useState([]);
-  const [powerUpData, setPowerUpData] = useState([]);
+  const [playerKillCount, setPlayerKillCount] = useState(0);
   const [kaijuData, setKaijuData] = useState([]);
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
   const [highlightedTiles0, setHighlightedTiles0] = useState([]);
@@ -194,7 +191,8 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
           : 1;
       setWinner(_winner);
     }
-    if (playerKillCount >= 2) setWinner(-1);
+    if (playerKillCount > 1) setWinner(-1);
+    // if (playerKillCount >= 2) setWinner(-1);
     console.log(playerKillCount);
   }, [kaijuKillCount, playerKillCount]);
   useEffect(() => {
@@ -209,17 +207,34 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   }, [playerMoveToTiles]);
   useEffect(() => {
     if (winner !== null && !replayModalMessage) {
-      if (!kaijuData.find(kaiju => kaiju.lives > 0)) {
+      if (!kaijuData.find(kaiju => kaiju.lives > 0) || winner === -1) {
         let message = "You won?";
         switch (winner) {
           case 0:
-            message = "You saved the city!";
+            message = [
+              <ReplayTitle fontSize={35}>You saved the city!</ReplayTitle>,
+              <br />,
+              <br />,
+              <ReplayTitle>Play again?</ReplayTitle>
+            ];
             break;
           case 1:
-            message = "Your teammate saved the city!";
+            message = [
+              <ReplayTitle fontSize={35}>
+                Your teammate saved the city!
+              </ReplayTitle>,
+              <br />,
+              <br />,
+              <ReplayTitle>Play again?</ReplayTitle>
+            ];
             break;
           case -1:
-            message = "You died.";
+            message = [
+              <ReplayTitle fontSize={35}>You died</ReplayTitle>,
+              <br />,
+              <br />,
+              <ReplayTitle>Play again?</ReplayTitle>
+            ];
             break;
         }
         setReplayModalMessage(message);
@@ -237,6 +252,10 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
         scale,
         0
       );
+      // if (shouldUpdate(accTime.current, 5)) {
+      //   // console.log("hey");
+      //   if (playerData.every(p => !p.lives)) setWinner(-1);
+      // }
       if (shouldUpdate(accTime.current, 2))
         updateTileState(
           playerData,
@@ -276,7 +295,8 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
         teleportData,
         setTeleportData,
         false,
-        winner
+        winner,
+        playerKillCount
       );
       // move monsters
       moveKaijuPieces(
@@ -304,7 +324,18 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
     <GameWrapper>
       {replayModalMessage && (
         <ReplayModal>
-          <ReplayTitle>{replayModalMessage}</ReplayTitle>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              height: "150px",
+              minHeight: "150px",
+              marginTop: "-115px"
+            }}
+          >
+            {replayModalMessage}
+          </div>
           <ButtonsWrapper>
             <Button onClick={handleClickHome}>No Thanks</Button>
             <Button onClick={handleClickGame}>Play Again</Button>
@@ -313,7 +344,6 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       )}
       <GameBoard
         isPaused={isPaused}
-        powerUpData={powerUpData}
         playerData={playerData}
         kaijuData={kaijuData}
         setPlayerMoveToTiles={setPlayerMoveToTiles}

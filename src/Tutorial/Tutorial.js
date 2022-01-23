@@ -176,7 +176,7 @@ export const Tutorial = ({
           { i: 3, j: 3 }
         ];
         kaijuSpawnPositions = [{ i: 19, j: 3 }];
-        kaijuMoveSpeed = 0;
+        // kaijuMoveSpeed = 0;
         break;
     }
     initializeTutorialGameBoard(
@@ -261,7 +261,6 @@ export const Tutorial = ({
         () => {},
         teleportData,
         setTeleportData,
-        undefined,
         true,
         null
       );
@@ -277,7 +276,7 @@ export const Tutorial = ({
         accTime.current,
         playerData,
         dmgArray,
-        undefined,
+        () => {},
         true,
         null
       );

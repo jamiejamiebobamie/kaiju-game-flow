@@ -1631,7 +1631,7 @@ export const PLAYER_ABILITIES = {
     activatePassive: baseStats => {
       return {
         ...baseStats,
-        moveSpeed: baseStats.moveSpeed + 4
+        moveSpeed: baseStats.moveSpeed + 2
       };
     },
     activateActive: (
@@ -1897,14 +1897,12 @@ export const PLAYER_CLASSES = [
   {
     elems: "Bubble,Death,Fire",
     class_name: "Dark Wizard",
-    player_class_description:
-      "You know fire and death magic and can dispell the magic of others. Some say you make deals with devils, but you will not tell!"
+    player_class_description: "You're a wizard, but evil."
   },
   {
     elems: "Bubble,Death,Glass",
     class_name: "Dark Fairy",
-    player_class_description:
-      "You hail from the forest and send the souls of those you've killed after your enemies, disappearing from sight and dispelling any magic when threatened."
+    player_class_description: "Evil fairy."
   },
   {
     elems: "Bubble,Death,Heart",
@@ -1921,32 +1919,28 @@ export const PLAYER_CLASSES = [
   {
     elems: "Bubble,Death,Lightning",
     class_name: "Dark Wizard",
-    player_class_description:
-      "You know lightning and death magic and can dispell the magic of others. Some say you make deals with devils, but you will not tell!"
+    player_class_description: "Muhahaha!"
   },
   {
     elems: "Bubble,Death,Metal",
     class_name: "Undead Provisioner",
     player_class_description:
-      "Even armies of the dead need provisions, like rotting meat and calcified cartilage. You can set-up barriers and dismantle them at a moments notice."
+      "Even armies of the dead need provisions, like rotting meat and calcified cartilage."
   },
   {
     elems: "Bubble,Death,Wood",
-    class_name: "Undead Fairy",
-    player_class_description:
-      "You were a fairy and then you died. Now you're an undead fairy. What else did you need to know?"
+    class_name: "Witch",
+    player_class_description: "Don't get wet."
   },
   {
     elems: "Bubble,Fire,Glass",
     class_name: "High Wizard",
-    player_class_description:
-      "Your magic is of the highest caliber. None may cross you."
+    player_class_description: "Magic!"
   },
   {
     elems: "Bubble,Fire,Heart",
     class_name: "Fire Sorcerer",
-    player_class_description:
-      "Pyromaniac, anyone? At least you can heal any allies that get burnt too."
+    player_class_description: "Pyromaniac."
   },
   {
     elems: "Bubble,Fire,Ice",
@@ -1956,43 +1950,37 @@ export const PLAYER_CLASSES = [
   {
     elems: "Bubble,Fire,Lightning",
     class_name: "High Wizard",
-    player_class_description:
-      "Your magic is of the highest caliber. None may cross you."
+    player_class_description: "Magic!"
   },
   {
     elems: "Bubble,Fire,Metal",
     class_name: "General",
-    player_class_description:
-      "You command... no one, but yourself. A master of fire and metal. You've got gumption and grit, and bubbles too. Are you ready soldier?"
+    player_class_description: "You command fire and metal."
   },
   {
     elems: "Bubble,Fire,Wood",
-    class_name: "Charred Fairy",
-    player_class_description:
-      "Your forest burnt down and charred your pretty face. Now someone's gonna pay!"
+    class_name: "Self-made Firefighter",
+    player_class_description: "You put out fires..."
   },
   {
     elems: "Bubble,Glass,Heart",
-    class_name: "Light Fairy",
-    player_class_description: "You're one of the good ones."
+    class_name: "Flighty Healer",
+    player_class_description: "Run away! Run away!"
   },
   {
     elems: "Bubble,Glass,Ice",
-    class_name: "Slow Escapist",
-    player_class_description:
-      "Master of setting traps and running away. Bet you wish you were a bit faster though?"
+    class_name: "Escapist",
+    player_class_description: "Master of setting traps and running away."
   },
   {
     elems: "Bubble,Glass,Lightning",
     class_name: "High Wizard",
-    player_class_description:
-      "Your magic is of the highest caliber. None may cross you."
+    player_class_description: "Magic!"
   },
   {
     elems: "Bubble,Glass,Metal",
-    class_name: "Dispeller",
-    player_class_description:
-      "Full defensive build, eh? Hopefully your teammate can throw a fireball..."
+    class_name: "Fortifier",
+    player_class_description: "Who hurt you?"
   },
   {
     elems: "Bubble,Glass,Wood",
@@ -2007,25 +1995,23 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Bubble,Heart,Lightning",
-    class_name: "Genie",
-    player_class_description: "Will all your wishes be granted?"
+    class_name: "Magician",
+    player_class_description: "Magical jack-of-all trades."
   },
   {
     elems: "Bubble,Heart,Metal",
     class_name: "Healer",
-    player_class_description:
-      "Full defensive build, eh? Hopefully your teammate can throw a fireball..."
+    player_class_description: "Full defensive build..."
   },
   {
     elems: "Bubble,Heart,Wood",
     class_name: "Archdruid",
-    player_class_description:
-      "You're a druid with a title. Don't get snooty about it."
+    player_class_description: "You defend your natural territory to death."
   },
   {
     elems: "Bubble,Ice,Lightning",
     class_name: "Fury",
-    player_class_description: "An Amazonian weather witch."
+    player_class_description: "Ahhh!"
   },
   {
     elems: "Bubble,Ice,Metal",
@@ -2035,8 +2021,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Bubble,Ice,Wood",
     class_name: "Trapper",
-    player_class_description:
-      "Master of setting traps and running away. Bet you wish you were a bit faster though?"
+    player_class_description: "Master of setting traps and running away."
   },
   {
     elems: "Bubble,Lightning,Metal",
@@ -2047,7 +2032,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Bubble,Lightning,Wood",
     class_name: "Stormcaller",
-    player_class_description: "You call the storms, but do they pick up?"
+    player_class_description: "You call the storms."
   },
   {
     elems: "Bubble,Metal,Wood",
@@ -2058,40 +2043,37 @@ export const PLAYER_CLASSES = [
   {
     elems: "Death,Fire,Glass",
     class_name: "Infernalist",
-    player_class_description: "Deals with devils? Yikes."
+    player_class_description: "Devil deals."
   },
   {
     elems: "Death,Fire,Heart",
     class_name: "Chaos Sorcerer",
-    player_class_description:
-      "You kiss boo-boos as much as you cause them. It's great to be chaotic neutral, amiright?"
+    player_class_description: "You kiss boo-boos as much as you cause them."
   },
   {
     elems: "Death,Fire,Ice",
-    class_name: "Horseman",
-    player_class_description: "Horseman of what? Can you be more specific?"
+    class_name: "Deathdealer",
+    player_class_description: "You deal death."
   },
   {
     elems: "Death,Fire,Lightning",
     class_name: "Warlock",
-    player_class_description: "Deals with devils? Yikes."
+    player_class_description: "You are morally ambiguous."
   },
   {
     elems: "Death,Fire,Metal",
     class_name: "Death Knight",
-    player_class_description: "A necromantic knight? Chivalry truly is dead."
+    player_class_description: "Chivalry truly is dead."
   },
   {
     elems: "Death,Fire,Wood",
-    class_name: "Unkempt Druid",
-    player_class_description:
-      "Sacrifical druids who kill those who cross nature? What happened to koombyah?"
+    class_name: "War Druid",
+    player_class_description: "Nature's warrior."
   },
   {
     elems: "Death,Glass,Heart",
     class_name: "Psychopomp",
-    player_class_description:
-      "You travel between life and death, bringing messages between the two."
+    player_class_description: "You travel between life and death."
   },
   {
     elems: "Death,Glass,Ice",
@@ -2101,7 +2083,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Death,Glass,Lightning",
     class_name: "Duelist",
-    player_class_description: "Ready for a fight."
+    player_class_description: "You're ready for a fight."
   },
   {
     elems: "Death,Glass,Metal",
@@ -2117,32 +2099,28 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Death,Heart,Ice",
-    class_name: "Ferryman",
-    player_class_description: "Never met such a spooky boatman."
+    class_name: "Ice Healer",
+    player_class_description: "Skilled in healing and icy death."
   },
   {
     elems: "Death,Heart,Lightning",
     class_name: "Dark Sorcerer",
-    player_class_description:
-      "For such a spooky personage, you certainly send a lot of love."
+    player_class_description: "Evil sorcerer."
   },
   {
     elems: "Death,Heart,Metal",
     class_name: "Forsaken Paladin",
-    player_class_description:
-      "You were a good guy and then something happened? Dramaa!!"
+    player_class_description: "No longer good."
   },
   {
     elems: "Death,Heart,Wood",
     class_name: "Undead Shaman",
-    player_class_description:
-      "You were a shaman and then you died and now you still are."
+    player_class_description: "Rotting flesh hangs off of you."
   },
   {
     elems: "Death,Ice,Lightning",
     class_name: "Undead Pirate",
-    player_class_description:
-      "You were a pirate and then you died and now you still are."
+    player_class_description: "Yar!"
   },
   {
     elems: "Death,Ice,Metal",
@@ -2152,17 +2130,17 @@ export const PLAYER_CLASSES = [
   {
     elems: "Death,Ice,Wood",
     class_name: "Undertaker",
-    player_class_description: "Your clients say you're a lively one!"
+    player_class_description: "They call you the Undertaker!"
   },
   {
     elems: "Death,Lightning,Metal",
-    class_name: "Undead Archer",
-    player_class_description: "You were an archer and now you still are."
+    class_name: "Necro, Electric Archer",
+    player_class_description: "The name says it all."
   },
   {
     elems: "Death,Lightning,Wood",
-    class_name: "Sky Shaman",
-    player_class_description: "You priase the sky and draw power from it."
+    class_name: "Nature's Wrath",
+    player_class_description: "Self-named."
   },
   {
     elems: "Death,Metal,Wood",
@@ -2171,9 +2149,8 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Fire,Glass,Heart",
-    class_name: "Bard",
-    player_class_description:
-      "Warmth and good cheer is all you share, that and cowardice. No one is better than at running away."
+    class_name: "Fire Mage",
+    player_class_description: "Heals and fireballs."
   },
   {
     elems: "Fire,Glass,Ice",
@@ -2183,20 +2160,17 @@ export const PLAYER_CLASSES = [
   {
     elems: "Fire,Glass,Lightning",
     class_name: "Wizard",
-    player_class_description:
-      "You're a standard wizard. 5 fire dmg, 5 fire dmg."
+    player_class_description: "You're a standard wizard. Pew pew."
   },
   {
     elems: "Fire,Glass,Metal",
     class_name: "Archon",
-    player_class_description:
-      "You're one of the heavenly choir. A seraphim of fire, wielding a flamed sword and wreathed in fiery wings!"
+    player_class_description: "You're a seraphim of fire."
   },
   {
     elems: "Fire,Glass,Wood",
-    class_name: "Charred Fairy",
-    player_class_description:
-      "Your forest burnt down and charred your pretty face. Now someone's gonna pay!"
+    class_name: "Hedge Eccentric",
+    player_class_description: "A liminal fighter."
   },
   {
     elems: "Fire,Heart,Ice",
@@ -2205,31 +2179,28 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Fire,Heart,Lightning",
-    class_name: "Shaman",
-    player_class_description: "You're a standard shaman."
+    class_name: "Wizard Apprentice",
+    player_class_description: "You're new."
   },
   {
     elems: "Fire,Heart,Metal",
     class_name: "Crusader",
-    player_class_description: "You're a standard crusader. For God's glory!"
+    player_class_description: "For God's glory!"
   },
   {
     elems: "Fire,Heart,Wood",
-    class_name: "Bard",
-    player_class_description:
-      "Warmth and good cheer is all you share, that and wood. You're good at growing wood."
+    class_name: "Harvester",
+    player_class_description: "A controlled burn heals the land."
   },
   {
     elems: "Fire,Ice,Lightning",
     class_name: "Elementalist",
-    player_class_description:
-      "They said you should just pick one. That you couldn't possibly master them all, but you did! Muahaha!"
+    player_class_description: "They said you could never master them all."
   },
   {
     elems: "Fire,Ice,Metal",
     class_name: "Enchanter",
-    player_class_description:
-      "You build shields and barriers and lay down ice and fire like you got some real sore muscles."
+    player_class_description: "Enchanted barricades and elemental attacks."
   },
   {
     elems: "Fire,Ice,Wood",
@@ -2250,13 +2221,12 @@ export const PLAYER_CLASSES = [
     elems: "Fire,Metal,Wood",
     class_name: "Blacksmith",
     player_class_description:
-      "You use metal and wood and fire to shape the battlefield into your glorious creation!"
+      "You use metal, wood, and fire to shape the battlefield into your glorious creation!"
   },
   {
     elems: "Glass,Heart,Ice",
     class_name: "Interloper",
-    player_class_description:
-      "You insert yourself into battle for a moment cast a spell or two and then promptly run away. Rinse and repeat."
+    player_class_description: "Never in one place long."
   },
   {
     elems: "Glass,Heart,Lightning",
@@ -2266,43 +2236,37 @@ export const PLAYER_CLASSES = [
   {
     elems: "Glass,Heart,Metal",
     class_name: "Cleric",
-    player_class_description:
-      "Full defensive build, eh? Hopefully your teammate can throw a fireball..."
+    player_class_description: "Full defensive build..."
   },
   {
     elems: "Glass,Heart,Wood",
-    class_name: "Sprite",
-    player_class_description:
-      "You're kind of like a fairy, but with a different name."
+    class_name: "Weakling",
+    player_class_description: "You're a weakling. I doubt you'll win."
   },
   {
     elems: "Glass,Ice,Lightning",
     class_name: "Weather Witch",
-    player_class_description:
-      "Whether far aay or close up, weather witches always have a spell up their sleeve."
+    player_class_description: "Dangerous at all ranges."
   },
   {
     elems: "Glass,Ice,Metal",
     class_name: "Sherpa",
-    player_class_description:
-      "You guide wayward travelers with love and built structures. And if something really goes awry, you always know the secret routes of escape."
+    player_class_description: "I'll follow you."
   },
   {
     elems: "Glass,Ice,Wood",
     class_name: "Trapper",
-    player_class_description:
-      "Master of setting traps and running away. Bet you wish you were a bit faster though?"
+    player_class_description: "Master of setting traps and running away."
   },
   {
     elems: "Glass,Lightning,Metal",
     class_name: "Phalanx",
-    player_class_description:
-      "Build barriers, attack through them, disappear in a blink of an eye. No one is getting through your defense."
+    player_class_description: "No one is getting through your defense."
   },
   {
     elems: "Glass,Lightning,Wood",
-    class_name: "Druid",
-    player_class_description: "Just a standard druid."
+    class_name: "Traveller",
+    player_class_description: "You get around."
   },
   {
     elems: "Glass,Metal,Wood",
@@ -2313,7 +2277,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Heart,Ice,Lightning",
     class_name: "Soothsayer",
-    player_class_description: "Do you really use bones to predict the future?"
+    player_class_description: "Austere, yet loving."
   },
   {
     elems: "Heart,Ice,Metal",
@@ -2330,13 +2294,12 @@ export const PLAYER_CLASSES = [
   {
     elems: "Heart,Lightning,Metal",
     class_name: "Enchanted Archer",
-    player_class_description: "Like all the other archers."
+    player_class_description: "Not like the other archers."
   },
   {
     elems: "Heart,Lightning,Wood",
     class_name: "Nurturing Druid",
-    player_class_description:
-      "You take the peace, love, and nature thing to its extreme."
+    player_class_description: "Yay!"
   },
   {
     elems: "Heart,Metal,Wood",
@@ -2361,6 +2324,6 @@ export const PLAYER_CLASSES = [
   {
     elems: "Lightning,Metal,Wood",
     class_name: "Urban Ranger",
-    player_class_description: "Only you can pull off urban camo. Congrats."
+    player_class_description: "You can pull off urban camo. Congrats."
   }
 ];

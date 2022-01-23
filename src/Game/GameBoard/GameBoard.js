@@ -28,7 +28,6 @@ const BackgroundImage = styled.img`
 export const GameBoard = ({
   isClassWrapper = false,
   isPaused,
-  powerUpData,
   playerData,
   kaijuData,
   setPlayerMoveToTiles,
@@ -60,14 +59,6 @@ export const GameBoard = ({
       lives={k.lives}
     />
   ));
-  const powerUps = powerUpData.map((k, i) => (
-    <PowerUp
-      key={i}
-      charLocation={k.charLocation}
-      element={k.element}
-      color={k.color}
-    />
-  ));
   const players = playerData.map(p => (
     <Player
       key={p.i}
@@ -87,7 +78,6 @@ export const GameBoard = ({
       {isPaused && <PauseModal />}
       <ShiftContentOver scale={scale}>
         {tiles}
-        {powerUps}
         {kaiju}
         {players}
       </ShiftContentOver>
