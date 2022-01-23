@@ -165,8 +165,10 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   useEffect(() => {
     if (kaijuKillCount.length >= 7) {
       const _winner =
-        kaijuKillCount.filter(k => k === 0).length >
-        kaijuKillCount.filter(k => k === 1).length
+        playerData[0].lives && !playerData[1].lives
+          ? 0
+          : kaijuKillCount.filter(k => k === 0).length >
+            kaijuKillCount.filter(k => k === 1).length
           ? 0
           : 1;
       setWinner(_winner);

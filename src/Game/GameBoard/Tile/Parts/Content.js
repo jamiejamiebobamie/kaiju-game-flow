@@ -30,7 +30,6 @@ const Image = styled.div`
   height: 100%;
   background-repeat: no-repeat;
   background-position: 50%;
-  ${props => props.isKaiju && "background-image: url(testKaijuTile.png);"}
   visibility: visible;
   -webkit-transform: rotate(-60deg);
   -moz-transform: rotate(-60deg);
