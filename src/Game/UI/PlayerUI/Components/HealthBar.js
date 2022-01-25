@@ -4,7 +4,9 @@ import { useHover } from "../../../../Utils/utils";
 
 const Wrapper = styled.div`
   display: flex;
-  overflow: scroll;
+  /* overflow: scroll; */
+  overflow: hidden;
+
   justify-content: flex-start;
   width: 60%;
   height: 50px;

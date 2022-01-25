@@ -9,9 +9,10 @@ const Wrapper = styled.div`
     props.isReversed ? "flex-flow: row wrap;" : "flex-flow: row wrap-reverse;"}
   justify-content: space-around;
   width: 100%;
-  height: 180px;
+  /* height: 300px; */
   overflow: scroll;
   overflow-y: scroll;
+  /* background-color: green; */
 `;
 const AbilityTypeWrapper = styled.div`
   display: flex;

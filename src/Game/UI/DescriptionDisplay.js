@@ -13,9 +13,9 @@ const getDescription = (string, playerData, playerIndex) => {
                 <span
                   style={{
                     color:
-                      playerData[playerIndex].moveSpeed > 8
+                      playerData[playerIndex].moveSpeed > 5
                         ? "green"
-                        : playerData[playerIndex].moveSpeed < 8
+                        : playerData[playerIndex].moveSpeed < 5
                         ? "red"
                         : "black"
                   }}
@@ -235,7 +235,7 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "One Foot in the Grave",
         description: "Communing with death has brought you closer to it...",
-        effect1: "-2 to starting health",
+        effect1: "-1 to starting health",
         effect2: "",
         img: "",
         formatData: {}
@@ -302,7 +302,8 @@ export const DescriptionDisplay = ({
   displayString,
   hoveredContent = null,
   isClassWrapper,
-  pickedAbilities
+  pickedAbilities,
+  isTutorial
 }) => {
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
@@ -319,7 +320,7 @@ export const DescriptionDisplay = ({
     };
   return (
     <Wrapper isClassWrapper={isClassWrapper}>
-      <h2>{title}</h2>
+      <h2>{!isTutorial && !title ? "Press ESC to pause" : title}</h2>
       <p>{description}</p>
       <p>{effect1}</p>
       <p>{effect2}</p>

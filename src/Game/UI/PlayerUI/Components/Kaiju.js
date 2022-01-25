@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   width: 70%;
   height: 60px;
   border-radius: 10px;
-  overflow: scroll;
+  overflow: hidden;
 `;
 const KaijuIcon = styled.i`
   min-width: 30px;

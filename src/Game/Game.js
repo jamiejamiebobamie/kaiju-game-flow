@@ -293,7 +293,7 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
           ? 0
           : accTime.current + intervalTime;
     }
-  });
+  }, intervalTime);
   return (
     <GameWrapper>
       {replayModalMessage && (

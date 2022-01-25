@@ -1647,7 +1647,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 30,
+        count: 20,
         statusKey: "isElectrified",
         numTiles: 3,
         setTileStatuses

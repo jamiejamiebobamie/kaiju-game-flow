@@ -54,7 +54,7 @@ const AbilityButtonsWrapper = styled.div`
   flex-direction: column;
   justify-content: space-around;
   width: 100%;
-  height: 270px;
+  overflow: hidden;
 `;
 const Title = styled.div`
   font-size: 20px;
@@ -205,10 +205,18 @@ export const ClassPicker = ({
     <ClassPickerWrapper animName={animName}>
       {classTitle && <ClassTitlePopUp>You are a {classTitle}</ClassTitlePopUp>}
       <AbilityButtonsWrapper>
-        <br />
-        <Title>Choose your abilities</Title>
-        <br />
-        <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
+        <div
+          style={{
+            height: "75px"
+            // backgroundColor: "blue"
+            // backgroundColor: "red"
+            // padding: "50px"
+          }}
+        >
+          <br />
+          <Title>Choose your abilities</Title>
+          <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
+        </div>
         <Abilities
           handleChange={handleChange}
           pickedAbilities={pickedAbilities}
@@ -239,6 +247,7 @@ export const ClassPicker = ({
           displayString={displayString}
           pickedAbilities={pickedAbilities}
           playerData={playerData}
+          isTutorial={true}
         />
         <PlayButton onClick={handleClickPlay}>Play!</PlayButton>
       </DescriptionDisplayWrapper>
