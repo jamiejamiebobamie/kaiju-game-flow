@@ -143,9 +143,9 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       switch (code) {
         case "Escape":
           setIsPaused(_isPaused => !_isPaused);
-          setIntervalTime(_intervalTime =>
-            _intervalTime === null ? 100 : null
-          );
+          // setIntervalTime(_intervalTime =>
+          //   _intervalTime === null ? 100 : null
+          // );
           break;
       }
     },
@@ -190,6 +190,11 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       setPlayerMoveToTiles(null);
     }
   }, [playerMoveToTiles]);
+  // useEffect(() => {
+  //   if (teleportData.length) setHighlightedTiles0([]);
+  //   // setPath
+  // }, [teleportData]);
+
   useEffect(() => {
     if (winner !== null && !replayModalMessage) {
       if (!kaijuData.find(kaiju => kaiju.lives > 0) || winner === -1) {
@@ -237,7 +242,7 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
     }
   }, [kaijuData, winner]);
   useInterval(() => {
-    if (!replayModalMessage) {
+    if (!replayModalMessage && !isPaused) {
       updateHighlightedTiles(
         setHighlightedTiles0,
         playerData,
@@ -308,7 +313,7 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
           ? 0
           : accTime.current + intervalTime;
     }
-  }, intervalTime);
+  });
   return (
     <GameWrapper>
       {replayModalMessage && (

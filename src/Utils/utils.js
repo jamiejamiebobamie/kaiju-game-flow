@@ -380,7 +380,6 @@ export const updateHighlightedTiles = (
   path,
   setPath,
   scale,
-  i,
   isTutorial
 ) => {
   let _highlightedTiles = [];
@@ -413,10 +412,10 @@ export const updateHighlightedTiles = (
     }
   } else if (
     playerData &&
-    playerData[i] &&
-    playerData[i].moveToTiles.length > 0
+    playerData[0] &&
+    playerData[0].moveToTiles.length > 0
   ) {
-    _highlightedTiles = playerData[i].moveToTiles.map(t => {
+    _highlightedTiles = playerData[0].moveToTiles.map(t => {
       return { h_i: t.i, h_j: t.j };
     });
   }
@@ -787,41 +786,42 @@ export const shootPower = ({
           ? [data[dataIndex === 0 ? 1 : 0].tile, dataIndex === 0 ? 1 : 0]
           : getClosestEntityFromTile(targetData, originTile, scale);
       if (originTile && targetTile) {
-        const [manaPoolCount, manaPoolNumTiles] = d.isInManaPool
-          ? statusKey === "isShielded"
-            ? [4, 6]
-            : statusKey === "isWooded"
-            ? [20, 3]
-            : statusKey === "isOnFire"
-            ? [30, 3]
-            : statusKey === "isGhosted"
-            ? [60, 3]
-            : statusKey === "isBubble"
-            ? [7, 6]
-            : statusKey === "isHealing"
-            ? [30, 6]
-            : [null, null]
-          : [null, null];
+        // const [manaPoolCount, manaPoolNumTiles] = d.isInManaPool
+        //   ? statusKey === "isShielded"
+        //     ? [4, 6]
+        //     : statusKey === "isWooded"
+        //     ? [20, 3]
+        //     : statusKey === "isOnFire"
+        //     ? [30, 3]
+        //     : statusKey === "isGhosted"
+        //     ? [60, 3]
+        //     : statusKey === "isBubble"
+        //     ? [7, 6]
+        //     : statusKey === "isHealing"
+        //     ? [30, 6]
+        //     : [null, null]
+        //   : [null, null];
         const tileStatusesCountModifier = [
           "isWooded",
           "isOnFire",
-          "isShielded",
+          // "isShielded",
           "isHealing"
         ];
         const tileStatusesNumTilesModifier = [
           "isWooded",
           "isGhosted",
-          "isShielded",
+          // "isShielded",
           "isHealing"
         ];
         const [tile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
-          manaPoolNumTiles
-            ? manaPoolNumTiles
-            : data[dataIndex].numTilesModifier &&
-              tileStatusesNumTilesModifier.includes(statusKey)
+          // manaPoolNumTiles
+          //   ? manaPoolNumTiles
+          //   :
+          data[dataIndex].numTilesModifier &&
+            tileStatusesNumTilesModifier.includes(statusKey)
             ? numTiles + data[dataIndex].numTilesModifier
             : numTiles
         );
@@ -830,12 +830,14 @@ export const shootPower = ({
             ..._tiles[tile.i][tile.j],
             [statusKey]: {
               dirs,
-              count: manaPoolCount
-                ? manaPoolCount
-                : data[dataIndex].tileCountModifier &&
-                  tileStatusesCountModifier.includes(statusKey)
-                ? count + data[dataIndex].tileCountModifier
-                : count,
+              count:
+                // manaPoolCount
+                //   ? manaPoolCount
+                //   :
+                data[dataIndex].tileCountModifier &&
+                tileStatusesCountModifier.includes(statusKey)
+                  ? count + data[dataIndex].tileCountModifier
+                  : count,
               targetIndex,
               isKaiju: d.isKaiju || statusKey === "isHealing",
               startCount: count,

@@ -202,6 +202,13 @@ export const Tutorial = ({
       setPlayerMoveToTiles(null);
     }
   }, [playerMoveToTiles]);
+  // useEffect(() => {
+  //   if (teleportData.length) {
+  //     console.log("hey", teleportData);
+  //     setHighlightedTiles0([]);
+  //   }
+  //   // setPath
+  // }, [teleportData]);
   useInterval(() => {
     const isTutorial = true;
     updateHighlightedTiles(
@@ -211,7 +218,6 @@ export const Tutorial = ({
       path,
       setPath,
       scale,
-      0,
       isTutorial
     );
     if (shouldUpdate(accTime.current, 3))

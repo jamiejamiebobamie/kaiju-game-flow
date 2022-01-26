@@ -20,6 +20,7 @@ const ClassPickerWrapper = styled.div`
   border-thickness: thin;
   border-radius: 10px;
   border-color: #6b948e;
+  /* background-color: red; */
 
   ${props =>
     props.animName &&
@@ -56,6 +57,15 @@ const AbilityButtonsWrapper = styled.div`
   justify-content: space-around;
   width: 100%;
   overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  /* background-color: green; */
+  /* pointer-events: none; */
+  &::-webkit-scrollbar {
+    display: none; /* for Chrome, Safari, and Opera */
+    width: 0; /* Remove scrollbar space */
+    background: transparent; /* Optional: just make scrollbar invisible */
+  }
 `;
 const Title = styled.div`
   font-size: 20px;
