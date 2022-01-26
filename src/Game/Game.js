@@ -143,9 +143,7 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       switch (code) {
         case "Escape":
           setIsPaused(_isPaused => !_isPaused);
-          // setIntervalTime(_intervalTime =>
-          //   _intervalTime === null ? 100 : null
-          // );
+          setIntervalTime(_intervalTime => (_intervalTime === null ? 1 : null));
           break;
       }
     },
@@ -238,82 +236,84 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
             break;
         }
         setReplayModalMessage(message);
+        setIntervalTime(null);
       }
     }
   }, [kaijuData, winner]);
   useInterval(() => {
-    if (!replayModalMessage && !isPaused) {
-      updateHighlightedTiles(
-        setHighlightedTiles0,
-        playerData,
-        hoverLookupString,
-        path,
-        setPath,
-        scale,
-        0
-      );
-      if (shouldUpdate(accTime.current, 3))
-        updateTileState(
-          playerData,
-          kaijuData,
-          setDmgArray,
-          setTileStatuses,
-          width,
-          height,
-          scale,
-          accTime.current
-        );
-      redrawTiles(
-        highlightedTiles0,
-        setHoverRef,
-        setClickedTile,
-        setTiles,
+    // if (!replayModalMessage && !isPaused) {
+    updateHighlightedTiles(
+      setHighlightedTiles0,
+      playerData,
+      hoverLookupString,
+      path,
+      setPath,
+      scale,
+      0
+    );
+    if (shouldUpdate(accTime.current, 3))
+      updateTileState(
         playerData,
         kaijuData,
-        tileStatuses,
+        setDmgArray,
         setTileStatuses,
         width,
         height,
-        scale
-      );
-      // move players
-      movePlayerPieces(
-        playerData,
-        setPlayerData,
-        tileStatuses,
-        setTileStatuses,
         scale,
-        accTime.current,
-        kaijuData,
-        dmgArray,
-        setPlayerKillCount,
-        teleportData,
-        setTeleportData,
-        false,
-        winner,
-        playerKillCount
+        accTime.current
       );
-      // move monsters
-      moveKaijuPieces(
-        kaijuData,
-        setKaijuData,
-        tileStatuses,
-        setTileStatuses,
-        scale,
-        accTime.current,
-        playerData,
-        dmgArray,
-        setKaijuKillCount,
-        false,
-        winner
-      );
-      // update accumulated time.
-      accTime.current =
-        accTime > Number.MAX_SAFE_INTEGER - 10000
-          ? 0
-          : accTime.current + intervalTime;
-    }
-  });
+    redrawTiles(
+      highlightedTiles0,
+      setHoverRef,
+      setClickedTile,
+      setTiles,
+      playerData,
+      kaijuData,
+      tileStatuses,
+      setTileStatuses,
+      width,
+      height,
+      scale
+    );
+    // move players
+    movePlayerPieces(
+      playerData,
+      setPlayerData,
+      tileStatuses,
+      setTileStatuses,
+      scale,
+      accTime.current,
+      kaijuData,
+      dmgArray,
+      setPlayerKillCount,
+      teleportData,
+      setTeleportData,
+      false,
+      winner,
+      playerKillCount
+    );
+    // move monsters
+    moveKaijuPieces(
+      kaijuData,
+      setKaijuData,
+      tileStatuses,
+      setTileStatuses,
+      scale,
+      accTime.current,
+      playerData,
+      dmgArray,
+      setKaijuKillCount,
+      false,
+      winner
+    );
+    // console.log(accTime.current);
+    // update accumulated time.
+    accTime.current =
+      accTime > Number.MAX_SAFE_INTEGER - 10000
+        ? 0
+        : accTime.current + intervalTime;
+    // }
+  }, intervalTime);
   return (
     <GameWrapper>
       {replayModalMessage && (

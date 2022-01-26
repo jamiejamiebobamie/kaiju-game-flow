@@ -105,8 +105,8 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityHeartActive":
       return {
         title: "Heal",
-        description: "Heal your teammate up to maximum health.",
-        effect1: "Heal will follow its target between tiles.",
+        description: "Heal your teammate",
+        effect1: "",
         effect2: "",
         img: "",
         formatData: {}
@@ -114,16 +114,16 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityHeartPassive":
       return {
         title: "Good Vibes",
-        description: "You send out good vibes.",
-        effect1: "Does nothing. Or does it?",
-        effect2: "It doesn't.",
+        description: "You send out good vibes",
+        effect1: "",
+        effect2: "",
         img: "",
         formatData: {}
       };
     case "abilityMetalPassive":
       return {
         title: "Builder",
-        description: "Your magic is larger, goes farther, and lasts longer.",
+        description: "Your magic is larger, goes farther, and lasts longer",
         effect1: "+1 number of tiles modifier",
         effect2: "+1 tile count modifier",
         img: "",
@@ -133,8 +133,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Aegis",
         description:
-          "Create a large area of protection around you. Blocking many ranged attacks.",
-        effect1: "Status remains on the tile until walked on.",
+          "Create an area of protection around you. Blocking many ranged attacks",
+        effect1: "Status remains on the tile until walked on",
         effect2: "",
         img: "",
         formatData: {}
@@ -142,7 +142,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityGlassPassive":
       return {
         title: "Teleport Sickness",
-        description: "Zipping through space-time makes you nauseous.",
+        description: "Zipping through space-time makes you nauseous",
         effect1: "-2 to move speed",
         effect2: "",
         img: "",
@@ -151,7 +151,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityGlassActive":
       return {
         title: "Escape",
-        description: 'Instantly travel to a "safe" tile.',
+        description: 'Instantly travel to a "safe" tile',
         effect1: "",
         effect2: "",
         img: "",
@@ -160,7 +160,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityIcePassive":
       return {
         title: "Inclement Weather",
-        description: "The forecast calls for snow.",
+        description: "The forecast calls for snow",
         effect1: "-1 to move speed",
         effect2: "",
         img: "",
@@ -169,7 +169,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityIceActive":
       return {
         title: "Ice Slice",
-        description: "Conjure a stationary vortex of ice.",
+        description: "Conjure a stationary vortex of ice",
         effect1: "",
         effect2: "",
         img: "",
@@ -178,7 +178,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityFirePassive":
       return {
         title: "Fuel to Burn",
-        description: "All of your magic goes farther and lasts longer.",
+        description: "All of your magic goes farther and lasts longer",
         effect1: "+1 tile count modifier",
         effect2: "",
         img: "",
@@ -187,8 +187,9 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityFireActive":
       return {
         title: "Wildfire",
-        description: "Fire travels in the direction of your closest enemy.",
-        effect1: "Creates a single, lateral line of fire.",
+        description:
+          "Create a single, lateral line of fire that travels in the direction of your closest enemy",
+        effect1: "",
         effect2: "",
         img: "",
         formatData: {}
@@ -196,8 +197,8 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityWoodPassive":
       return {
         title: "Crunchy Granola",
-        description: "You're extra healthy.",
-        effect1: "+2 to starting lives.",
+        description: "You're extra healthy",
+        effect1: "+2 to starting lives",
         effect2: "",
         img: "",
         formatData: {}
@@ -206,8 +207,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Overgrowth",
         description:
-          "Poison ivy travels in the direction of your closest enemy.",
-        effect1: "Status remains on the tile until walked on.",
+          "Poison ivy travels in the direction of your closest enemy",
+        effect1: "Status remains on the tile until walked on",
         effect2: "",
         img: "",
         formatData: {}
@@ -215,7 +216,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityLightningPassive":
       return {
         title: "Charged Step",
-        description: "Electrical energy courses through your body.",
+        description: "Electrical energy courses through your body",
         effect1: "+2 to move speed",
         effect2: "",
         img: "",
@@ -225,8 +226,8 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Discharge",
         description:
-          "Cast 3 bolts of lightning in the direction of your closest enemy.",
-        effect1: "Bolts ricochet off the walls of the map.",
+          "Cast 3 bolts of lightning in the direction of your closest enemy",
+        effect1: "Bolts ricochet off the walls of the map",
         effect2: "",
         img: "",
         formatData: {}
@@ -243,8 +244,8 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityDeathActive":
       return {
         title: "Haunt",
-        description: "Shoot a ghost at your closest enemy.",
-        effect1: "Ghost will follow the enemy between tiles.",
+        description: "Shoot a ghost at your closest enemy",
+        effect1: "",
         effect2: "",
         img: "",
         formatData: {}
@@ -252,7 +253,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityBubblePassive":
       return {
         title: "So Many Bubbles",
-        description: "Your magic is more effective.",
+        description: "Your magic is more effective",
         effect1: "+1 number of tiles modifier",
         effect2: "",
         img: "",
@@ -261,8 +262,8 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityBubbleActive":
       return {
         title: "Dispel",
-        description: "Dispel all tile effects around you.",
-        effect1: "Clears both positive and negative statuses.",
+        description: "Dispel all tile effects around you",
+        effect1: "Clears both positive and negative statuses",
         effect2: "",
         img: "",
         formatData: {}
@@ -270,7 +271,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "healthBar":
       return {
         title: "Health Bar",
-        description: "You're health bar.",
+        description: "Your health bar",
         effect1: "",
         effect2: "",
         img: "",
