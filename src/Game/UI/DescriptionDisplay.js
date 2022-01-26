@@ -290,7 +290,9 @@ const Wrapper = styled.div`
   border-radius: 10px;
   text-font: 30px;
   font-alignment: 30px;
-  color: black;
+  color: #64939b;
+  border-color: #64939b;
+
   font-family: gameboy;
   @font-face {
     font-family: gameboy;

@@ -32,7 +32,8 @@ export const Wrapper = styled.div`
 `;
 export const Title = styled.div`
   font-size: 40px;
-  color: black;
+  border-color: #64939b;
+  color: #64939b;
   font-family: gameboy;
   @font-face {
     font-family: gameboy;
@@ -71,6 +72,8 @@ export const Button = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-bottom: 5px solid;
+  border-color: #64939b;
+  color: #64939b;
   &:hover {
     border-bottom: 3px solid;
     transform: translate(0px, 3px);
@@ -85,4 +88,6 @@ export const Button = styled.div`
 export const StyledIcon = styled.i`
   margin-top: 3px;
   margin-left: 5px;
+  border-color: #64939b;
+  color: #64939b;
 `;

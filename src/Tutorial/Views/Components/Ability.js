@@ -59,9 +59,10 @@ const Wrapper = styled.div`
   justify-self: center;
   align-self: center;
   border-radius: 100%;
-  border-color: ${props => props.color};
+  color: ${props => (props.color ? props.color : "#64939b")};
   border-style: solid;
   border-width: thin;
+  border-color: ${props => (props.color ? props.color : "#64939b")};
   min-width: 50px;
   height: 50px;
   cursor: pointer;
@@ -72,7 +73,7 @@ const AbilityIcon = styled.i`
   justify-self: center;
   align-self: center;
   transform: scale(2);
-  color: ${props => props.color};
+  color: ${props => (props.color ? props.color : "#64939b")};
 `;
 export const Ability = ({
   name,

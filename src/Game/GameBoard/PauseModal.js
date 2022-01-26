@@ -13,12 +13,12 @@ const Wrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
+  border-color: #64939b;
+  color: #64939b;
 
   font-size: 30px;
   font-alignment: center;
-  color: black;
-  background-color: #f2e3cc;
-
+  background-color: #152642;
   font-family: gameboy;
   @font-face {
     font-family: gameboy;

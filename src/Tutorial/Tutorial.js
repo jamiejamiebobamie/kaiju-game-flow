@@ -124,7 +124,7 @@ export const Tutorial = ({
         setBackButtonContent("Back");
         setNextButtonContent("Next");
         setTitle([
-          "You cast magic to attack, defend and more",
+          "You cast magic to attack and defend",
           <div
             style={{
               width: "100%",

@@ -47,6 +47,10 @@ export const Home = () => {
               style={{ color: "black", textDecoration: "none" }}
               href="https://github.com/jamiejamiebobamie/kaiju-game-flow"
               rel="noreferrer"
+              style={{
+                color: "#64939b",
+                textDecoration: "none"
+              }}
             >
               Code <StyledIcon className="fa fa-github-alt" />
             </a>

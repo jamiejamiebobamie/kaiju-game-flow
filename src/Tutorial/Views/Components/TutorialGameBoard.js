@@ -34,7 +34,7 @@ const Title = styled.div`
   pointer-events: none;
   font-size: 13px;
   z-index: 1;
-  color: black;
+  color: #6b948e;
   font-family: gameboy;
   @font-face {
     font-family: gameboy;

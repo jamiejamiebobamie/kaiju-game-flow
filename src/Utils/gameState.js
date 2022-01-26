@@ -1530,7 +1530,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 35,
+        count: 15,
         statusKey: "isCold",
         numTiles: 6,
         setTileStatuses

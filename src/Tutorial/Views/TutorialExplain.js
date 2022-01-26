@@ -13,6 +13,7 @@ const BackgroundImage = styled.img`
   border-radius: 5px;
   border-style: solid;
   border-thickness: thick;
+  border-color: #64939b;
   margin-top: -170px;
   width: 478px;
   height: 800px;

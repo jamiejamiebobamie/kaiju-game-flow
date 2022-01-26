@@ -13,7 +13,6 @@ const Wrapper = styled.div`
       : "width: 65%;"};
   height: 100%;
   overflow: none;
-  overflow-y: none;
 `;
 export const Abilities = ({
   shiftContentOver,

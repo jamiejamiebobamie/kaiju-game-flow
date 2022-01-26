@@ -16,6 +16,14 @@ const Wrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
+  background-color: #152642;
+  border-color: #64939b;
+
+  border-style: solid;
+  border-thickness: thin;
+  border-color: #64939b;
+  color: #64939b;
+  background-color: #152642;
 `;
 const PlayerBorder = styled.div`
   position: absolute;
@@ -31,6 +39,7 @@ const PlayerPicture = styled.i`
   margin-top: 70px;
   margin-left: 68px;
   transform: scale(10);
+  color: #64939b;
 `;
 const ClassPicture = styled.i`
   display: flex;
@@ -41,11 +50,13 @@ const ClassPicture = styled.i`
   z-index: 2;
   width: 30px;
   height: 30px;
-  border-radius: 10px;
   border-radius: 100%;
   border-style: solid;
   border-thickness: thin;
-  background-color: #f2e3cc;
+  border-color: #64939b;
+  color: #64939b;
+  background-color: #152642;
+
   align-items: center;
 `;
 export const PlayerUI = ({

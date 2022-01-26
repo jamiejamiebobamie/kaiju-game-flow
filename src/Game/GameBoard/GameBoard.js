@@ -12,6 +12,7 @@ const Board = styled.div`
   border-style: solid;
   border-thickness: medium;
   border-radius: 10px;
+  border-color: #64939b;
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;

@@ -19,6 +19,7 @@ const ClassPickerWrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
+  border-color: #6b948e;
 
   ${props =>
     props.animName &&
@@ -63,7 +64,7 @@ const Title = styled.div`
   align-self: flex-start;
   margin-left: 50px;
   align-content: center;
-  color: black;
+  color: #6b948e;
   font-family: gameboy;
   @font-face {
     font-family: gameboy;
@@ -100,6 +101,9 @@ const PlayButton = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-bottom: 5px solid;
+  border-color: #64939b;
+  color: #64939b;
+
   &:hover {
     border-bottom: 3px solid;
     transform: translate(0px, 3px);
@@ -125,6 +129,9 @@ const ClassTitlePopUp = styled.div`
   height: 200px;
   margin-left: -450px;
   margin-top: -150px;
+  /* color: #bb86fc; */
+  /* color: #65ff00; */
+  color: #779b64;
 
   z-index: 9999999999;
   opacity: 0;

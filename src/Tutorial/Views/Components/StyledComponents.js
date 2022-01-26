@@ -16,6 +16,7 @@ export const Wrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
+  border-color: #64939b;
   ${props =>
     props.animName &&
     `-webkit-animation-duration: 3s;
@@ -79,6 +80,9 @@ export const Button = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-bottom: 5px solid;
+  border-color: #64939b;
+  color: #64939b;
+
   &:hover {
     border-bottom: 3px solid;
     transform: translate(0px, 3px);
@@ -103,7 +107,7 @@ export const Title = styled.div`
   align-self: center;
   font-size: 20px;
   text-align: center;
-  color: black;
+  color: #64939b;
   font-family: gameboy;
   @font-face {
     font-family: gameboy;

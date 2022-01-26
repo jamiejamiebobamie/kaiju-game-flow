@@ -65,7 +65,7 @@ const Wrapper = styled.div`
   align-self: center;
   border-radius: 100%;
   border-style: solid;
-  border-color: black;
+  border-color: ${props => props.color};
   min-width: 50px;
   height: 50px;
   ${props => props.isAnimating && "animation: rotation linear .5s;"};
@@ -135,9 +135,9 @@ const AbilityNum = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-color: ${props => props.color};
-  background-color: transparent;
-  color: black;
-  color: ${props => props.color};
+  background-color: ${props => props.color};
+  color: #152642;
+  /* color: ${props => props.color}; */
   text-align: right;
   align-content: center;
   align-items: center;

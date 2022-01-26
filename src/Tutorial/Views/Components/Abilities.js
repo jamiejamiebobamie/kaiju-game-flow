@@ -21,6 +21,7 @@ const AbilityTypeWrapper = styled.div`
   border-radius: 30px;
   border-style: solid;
   border-width: thin;
+  border-color: #64939b;
   padding: 10px;
 `;
 const AbilityButtonsWrapper = styled.div`
@@ -38,7 +39,7 @@ const AbilityTypeTitle = styled.div`
   display: flex;
   align-self: center;
   align-content: center;
-  color: black;
+  color: #64939b;
   font-family: gameboy;
   @font-face {
     font-family: gameboy;
@@ -52,6 +53,7 @@ const ButtonWrapper = styled.div`
   border-radius: 30px;
   border-style: solid;
   border-width: thin;
+  border-color: #64939b;
   ${props => props.isPicked && `border-color: ${props.color};`}
   width: 60px;
   padding-top: 5px;

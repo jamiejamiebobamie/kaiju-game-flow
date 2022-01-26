@@ -46,6 +46,8 @@ const Button = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-bottom: 5px solid;
+  border-color: #64939b;
+  color: #64939b;
   &:hover {
     border-bottom: 3px solid;
     transform: translate(0px, 3px);
@@ -57,7 +59,9 @@ const Button = styled.div`
     src: url(Early_GameBoy.ttf);
   }
 `;
-const ReplayTitle = styled.div``;
+const ReplayTitle = styled.div`
+  color: #64939b;
+`;
 const ReplayModal = styled.div`
   position: absolute;
   z-index: 9999999999;
@@ -81,6 +85,7 @@ const ReplayModal = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
+  border-color: #64939b;
 
   background-color: #152642;
 
@@ -164,13 +169,13 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   }, []);
   useEffect(() => {
     if (kaijuKillCount.length >= 7) {
-      const _winner =
-        playerData[0].lives && !playerData[1].lives
-          ? 0
-          : kaijuKillCount.filter(k => k === 0).length >
-            kaijuKillCount.filter(k => k === 1).length
-          ? 0
-          : 1;
+      const _winner = 0;
+      // playerData[0].lives && !playerData[1].lives
+      //   ? 0
+      //   : kaijuKillCount.filter(k => k === 0).length >
+      //     kaijuKillCount.filter(k => k === 1).length
+      //   ? 0
+      //   : 1;
       setWinner(_winner);
     }
     if (playerKillCount > 1) setWinner(-1);
@@ -190,18 +195,28 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       if (!kaijuData.find(kaiju => kaiju.lives > 0) || winner === -1) {
         let message = "You won?";
         switch (winner) {
+          // case 0:
+          //   message = [
+          //     <ReplayTitle fontSize={35}>You saved the city!</ReplayTitle>,
+          //     <br />,
+          //     <br />,
+          //     <ReplayTitle>Play again?</ReplayTitle>
+          //   ];
+          //   break;
+          // case 1:
+          //   message = [
+          //     <ReplayTitle fontSize={35}>
+          //       Your teammate saved the city!
+          //     </ReplayTitle>,
+          //     <br />,
+          //     <br />,
+          //     <ReplayTitle>Play again?</ReplayTitle>
+          //   ];
+          //   break;
           case 0:
             message = [
-              <ReplayTitle fontSize={35}>You saved the city!</ReplayTitle>,
-              <br />,
-              <br />,
-              <ReplayTitle>Play again?</ReplayTitle>
-            ];
-            break;
-          case 1:
-            message = [
               <ReplayTitle fontSize={35}>
-                Your teammate saved the city!
+                Your team saved the city!
               </ReplayTitle>,
               <br />,
               <br />,
