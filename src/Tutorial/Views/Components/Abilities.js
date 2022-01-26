@@ -12,6 +12,16 @@ const Wrapper = styled.div`
   /* height: 300px; */
   overflow: scroll;
   overflow-y: scroll;
+  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  /* background-color: green; */
+  /* pointer-events: none; */
+  &::-webkit-scrollbar {
+    display: none; /* for Chrome, Safari, and Opera */
+    width: 0; /* Remove scrollbar space */
+    background: transparent; /* Optional: just make scrollbar invisible */
+  }
   /* background-color: green; */
 `;
 const AbilityTypeWrapper = styled.div`
