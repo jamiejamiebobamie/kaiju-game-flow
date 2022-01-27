@@ -9,20 +9,16 @@ const Wrapper = styled.div`
     props.isReversed ? "flex-flow: row wrap;" : "flex-flow: row wrap-reverse;"}
   justify-content: space-around;
   width: 100%;
-  /* height: 300px; */
   overflow: scroll;
   overflow-y: scroll;
   overflow: hidden;
   overflow-x: hidden;
   overflow-y: hidden;
-  /* background-color: green; */
-  /* pointer-events: none; */
   &::-webkit-scrollbar {
     display: none; /* for Chrome, Safari, and Opera */
     width: 0; /* Remove scrollbar space */
     background: transparent; /* Optional: just make scrollbar invisible */
   }
-  /* background-color: green; */
 `;
 const AbilityTypeWrapper = styled.div`
   display: flex;
@@ -50,11 +46,6 @@ const AbilityTypeTitle = styled.div`
   align-self: center;
   align-content: center;
   color: #64939b;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 const ButtonWrapper = styled.div`
   display: flex;

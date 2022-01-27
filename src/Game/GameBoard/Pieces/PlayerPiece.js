@@ -75,8 +75,7 @@ const Character = styled.img`
 }
 `;
 const Particle = styled.i`
-color: ${props => props.color};
-
+    color: ${props => props.color};
     animation: rise 5s infinite;
     position: absolute;
     z-index:2;
@@ -114,62 +113,62 @@ export const Player = ({
       setTimeout(() => setIsDamaged(false), 4000);
     }
   }, [lives]);
-  useEffect(() => {
-    if (!_isHealed) {
-      _setIsHealed(true);
-      const _particles = [];
-      for (let i = 0; i < 5; i++) {
-        _particles.push(
-          <Particle
-            x={
-              Math.random() > 0.5
-                ? -1 * Math.random() + charLocation.x
-                : Math.random() + charLocation.x
-            }
-            y={
-              Math.random() > 0.5
-                ? -1 * Math.random() + charLocation.y
-                : Math.random() + charLocation.y
-            }
-            className={`fa ${
-              _isTeleported ? "fa-angle-double-up" : "fa-heart-o"
-            }`}
-            color={_isTeleported ? "maroon" : "pink"}
-          />
-        );
-      }
-      setParticles(_particles);
-      setTimeout(() => _setIsHealed(false), 2000);
-    }
-  }, [isHealed]);
-  useEffect(() => {
-    if (!_isTeleported) {
-      _setIsTeleported(true);
-      const _particles = [];
-      for (let i = 0; i < 5; i++) {
-        _particles.push(
-          <Particle
-            x={
-              Math.random() > 0.5
-                ? -1 * Math.random() + charLocation.x
-                : Math.random() + charLocation.x
-            }
-            y={
-              Math.random() > 0.5
-                ? -1 * Math.random() + charLocation.y
-                : Math.random() + charLocation.y
-            }
-            className={`fa ${
-              _isTeleported ? "fa-angle-double-up" : "fa-heart-o"
-            }`}
-            color={_isTeleported ? "maroon" : "pink"}
-          />
-        );
-      }
-      setParticles(_particles);
-      setTimeout(() => _setIsTeleported(false), 2000);
-    }
-  }, [isTeleported]);
+  // useEffect(() => {
+  //   if (!_isHealed) {
+  //     _setIsHealed(true);
+  //     const _particles = [];
+  //     for (let i = 0; i < 5; i++) {
+  //       _particles.push(
+  //         <Particle
+  //           x={
+  //             Math.random() > 0.5
+  //               ? -1 * Math.random() * 5 + charLocation.x
+  //               : Math.random() * 5 + charLocation.x
+  //           }
+  //           y={
+  //             Math.random() > 0.5
+  //               ? -1 * Math.random() * 5 + charLocation.y
+  //               : Math.random() * 5 + charLocation.y
+  //           }
+  //           className={`fa ${
+  //             _isTeleported ? "fa-angle-double-up" : "fa-heart-o"
+  //           }`}
+  //           color={_isTeleported ? "maroon" : "pink"}
+  //         />
+  //       );
+  //     }
+  //     setParticles(_particles);
+  //     setTimeout(() => _setIsHealed(false), 2000);
+  //   }
+  // }, [isHealed]);
+  // useEffect(() => {
+  //   if (!_isTeleported) {
+  //     _setIsTeleported(true);
+  //     const _particles = [];
+  //     for (let i = 0; i < 5; i++) {
+  //       _particles.push(
+  //         <Particle
+  //           x={
+  //             Math.random() > 0.5
+  //               ? -1 * Math.random() + charLocation.x
+  //               : Math.random() + charLocation.x
+  //           }
+  //           y={
+  //             Math.random() > 0.5
+  //               ? -1 * Math.random() + charLocation.y
+  //               : Math.random() + charLocation.y
+  //           }
+  //           className={`fa ${
+  //             _isTeleported ? "fa-angle-double-up" : "fa-heart-o"
+  //           }`}
+  //           color={_isTeleported ? "maroon" : "pink"}
+  //         />
+  //       );
+  //     }
+  //     setParticles(_particles);
+  //     setTimeout(() => _setIsTeleported(false), 2000);
+  //   }
+  // }, [isTeleported]);
   return (
     <Wrapper lives={lives} charLocation={charLocation}>
       {(_isTeleported || _isHealed) && particles}

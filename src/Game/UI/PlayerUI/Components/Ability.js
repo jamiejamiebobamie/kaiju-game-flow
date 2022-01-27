@@ -137,17 +137,11 @@ const AbilityNum = styled.div`
   border-color: ${props => props.color};
   background-color: ${props => props.color};
   color: #152642;
-  /* color: ${props => props.color}; */
   text-align: right;
   align-content: center;
   align-items: center;
   justify-content: center;
-  font-family: gameboy;
   font-size: 12px;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 export const Ability = ({
   playerIndex,

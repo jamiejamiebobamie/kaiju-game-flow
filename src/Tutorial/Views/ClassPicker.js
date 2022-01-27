@@ -20,34 +20,22 @@ const ClassPickerWrapper = styled.div`
   border-thickness: thin;
   border-radius: 10px;
   border-color: #6b948e;
-  /* background-color: red; */
-
-  ${props =>
-    props.animName &&
-    `-webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-name: ${props.animName};
-    animation-name:  ${props.animName};`}
-
-  @keyframes fadeInLeft {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-name: fadeInUp;
+  animation-name: fadeInUp;
+  @keyframes fadeInUp {
     0% {
       opacity: 0;
-      transform: translateX(-20px);
+      transform: translateY(20px);
+    }
+    10% {
+      opacity: 0;
+      transform: translateY(20px);
     }
     100% {
       opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes fadeInRight {
-    0% {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
+      transform: translateY(0);
     }
   }
 `;
@@ -59,8 +47,6 @@ const AbilityButtonsWrapper = styled.div`
   overflow: hidden;
   overflow-x: hidden;
   overflow-y: hidden;
-  /* background-color: green; */
-  /* pointer-events: none; */
   &::-webkit-scrollbar {
     display: none; /* for Chrome, Safari, and Opera */
     width: 0; /* Remove scrollbar space */
@@ -75,11 +61,6 @@ const Title = styled.div`
   margin-left: 50px;
   align-content: center;
   color: #6b948e;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 const DescriptionDisplayWrapper = styled.div`
   display: flex;
@@ -119,11 +100,6 @@ const PlayButton = styled.div`
     transform: translate(0px, 3px);
   }
   font-size: 20px;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 const ClassTitlePopUp = styled.div`
   position: absolute;
@@ -134,23 +110,14 @@ const ClassTitlePopUp = styled.div`
   pointer-events: none;
   left: 50%;
   top: 45%;
-
   width: 900px;
   height: 200px;
   margin-left: -450px;
   margin-top: -150px;
-  /* color: #bb86fc; */
-  /* color: #65ff00; */
   color: #779b64;
-
   z-index: 9999999999;
   opacity: 0;
   font-size: 50px;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
   -webkit-animation-duration: 3s;
   animation-duration: 3s;
   -webkit-animation-name: fadeInFadeOutUp;
@@ -175,7 +142,6 @@ const ClassTitlePopUp = styled.div`
   }
 `;
 export const ClassPicker = ({
-  animName,
   pickedAbilities,
   setPickedAbilities,
   handleClickPlay,
@@ -219,17 +185,10 @@ export const ClassPicker = ({
     if (classTitle) setTimeout(() => setClassTitle(null), 3000);
   }, [classTitle]);
   return (
-    <ClassPickerWrapper animName={animName}>
+    <ClassPickerWrapper>
       {classTitle && <ClassTitlePopUp>You are a {classTitle}</ClassTitlePopUp>}
       <AbilityButtonsWrapper>
-        <div
-          style={{
-            height: "75px"
-            // backgroundColor: "blue"
-            // backgroundColor: "red"
-            // padding: "50px"
-          }}
-        >
+        <div style={{ height: "75px" }}>
           <br />
           <Title>Choose your abilities</Title>
           <Title>{`Pick ${numAbilitiesToPick}:`}</Title>

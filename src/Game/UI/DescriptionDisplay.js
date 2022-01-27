@@ -151,7 +151,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityGlassActive":
       return {
         title: "Escape",
-        description: 'Instantly travel to a "safe" tile',
+        description: "Instantly travel to a safe tile",
         effect1: "",
         effect2: "",
         img: "",
@@ -277,6 +277,15 @@ const getDescription = (string, playerData, playerIndex) => {
         img: "",
         formatData: {}
       };
+    case "Kaiju":
+      return {
+        title: "Kaiju",
+        description: "They come from the sea!",
+        effect1: "",
+        effect2: "",
+        img: "",
+        formatData: {}
+      };
   }
 };
 const Wrapper = styled.div`
@@ -293,17 +302,11 @@ const Wrapper = styled.div`
   font-alignment: 30px;
   color: #64939b;
   border-color: #64939b;
-
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 export const DescriptionDisplay = ({
-  playerData,
-  displayString,
   hoveredContent = null,
+  displayString,
+  playerData,
   isClassWrapper,
   pickedAbilities,
   isTutorial

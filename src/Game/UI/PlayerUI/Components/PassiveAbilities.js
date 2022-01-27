@@ -31,8 +31,10 @@ const PassiveAbility = styled.div`
   border-radius: 10px;
   border-radius: 100%;
   border-style: solid;
-  border-thickness: thin;
-  color: ${props => props.color};
+  border-thickness: 1px;
+  border-color: #152642;
+  background-color: ${props => props.color};
+  color: #152642;
   transform: rotate(
     ${props => (props.isReversed ? props.i * 18 - 90 : props.i * 18 - 30)}deg
   );

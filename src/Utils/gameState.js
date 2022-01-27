@@ -2139,7 +2139,7 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Death,Lightning,Wood",
-    class_name: "Nature's Wrath",
+    class_name: "Arcane Avenger",
     player_class_description: "Self-named."
   },
   {
@@ -2314,7 +2314,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Ice,Lightning,Wood",
     class_name: "Vengeful Druid",
-    player_class_description: "You are nature's wrath!."
+    player_class_description: "You are nature's wrath!"
   },
   {
     elems: "Ice,Metal,Wood",

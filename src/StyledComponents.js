@@ -34,11 +34,6 @@ export const Title = styled.div`
   font-size: 40px;
   border-color: #64939b;
   color: #64939b;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
   margin-bottom: 100px;
 `;
 export const ButtonGroup = styled.div`
@@ -79,11 +74,6 @@ export const Button = styled.div`
     transform: translate(0px, 3px);
   }
   font-size: 25px;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 export const StyledIcon = styled.i`
   margin-top: 3px;

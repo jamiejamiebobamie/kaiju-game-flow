@@ -35,11 +35,6 @@ const Title = styled.div`
   font-size: 13px;
   z-index: 1;
   color: #6b948e;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 export const TutorialGameBoard = ({
   shiftContentOver,

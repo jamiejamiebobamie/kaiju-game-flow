@@ -786,40 +786,16 @@ export const shootPower = ({
           ? [data[dataIndex === 0 ? 1 : 0].tile, dataIndex === 0 ? 1 : 0]
           : getClosestEntityFromTile(targetData, originTile, scale);
       if (originTile && targetTile) {
-        // const [manaPoolCount, manaPoolNumTiles] = d.isInManaPool
-        //   ? statusKey === "isShielded"
-        //     ? [4, 6]
-        //     : statusKey === "isWooded"
-        //     ? [20, 3]
-        //     : statusKey === "isOnFire"
-        //     ? [30, 3]
-        //     : statusKey === "isGhosted"
-        //     ? [60, 3]
-        //     : statusKey === "isBubble"
-        //     ? [7, 6]
-        //     : statusKey === "isHealing"
-        //     ? [30, 6]
-        //     : [null, null]
-        //   : [null, null];
-        const tileStatusesCountModifier = [
-          "isWooded",
-          "isOnFire",
-          // "isShielded",
-          "isHealing"
-        ];
+        const tileStatusesCountModifier = ["isWooded", "isOnFire", "isHealing"];
         const tileStatusesNumTilesModifier = [
           "isWooded",
           "isGhosted",
-          // "isShielded",
           "isHealing"
         ];
         const [tile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
-          // manaPoolNumTiles
-          //   ? manaPoolNumTiles
-          //   :
           data[dataIndex].numTilesModifier &&
             tileStatusesNumTilesModifier.includes(statusKey)
             ? numTiles + data[dataIndex].numTilesModifier
@@ -831,9 +807,6 @@ export const shootPower = ({
             [statusKey]: {
               dirs,
               count:
-                // manaPoolCount
-                //   ? manaPoolCount
-                //   :
                 data[dataIndex].tileCountModifier &&
                 tileStatusesCountModifier.includes(statusKey)
                   ? count + data[dataIndex].tileCountModifier
@@ -1140,10 +1113,10 @@ export const movePlayerPieces = (
                 _data[i].tile &&
                 targetTile &&
                 findPath(_data[i].tile, targetTile, scale, isTutorial).length;
-              const surroundingTiles = [
-                _data[i].tile,
-                ...getAdjacentTiles(_data[i].tile)
-              ];
+              const adj_tiles = isTutorial
+                ? getAdjacentTilesTutorial(_data[i].tile)
+                : getAdjacentTiles(_data[i].tile);
+              const surroundingTiles = [_data[i].tile, ...adj_tiles];
               const isInDanger = surroundingTiles.some(
                 t =>
                   tileStatuses[t.i] &&
@@ -1587,7 +1560,7 @@ const getSafeTile = (kaijuData, tileStatuses, scale) => {
     });
   return safeTileObj.index;
 };
-const getAdjacentTiles = (tile, isTutorial) => {
+const getAdjacentTiles = tile => {
   return [
     { i: 0, j: -1 },
     { i: 1, j: tile.i % 2 ? 0 : -1 },
@@ -1599,11 +1572,35 @@ const getAdjacentTiles = (tile, isTutorial) => {
     .map(t => {
       return { i: t.i + tile.i, j: t.j + tile.j };
     })
-    .filter(t =>
-      isTutorial
-        ? isTileOnGameBoardTutorial(t)
-        : PENINSULA_TILE_LOOKUP[`${t.i} ${t.j}`]
-    );
+    .filter(t => PENINSULA_TILE_LOOKUP[`${t.i} ${t.j}`]);
+};
+export const areTilesAdjacent = (tile1, tile2) => {
+  return [
+    { i: 0, j: -1 },
+    { i: 1, j: tile1.i % 2 ? 0 : -1 },
+    { i: 1, j: tile1.i % 2 ? 1 : 0 },
+    { i: 0, j: 1 },
+    { i: -1, j: tile1.i % 2 ? 1 : 0 },
+    { i: -1, j: tile1.i % 2 ? 0 : -1 }
+  ]
+    .map(t => {
+      return { i: t.i + tile1.i, j: t.j + tile1.j };
+    })
+    .some(t => tile2.i === t.i && tile2.j === t.j);
+};
+const getAdjacentTilesTutorial = tile => {
+  return [
+    { i: 0, j: -1 },
+    { i: 1, j: tile.i % 2 ? 0 : -1 },
+    { i: 1, j: tile.i % 2 ? 1 : 0 },
+    { i: 0, j: 1 },
+    { i: -1, j: tile.i % 2 ? 1 : 0 },
+    { i: -1, j: tile.i % 2 ? 0 : -1 }
+  ]
+    .map(t => {
+      return { i: t.i + tile.i, j: t.j + tile.j };
+    })
+    .filter(t => isTileOnGameBoardTutorial(t));
 };
 const findPath = (start, goal, scale, isTutorial) => {
   let count = 0;
@@ -1612,7 +1609,9 @@ const findPath = (start, goal, scale, isTutorial) => {
     if ((currTile.i === goal.i && currTile.j === goal.j) || count > 400)
       return arr;
     // produce all possible adjacent tile indices to currTile
-    const adjacentTiles = getAdjacentTiles(currTile, isTutorial);
+    const adjacentTiles = isTutorial
+      ? getAdjacentTilesTutorial(currTile)
+      : getAdjacentTiles(currTile);
     // get all charXAndY for each confirmed adjacent tile
     const goalXY = getCharXAndY({ ...goal, scale });
     const test = getCharXAndY({ ...adjacentTiles[0], scale });
@@ -1641,16 +1640,11 @@ const findPath = (start, goal, scale, isTutorial) => {
       const randTile = remainingTiles[randInt];
       const _arr = [...arr, randTile];
       return recur(randTile, _arr, count + 1);
-    } else {
+    } else if (shortest.tile) {
       const _arr = [...arr, shortest.tile];
       return recur(shortest.tile, _arr, count + 1);
+    } else {
+      return [];
     }
-    // } else if (shortest.tile) {
-    //   const _arr = [...arr, shortest.tile];
-    //   return recur(shortest.tile, _arr, count + 1);
-    // } else {
-    //   // const _arr = [...arr, shortest.tile];
-    //   return recur(currTile, arr, count + 1);
-    // }
   }
 };

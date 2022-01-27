@@ -11,7 +11,8 @@ import {
   updateTileState,
   redrawTiles,
   updateHighlightedTiles,
-  initializeTutorialGameBoard
+  initializeTutorialGameBoard,
+  areTilesAdjacent
 } from "../Utils/utils";
 
 export const Tutorial = ({
@@ -44,16 +45,11 @@ export const Tutorial = ({
   const [nextButtonContent, setNextButtonContent] = useState("");
   const [backButtonContent, setBackButtonContent] = useState("");
   const [backButtonCallback, setBackButtonCallback] = useState(() => {});
-  const [animName, setAnimName] = useState("fadeInRight");
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const incrementTutorialViewIndex = () => {
-    setAnimName("fadeInRight");
-    setTimeout(() => setAnimName(null), 3000);
     setTutorialViewIndex(_i => (_i + 1 <= maxTutorialViewIndex ? _i + 1 : 0));
   };
   const decrementTutorialViewIndex = () => {
-    setAnimName("fadeInLeft");
-    setTimeout(() => setAnimName(null), 3000);
     setTutorialViewIndex(_i => (_i - 1 >= 0 ? _i - 1 : 0));
   };
   useEffect(() => {
@@ -195,20 +191,21 @@ export const Tutorial = ({
   useEffect(() => {
     if (playerMoveToTiles !== null) {
       setPlayerData(_playerData =>
-        _playerData.map((p, i) =>
-          i === 0 ? { ...p, moveToTiles: playerMoveToTiles } : p
-        )
+        _playerData.map((p, i) => {
+          return i === 0 &&
+            playerMoveToTiles.some(t =>
+              areTilesAdjacent(t, _playerData[0].tile)
+            )
+            ? {
+                ...p,
+                moveToTiles: playerMoveToTiles
+              }
+            : p;
+        })
       );
-      setPlayerMoveToTiles(null);
     }
+    setPlayerMoveToTiles(null);
   }, [playerMoveToTiles]);
-  // useEffect(() => {
-  //   if (teleportData.length) {
-  //     console.log("hey", teleportData);
-  //     setHighlightedTiles0([]);
-  //   }
-  //   // setPath
-  // }, [teleportData]);
   useInterval(() => {
     const isTutorial = true;
     updateHighlightedTiles(
@@ -287,7 +284,6 @@ export const Tutorial = ({
   });
   return tutorialViewIndex === maxTutorialViewIndex ? (
     <ClassPicker
-      animName={animName}
       incrementTutorialViewIndex={incrementTutorialViewIndex}
       decrementTutorialViewIndex={decrementTutorialViewIndex}
       pickedAbilities={pickedAbilities}
@@ -313,7 +309,6 @@ export const Tutorial = ({
     />
   ) : (
     <TutorialExplain
-      animName={animName}
       showCity={tutorialViewIndex === 1}
       shiftContentOver={tutorialViewIndex === 6}
       incrementTutorialViewIndex={incrementTutorialViewIndex}

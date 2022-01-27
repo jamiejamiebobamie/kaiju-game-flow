@@ -53,10 +53,9 @@ const ClassPicture = styled.i`
   border-radius: 100%;
   border-style: solid;
   border-thickness: thin;
-  border-color: #64939b;
-  color: #64939b;
-  background-color: #152642;
-
+  border-color: #152642;
+  color: #152642;
+  background-color: #64939b;
   align-items: center;
 `;
 export const PlayerUI = ({

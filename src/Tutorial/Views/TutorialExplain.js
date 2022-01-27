@@ -21,7 +21,6 @@ const BackgroundImage = styled.img`
   background-repeat: no-repeat;
 `;
 export const TutorialExplain = ({
-  animName,
   title,
   title2,
   shiftContentOver,
@@ -55,7 +54,7 @@ export const TutorialExplain = ({
     lookupClassAndOrSetPassives(pickedAbilities, setPlayerData);
   }, [pickedAbilities]);
   return (
-    <Wrapper animName={animName}>
+    <Wrapper>
       <TitleWrapper>
         <Title>{title}</Title>
       </TitleWrapper>

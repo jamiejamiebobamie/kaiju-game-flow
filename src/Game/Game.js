@@ -11,7 +11,8 @@ import {
   updateTileState,
   redrawTiles,
   updateHighlightedTiles,
-  initializeGameBoard
+  initializeGameBoard,
+  areTilesAdjacent
 } from "../Utils/utils";
 const GameWrapper = styled.div`
   position: relative;
@@ -53,11 +54,6 @@ const Button = styled.div`
     transform: translate(0px, 3px);
   }
   font-size: 17px;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 const ReplayTitle = styled.div`
   color: #64939b;
@@ -108,12 +104,7 @@ const ReplayModal = styled.div`
     }
   }
   ${props =>
-    props.fontSize ? `font-size:${props.fontSize}px;` : "font-size:25px;"}
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
+    props.fontSize ? `font-size:${props.fontSize}px;` : "font-size:25px;"};
 `;
 export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   const width = 500;
@@ -168,12 +159,6 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   useEffect(() => {
     if (kaijuKillCount.length >= 7) {
       const _winner = 0;
-      // playerData[0].lives && !playerData[1].lives
-      //   ? 0
-      //   : kaijuKillCount.filter(k => k === 0).length >
-      //     kaijuKillCount.filter(k => k === 1).length
-      //   ? 0
-      //   : 1;
       setWinner(_winner);
     }
     if (playerKillCount > 1) setWinner(-1);
@@ -181,41 +166,26 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   useEffect(() => {
     if (playerMoveToTiles !== null) {
       setPlayerData(_playerData =>
-        _playerData.map((p, i) =>
-          i === 0 ? { ...p, moveToTiles: playerMoveToTiles } : p
-        )
+        _playerData.map((p, i) => {
+          return i === 0 &&
+            playerMoveToTiles.some(t =>
+              areTilesAdjacent(t, _playerData[0].tile)
+            )
+            ? {
+                ...p,
+                moveToTiles: playerMoveToTiles
+              }
+            : p;
+        })
       );
-      setPlayerMoveToTiles(null);
     }
+    setPlayerMoveToTiles(null);
   }, [playerMoveToTiles]);
-  // useEffect(() => {
-  //   if (teleportData.length) setHighlightedTiles0([]);
-  //   // setPath
-  // }, [teleportData]);
-
   useEffect(() => {
     if (winner !== null && !replayModalMessage) {
       if (!kaijuData.find(kaiju => kaiju.lives > 0) || winner === -1) {
         let message = "You won?";
         switch (winner) {
-          // case 0:
-          //   message = [
-          //     <ReplayTitle fontSize={35}>You saved the city!</ReplayTitle>,
-          //     <br />,
-          //     <br />,
-          //     <ReplayTitle>Play again?</ReplayTitle>
-          //   ];
-          //   break;
-          // case 1:
-          //   message = [
-          //     <ReplayTitle fontSize={35}>
-          //       Your teammate saved the city!
-          //     </ReplayTitle>,
-          //     <br />,
-          //     <br />,
-          //     <ReplayTitle>Play again?</ReplayTitle>
-          //   ];
-          //   break;
           case 0:
             message = [
               <ReplayTitle fontSize={35}>
@@ -241,7 +211,6 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
     }
   }, [kaijuData, winner]);
   useInterval(() => {
-    // if (!replayModalMessage && !isPaused) {
     updateHighlightedTiles(
       setHighlightedTiles0,
       playerData,
@@ -306,13 +275,11 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       false,
       winner
     );
-    // console.log(accTime.current);
     // update accumulated time.
     accTime.current =
       accTime > Number.MAX_SAFE_INTEGER - 10000
         ? 0
         : accTime.current + intervalTime;
-    // }
   }, intervalTime);
   return (
     <GameWrapper>

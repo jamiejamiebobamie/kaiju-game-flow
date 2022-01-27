@@ -17,40 +17,6 @@ export const Wrapper = styled.div`
   border-thickness: thin;
   border-radius: 10px;
   border-color: #64939b;
-  ${props =>
-    props.animName &&
-    `-webkit-animation-duration: 3s;
-    animation-duration: 3s;
-    -webkit-animation-name: ${props.animName};
-    animation-name:  ${props.animName};`}
-  @keyframes fadeInLeft {
-    0% {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    10% {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes fadeInRight {
-    0% {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    10% {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
 `;
 export const ButtonsWrapper = styled.div`
   position: absolute;
@@ -88,11 +54,6 @@ export const Button = styled.div`
     transform: translate(0px, 3px);
   }
   font-size: 20px;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 export const TitleWrapper = styled.div`
   display: flex;
@@ -108,11 +69,6 @@ export const Title = styled.div`
   font-size: 20px;
   text-align: center;
   color: #64939b;
-  font-family: gameboy;
-  @font-face {
-    font-family: gameboy;
-    src: url(Early_GameBoy.ttf);
-  }
 `;
 export const StyledIcon = styled.i`
   display: flex;
