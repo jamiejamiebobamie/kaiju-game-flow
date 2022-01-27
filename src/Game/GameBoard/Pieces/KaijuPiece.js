@@ -26,7 +26,7 @@ const MonsterImg = styled.img`
   display: ${props => (props.lives > 0 ? "flex" : "none")};
   width: 40px;
   height: 40px;
-  animation-iteration-count: 2s;
+  animation-iteration-count: 1s;
   ${props => props.isDamaged && "animation: shake 0.5s;"};
   @keyframes shake {
     0% {
@@ -120,13 +120,13 @@ export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
   useEffect(() => {
     if (isFirstLoad) {
       setIsFirstLoad(false);
-    } else {
+    } else if (!isDamaged) {
       setIsDamaged(true);
       setHealthModifierText(prevText => [
         ...prevText,
         <ModiferText color={"red"}>{"-1"}</ModiferText>
       ]);
-      setTimeout(() => setIsDamaged(null), 2000);
+      setTimeout(() => setIsDamaged(null), 1000);
     }
   }, [lives]);
   const bars = [];

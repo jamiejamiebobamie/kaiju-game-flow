@@ -104,14 +104,14 @@ export const Player = ({
   const [modifierText, setModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
   const [isHealedLocal, setIsHealedLocal] = useState(false);
+  const [isHealedCached, setIsHealedCached] = useState(isHealed);
   const [isTeleportedLocal, setIsTeleportedLocal] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
     if (isFirstLoad) {
       setIsFirstLoad(false);
     } else {
-      if (!isHealedLocal) {
-        console.log("!isHealed");
+      if (isHealed === isHealedCached && !isDamaged) {
         setIsDamaged(true);
         setModifierText(prevText => [
           ...prevText,
@@ -134,6 +134,7 @@ export const Player = ({
         ]);
       }
     }
+    setIsHealedCached(isHealed);
   }, [isHealed]);
   useEffect(() => {
     if (isFirstLoad) {
