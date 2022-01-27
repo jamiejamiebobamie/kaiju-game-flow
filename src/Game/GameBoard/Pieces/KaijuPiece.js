@@ -84,19 +84,59 @@ const Bar = styled.div`
   pointer-events: none;
   margin-top: -15px;
 `;
-export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
-  const [isDamaged, setIsDamaged] = useState(false);
-  useEffect(() => {
-    if (lives < 3) {
-      setIsDamaged(true);
-      setTimeout(() => setIsDamaged(false), 2000);
+const ModiferText = styled.p`
+  position: absolute;
+  margin-left: ${props => props.randShift}px;
+  margin-top: -30px;
+  z-index: 20002;
+  opacity: 0;
+  color: red;
+  animation-timing-function: ease-in;
+  -webkit-animation-duration: 2s;
+  animation-duration: 2s;
+  -webkit-animation-name: textRise;
+  animation-name: textRise;
+  @keyframes textRise {
+    0% {
+      opacity: 0;
+      transform: translateY(0px);
     }
+    10% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+  }
+`;
+export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
+  const [healthModifierText, setHealthModifierText] = useState([]);
+  const [isDamaged, setIsDamaged] = useState(null);
+  useEffect(() => {
+    if (!isDamaged) {
+      setIsDamaged(true);
+      setTimeout(() => setIsDamaged(null), 2000);
+    }
+    setHealthModifierText(prevText => [
+      ...prevText,
+      <ModiferText
+        randShift={Math.random() > 0.5 ? Math.random() * -5 : Math.random() * 5}
+        color={"red"}
+      >
+        -1
+      </ModiferText>
+    ]);
   }, [lives]);
   const bars = [];
   for (let i = 0; i < lives; i++) bars.push(<Bar lives={lives} key={i} />);
+  // <p style={{ position: "absolute", zIndex: 3, color: "white" }}>{dir}</p>
   return (
     <Monster lives={lives} charLocation={charLocation}>
-      <p style={{ position: "absolute", zIndex: 3, color: "white" }}>{dir}</p>
+      {healthModifierText}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <MonsterImg lives={lives} isDamaged={isDamaged} src={"kaiju.png"} />
     </Monster>
