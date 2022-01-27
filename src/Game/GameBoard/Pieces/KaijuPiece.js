@@ -116,20 +116,18 @@ const ModiferText = styled.p`
 export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
   const [healthModifierText, setHealthModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
-    if (!isDamaged) {
+    if (isFirstLoad) {
+      setIsFirstLoad(false);
+    } else {
       setIsDamaged(true);
+      setHealthModifierText(prevText => [
+        ...prevText,
+        <ModiferText color={"red"}>{"-1"}</ModiferText>
+      ]);
       setTimeout(() => setIsDamaged(null), 2000);
     }
-    setHealthModifierText(prevText => [
-      ...prevText,
-      <ModiferText
-        randShift={Math.random() > 0.5 ? Math.random() * -5 : Math.random() * 5}
-        color={"red"}
-      >
-        -1
-      </ModiferText>
-    ]);
   }, [lives]);
   const bars = [];
   for (let i = 0; i < lives; i++) bars.push(<Bar lives={lives} key={i} />);

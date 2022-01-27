@@ -63,10 +63,10 @@ const ModiferText = styled.p`
   margin-top: -30px;
   z-index: 20002;
   opacity: 0;
-  ${props =>
-    Math.random() > 0.5
-      ? `margin-left: ${props.randShift}px`
-      : `margin-right: ${props.randShift}px`};
+  font-size: ${props => (props.fontSize ? `${props.fontSize}px` : "17px")};
+  ${Math.random() > 0.5
+    ? `margin-left: ${Math.random() * 10}px`
+    : `margin-right: ${Math.random() * 10}px`};
   color: ${props => props.color};
   animation-timing-function: ease-in;
   -webkit-animation-duration: 2s;
@@ -101,29 +101,59 @@ export const Player = ({
   color,
   i = 0
 }) => {
-  const [healthModifierText, setHealthModifierText] = useState([]);
+  const [modifierText, setModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
+  const [isHealedLocal, setIsHealedLocal] = useState(false);
+  const [isTeleportedLocal, setIsTeleportedLocal] = useState(false);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   useEffect(() => {
-    if (!isHealed && isDamaged === false) {
-      setIsDamaged(true);
-      setTimeout(() => setIsDamaged(false), 2000);
-    } else if (isDamaged === null) setIsDamaged(false);
-    setHealthModifierText(prevText => [
-      ...prevText,
-      <ModiferText
-        randShift={Math.random() * 10}
-        color={isHealed ? "green" : "red"}
-      >
-        {isHealed ? "+1" : "-1"}
-      </ModiferText>
-    ]);
-  }, [isHealed, lives]);
-
-  // <p>{dir}</p>
-
+    if (isFirstLoad) {
+      setIsFirstLoad(false);
+    } else {
+      if (!isHealedLocal) {
+        console.log("!isHealed");
+        setIsDamaged(true);
+        setModifierText(prevText => [
+          ...prevText,
+          <ModiferText color={"red"}>{"-1"}</ModiferText>
+        ]);
+        setTimeout(() => setIsDamaged(null), 2000);
+      }
+    }
+  }, [lives]);
+  useEffect(() => {
+    if (isFirstLoad) {
+      setIsFirstLoad(false);
+    } else {
+      if (!isHealedLocal) {
+        setIsHealedLocal(true);
+        setTimeout(() => setIsHealedLocal(false), 2000);
+        setModifierText(prevText => [
+          ...prevText,
+          <ModiferText color={"green"}>{"+1"}</ModiferText>
+        ]);
+      }
+    }
+  }, [isHealed]);
+  useEffect(() => {
+    if (isFirstLoad) {
+      setIsFirstLoad(false);
+    } else {
+      if (!isTeleportedLocal) {
+        setIsTeleportedLocal(true);
+        setTimeout(() => setIsTeleportedLocal(false), 2000);
+        setModifierText(prevText => [
+          ...prevText,
+          <ModiferText fontSize={13} color={"purple"}>
+            Zip!
+          </ModiferText>
+        ]);
+      }
+    }
+  }, [isTeleported]);
   return (
     <Wrapper lives={lives} charLocation={charLocation}>
-      {healthModifierText}
+      {modifierText}
       <Character
         isDamaged={isDamaged}
         color={color}

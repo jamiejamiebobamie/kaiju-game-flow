@@ -1163,6 +1163,7 @@ export const movePlayerPieces = (
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
             _data[i].isTeleported = !_data[i].isTeleported;
+            console.log(_data[i].isTeleported, i);
             const _path = findPath(
               _data[i].tile,
               getSafeTile(enemyData, tileStatuses, scale),
