@@ -194,7 +194,7 @@ export const initializeTutorialGameBoard = (
       dir: "idle",
       color: "purple",
       isThere: true,
-      lives: 5,
+      lives: 3,
       moveSpeed: kaijuMoveSpeed !== undefined ? kaijuMoveSpeed : 2,
       lastDmg: 0,
       abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
@@ -348,8 +348,13 @@ export const spawnKaiju = (
         moveToTiles: [kaijuTile],
         tile: kaijuTile,
         isThere: false,
-        lives: 5,
-        isOnTiles: false
+        lives: 3,
+        isOnTiles: false,
+        moveSpeed: kaijuData[0]
+          ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < 4
+            ? kaijuData[0].moveSpeed + 1
+            : 4
+          : 1
       }
     : {
         key,
@@ -360,8 +365,12 @@ export const spawnKaiju = (
         tile: kaijuTile,
         color: "purple",
         isThere: false,
-        lives: 5,
-        moveSpeed: 2,
+        lives: 3,
+        moveSpeed: kaijuData[0]
+          ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < 4
+            ? kaijuData[0].moveSpeed + 1
+            : 4
+          : 1,
         lastDmg: 0,
         abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
         isKaiju: true,
@@ -1412,9 +1421,9 @@ export const moveKaijuPieces = (
     }
     const newKaiju =
       !isTutorial &&
-      data.length < 3 &&
+      (winner === null) & (data.length < 7) &&
       accTime &&
-      !(accTime % 3) &&
+      !(accTime % 100) &&
       spawnKaiju(data, enemyData, scale);
     let isKaijuRespawned = false || winner !== null;
     let isRespawn = true;

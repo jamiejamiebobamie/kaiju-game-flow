@@ -1542,7 +1542,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTimeAI: 40,
-    cooldownTime: 4000,
+    cooldownTime: 5000,
     color: "PaleTurquoise"
   },
   fire: {
@@ -1581,7 +1581,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 4000,
+    cooldownTime: 3000,
     cooldownTimeAI: 40,
     color: "tomato"
   },
@@ -1620,7 +1620,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 6000,
+    cooldownTime: 4000,
     cooldownTimeAI: 60,
     color: "Chartreuse"
   },
@@ -1659,7 +1659,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 4000,
+    cooldownTime: 3000,
     cooldownTimeAI: 20,
     color: "cyan"
   },
@@ -1698,7 +1698,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 15000,
+    cooldownTime: 10000,
     cooldownTimeAI: 150,
     color: "GhostWhite"
   },
@@ -1738,7 +1738,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 8000,
+    cooldownTime: 5000,
     cooldownTimeAI: 80,
     color: "Thistle"
   },
@@ -1780,7 +1780,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 10000,
+    cooldownTime: 5000,
     cooldownTimeAI: 100,
     color: "AntiqueWhite"
   },
@@ -1869,7 +1869,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 20,
+        count: 15,
         statusKey: "isOnKaijuFire",
         numTiles: 3,
         setTileStatuses
@@ -1881,7 +1881,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 150,
+    cooldownTimeAI: 200,
     color: "#df73ff"
   }
 };

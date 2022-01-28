@@ -157,7 +157,7 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
     );
   }, []);
   useEffect(() => {
-    if (kaijuKillCount.length >= 7) {
+    if (kaijuKillCount.length >= 5) {
       const _winner = 0;
       setWinner(_winner);
     }

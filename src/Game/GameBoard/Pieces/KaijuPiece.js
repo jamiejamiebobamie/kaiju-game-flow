@@ -120,13 +120,15 @@ export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
   useEffect(() => {
     if (isFirstLoad) {
       setIsFirstLoad(false);
-    } else if (!isDamaged) {
+    } else if (!isDamaged && lives) {
       setIsDamaged(true);
       setHealthModifierText(prevText => [
         ...prevText,
         <ModiferText color={"red"}>{"-1"}</ModiferText>
       ]);
       setTimeout(() => setIsDamaged(null), 1000);
+    } else if (!lives) {
+      setHealthModifierText([]);
     }
   }, [lives]);
   const bars = [];
