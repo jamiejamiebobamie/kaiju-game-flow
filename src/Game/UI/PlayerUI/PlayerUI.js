@@ -149,7 +149,7 @@ export const PlayerUI = ({
         />
         <ClassPicture
           ref={setHoverRef(`class ${playerIndex}`)}
-          className="fa fa-wrench"
+          className="fa fa-magic"
           isReversed={isReversed}
         />
       </PlayerBorder>
