@@ -13,9 +13,9 @@ const getDescription = (string, playerData, playerIndex) => {
                 <span
                   style={{
                     color:
-                      playerData[playerIndex].moveSpeed > 5
+                      playerData[playerIndex].moveSpeed > 6
                         ? "green"
-                        : playerData[playerIndex].moveSpeed < 5
+                        : playerData[playerIndex].moveSpeed < 6
                         ? "red"
                         : "black"
                   }}
