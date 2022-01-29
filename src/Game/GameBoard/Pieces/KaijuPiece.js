@@ -124,7 +124,7 @@ export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
       setIsDamaged(true);
       setHealthModifierText(prevText => [
         ...prevText,
-        <ModiferText color={"red"}>{"-1"}</ModiferText>
+        <ModiferText color={"#FF383B"}>{"-1"}</ModiferText>
       ]);
       setTimeout(() => setIsDamaged(null), 1000);
     } else if (!lives) {

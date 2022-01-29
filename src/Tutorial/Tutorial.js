@@ -12,7 +12,8 @@ import {
   redrawTiles,
   updateHighlightedTiles,
   initializeTutorialGameBoard,
-  areTilesAdjacent
+  areTilesAdjacent,
+  getAdjacentTilesTutorial
 } from "../Utils/utils";
 
 export const Tutorial = ({
@@ -190,17 +191,30 @@ export const Tutorial = ({
   }, [tutorialViewIndex]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
+      const adjTilesToPath = playerMoveToTiles[0] && [
+        playerMoveToTiles[0],
+        ...getAdjacentTilesTutorial(playerMoveToTiles[0])
+      ];
       setPlayerData(_playerData =>
         _playerData.map((p, i) => {
-          return i === 0 &&
-            playerMoveToTiles.some(t =>
-              areTilesAdjacent(t, _playerData[0].tile)
-            )
-            ? {
-                ...p,
-                moveToTiles: playerMoveToTiles
-              }
-            : p;
+          if (i === 0) {
+            const adjTilesToPlayer = p.tile && [
+              p.tile,
+              ...getAdjacentTilesTutorial(p.tile)
+            ];
+            const shouldSet =
+              adjTilesToPlayer &&
+              adjTilesToPath &&
+              adjTilesToPlayer.some(t =>
+                adjTilesToPath.some(_t => _t.i === t.i && _t.j === t.j)
+              );
+            return {
+              ...p,
+              moveToTiles: shouldSet ? playerMoveToTiles : p.moveToTiles
+            };
+          } else {
+            return p;
+          }
         })
       );
     }

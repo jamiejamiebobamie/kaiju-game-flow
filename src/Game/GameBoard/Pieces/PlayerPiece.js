@@ -115,7 +115,7 @@ export const Player = ({
         setIsDamaged(true);
         setModifierText(prevText => [
           ...prevText,
-          <ModiferText color={"red"}>{"-1"}</ModiferText>
+          <ModiferText color={"#FF383B"}>{"-1"}</ModiferText>
         ]);
         setTimeout(() => setIsDamaged(null), 2000);
       }
@@ -130,7 +130,7 @@ export const Player = ({
         setTimeout(() => setIsHealedLocal(false), 2000);
         setModifierText(prevText => [
           ...prevText,
-          <ModiferText color={"green"}>{"+1"}</ModiferText>
+          <ModiferText color={"#9FEA4F"}>{"+1"}</ModiferText>
         ]);
       }
     }
@@ -145,7 +145,7 @@ export const Player = ({
         setTimeout(() => setIsTeleportedLocal(false), 2000);
         setModifierText(prevText => [
           ...prevText,
-          <ModiferText fontSize={13} color={"purple"}>
+          <ModiferText fontSize={13} color={"#9338E9"}>
             Zip!
           </ModiferText>
         ]);

@@ -1592,7 +1592,7 @@ export const PLAYER_ABILITIES = {
     activatePassive: baseStats => {
       return {
         ...baseStats,
-        lives: baseStats.lives + 2
+        lives: baseStats.lives + 1
       };
     },
     activateActive: (
@@ -1631,7 +1631,7 @@ export const PLAYER_ABILITIES = {
     activatePassive: baseStats => {
       return {
         ...baseStats,
-        moveSpeed: baseStats.moveSpeed + 2
+        moveSpeed: baseStats.moveSpeed + 1
       };
     },
     activateActive: (
@@ -1908,13 +1908,12 @@ export const PLAYER_CLASSES = [
     elems: "Bubble,Death,Heart",
     class_name: "Wild Mage",
     player_class_description:
-      "Your magic deals with life and death ...and bubbles? You're wild, baby!"
+      "Your magic deals with life and death ...and bubbles?"
   },
   {
     elems: "Bubble,Death,Ice",
-    class_name: "Dark Ice Fairy",
-    player_class_description:
-      "You hail from the frosty climbs of the northern moutains. You rain ice and death down on your enemies."
+    class_name: "Dark One",
+    player_class_description: "Spooky."
   },
   {
     elems: "Bubble,Death,Lightning",
@@ -1960,7 +1959,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Bubble,Fire,Wood",
     class_name: "Self-made Firefighter",
-    player_class_description: "You put out fires..."
+    player_class_description: "You put out fires?"
   },
   {
     elems: "Bubble,Glass,Heart",
@@ -1984,14 +1983,13 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Bubble,Glass,Wood",
-    class_name: "Fairy",
-    player_class_description: "Just a plain fairy. Nothing to see here..."
+    class_name: "Iris",
+    player_class_description: "Rainbow-rider!"
   },
   {
     elems: "Bubble,Heart,Ice",
     class_name: "Alchemist",
-    player_class_description:
-      "You build potions of healing and traps made of ice. And blow bubbles made of soap."
+    player_class_description: "Practice temperance in all things."
   },
   {
     elems: "Bubble,Heart,Lightning",
@@ -2001,12 +1999,12 @@ export const PLAYER_CLASSES = [
   {
     elems: "Bubble,Heart,Metal",
     class_name: "Healer",
-    player_class_description: "Full defensive build..."
+    player_class_description: "Full defensive build."
   },
   {
     elems: "Bubble,Heart,Wood",
     class_name: "Archdruid",
-    player_class_description: "You defend your natural territory to death."
+    player_class_description: "Nature calls!"
   },
   {
     elems: "Bubble,Ice,Lightning",
@@ -2031,8 +2029,8 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Bubble,Lightning,Wood",
-    class_name: "Stormcaller",
-    player_class_description: "You call the storms."
+    class_name: "Red Mage",
+    player_class_description: "You make this look good."
   },
   {
     elems: "Bubble,Metal,Wood",
@@ -2053,7 +2051,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Death,Fire,Ice",
     class_name: "Deathdealer",
-    player_class_description: "You deal death."
+    player_class_description: "As lethal as a buzzsaw."
   },
   {
     elems: "Death,Fire,Lightning",
@@ -2140,7 +2138,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Death,Lightning,Wood",
     class_name: "Arcane Avenger",
-    player_class_description: "Self-named."
+    player_class_description: "You have an origin story."
   },
   {
     elems: "Death,Metal,Wood",
@@ -2214,14 +2212,13 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Fire,Lightning,Wood",
-    class_name: "Naturalist",
-    player_class_description: "Not a nudist!"
+    class_name: "Trickster",
+    player_class_description: "Tricky."
   },
   {
     elems: "Fire,Metal,Wood",
     class_name: "Blacksmith",
-    player_class_description:
-      "You use metal, wood, and fire to shape the battlefield into your glorious creation!"
+    player_class_description: "The battlefield: your glorious creation!"
   },
   {
     elems: "Glass,Heart,Ice",
@@ -2236,7 +2233,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Glass,Heart,Metal",
     class_name: "Cleric",
-    player_class_description: "Full defensive build..."
+    player_class_description: "Full defensive build."
   },
   {
     elems: "Glass,Heart,Wood",
@@ -2251,7 +2248,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Glass,Ice,Metal",
     class_name: "Sherpa",
-    player_class_description: "I'll follow you."
+    player_class_description: "Even monsters follow you."
   },
   {
     elems: "Glass,Ice,Wood",
@@ -2272,7 +2269,7 @@ export const PLAYER_CLASSES = [
     elems: "Glass,Metal,Wood",
     class_name: "Gardener",
     player_class_description:
-      "You own the battlefield, shaping the landscape to your green thumb's curve!"
+      "You shape the landscape to your green thumb's curve."
   },
   {
     elems: "Heart,Ice,Lightning",
@@ -2282,8 +2279,7 @@ export const PLAYER_CLASSES = [
   {
     elems: "Heart,Ice,Metal",
     class_name: "Icy Settler",
-    player_class_description:
-      "You were built for icy endeavours across the arctic."
+    player_class_description: "Icy endeavours across the arctic."
   },
   {
     elems: "Heart,Ice,Wood",
@@ -2324,6 +2320,6 @@ export const PLAYER_CLASSES = [
   {
     elems: "Lightning,Metal,Wood",
     class_name: "Urban Ranger",
-    player_class_description: "You can pull off urban camo. Congrats."
+    player_class_description: "Urban camo."
   }
 ];

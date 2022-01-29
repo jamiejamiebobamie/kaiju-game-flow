@@ -12,7 +12,8 @@ import {
   redrawTiles,
   updateHighlightedTiles,
   initializeGameBoard,
-  areTilesAdjacent
+  areTilesAdjacent,
+  getAdjacentTiles
 } from "../Utils/utils";
 const GameWrapper = styled.div`
   position: relative;
@@ -165,17 +166,30 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   }, [kaijuKillCount, playerKillCount]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
+      const adjTilesToPath = playerMoveToTiles[0] && [
+        playerMoveToTiles[0],
+        ...getAdjacentTiles(playerMoveToTiles[0])
+      ];
       setPlayerData(_playerData =>
         _playerData.map((p, i) => {
-          return i === 0 &&
-            playerMoveToTiles.some(t =>
-              areTilesAdjacent(t, _playerData[0].tile)
-            )
-            ? {
-                ...p,
-                moveToTiles: playerMoveToTiles
-              }
-            : p;
+          if (i === 0) {
+            const adjTilesToPlayer = p.tile && [
+              p.tile,
+              ...getAdjacentTiles(p.tile)
+            ];
+            const shouldSet =
+              adjTilesToPlayer &&
+              adjTilesToPath &&
+              adjTilesToPlayer.some(t =>
+                adjTilesToPath.some(_t => _t.i === t.i && _t.j === t.j)
+              );
+            return {
+              ...p,
+              moveToTiles: shouldSet ? playerMoveToTiles : p.moveToTiles
+            };
+          } else {
+            return p;
+          }
         })
       );
     }

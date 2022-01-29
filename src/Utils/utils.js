@@ -255,7 +255,7 @@ export const initializeGameBoard = (
       dir: "idle",
       i: k,
       isThere: true,
-      moveSpeed: 5,
+      moveSpeed: 6,
       lives: 4,
       isOnTiles: true,
       isKaiju: false,
@@ -1570,7 +1570,7 @@ const getSafeTile = (kaijuData, tileStatuses, scale) => {
     });
   return safeTileObj.index;
 };
-const getAdjacentTiles = tile => {
+export const getAdjacentTiles = tile => {
   return [
     { i: 0, j: -1 },
     { i: 1, j: tile.i % 2 ? 0 : -1 },
@@ -1598,7 +1598,7 @@ export const areTilesAdjacent = (tile1, tile2) => {
     })
     .some(t => tile2.i === t.i && tile2.j === t.j);
 };
-const getAdjacentTilesTutorial = tile => {
+export const getAdjacentTilesTutorial = tile => {
   return [
     { i: 0, j: -1 },
     { i: 1, j: tile.i % 2 ? 0 : -1 },

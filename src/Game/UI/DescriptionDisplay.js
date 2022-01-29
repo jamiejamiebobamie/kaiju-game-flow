@@ -187,9 +187,8 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityFireActive":
       return {
         title: "Wildfire",
-        description:
-          "Create a single, lateral line of fire that travels in the direction of your closest enemy",
-        effect1: "",
+        description: "Create a single, lateral line of fire.",
+        effect1: "Fire travels in the direction of your closest enemy",
         effect2: "",
         img: "",
         formatData: {}
@@ -198,7 +197,7 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Crunchy Granola",
         description: "You're extra healthy",
-        effect1: "+2 to starting lives",
+        effect1: "+1 to starting lives",
         effect2: "",
         img: "",
         formatData: {}
@@ -217,7 +216,7 @@ const getDescription = (string, playerData, playerIndex) => {
       return {
         title: "Charged Step",
         description: "Electrical energy courses through your body",
-        effect1: "+2 to move speed",
+        effect1: "+1 to move speed",
         effect2: "",
         img: "",
         formatData: {}
