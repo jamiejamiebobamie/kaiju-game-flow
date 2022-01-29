@@ -4,10 +4,16 @@ import { Game } from "./Game/Game";
 import {
   Wrapper,
   Title,
+  StyledSpookyText,
+  StyledSciFiText,
   ButtonGroup,
   ButtonsWrapper,
+  ButtonOutline,
   Button,
-  StyledIcon
+  StyledIcon,
+  StyledSpookyTextShadow,
+  StyledSciFiTextShadow,
+  StyledLink
 } from "./StyledComponents";
 
 export const Home = () => {
@@ -32,28 +38,38 @@ export const Home = () => {
   };
   return tutorialViewIndex === -1 ? (
     <Wrapper>
-      <Title>Kaiju City</Title>
+      <Title>
+        <StyledSpookyText>Kaiju</StyledSpookyText>{" "}
+        <StyledSciFiText>City</StyledSciFiText>
+        <StyledSpookyTextShadow>Kaiju</StyledSpookyTextShadow>{" "}
+        <StyledSciFiTextShadow>City</StyledSciFiTextShadow>
+      </Title>
       <ButtonGroup>
         <ButtonsWrapper>
-          <Button onClick={handleClickGame}>Game</Button>
+          <Button onClick={handleClickGame}>
+            <ButtonOutline zIndex={1} />
+            Game!
+          </Button>
         </ButtonsWrapper>
         <ButtonsWrapper>
-          <Button onClick={handleClickTutorial}>Tutorial</Button>
+          <Button onClick={handleClickTutorial}>
+            <ButtonOutline zIndex={1} />
+            Tutorial!
+          </Button>
         </ButtonsWrapper>
         <ButtonsWrapper>
           <Button>
-            <a
+            <ButtonOutline zIndex={1} />
+
+            <StyledLink></StyledLink>
+            <StyledLink
               target="_blank"
-              style={{ color: "black", textDecoration: "none" }}
               href="https://github.com/jamiejamiebobamie/kaiju-game-flow"
               rel="noreferrer"
-              style={{
-                color: "#64939b",
-                textDecoration: "none"
-              }}
             >
-              Code <StyledIcon className="fa fa-github-alt" />
-            </a>
+              Code!
+              <StyledIcon className="fa fa-github-alt" />
+            </StyledLink>
           </Button>
         </ButtonsWrapper>
       </ButtonGroup>

@@ -3,6 +3,24 @@
   src: local("Early_GameBoy"), url(./fonts/Early_GameBoy.ttf) format("truetype");
 }
 
+@font-face {
+  font-family: bangers;
+  src: local("Bangers-Regular"),
+    url(./fonts/Bangers-Regular.ttf) format("truetype");
+}
+@font-face {
+  font-family: green_fuz;
+  src: local("green_fuz"), url(./fonts/green_fuz.otf) format("OpenType");
+}
+@font-face {
+  font-family: Metro;
+  src: local("Metro"), url(./fonts/Metro.otf) format("OpenType");
+}
+@font-face {
+  font-family: minotaur;
+  src: local("minotaur"), url(./fonts/minotaur.ttf) format("truetype");
+}
+
 body {
   margin: 0;
   /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -13,8 +31,19 @@ body {
   background-color: #152642;
   font-family: monospace;
 
-  font-family: gameboy;
+  font-family: bangers;
+  /* text-stroke: 1px #f6ffd4;
+  -webkit-text-stroke: 1px #f6ffd4; */
+
+  webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
+
 /* code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;

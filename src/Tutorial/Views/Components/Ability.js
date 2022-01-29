@@ -39,7 +39,7 @@ const ICON_LOOKUP = {
     loader: "fa-spinner"
   },
   metal: {
-    Passive: "fa-cutlery",
+    Passive: "fa-wrench",
     Active: "fa-shield",
     loader: "fa-spinner"
   },
