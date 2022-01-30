@@ -66,18 +66,6 @@ export const Button = styled.div`
 
   border-radius: 5px;
   border-style: solid;
-  /* border-thickness: thin; */
-  /* border: 3px solid #785391;
-  border-bottom: 5px solid #785391;
-  color: #621d75; */
-  /*
-  border: 3px solid #64939b;
-  border-bottom: 5px solid #64939b;
-  color: #64939b;
-  &:hover {
-    border-bottom: 3px solid #64939b;
-    transform: translate(0px, 3px);
-  } */
 
   border: 3px solid #5a8a7a;
   border-bottom: 5px solid #5a8a7a;
@@ -90,21 +78,6 @@ export const Button = styled.div`
     filter: drop-shadow(0px 0px 0px black);
   }
 
-  /* border-left: 3px solid #785391;
-  border-right: 3px solid #785391; */
-  /* border-bottom: 5px solid #785391; */
-  /* border-color: #785391; */
-  /* color: #785391; */
-
-  /* background-color: black; */
-
-  /* background: -webkit-linear-gradient(#785391, #64939b); */
-  /* -webkit-background-clip: text; */
-
-  /* &:hover {
-    border-bottom: 3px solid #785391;
-    transform: translate(0px, 3px);
-  } */
   font-size: 15px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
