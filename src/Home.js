@@ -16,6 +16,7 @@ import {
   StyledLink,
   TestSilo
 } from "./StyledComponents";
+import { SkyLineSVG } from "./SkyLineSVG";
 
 export const Home = () => {
   const MAX_TUTORIAL_VIEW_INDEX = 6;
@@ -44,35 +45,12 @@ export const Home = () => {
   // <TestSilo zIndex={-60} x={100} y={300} src={"silo6.png"} />
   //
   // <TestSilo zIndex={-70} x={100} y={400} src={"silo7.png"} />
-
+  // <SkyLineSVG x={0} y={15} zIndex={-101} />
+  // <SkyLineSVG x={0} y={20} zIndex={-102} />
   return tutorialViewIndex === -1 ? (
     <Wrapper>
-      <svg
-        style={{
-          position: "absolute",
-          backgroundColor: "red",
-          zIndex: "100",
-          transform: "scale(2)",
-          opacity: 0.3
-        }}
-        width="500"
-        height="500"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="cityFade" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="black" />
-            <stop offset="30%" stop-color="black" />
-            <stop offset="100%" stop-color="transparent" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M 50 200 v -80 h 50 v 80 h 10 v -40 h 50 v 40 h 50"
-          fill="url(#cityFade)"
-          stroke="black"
-        />
-      </svg>
-      <TestSilo zIndex={-40} x={425} y={400} src={"silo3.png"} />
+      <SkyLineSVG x={0} y={-30} zIndex={-100} />
+
       <Title>
         <StyledSpookyText>Kaiju</StyledSpookyText>{" "}
         <StyledSciFiText>City</StyledSciFiText>
@@ -127,3 +105,12 @@ export const Home = () => {
   );
 };
 // <TestSilo x={0} y={40} src={"silo2.png"} />
+
+// <TestSilo
+//   scaleX={4}
+//   scaleY={7}
+//   zIndex={1}
+//   x={100}
+//   y={215}
+//   src={"silo3.png"}
+// />

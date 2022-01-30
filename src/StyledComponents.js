@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 export const Wrapper = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -8,13 +9,14 @@ export const Wrapper = styled.div`
   align-items: center;
   width: 750px;
   height: 900px;
-  min-width: 700px;
+  min-width: 750px;
   min-height: 800px;
-  margin-top: 5vh;
+  margin-top: 150px;
   -webkit-animation-duration: 3s;
   animation-duration: 3s;
   -webkit-animation-name: fadeInUp;
   animation-name: fadeInUp;
+  /* background-color: green; */
   @keyframes fadeInUp {
     0% {
       opacity: 0;
@@ -80,7 +82,7 @@ export const Button = styled.div`
   border: 3px solid #5a8a7a;
   border-bottom: 5px solid #5a8a7a;
   color: #5a8a7a;
-  filter: drop-shadow(0px 1.5px 1.5px black);
+  filter: drop-shadow(0px 3px 1px black);
 
   &:hover {
     border-bottom: 3px solid #5a8a7a;
@@ -183,12 +185,11 @@ export const StyledLink = styled.a`
 export const StyledIcon = styled.i`
   margin-left: 5px;
   /* margin-right: 20px; */
-
-  /* margin-top: 3px; */
   /* margin-left: 5px; */
   /* border-color: 785391; */
   /* color: #785391; */
   color: #5a8a7a;
+  transform: scale(1.2, 1);
 
   /* 64939b */
   /* textstroke: 0px black;
@@ -201,7 +202,7 @@ export const Title = styled.div`
   color: #64939b;
   margin-bottom: 100px;
   transform: scale(1.5);
-  margin-top: -110px;
+  margin-top: -300px;
   pointer-events: none;
 `;
 export const StyledSpookyText = styled.p`
@@ -257,6 +258,7 @@ export const StyledSciFiTextShadow = styled.p`
 `;
 export const TestSilo = styled.img`
   position: absolute;
+  pointer-events: none;
   ${props => `z-index:${props.zIndex}; left: ${props.x}px; top:${props.y}px;`};
-  transform: scale(4, 7);
+  ${props => ` transform: scale(${props.scaleX}, ${props.scaleY});`};
 `;

@@ -30,6 +30,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #152642;
   font-family: monospace;
+  overflow: hidden;
 
   font-family: gameboy;
   /* text-stroke: 1px #f6ffd4;
