@@ -8,15 +8,23 @@ export const Wrapper = styled.div`
   align-self: center;
   align-items: center;
   width: 750px;
-  height: 900px;
   min-width: 750px;
+  /* height: 100%;
+  min-height: 100%; */
+  height: 900px;
   min-height: 800px;
-  margin-top: 150px;
-  -webkit-animation-duration: 3s;
+  /* background-color: blue; */
+  /* opacity: 0.3; */
+  ${props =>
+    props.scale &&
+    props.translate &&
+    `transform: ${props.scale} ${props.translate}; cursor:pointer;`};
+
+  /* margin-top: 650px; */
+  /* -webkit-animation-duration: 3s;
   animation-duration: 3s;
   -webkit-animation-name: fadeInUp;
   animation-name: fadeInUp;
-  /* background-color: green; */
   @keyframes fadeInUp {
     0% {
       opacity: 0;
@@ -28,11 +36,10 @@ export const Wrapper = styled.div`
     }
     100% {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0px);
     }
-  }
+  } */
 `;
-
 export const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-around;
@@ -177,6 +184,7 @@ export const Title = styled.div`
   transform: scale(1.5);
   margin-top: -300px;
   pointer-events: none;
+  /* background-color: green; */
 `;
 export const StyledSpookyText = styled.p`
   font-family: green_fuz;
@@ -199,10 +207,10 @@ export const StyledSciFiText = styled.p`
   font-size: 43px;
   color: #621d75;
   /* color: black; */
-
   /* Width and color values */
   text-stroke: 1px black;
   -webkit-text-stroke: 1px black;
+  filter: drop-shadow(3px 3px 1px black);
 `;
 
 export const StyledSpookyTextShadow = styled.p`
@@ -210,13 +218,9 @@ export const StyledSpookyTextShadow = styled.p`
   z-index: -1;
   font-family: green_fuz;
   font-size: 90px;
-  margin-top: -190px;
-  text-shadow: 3px 6px;
+  margin-top: -191px;
+  /* text-shadow: 3px 6px; */
   color: black;
-  filter: drop-shadow(0px 3px 1px black);
-
-  /* -webkit-text-stroke: 2px black; */
-  /* margin-left: -5px; */
 `;
 export const StyledSciFiTextShadow = styled.p`
   position: absolute;
@@ -227,7 +231,6 @@ export const StyledSciFiTextShadow = styled.p`
   text-shadow: 3px 6px;
   color: black;
   /* Width and color values */
-  filter: drop-shadow(0px 3px 1px black);
 `;
 export const TestSilo = styled.img`
   position: absolute;

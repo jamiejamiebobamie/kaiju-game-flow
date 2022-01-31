@@ -7,11 +7,11 @@ import { lookupClassAndOrSetPassives } from "../../Utils/utils";
 
 const ClassPickerWrapper = styled.div`
   display: flex;
-  margin-top: 5vh;
+  /* margin-top: -10px; */
   width: 750px;
-  height: 900px;
   min-width: 700px;
-  min-height: 800px;
+  height: 900px;
+  min-height: 900px;
   flex-direction: column;
   align-self: center;
   align-items: center;
@@ -67,6 +67,7 @@ const DescriptionDisplayWrapper = styled.div`
   position: relative;
   justify-content: space-around;
   width: 100%;
+  margin-top: -30px;
 `;
 const PlayButton = styled.div`
   position: absolute;

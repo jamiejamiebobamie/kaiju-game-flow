@@ -4,7 +4,7 @@ export const Wrapper = styled.div`
   position: relative;
   padding-top: 30px;
   display: flex;
-  margin-top: 5vh;
+  /* margin-top: 5vh; */
   width: 750px;
   height: 900px;
   min-width: 700px;
