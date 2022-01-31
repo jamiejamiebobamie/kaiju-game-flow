@@ -3,21 +3,15 @@ import { Tutorial } from "./Tutorial/Tutorial";
 import { Game } from "./Game/Game";
 import {
   Wrapper,
-  // Title,
-  // StyledSpookyText,
-  // StyledSciFiText,
   ButtonGroup,
   ButtonsWrapper,
   ButtonOutline,
   Button,
   StyledIcon,
-  // StyledSpookyTextShadow,
-  // StyledSciFiTextShadow,
   StyledLink
-  // TestSilo
-} from "./StyledComponents";
-// import { SkyLineSVG } from "./SkyLineSVG";
-import { Logo } from "./Logo";
+} from "./Components/StyledComponents";
+import { Logo } from "./Components/Logo";
+import { NavBar } from "./Components/NavBar";
 
 export const Home = () => {
   const MAX_TUTORIAL_VIEW_INDEX = 6;
@@ -39,30 +33,12 @@ export const Home = () => {
   const handleClickTutorial = () => {
     setTutorialViewIndex(0);
   };
-  // <TestSilo zIndex={-150} x={100} y={200} src={"silo6.png"} />
-
   return (
-    <div style={{ width: "100%", display: "flex", flexDirection: "column" }}>
-      <div
-        style={{
-          width: "100%",
-          height: "125px",
-          marginBottom: "-50px"
-          // backgroundColor: "blue"
-          // overflow: "hidden"
-          // borderBottom: "solid 2px"
-        }}
-      >
-        {tutorialViewIndex !== -1 && (
-          <Wrapper
-            onClick={handleClickHome}
-            scale={"scale(.5)"}
-            translate={"translate(-400px, -550px)"}
-          >
-            <Logo isNavBar={true} />
-          </Wrapper>
-        )}
-      </div>
+    <>
+      <NavBar
+        handleClickHome={handleClickHome}
+        isLogoDisplayed={tutorialViewIndex !== -1}
+      />
       {tutorialViewIndex === -1 ? (
         <Wrapper>
           <Logo />
@@ -112,6 +88,6 @@ export const Home = () => {
           handleClickHome={handleClickHome}
         />
       )}
-    </div>
+    </>
   );
 };

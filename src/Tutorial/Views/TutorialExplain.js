@@ -7,18 +7,20 @@ import {
   TitleWrapper,
   Title,
   ButtonsWrapper,
-  Button
+  Button,
+  ButtonGroup,
+  ButtonOutline
 } from "./Components/StyledComponents";
 const BackgroundImage = styled.img`
+  background-repeat: no-repeat;
+  /* margin-top: 30px; */
   border-radius: 5px;
   border-style: solid;
   border-thickness: thick;
-  border-color: #64939b;
-  margin-top: -170px;
-  width: 478px;
-  height: 800px;
-  transform: scale(0.6);
-  background-repeat: no-repeat;
+  border-color: #db974f;
+  /* width: 478px;
+  height: 800px; */
+  /* transform: scale(0.6); */
 `;
 export const TutorialExplain = ({
   title,
@@ -59,7 +61,7 @@ export const TutorialExplain = ({
         <Title>{title}</Title>
       </TitleWrapper>
       {showCity ? (
-        <BackgroundImage src={"test_map.png"} />
+        <BackgroundImage src={"test_map.png"} width={300} />
       ) : (
         <TutorialGameBoard
           shiftContentOver={shiftContentOver}
@@ -86,12 +88,20 @@ export const TutorialExplain = ({
           <Title>{title2}</Title>
         </TitleWrapper>
       )}
-      <ButtonsWrapper>
-        <Button onClick={backButtonCallback}>{backButtonContent}</Button>
-        <Button onClick={() => incrementTutorialViewIndex()}>
-          {nextButtonContent}
-        </Button>
-      </ButtonsWrapper>
+      <ButtonGroup>
+        <ButtonsWrapper>
+          <Button onClick={backButtonCallback}>
+            <ButtonOutline zIndex={1} />
+            {backButtonContent}
+          </Button>
+        </ButtonsWrapper>
+        <ButtonsWrapper>
+          <Button onClick={() => incrementTutorialViewIndex()}>
+            <ButtonOutline zIndex={1} />
+            {nextButtonContent}
+          </Button>
+        </ButtonsWrapper>
+      </ButtonGroup>
     </Wrapper>
   );
 };

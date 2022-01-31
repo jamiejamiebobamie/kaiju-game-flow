@@ -4,6 +4,11 @@ import { Abilities } from "./Components/Abilities";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
 import { DescriptionDisplay } from "../../Game/UI/DescriptionDisplay";
 import { lookupClassAndOrSetPassives } from "../../Utils/utils";
+import {
+  ButtonsWrapper,
+  Button,
+  ButtonOutline
+} from "./Components/StyledComponents";
 
 const ClassPickerWrapper = styled.div`
   display: flex;
@@ -69,6 +74,22 @@ const DescriptionDisplayWrapper = styled.div`
   width: 100%;
   margin-top: -30px;
 `;
+
+export const ButtonGroup = styled.div`
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  align-items: center;
+  width: 250px;
+  height: 30px;
+  right: 30px;
+  bottom: 20px;
+  transform: scale(1.2, 1.5);
+  /* background-color: red; */
+`;
+
 const PlayButton = styled.div`
   position: absolute;
   z-index: 2;
@@ -226,8 +247,16 @@ export const ClassPicker = ({
           playerData={playerData}
           isTutorial={true}
         />
-        <PlayButton onClick={handleClickPlay}>Play!</PlayButton>
+        <ButtonGroup>
+          <ButtonsWrapper>
+            <Button onClick={handleClickPlay}>
+              <ButtonOutline zIndex={1} />
+              Play!
+            </Button>
+          </ButtonsWrapper>
+        </ButtonGroup>
       </DescriptionDisplayWrapper>
     </ClassPickerWrapper>
   );
 };
+// <PlayButton onClick={handleClickPlay}>Play!</PlayButton>

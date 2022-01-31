@@ -15,52 +15,124 @@ export const Wrapper = styled.div`
   border-radius: 10px;
   border-style: solid;
   border-thickness: thin;
-  border-radius: 10px;
-  border-color: #64939b;
+
+  /* border-color: #64939b; */
+  border-color: #db974f;
+  /* background-color: #916a40; */
+`;
+// export const ButtonsWrapper = styled.div`
+//   position: absolute;
+//   display: flex;
+//   bottom: 75px;
+//   justify-content: space-around;
+//   width: 100%;
+//   height: 100px;
+// `;
+// export const Button = styled.div`
+//   display: flex;
+//   position: relative;
+//   flex-direction: column;
+//   justify-content: center;
+//
+//   min-width: 150px;
+//   height: 50px;
+//   right: 30px;
+//   bottom: 30px;
+//
+//   font-alignment: center;
+//   text-align: center;
+//
+//   cursor: pointer;
+//
+//   border-radius: 5px;
+//   border-style: solid;
+//   border-thickness: thin;
+//   border-bottom: 5px solid;
+//   border-color: #64939b;
+//   color: #64939b;
+//
+//   &:hover {
+//     border-bottom: 3px solid;
+//     transform: translate(0px, 3px);
+//   }
+//   font-size: 20px;
+// `;
+export const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: space-around;
+  /* flex-direction: column; */
+  align-items: center;
+  width: 500px;
+  height: 200px;
+  margin-top: 25px;
+  transform: scale(1.2, 1.5);
+  /* background-color: red; */
 `;
 export const ButtonsWrapper = styled.div`
-  position: absolute;
+  position: relative;
   display: flex;
-  bottom: 75px;
-  justify-content: space-around;
+  flex-direction: column;
+  justify-content: flex-start;
   width: 100%;
   height: 100px;
 `;
 export const Button = styled.div`
   display: flex;
-  position: relative;
-  flex-direction: column;
+  align-self: center;
   justify-content: center;
-
-  min-width: 150px;
-  height: 50px;
-  right: 30px;
-  bottom: 30px;
+  width: 200px;
+  min-width: 200px;
+  height: 20px;
 
   font-alignment: center;
-  text-align: center;
-
   cursor: pointer;
 
   border-radius: 5px;
   border-style: solid;
-  border-thickness: thin;
-  border-bottom: 5px solid;
-  border-color: #64939b;
-  color: #64939b;
+
+  border: 3px solid #5a8a7a;
+  border-bottom: 5px solid #5a8a7a;
+  color: #5a8a7a;
+  filter: drop-shadow(0px 3px 1px black);
 
   &:hover {
-    border-bottom: 3px solid;
+    border-bottom: 3px solid #5a8a7a;
     transform: translate(0px, 3px);
+    filter: drop-shadow(0px 0px 0px black);
   }
-  font-size: 20px;
+
+  font-size: 15px;
+  text-stroke: 0.5px black;
+  -webkit-text-stroke: 0.5px black;
+  background-color: #376e5b;
+`;
+export const ButtonOutline = styled.div`
+  position: absolute;
+  z-index: ${props => props.zIndex};
+  width: 200px;
+  min-width: 200px;
+  height: 19.5px;
+  margin-top: -0.5px;
+  pointer-events: none;
+  border-radius: 3px;
+  border: 0.75px solid black;
+  border-right: 0.3px solid black;
+  border-left: 0.3px solid black;
+  border-bottom: 0.5px solid black;
 `;
 export const TitleWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 100%;
+  /* width: 90%; */
+  padding-left: 50px;
+  padding-right: 50px;
+
   height: 130px;
+  /* background-color: #614324; */
+  /* border-radius: 3px;
+  border-style: none;
+  border-thickness: thin; */
 `;
 export const Title = styled.div`
   display: flex;
@@ -68,7 +140,12 @@ export const Title = styled.div`
   align-self: center;
   font-size: 20px;
   text-align: center;
+  text-stroke: 0.5px black;
+  -webkit-text-stroke: 0.5px black;
   color: #64939b;
+  /* color: #621d75; */
+  color: #db974f;
+  /* color: #376e5b; */
 `;
 export const StyledIcon = styled.i`
   display: flex;
