@@ -11,7 +11,6 @@ const Wrapper = styled.div`
   ${props => (props.isReversed ? "right: 85px;" : "right: 77px;")};
   width: 50px;
   height: 50px;
-  pointer-events: none;
   transform: rotate(${props => (props.isReversed ? 90 : 30)}deg);
 `;
 const PassiveAbilityWrapper = styled.div`

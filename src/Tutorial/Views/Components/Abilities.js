@@ -27,7 +27,7 @@ const AbilityTypeWrapper = styled.div`
   border-radius: 30px;
   border-style: solid;
   border-width: thin;
-  border-color: #64939b;
+  border-color: #db974f;
   padding: 10px;
 `;
 const AbilityButtonsWrapper = styled.div`
@@ -45,7 +45,7 @@ const AbilityTypeTitle = styled.div`
   display: flex;
   align-self: center;
   align-content: center;
-  color: #64939b;
+  color: #db974f;
 `;
 const ButtonWrapper = styled.div`
   display: flex;
@@ -54,7 +54,7 @@ const ButtonWrapper = styled.div`
   border-radius: 30px;
   border-style: solid;
   border-width: thin;
-  border-color: #64939b;
+  border-color: #db974f;
   ${props => props.isPicked && `border-color: ${props.color};`}
   width: 60px;
   padding-top: 5px;

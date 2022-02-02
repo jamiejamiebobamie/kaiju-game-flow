@@ -15,74 +15,51 @@ import {
   areTilesAdjacent,
   getAdjacentTiles
 } from "../Utils/utils";
+import {
+  ButtonsWrapper,
+  Button,
+  ButtonGroup,
+  ButtonOutline,
+  BackgroundImage
+} from "../Tutorial/Views/Components/StyledComponents";
 const GameWrapper = styled.div`
   position: relative;
-  margin-top: 100px;
   display: flex;
+  align-self: center;
   justify-content: space-between;
+  width: auto;
   width: 1200px;
 `;
-const ButtonsWrapper = styled.div`
-  position: absolute;
-  display: flex;
-  bottom: 75px;
-  justify-content: space-around;
-  width: 100%;
-  height: 100px;
-`;
-const Button = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  justify-content: center;
-
-  min-width: 180px;
-  height: 60px;
-
-  font-alignment: center;
-  text-align: center;
-
-  cursor: pointer;
-
-  border-radius: 5px;
-  border-style: solid;
-  border-thickness: thin;
-  border-bottom: 5px solid;
-  border-color: #64939b;
-  color: #64939b;
-  &:hover {
-    border-bottom: 3px solid;
-    transform: translate(0px, 3px);
-  }
-  font-size: 17px;
-`;
 const ReplayTitle = styled.div`
-  color: #64939b;
+  display: flex;
+  align-self: center;
+  text-alignment: center;
+  text-align: center;
+  font-alignment: center;
+  color: #db974f;
 `;
 const ReplayModal = styled.div`
   position: absolute;
   z-index: 9999999999;
 
+  padding: 50px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  align-content: center;
   align-self: center;
   align-items: center;
 
-  width: 750px;
-  height: 550px;
-  min-width: 750px;
-  min-height: 550px;
+  margin-left: 25%;
 
-  left: 250px;
+  width: 550px;
+  height: 350px;
 
   border-radius: 10px;
   border-style: solid;
   border-thickness: thin;
-  border-radius: 10px;
-  border-color: #64939b;
+  border-color: #db974f;
 
   background-color: #152642;
 
@@ -202,9 +179,7 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
         switch (winner) {
           case 0:
             message = [
-              <ReplayTitle fontSize={35}>
-                Your team saved the city!
-              </ReplayTitle>,
+              <ReplayTitle fontSize={35}>You saved the city!</ReplayTitle>,
               <br />,
               <br />,
               <ReplayTitle>Play again?</ReplayTitle>
@@ -304,17 +279,25 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              height: "150px",
-              minHeight: "150px",
-              marginTop: "-115px"
+              marginBottom: "50px"
             }}
           >
             {replayModalMessage}
           </div>
-          <ButtonsWrapper>
-            <Button onClick={handleClickHome}>No Thanks</Button>
-            <Button onClick={handleClickGame}>Play Again</Button>
-          </ButtonsWrapper>
+          <ButtonGroup>
+            <ButtonsWrapper>
+              <Button onClick={handleClickHome}>
+                <ButtonOutline zIndex={1} />
+                No Thanks
+              </Button>
+            </ButtonsWrapper>
+            <ButtonsWrapper>
+              <Button onClick={handleClickGame}>
+                <ButtonOutline zIndex={1} />
+                Play Again
+              </Button>
+            </ButtonsWrapper>
+          </ButtonGroup>
         </ReplayModal>
       )}
       <GameBoard

@@ -12,11 +12,15 @@ import {
 
 const ClassPickerWrapper = styled.div`
   display: flex;
+  height: auto;
+  width: auto;
+  padding: 5px;
+
   /* margin-top: -10px; */
-  width: 750px;
+  /* width: 750px;
   min-width: 700px;
   height: 900px;
-  min-height: 900px;
+  min-height: 900px; */
   flex-direction: column;
   align-self: center;
   align-items: center;
@@ -24,7 +28,7 @@ const ClassPickerWrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
-  border-color: #6b948e;
+  border-color: #db974f;
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
   -webkit-animation-name: fadeInUp;
@@ -65,7 +69,7 @@ const Title = styled.div`
   align-self: flex-start;
   margin-left: 50px;
   align-content: center;
-  color: #6b948e;
+  color: #db974f;
 `;
 const DescriptionDisplayWrapper = styled.div`
   display: flex;

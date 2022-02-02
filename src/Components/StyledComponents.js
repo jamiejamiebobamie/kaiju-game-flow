@@ -40,6 +40,18 @@ export const Wrapper = styled.div`
     }
   } */
 `;
+export const TestImg = styled.img`
+  position: absolute;
+  /* background-color: blue; */
+  // ${props => (props.alignment === "end" ? "width: 70px;" : `width: 110px;`)};
+  /* width: 70px; */
+  /* height: 150px; */
+  ${props =>
+    props.alignment === "end"
+      ? "align-self: flex-end; margin-left: 0px;width: 70px; filter: drop-shadow(-30px 5px 20px black);"
+      : " width: 110px; align-self: flex-start; margin-left: -40px;margin-top: 1.5px;filter: drop-shadow(25px 5px 20px black);"};
+  /* filter: drop-shadow(30px 5px 20px black); */
+`;
 export const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-around;

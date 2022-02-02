@@ -9,19 +9,9 @@ import {
   ButtonsWrapper,
   Button,
   ButtonGroup,
-  ButtonOutline
+  ButtonOutline,
+  BackgroundImage
 } from "./Components/StyledComponents";
-const BackgroundImage = styled.img`
-  background-repeat: no-repeat;
-  /* margin-top: 30px; */
-  border-radius: 5px;
-  border-style: solid;
-  border-thickness: thick;
-  border-color: #db974f;
-  /* width: 478px;
-  height: 800px; */
-  /* transform: scale(0.6); */
-`;
 export const TutorialExplain = ({
   title,
   title2,

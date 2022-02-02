@@ -17,12 +17,12 @@ const Wrapper = styled.div`
   border-thickness: thin;
   border-radius: 10px;
   background-color: #152642;
-  border-color: #64939b;
+  border-color: #db974f;
 
   border-style: solid;
   border-thickness: thin;
-  border-color: #64939b;
-  color: #64939b;
+  border-color: #db974f;
+  color: #db974f;
   background-color: #152642;
 `;
 const PlayerBorder = styled.div`
@@ -34,12 +34,13 @@ const PlayerBorder = styled.div`
   height: 150px;
   border-radius: 100%;
   overflow: hidden;
+  /* pointer-events: none; */
 `;
 const PlayerPicture = styled.i`
   margin-top: 70px;
   margin-left: 68px;
   transform: scale(10);
-  color: #64939b;
+  color: #db974f;
 `;
 const ClassPicture = styled.i`
   display: flex;
@@ -55,7 +56,7 @@ const ClassPicture = styled.i`
   border-thickness: thin;
   border-color: #152642;
   color: #152642;
-  background-color: #64939b;
+  background-color: #db974f;
   align-items: center;
 `;
 export const PlayerUI = ({

@@ -299,8 +299,8 @@ const Wrapper = styled.div`
   border-radius: 10px;
   text-font: 30px;
   font-alignment: 30px;
-  color: #64939b;
-  border-color: #64939b;
+  color: #db974f;
+  border-color: #db974f;
 `;
 export const DescriptionDisplay = ({
   hoveredContent = null,

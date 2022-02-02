@@ -1128,6 +1128,7 @@ export const movePlayerPieces = (
               const surroundingTiles = [_data[i].tile, ...adj_tiles];
               const isInDanger = surroundingTiles.some(
                 t =>
+                  t &&
                   tileStatuses[t.i] &&
                   tileStatuses[t.i][t.j] &&
                   Object.keys(tileStatuses[t.i][t.j]).includes("isOnKaijuFire")
@@ -1538,7 +1539,9 @@ const getRandomTileOnBoard = (scale, isTutorial) => {
   }
 };
 const getSafeTile = (kaijuData, tileStatuses, scale) => {
-  const kaijuLocations = kaijuData.map(({ charLocation }) => charLocation);
+  const kaijuLocations = kaijuData
+    .filter(({ lives }) => lives)
+    .map(({ charLocation }) => charLocation);
   const allTiles = NOT_BRIDGE_TILES_VALS;
   let safeTileObj = {
     distance: Number.MIN_SAFE_INTEGER,

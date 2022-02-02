@@ -34,7 +34,7 @@ const Title = styled.div`
   pointer-events: none;
   font-size: 13px;
   z-index: 1;
-  color: #6b948e;
+  color: #db974f;
 `;
 export const TutorialGameBoard = ({
   shiftContentOver,

@@ -8,7 +8,7 @@ const Wrapper = styled.svg`
   position: absolute;
   z-index: ${props => props.zIndex};
   width: 75%;
-  height: 300px;
+  height: 350px;
   pointer-events: none;
   top: ${props => (props.isNavBar ? "25px" : "-90px")};
   /* background-color: red; */
@@ -234,3 +234,8 @@ export const SkyLineSVG = ({ x, y, zIndex, isNavBar }) => {
     </Wrapper>
   );
 };
+// <path
+//   fill="none"
+//   stroke="green"
+//   d="M 0,400 Q 0,355 -10,-10 t 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0 30,0"
+// />

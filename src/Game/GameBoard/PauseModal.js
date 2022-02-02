@@ -13,8 +13,8 @@ const Wrapper = styled.div`
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
-  border-color: #64939b;
-  color: #64939b;
+  border-color: #db974f;
+  color: #db974f;
   font-size: 30px;
   font-alignment: center;
   background-color: #152642;

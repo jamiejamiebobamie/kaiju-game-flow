@@ -2,71 +2,40 @@ import styled from "styled-components";
 
 export const Wrapper = styled.div`
   position: relative;
-  padding-top: 30px;
   display: flex;
-  /* margin-top: 5vh; */
-  width: 750px;
-  height: 900px;
+  align-self: center;
+  align-items: center;
+  width: auto;
+  height: auto;
   min-width: 700px;
-  min-height: 800px;
   flex-direction: column;
   align-self: center;
   align-items: center;
   border-radius: 10px;
   border-style: solid;
   border-thickness: thin;
-
-  /* border-color: #64939b; */
   border-color: #db974f;
-  /* background-color: #916a40; */
+  transition: 3s;
 `;
-// export const ButtonsWrapper = styled.div`
-//   position: absolute;
-//   display: flex;
-//   bottom: 75px;
-//   justify-content: space-around;
-//   width: 100%;
-//   height: 100px;
-// `;
-// export const Button = styled.div`
-//   display: flex;
-//   position: relative;
-//   flex-direction: column;
-//   justify-content: center;
-//
-//   min-width: 150px;
-//   height: 50px;
-//   right: 30px;
-//   bottom: 30px;
-//
-//   font-alignment: center;
-//   text-align: center;
-//
-//   cursor: pointer;
-//
-//   border-radius: 5px;
-//   border-style: solid;
-//   border-thickness: thin;
-//   border-bottom: 5px solid;
-//   border-color: #64939b;
-//   color: #64939b;
-//
-//   &:hover {
-//     border-bottom: 3px solid;
-//     transform: translate(0px, 3px);
-//   }
-//   font-size: 20px;
-// `;
+export const BackgroundImage = styled.img`
+  background-repeat: no-repeat;
+  margin-bottom: 30px;
+  border-radius: 5px;
+  border-style: solid;
+  border-thickness: thick;
+  border-color: #db974f;
+`;
 export const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-around;
-  /* flex-direction: column; */
   align-items: center;
   width: 500px;
-  height: 200px;
-  margin-top: 25px;
+  height: 50px;
   transform: scale(1.2, 1.5);
-  /* background-color: red; */
+  margin-top: 25px;
+  margin-bottom: 25px;
+  margin-left: 50px;
+  margin-right: 50px;
 `;
 export const ButtonsWrapper = styled.div`
   position: relative;
@@ -74,7 +43,7 @@ export const ButtonsWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
-  height: 100px;
+  /* height: 100px; */
 `;
 export const Button = styled.div`
   display: flex;

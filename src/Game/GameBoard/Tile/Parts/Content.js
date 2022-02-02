@@ -6,6 +6,7 @@ const ContentWrapper = styled.div`
   height: 200px;
   margin: 0 0 0 -80px;
   position: absolute;
+  cursor: pointer;
   z-index: -1;
   overflow: hidden;
   visibility: hidden;
