@@ -19,11 +19,21 @@ const ShiftContentOver = styled.div`
   margin-left: -5px;
   position: absolute;
 `;
-const BackgroundImage = styled.img`
+// const BackgroundImage = styled.img`
+//   z-index: -3;
+//   width: 100%;
+//   height: 100%;
+//   background-repeat: no-repeat;
+// `;
+const BackgroundImage = styled.svg`
   z-index: -3;
   width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
+  /* background-repeat: no-repeat;
+  background-color: red; */
+  opacity: 0.5;
+  background: url("test_map.png");
+  pointer-events: none;
 `;
 export const GameBoard = ({
   isClassWrapper = false,
@@ -65,7 +75,6 @@ export const GameBoard = ({
       charLocation={p.charLocation}
       color={p.color}
       scale={scale}
-      isInManaPool={p.isInManaPool}
       lives={p.lives}
       isHealed={p.isHealed}
       isTeleported={p.isTeleported}
@@ -80,7 +89,15 @@ export const GameBoard = ({
         {kaiju}
         {players}
       </ShiftContentOver>
-      <BackgroundImage src={"test_map.png"} />
+      <BackgroundImage>
+        <defs></defs>
+        <path
+          d="M 85 0 l 45,80 l -5,5 l 5,15 l -10,10"
+          stroke="black"
+          stroke-width="1px"
+          // fill="#152642"
+        />
+      </BackgroundImage>
     </Board>
   );
 };

@@ -243,7 +243,6 @@ export const Player = ({
   dir,
   lives,
   charLocation,
-  isInManaPool,
   isHealed,
   isTeleported,
   color,
