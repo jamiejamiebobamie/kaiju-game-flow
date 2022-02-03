@@ -8,8 +8,7 @@ import {
   ButtonOutline,
   Button,
   StyledIcon,
-  StyledLink,
-  TestImg
+  StyledLink
 } from "./Components/StyledComponents";
 import { Logo } from "./Components/Logo";
 import { NavBar } from "./Components/NavBar";
@@ -44,9 +43,6 @@ export const Home = () => {
         <Wrapper>
           <Logo />
           <ButtonGroup>
-            <TestImg alignment={"start"} width={"300"} src="test1.png" />
-            <TestImg alignment={"end"} src="test2.png" />
-
             <ButtonsWrapper>
               <Button onClick={handleClickGame}>
                 <ButtonOutline zIndex={1} />

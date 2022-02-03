@@ -16,6 +16,7 @@ export const Wrapper = styled.div`
   border-thickness: thin;
   border-color: #db974f;
   transition: 3s;
+  margin-top: 80px;
 `;
 export const BackgroundImage = styled.img`
   background-repeat: no-repeat;

@@ -9,48 +9,12 @@ export const Wrapper = styled.div`
   align-items: center;
   width: 750px;
   min-width: 750px;
-  /* height: 100%;
-  min-height: 100%; */
   height: 900px;
   min-height: 800px;
-  /* background-color: blue; */
-  /* opacity: 0.3; */
   ${props =>
     props.scale &&
     props.translate &&
     `transform: ${props.scale} ${props.translate}; cursor:pointer;`};
-
-  /* margin-top: 650px; */
-  /* -webkit-animation-duration: 3s;
-  animation-duration: 3s;
-  -webkit-animation-name: fadeInUp;
-  animation-name: fadeInUp;
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    10% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0px);
-    }
-  } */
-`;
-export const TestImg = styled.img`
-  position: absolute;
-  /* background-color: blue; */
-  // ${props => (props.alignment === "end" ? "width: 70px;" : `width: 110px;`)};
-  /* width: 70px; */
-  /* height: 150px; */
-  ${props =>
-    props.alignment === "end"
-      ? "align-self: flex-end; margin-left: 0px;width: 70px; filter: drop-shadow(-30px 5px 20px black);"
-      : " width: 110px; align-self: flex-start; margin-left: -40px;margin-top: 1.5px;filter: drop-shadow(25px 5px 20px black);"};
-  /* filter: drop-shadow(30px 5px 20px black); */
 `;
 export const ButtonGroup = styled.div`
   display: flex;
@@ -61,7 +25,6 @@ export const ButtonGroup = styled.div`
   height: 200px;
   margin-top: 25px;
   transform: scale(1.2, 1.5);
-  /* background-color: red; */
 `;
 export const ButtonsWrapper = styled.div`
   position: relative;
@@ -175,14 +138,7 @@ export const StyledSciFiTextShadow = styled.p`
   text-shadow: 3px 6px;
   color: black;
 `;
-export const TestSilo = styled.img`
-  position: absolute;
-  pointer-events: none;
-  ${props => `z-index:${props.zIndex}; left: ${props.x}px; top:${props.y}px;`};
-  ${props => ` transform: scale(${props.scaleX}, ${props.scaleY});`};
-`;
 export const StyledStaticLogo = styled.img`
-  /* position: absolute;
-  z-index: 1000; */
   cursor: pointer;
+  margin-left: 30px;
 `;

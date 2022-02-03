@@ -923,14 +923,14 @@ const getDirFromTiles = (currTile, nextTile) => {
     "0 1 0": "down",
     "0 0 0": "idle",
     "0 0 1": "idle",
-    "1 0 1": "up right",
-    "1 -1 0": "up right",
-    "1 1 1": "down right",
-    "1 0 0": "down right",
-    "-1 1 1": "down left",
-    "-1 0 0": "down left",
-    "-1 0 1": "up left",
-    "-1 -1 0": "up left"
+    "1 0 1": "upRight",
+    "1 -1 0": "upRight",
+    "1 1 1": "downRight",
+    "1 0 0": "downRight",
+    "-1 1 1": "downLeft",
+    "-1 0 0": "downLeft",
+    "-1 0 1": "upLeft",
+    "-1 -1 0": "upLeft"
   };
   const dir = lookup[lookup_key];
   return dir;

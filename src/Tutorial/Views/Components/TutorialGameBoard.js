@@ -81,6 +81,7 @@ export const TutorialGameBoard = ({
       lives={p.lives}
       isHealed={p.isHealed}
       isTeleported={p.isTeleported}
+      dir={p.dir}
     />
   ));
   return (

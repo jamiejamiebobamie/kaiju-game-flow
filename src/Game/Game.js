@@ -29,6 +29,7 @@ const GameWrapper = styled.div`
   justify-content: space-between;
   width: auto;
   width: 1200px;
+  margin-top: 80px;
 `;
 const ReplayTitle = styled.div`
   display: flex;

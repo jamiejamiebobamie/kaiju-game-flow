@@ -11,7 +11,148 @@ const Wrapper = styled.i`
   color: ${props => props.color};
   pointer-events: none;
 `;
-const Character = styled.img`
+
+// ${props =>
+//   props.anim &&
+//   `animation: ${props.anim} 0.3s steps(${
+//     props.dir === "idle" ? 1 : 10
+//   }) infinite;`};
+const SpriteSheet = styled.div`
+  pointer-events: none;
+  ${props =>
+    props.color === "blue"
+      ? 'background: url("spritesheet/player.png");'
+      : 'background: url("spritesheet/teammate.png");'}
+  transform: scale(.4) translate(-130px, -165px);
+  height: 200px;
+  width: 152px;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+  -webkit-transition: -webkit-transform 3s ease-in-out;
+  ${props => `animation: ${props.anim} 1s steps(10) infinite;`};
+  @keyframes upRight {
+    from {
+      background-position-x: -152px;
+      background-position-y: 0px;
+    }
+    to {
+      background-position-x: -1682px;
+      background-position-y: 0px;
+    }
+  }
+  @keyframes up {
+    from {
+      background-position-x: -152px;
+      background-position-y: 220px;
+    }
+    to {
+      background-position-x: -1682px;
+      background-position-y: 220px;
+    }
+  }
+  @keyframes upLeft {
+    from {
+      background-position-x: -152px;
+      background-position-y: 440px;
+    }
+    to {
+      background-position-x: -1682px;
+      background-position-y: 440px;
+    }
+  }
+  @keyframes downLeft {
+    from {
+      background-position-x: -152px;
+      background-position-y: 660px;
+    }
+    to {
+      background-position-x: -1682px;
+      background-position-y: 660px;
+    }
+  }
+  @keyframes down {
+    from {
+      background-position-x: -152px;
+      background-position-y: 880px;
+    }
+    to {
+      background-position-x: -1682px;
+      background-position-y: 880px;
+    }
+  }
+  @keyframes downRight {
+    from {
+      background-position-x: -152px;
+      background-position-y: 1100px;
+    }
+    to {
+      background-position-x: -1682px;
+      background-position-y: 1100px;
+    }
+  }
+
+  @keyframes idleupRight {
+    from {
+      background-position-x: 0px;
+      background-position-y: 0px;
+    }
+    to {
+      background-position-x: 0px;
+      background-position-y: 0px;
+    }
+  }
+  @keyframes idleup {
+    from {
+      background-position-x: 0px;
+      background-position-y: 220px;
+    }
+    to {
+      background-position-x: 0px;
+      background-position-y: 220px;
+    }
+  }
+  @keyframes idleupLeft {
+    from {
+      background-position-x: 0px;
+      background-position-y: 440px;
+    }
+    to {
+      background-position-x: 0px;
+      background-position-y: 440px;
+    }
+  }
+  @keyframes idledownLeft {
+    from {
+      background-position-x: 0px;
+      background-position-y: 660px;
+    }
+    to {
+      background-position-x: 0px;
+      background-position-y: 660px;
+    }
+  }
+  @keyframes idledown {
+    from {
+      background-position-x: 0px;
+      background-position-y: 880px;
+    }
+    to {
+      background-position-x: 0px;
+      background-position-y: 880px;
+    }
+  }
+  @keyframes idledownRight {
+    from {
+      background-position-x: 0px;
+      background-position-y: 1100px;
+    }
+    to {
+      background-position-x: 0px;
+      background-position-y: 1100px;
+    }
+  }
+`;
+const Character = styled.div`
     margin-left: -20px;
     margin-top: -45px;
     width: 50px;
@@ -91,6 +232,13 @@ const ModiferText = styled.p`
   }
 `;
 
+/*
+
+dir => direction -> idle
+
+anim => need dir when dir changes to idle.
+*/
+
 export const Player = ({
   dir,
   lives,
@@ -107,6 +255,11 @@ export const Player = ({
   const [isHealedCached, setIsHealedCached] = useState(isHealed);
   const [isTeleportedLocal, setIsTeleportedLocal] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [anim, setAnim] = useState("down");
+  useEffect(() => {
+    console.log(dir, anim);
+    dir && setAnim(dir === "idle" ? `${dir}${anim}` : dir);
+  }, [dir]);
   useEffect(() => {
     if (isFirstLoad) {
       setIsFirstLoad(false);
@@ -115,7 +268,9 @@ export const Player = ({
         setIsDamaged(true);
         setModifierText(prevText => [
           ...prevText,
-          <ModiferText color={"#FF383B"}>{"-1"}</ModiferText>
+          <ModiferText key={Math.random()} color={"#FF383B"}>
+            {"-1"}
+          </ModiferText>
         ]);
         setTimeout(() => setIsDamaged(null), 2000);
       }
@@ -130,7 +285,9 @@ export const Player = ({
         setTimeout(() => setIsHealedLocal(false), 2000);
         setModifierText(prevText => [
           ...prevText,
-          <ModiferText color={"#9FEA4F"}>{"+1"}</ModiferText>
+          <ModiferText key={Math.random()} color={"#9FEA4F"}>
+            {"+1"}
+          </ModiferText>
         ]);
       }
     }
@@ -145,7 +302,7 @@ export const Player = ({
         setTimeout(() => setIsTeleportedLocal(false), 2000);
         setModifierText(prevText => [
           ...prevText,
-          <ModiferText fontSize={13} color={"#9338E9"}>
+          <ModiferText key={Math.random()} fontSize={13} color={"#9338E9"}>
             Zip!
           </ModiferText>
         ]);
@@ -155,11 +312,9 @@ export const Player = ({
   return (
     <Wrapper lives={lives} charLocation={charLocation}>
       {modifierText}
-      <Character
-        isDamaged={isDamaged}
-        color={color}
-        src={color === "blue" ? "player.png" : "teammate.png"}
-      />
+      <Character isDamaged={isDamaged}>
+        <SpriteSheet anim={anim} color={color} />
+      </Character>
     </Wrapper>
   );
 };

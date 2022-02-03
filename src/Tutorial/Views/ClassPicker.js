@@ -15,12 +15,7 @@ const ClassPickerWrapper = styled.div`
   height: auto;
   width: auto;
   padding: 5px;
-
-  /* margin-top: -10px; */
-  /* width: 750px;
-  min-width: 700px;
-  height: 900px;
-  min-height: 900px; */
+  margin-top: 80px;
   flex-direction: column;
   align-self: center;
   align-items: center;
