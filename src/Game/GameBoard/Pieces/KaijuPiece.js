@@ -17,7 +17,8 @@ const Monster = styled.div`
         : "flex"};
     width: 40px;
     height: 40px;
-    z-index: 20001;
+    ${props =>
+      props.zIndex ? `z-index: ${props.zIndex + 20002}` : "z-index:20002"};
     left: ${props => `${props.charLocation.x}px`};
     top: ${props => `${props.charLocation.y}px`};
     pointer-events: none;
@@ -114,7 +115,7 @@ const ModiferText = styled.p`
     }
   }
 `;
-export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
+export const Kaiju = ({ zIndex, dir, charLocation, element, color, lives }) => {
   const [healthModifierText, setHealthModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
@@ -136,7 +137,7 @@ export const Kaiju = ({ dir, charLocation, element, color, lives }) => {
   for (let i = 0; i < lives; i++) bars.push(<Bar lives={lives} key={i} />);
   // <p style={{ position: "absolute", zIndex: 3, color: "white" }}>{dir}</p>
   return (
-    <Monster lives={lives} charLocation={charLocation}>
+    <Monster zIndex={zIndex} lives={lives} charLocation={charLocation}>
       {healthModifierText}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <MonsterImg lives={lives} isDamaged={isDamaged} src={"kaiju.png"} />

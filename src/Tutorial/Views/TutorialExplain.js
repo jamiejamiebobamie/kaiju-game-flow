@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
+import { GameMap } from "../../Components/GameMap.js";
+
 import { lookupClassAndOrSetPassives } from "../../Utils/utils";
 import {
   Wrapper,
@@ -42,6 +44,20 @@ export const TutorialExplain = ({
   height,
   scale
 }) => {
+  const borderStyles = `
+    position:relative;
+    width:245px;
+    height:395px;
+    background-repeat: no-repeat;
+    margin-bottom: 30px;
+    border-radius: 5px;
+    border-style: solid;
+    border-thickness: thick;
+    border-color: #db974f;
+    box-shadow: 3px 7px 10px black;
+    overflow:hidden;
+    `;
+  const mapStyles = `transform:scale(.5) translate(-125px);`;
   useEffect(() => {
     lookupClassAndOrSetPassives(pickedAbilities, setPlayerData);
   }, [pickedAbilities]);
@@ -51,7 +67,7 @@ export const TutorialExplain = ({
         <Title>{title}</Title>
       </TitleWrapper>
       {showCity ? (
-        <BackgroundImage src={"mapPic.png"} width={300} />
+        <GameMap borderStyles={borderStyles} mapStyles={mapStyles} />
       ) : (
         <TutorialGameBoard
           shiftContentOver={shiftContentOver}
@@ -95,3 +111,4 @@ export const TutorialExplain = ({
     </Wrapper>
   );
 };
+// <BackgroundImage src={"mapPic.png"} width={300} />

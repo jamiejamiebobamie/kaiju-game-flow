@@ -5,7 +5,8 @@ import _ from "lodash";
 const Wrapper = styled.i`
   display: ${props => (props.lives > 0 ? "flex" : "none")};
   position: absolute;
-  z-index: 20001;
+  ${props =>
+    props.zIndex ? `z-index: ${props.zIndex + 20001}` : "z-index:20001"};
   left: ${props => `${props.charLocation.x + 3.5}px`};
   top: ${props => `${props.charLocation.y}px`};
   color: ${props => props.color};
@@ -247,6 +248,7 @@ export const Player = ({
   isHealed,
   isTeleported,
   color,
+  zIndex,
   i = 0
 }) => {
   const [modifierText, setModifierText] = useState([]);
@@ -310,7 +312,7 @@ export const Player = ({
     }
   }, [isTeleported]);
   return (
-    <Wrapper lives={lives} charLocation={charLocation}>
+    <Wrapper zIndex={zIndex} lives={lives} charLocation={charLocation}>
       {modifierText}
       <Character isDamaged={isDamaged}>
         <SpriteSheet anim={anim} color={color} />

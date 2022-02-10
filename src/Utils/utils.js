@@ -10,6 +10,14 @@ import {
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 
+export const getFlattenedArrayIndex = tile => {
+  const { i, j } = tile;
+  // 25, 10
+  const rowLength = 24; // Math.ceil(width / (70 * scale));
+  const colLength = 10; // Math.ceil(height / (75 * scale));
+  return i !== undefined && j !== undefined ? rowLength * j + i : 0;
+};
+
 const getRandomAbilities = () => {
   const chosen = [];
   const possibilities = [

@@ -4,8 +4,7 @@ import "./App.css";
 
 const App = () => {
   /*
-        1. zIndex of gameboard pieces relative to flattened array index of i,j curr tile.
-        2. Teammate AI going below board on tutorial screen 5.
+        1. Teammate AI going below board on tutorial screen 5.
     */
   return (
     <div className="App">

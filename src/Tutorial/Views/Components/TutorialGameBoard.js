@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Player } from "../../../Game/GameBoard/Pieces/PlayerPiece";
 import { Kaiju } from "../../../Game/GameBoard/Pieces/KaijuPiece";
 import { Abilities } from "../../../Game/UI/PlayerUI/Components/Abilities";
+import { getFlattenedArrayIndex } from "../../../Utils/utils";
 
 const Board = styled.div`
   width: ${props => props.width}px;
@@ -64,10 +65,12 @@ export const TutorialGameBoard = ({
   const kaiju = kaijuData.map((k, i) => (
     <Kaiju
       key={k.key}
+      dir={k.dir}
       charLocation={k.charLocation}
       color={k.color}
       scale={scale}
       lives={k.lives}
+      zIndex={getFlattenedArrayIndex(k.tile)}
     />
   ));
   const players = playerData.map(p => (
@@ -77,11 +80,11 @@ export const TutorialGameBoard = ({
       charLocation={p.charLocation}
       color={p.color}
       scale={scale}
-      isInManaPool={p.isInManaPool}
       lives={p.lives}
       isHealed={p.isHealed}
       isTeleported={p.isTeleported}
       dir={p.dir}
+      zIndex={getFlattenedArrayIndex(p.tile)}
     />
   ));
   return (

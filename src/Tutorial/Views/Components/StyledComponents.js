@@ -25,6 +25,7 @@ export const BackgroundImage = styled.img`
   border-style: solid;
   border-thickness: thick;
   border-color: #db974f;
+  box-shadow: 3px 7px 10px black;
 `;
 export const ButtonGroup = styled.div`
   display: flex;
