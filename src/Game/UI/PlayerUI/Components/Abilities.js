@@ -7,14 +7,13 @@ const Wrapper = styled.div`
   ${props =>
     props.isReversed ? "flex-flow: row wrap;" : "flex-flow: row wrap-reverse;"}
   justify-content: flex-start;
-  ${props =>
-    props.shiftContentOver
-      ? "width: 150%;margin-left:-125px;justify-content: center;"
-      : "width: 65%;"};
-  height: 100%;
+  height: 100px;
+  width: 210px;
   overflow: none;
+  /* background-color: pink; */
 `;
 export const Abilities = ({
+  isLarge,
   shiftContentOver,
   playerIndex,
   kaijuData,
@@ -81,7 +80,7 @@ export const Abilities = ({
       scale={scale}
       setDisplayString={setDisplayString}
       abilityData={abilityData}
-      keyNum={i + 1}
+      keyNum={isReversed ? i + 4 : i + 1}
       playerIndex={playerIndex}
     />
   ));

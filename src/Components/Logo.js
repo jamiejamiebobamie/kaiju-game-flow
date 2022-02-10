@@ -9,17 +9,18 @@ import {
 } from "./StyledComponents";
 import { SkyLineSVG } from "./SkyLineSVG";
 
-export const Logo = ({ isNavBar, handleClickHome }) => {
-  return isNavBar ? (
-    <StyledStaticLogo onClick={handleClickHome} src="staticLogo.png" />
-  ) : (
+export const Logo = ({ isNavBar, handleClickHome, isDescription }) => {
+  // return isNavBar ? (
+  // ) : (
+  return (
     <>
-      <Title>
-        <StyledSpookyText>Kaiju</StyledSpookyText>{" "}
+      <Title isDescription={isDescription}>
+        <StyledSpookyText isDescription={isDescription}>Kaiju</StyledSpookyText>{" "}
         <StyledSciFiText>City</StyledSciFiText>
         <StyledSpookyTextShadow>Kaiju</StyledSpookyTextShadow>{" "}
       </Title>
-      <SkyLineSVG x={0} y={-30} zIndex={-100} />
     </>
   );
 };
+// <SkyLineSVG x={0} y={-30} zIndex={-100} />
+// <StyledStaticLogo onClick={handleClickHome} src="staticLogo.png" />

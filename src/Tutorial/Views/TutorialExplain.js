@@ -51,7 +51,7 @@ export const TutorialExplain = ({
         <Title>{title}</Title>
       </TitleWrapper>
       {showCity ? (
-        <BackgroundImage src={"test_map.png"} width={300} />
+        <BackgroundImage src={"mapPic.png"} width={300} />
       ) : (
         <TutorialGameBoard
           shiftContentOver={shiftContentOver}

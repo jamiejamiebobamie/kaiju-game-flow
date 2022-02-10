@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { Logo } from "../../Components/Logo";
 
 const getDescription = (string, playerData, playerIndex) => {
   switch (string) {
@@ -293,14 +294,20 @@ const Wrapper = styled.div`
   max-width: 600px;
   ${props =>
     !props.isClassWrapper &&
-    "padding: 20px; border-style: solid; border-thickness: thin; max-width: 460px;"}
-  width: 100%;
+    "padding: 20px; border-style: solid; border-thickness: thin; max-width: 400px;"}
+  /* width: 100%; */
+  width: 500px;
+
   height: 300px;
+  /* border-style: solid; */
   border-radius: 10px;
+  border-color: #db974f;
   text-font: 30px;
   font-alignment: 30px;
   color: #db974f;
-  border-color: #db974f;
+  /* background-color: green; */
+  /* box-shadow: 3px 7px 10px black; */
+  align-self: flex-end;
 `;
 export const DescriptionDisplay = ({
   hoveredContent = null,
@@ -325,7 +332,7 @@ export const DescriptionDisplay = ({
     };
   return (
     <Wrapper isClassWrapper={isClassWrapper}>
-      <h2>{!isTutorial && !title ? "Press ESC to pause" : title}</h2>
+      <h2>{!isTutorial && !title ? <Logo isDescription={true} /> : title}</h2>
       <p>{description}</p>
       <p>{effect1}</p>
       <p>{effect2}</p>
@@ -333,3 +340,5 @@ export const DescriptionDisplay = ({
     </Wrapper>
   );
 };
+// <h2>{!isTutorial && !title ? "Press ESC to pause" : title}</h2>;
+// <h2>{title}</h2>

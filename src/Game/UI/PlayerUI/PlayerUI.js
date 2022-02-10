@@ -11,19 +11,23 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: 100%;
-  height: 200px;
+  width: 400px;
+  height: 170px;
   border-style: solid;
   border-thickness: thin;
   border-radius: 10px;
   background-color: #152642;
   border-color: #db974f;
+  box-shadow: 3px 7px 10px black;
+  align-self: flex-end;
 
   border-style: solid;
   border-thickness: thin;
   border-color: #db974f;
   color: #db974f;
   background-color: #152642;
+  ${props =>
+    props.isTeammate && "align-content: flex-end; transform:scale(.75); "}
 `;
 const PlayerBorder = styled.div`
   position: absolute;
@@ -86,12 +90,13 @@ export const PlayerUI = ({
   setTileStatuses,
   playerIndex,
   kaijuKillCount,
+  isTeammate,
   scale
 }) => {
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const _playerUI = (
-    <Wrapper>
+    <Wrapper isTeammate={isTeammate}>
       {isReversed ? (
         <>
           <Abilities
@@ -112,23 +117,15 @@ export const PlayerUI = ({
             health={(playerData.length && playerData[playerIndex].lives) || 0}
             setDisplayString={setDisplayString}
           />
-          <Kaiju
-            kaijuArr={kaijuKillCount.filter(c => c === playerIndex)}
-            isReversed={isReversed}
-            setDisplayString={setDisplayString}
-          />
         </>
       ) : (
         <>
-          <Kaiju
-            kaijuArr={kaijuKillCount.filter(c => c === playerIndex)}
-            setDisplayString={setDisplayString}
-          />
           <HealthBar
             health={(playerData.length && playerData[playerIndex].lives) || 0}
             setDisplayString={setDisplayString}
           />
           <Abilities
+            isLarge={true}
             playerData={playerData}
             kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
@@ -143,7 +140,7 @@ export const PlayerUI = ({
           />
         </>
       )}
-      <PlayerBorder isReversed={isReversed}>
+      <PlayerBorder isReversed={true}>
         <PlayerPicture
           ref={setHoverRef(`modifiers ${playerIndex}`)}
           className="fa fa-user-circle"
@@ -151,12 +148,12 @@ export const PlayerUI = ({
         <ClassPicture
           ref={setHoverRef(`class ${playerIndex}`)}
           className="fa fa-magic"
-          isReversed={isReversed}
+          isReversed={true}
         />
       </PlayerBorder>
       <PassiveAbilities
         setDisplayString={setDisplayString}
-        isReversed={isReversed}
+        isReversed={true}
         abilities={
           (playerData &&
             playerData.length &&
@@ -168,3 +165,7 @@ export const PlayerUI = ({
   );
   return _playerUI;
 };
+// <Kaiju
+//   kaijuArr={kaijuKillCount.filter(c => c === playerIndex)}
+//   setDisplayString={setDisplayString}
+// />

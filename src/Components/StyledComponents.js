@@ -100,6 +100,25 @@ export const Title = styled.div`
   transform: scale(1.5);
   margin-top: -300px;
   pointer-events: none;
+  /* isDescription */
+  ${props =>
+    props.isDescription &&
+    `margin-left: 120px; transform: scale(1.2); margin-top: -75px;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-name: fadeInLogo;
+    animation-name: fadeInLogo;
+    @keyframes fadeInLogo {
+      0% {
+        opacity: 0;
+      }
+      10% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+  }`}
 `;
 export const StyledSpookyText = styled.p`
   font-family: green_fuz;
@@ -110,6 +129,10 @@ export const StyledSpookyText = styled.p`
   color: black;
 
   -webkit-text-stroke: 1.1px purple;
+
+  ${props =>
+    props.isDescription &&
+    "-webkit-text-stroke: 1px purple; filter: drop-shadow(0 0 0.2rem purple);"}
 `;
 export const StyledSciFiText = styled.p`
   font-family: Metro;

@@ -27,9 +27,19 @@ const GameWrapper = styled.div`
   display: flex;
   align-self: center;
   justify-content: space-between;
-  width: auto;
-  width: 1200px;
-  margin-top: 80px;
+  /* width: auto; */
+  width: 1000px;
+  height: 100%;
+
+  /* background-color: purple; */
+  margin-top: 40px;
+  border-style: solid;
+  border-thickness: thin;
+  border-radius: 10px;
+  /* background-color: #152642; */
+  border-color: #db974f;
+  overflow: hidden;
+  box-shadow: 3px 7px 10px black;
 `;
 const ReplayTitle = styled.div`
   display: flex;
@@ -52,7 +62,7 @@ const ReplayModal = styled.div`
   align-self: center;
   align-items: center;
 
-  margin-left: 25%;
+  margin-left: 15%;
 
   width: 550px;
   height: 350px;
@@ -108,12 +118,15 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
   const [intervalTime, setIntervalTime] = useState(1);
   const [replayModalMessage, setReplayModalMessage] = useState(null);
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
+  const handleClickPause = () => {
+    setIsPaused(_isPaused => !_isPaused);
+    setIntervalTime(_intervalTime => (_intervalTime === null ? 1 : null));
+  };
   useKeyPress(
     code => {
       switch (code) {
         case "Escape":
-          setIsPaused(_isPaused => !_isPaused);
-          setIntervalTime(_intervalTime => (_intervalTime === null ? 1 : null));
+          handleClickPause();
           break;
       }
     },
@@ -323,6 +336,8 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
         setPlayerData={setPlayerData}
         setTeleportData={setTeleportData}
         setTileStatuses={setTileStatuses}
+        handleClickHome={handleClickHome}
+        handleClickPause={handleClickPause}
         scale={scale}
       />
     </GameWrapper>

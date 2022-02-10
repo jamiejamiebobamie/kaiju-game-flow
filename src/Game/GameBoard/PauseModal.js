@@ -10,14 +10,14 @@ const Wrapper = styled.div`
   margin-top: 250px;
   margin-left: 120px;
   padding: 30px;
-  border-style: solid;
+  /* border-style: solid; */
   border-thickness: thin;
-  border-radius: 10px;
-  border-color: #db974f;
+  /* border-radius: 10px; */
+  /* border-color: #db974f; */
   color: #db974f;
   font-size: 30px;
   font-alignment: center;
-  background-color: #152642;
+  /* background-color: #152642; */
 `;
 export const PauseModal = () => {
   return <Wrapper>Paused</Wrapper>;

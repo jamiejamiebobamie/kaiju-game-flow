@@ -27,6 +27,7 @@ const MonsterImg = styled.img`
   width: 40px;
   height: 40px;
   animation-iteration-count: 1s;
+  filter: drop-shadow(0 0 2px #bf40bf);
   ${props => props.isDamaged && "animation: shake 0.5s;"};
   @keyframes shake {
     0% {

@@ -68,22 +68,10 @@ const Wrapper = styled.div`
   border-color: ${props => props.color};
   min-width: 50px;
   height: 50px;
-  ${props => props.isAnimating && "animation: rotation linear .5s;"};
-  cursor: pointer;
-  @keyframes rotation {
-    0% {
-      transform: rotate3d(0, 1, 0, 0deg);
-    }
-    50% {
-      transform: rotate3d(0, 1, 0, 90deg);
-    }
-    100% {
-      transform: rotate3d(0, 1, 0, 0deg);
-    }
-  }
+  transition: 2s;
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
-  -webkit-animation-name: fadeInRightAbility;
+  /* -webkit-animation-name: fadeInRightAbility;
   animation-name: fadeInRightAbility;
   @keyframes fadeInRightAbility {
     0% {
@@ -97,6 +85,19 @@ const Wrapper = styled.div`
     100% {
       opacity: 1;
       transform: translateX(0);
+    }
+  } */
+  ${props => props.isAnimating && "animation: rotation linear .5s;"};
+  cursor: pointer;
+  @keyframes rotation {
+    0% {
+      transform: rotate3d(0, 1, 0, 0deg);
+    }
+    50% {
+      transform: rotate3d(0, 1, 0, 90deg);
+    }
+    100% {
+      transform: rotate3d(0, 1, 0, 0deg);
     }
   }
 `;
@@ -169,18 +170,23 @@ export const Ability = ({
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
-  useKeyPress(() => playerIndex === 0 && handleClick(), `Digit${keyNum}`);
+  useKeyPress(
+    () =>
+      // playerIndex === 0 &&
+      handleClick(),
+    `Digit${keyNum}`
+  );
   useEffect(() => {
     if (isActive) {
-      playerIndex === 0 &&
-        activateActive(
-          playerIndex,
-          playerData,
-          setTeleportData,
-          kaijuData,
-          setTileStatuses,
-          scale
-        );
+      // playerIndex === 0 &&
+      activateActive(
+        playerIndex,
+        playerData,
+        setTeleportData,
+        kaijuData,
+        setTileStatuses,
+        scale
+      );
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
       setTimeout(() => {
@@ -197,7 +203,8 @@ export const Ability = ({
   return (
     <Wrapper
       onClick={() => {
-        playerIndex === 0 && handleClick();
+        // playerIndex === 0 &&
+        handleClick();
       }}
       isAnimating={isAnimating}
       ref={setHoverRef(`${displayLookup}Active`)}

@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   width: 50px;
   height: 50px;
   transform: rotate(${props => (props.isReversed ? 90 : 30)}deg);
+  margin-top: -20px;
 `;
 const PassiveAbilityWrapper = styled.div`
   position: absolute;

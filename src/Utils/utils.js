@@ -1126,13 +1126,18 @@ export const movePlayerPieces = (
                 ? getAdjacentTilesTutorial(_data[i].tile)
                 : getAdjacentTiles(_data[i].tile);
               const surroundingTiles = [_data[i].tile, ...adj_tiles];
-              const isInDanger = surroundingTiles.some(
-                t =>
-                  t &&
-                  tileStatuses[t.i] &&
-                  tileStatuses[t.i][t.j] &&
-                  Object.keys(tileStatuses[t.i][t.j]).includes("isOnKaijuFire")
-              );
+              const isInDanger =
+                tileStatuses &&
+                surroundingTiles &&
+                surroundingTiles.some(
+                  t =>
+                    t &&
+                    tileStatuses[t.i] &&
+                    tileStatuses[t.i][t.j] &&
+                    Object.keys(tileStatuses[t.i][t.j]).includes(
+                      "isOnKaijuFire"
+                    )
+                );
               const isOffensivePowerAndTargetInRange =
                 a.type === "offensive" &&
                 numTilesFromTarget &&
