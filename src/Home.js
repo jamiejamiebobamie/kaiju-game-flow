@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Tutorial } from "./Tutorial/Tutorial";
+import { Credits } from "./Credits";
 import { Game } from "./Game/Game";
 import {
   Wrapper,
@@ -16,6 +17,8 @@ import { NavBar } from "./Components/NavBar";
 export const Home = () => {
   const MAX_TUTORIAL_VIEW_INDEX = 6;
   const [isTutorial, setIsTutorial] = useState(true);
+  const [isCredits, setIsCredits] = useState(true);
+
   const [tutorialViewIndex, setTutorialViewIndex] = useState(-1);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const handleClickPlay = () =>
@@ -32,6 +35,11 @@ export const Home = () => {
   };
   const handleClickTutorial = () => {
     setTutorialViewIndex(0);
+  };
+  const handleClickCredits = () => {
+    setTutorialViewIndex(0);
+    setIsTutorial(false);
+    setIsCredits(true);
   };
   return (
     <>
@@ -69,6 +77,12 @@ export const Home = () => {
                 </StyledLink>
               </Button>
             </ButtonsWrapper>
+            <ButtonsWrapper>
+              <Button onClick={handleClickCredits}>
+                <ButtonOutline zIndex={1} />
+                Credits
+              </Button>
+            </ButtonsWrapper>
           </ButtonGroup>
         </Wrapper>
       ) : isTutorial ? (
@@ -81,6 +95,8 @@ export const Home = () => {
           handleClickPlay={handleClickPlay}
           handleClickHome={handleClickHome}
         />
+      ) : isCredits ? (
+        <Credits handleClickHome={handleClickHome} />
       ) : (
         <Game
           pickedAbilities={pickedAbilities}
