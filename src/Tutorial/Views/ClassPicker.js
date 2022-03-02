@@ -14,7 +14,7 @@ const ClassPickerWrapper = styled.div`
   display: flex;
   height: auto;
   width: auto;
-  padding: 5px;
+  /* padding: 5px; */
   /* margin-top: 80px; */
   background-color: #152642;
 
@@ -45,6 +45,15 @@ const ClassPickerWrapper = styled.div`
     }
   }
 `;
+const AbilityPickerWrapper = styled.div`
+  border-radius: 10px;
+  border-style: solid;
+  border-thickness: thin;
+  border-radius: 10px;
+  border-color: #db974f;
+  margin: 10px;
+  padding: 10px;
+`;
 const AbilityButtonsWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -73,27 +82,30 @@ const DescriptionDisplayWrapper = styled.div`
   position: relative;
   justify-content: space-around;
   width: 100%;
-  margin-top: -30px;
+  margin-top: 15px;
+  /* background-color: red; */
 `;
-
 export const ButtonGroup = styled.div`
-  position: absolute;
-  z-index: 2;
+  /* position: absolute; */
+  /* z-index: 2; */
   display: flex;
   justify-content: flex-end;
   flex-direction: column;
   align-items: center;
   width: 250px;
   height: 30px;
+  top: 20px;
   right: 30px;
-  bottom: 20px;
+  bottom: 30px;
   transform: scale(1.2, 1.5);
-  /* background-color: red; */
+  margin-top: 20px;
+  margin-bottom: 40px;
+  /* background-color: orange; */
 `;
 
 const PlayButton = styled.div`
-  position: absolute;
-  z-index: 2;
+  /* position: absolute;
+  z-index: 2; */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -164,6 +176,46 @@ const ClassTitlePopUp = styled.div`
     }
   }
 `;
+const CheckboxWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: 20px;
+  margin-top: -20px;
+
+  /* background-color: red; */
+`;
+const GenderWrapper = styled.div`
+  width: 50%;
+  display: flex;
+  justify-content: space-around;
+  margin-left: 30px;
+}}
+`;
+const CheckboxText = styled.div`
+  display: flex;
+  width: 200px;
+  margin: 10px;
+  color: #db974f;
+  text-stroke: 0.5px black;
+  -webkit-text-stroke: 0.5px black;
+`;
+const Checkbox = styled.div`
+  display: flex;
+  margin-top: 3px;
+  margin-left: 10px;
+  border-style: solid;
+  border-thickness: thin;
+  width: 10px;
+  height: 10px;
+  &:hover {
+    background-color: #779b64;
+  }
+`;
+const Checkmark = styled.i`
+  margin-left: -2px;
+  margin-top: -5px;
+`;
 export const ClassPicker = ({
   pickedAbilities,
   setPickedAbilities,
@@ -184,7 +236,11 @@ export const ClassPicker = ({
   width,
   height,
   scale,
-  numAbilitiesToPick
+  numAbilitiesToPick,
+  isMale,
+  setIsMale,
+  isTeammate,
+  setIsTeammate
 }) => {
   const [displayString, setDisplayString] = useState(null);
   const [classTitle, setClassTitle] = useState("");
@@ -222,24 +278,6 @@ export const ClassPicker = ({
           setDisplayString={setDisplayString}
         />
       </AbilityButtonsWrapper>
-      <TutorialGameBoard
-        isPaused={isPaused}
-        powerUpData={powerUpData}
-        playerData={playerData}
-        setPlayerData={setPlayerData}
-        setTeleportData={setTeleportData}
-        kaijuData={kaijuData}
-        setPlayerMoveToTiles={setPlayerMoveToTiles}
-        tileStatuses={tileStatuses}
-        setTileStatuses={setTileStatuses}
-        clickedTile={clickedTile}
-        setClickedTile={setClickedTile}
-        tiles={tiles}
-        path={path}
-        width={width}
-        height={height}
-        scale={scale}
-      />
       <DescriptionDisplayWrapper>
         <DescriptionDisplay
           isClassWrapper={true}
@@ -248,16 +286,57 @@ export const ClassPicker = ({
           playerData={playerData}
           isTutorial={true}
         />
-        <ButtonGroup>
-          <ButtonsWrapper>
-            <Button onClick={handleClickPlay}>
-              <ButtonOutline zIndex={1} />
-              Play!
-            </Button>
-          </ButtonsWrapper>
-        </ButtonGroup>
       </DescriptionDisplayWrapper>
+      <CheckboxWrapper>
+        <GenderWrapper>
+          <CheckboxText>
+            Male
+            <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
+              {isMale && <Checkmark className="fa fa-check" />}
+            </Checkbox>
+          </CheckboxText>
+          <CheckboxText>
+            Female
+            <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
+              {!isMale && <Checkmark className="fa fa-check" />}
+            </Checkbox>
+          </CheckboxText>
+        </GenderWrapper>
+        <CheckboxText>
+          Teammate?
+          <Checkbox onClick={() => setIsTeammate(_isT => !_isT)}>
+            {isTeammate && <Checkmark className="fa fa-check" />}
+          </Checkbox>
+        </CheckboxText>
+      </CheckboxWrapper>
+      <ButtonGroup>
+        <ButtonsWrapper>
+          <Button onClick={handleClickPlay}>
+            <ButtonOutline zIndex={1} />
+            Play!
+          </Button>
+        </ButtonsWrapper>
+      </ButtonGroup>
     </ClassPickerWrapper>
   );
 };
 // <PlayButton onClick={handleClickPlay}>Play!</PlayButton>
+
+// <TutorialGameBoard
+//   isPaused={isPaused}
+//   powerUpData={powerUpData}
+//   playerData={playerData}
+//   setPlayerData={setPlayerData}
+//   setTeleportData={setTeleportData}
+//   kaijuData={kaijuData}
+//   setPlayerMoveToTiles={setPlayerMoveToTiles}
+//   tileStatuses={tileStatuses}
+//   setTileStatuses={setTileStatuses}
+//   clickedTile={clickedTile}
+//   setClickedTile={setClickedTile}
+//   tiles={tiles}
+//   path={path}
+//   width={width}
+//   height={height}
+//   scale={scale}
+// />

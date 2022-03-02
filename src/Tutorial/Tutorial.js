@@ -23,7 +23,11 @@ export const Tutorial = ({
   handleClickHome,
   maxTutorialViewIndex,
   tutorialViewIndex,
-  setTutorialViewIndex
+  setTutorialViewIndex,
+  isMale,
+  setIsMale,
+  isTeammate,
+  setIsTeammate
 }) => {
   const width = 500;
   const height = 800;
@@ -320,6 +324,10 @@ export const Tutorial = ({
       height={height}
       scale={scale}
       numAbilitiesToPick={3}
+      isMale={isMale}
+      setIsMale={setIsMale}
+      isTeammate={isTeammate}
+      setIsTeammate={setIsTeammate}
     />
   ) : (
     <TutorialExplain

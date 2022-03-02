@@ -17,8 +17,9 @@ import { NavBar } from "./Components/NavBar";
 export const Home = () => {
   const MAX_TUTORIAL_VIEW_INDEX = 6;
   const [isTutorial, setIsTutorial] = useState(true);
-  const [isCredits, setIsCredits] = useState(true);
-
+  const [isCredits, setIsCredits] = useState(false);
+  const [isMale, setIsMale] = useState(false);
+  const [isTeammate, setIsTeammate] = useState(true);
   const [tutorialViewIndex, setTutorialViewIndex] = useState(-1);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const handleClickPlay = () =>
@@ -94,6 +95,10 @@ export const Home = () => {
           setPickedAbilities={setPickedAbilities}
           handleClickPlay={handleClickPlay}
           handleClickHome={handleClickHome}
+          isMale={isMale}
+          setIsMale={setIsMale}
+          isTeammate={isTeammate}
+          setIsTeammate={setIsTeammate}
         />
       ) : isCredits ? (
         <Credits handleClickHome={handleClickHome} />
@@ -102,6 +107,8 @@ export const Home = () => {
           pickedAbilities={pickedAbilities}
           handleClickGame={handleClickGame}
           handleClickHome={handleClickHome}
+          isMale={isMale}
+          isTeammate={isTeammate}
         />
       )}
     </>

@@ -28,18 +28,18 @@ const GameWrapper = styled.div`
   align-self: center;
   justify-content: space-between;
   /* width: auto; */
-  width: 1000px;
+  width: 800px;
   height: 100%;
 
   /* background-color: purple; */
   margin-top: 40px;
-  border-style: solid;
+  /* border-style: solid;
   border-thickness: thin;
-  border-radius: 10px;
+  border-radius: 10px; */
   /* background-color: #152642; */
-  border-color: #db974f;
+  /* border-color: #db974f; */
   overflow: hidden;
-  box-shadow: 3px 7px 10px black;
+  /* box-shadow: 3px 7px 10px black; */
 `;
 const ReplayTitle = styled.div`
   display: flex;
@@ -95,7 +95,13 @@ const ReplayModal = styled.div`
   ${props =>
     props.fontSize ? `font-size:${props.fontSize}px;` : "font-size:25px;"};
 `;
-export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
+export const Game = ({
+  pickedAbilities,
+  handleClickHome,
+  handleClickGame,
+  isMale,
+  isTeammate
+}) => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
@@ -145,7 +151,8 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       setClickedTile,
       setHoverRef,
       tileStatuses,
-      setTileStatuses
+      setTileStatuses,
+      isTeammate
     );
   }, []);
   useEffect(() => {
@@ -153,7 +160,8 @@ export const Game = ({ pickedAbilities, handleClickHome, handleClickGame }) => {
       const _winner = 0;
       setWinner(_winner);
     }
-    if (playerKillCount > 1) setWinner(-1);
+    console.log(playerData, playerKillCount);
+    if (playerKillCount >= playerData.length) setWinner(-1); // BUG!
   }, [kaijuKillCount, playerKillCount]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {

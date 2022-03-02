@@ -231,13 +231,15 @@ export const initializeGameBoard = (
   setClickedTile,
   setHoverRef,
   tileStatuses,
-  setTileStatuses
+  setTileStatuses,
+  isTeammate
 ) => {
   const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
   const teammateAbilities = getRandomAbilities();
-  for (let k = 0; k < 2; k++) {
+  const numPlayers = isTeammate ? 2 : 1;
+  for (let k = 0; k < numPlayers; k++) {
     const classDetails = lookupClassAndOrSetPassives(
       k === 0 ? pickedAbilities : teammateAbilities
     );

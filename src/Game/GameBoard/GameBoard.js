@@ -12,13 +12,13 @@ const Board = styled.div`
   height: 790px;
   minwidth: 790px;
   overflow: hidden;
-  border-top: 0px;
+  /* border-top: 0px;
   border-left: 0px;
-  border-bottom: 0px;
+  border-bottom: 0px; */
 
   border-style: solid;
   border-thickness: medium;
-  /* border-radius: 10px; */
+  border-radius: 10px;
   border-color: #db974f;
 `;
 const ShiftContentOver = styled.div`

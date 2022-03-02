@@ -13,9 +13,11 @@ const Wrapper = styled.div`
   height: 700px; */
   /* background-color: white; */
   align-self: center;
-  margin-left: 30px;
+  margin-top: 90px;
+
+  margin-left: -130px;
   margin-right: 30px;
-  height: 720px;
+  height: 350px;
 `;
 
 const ButtonGroup = styled.div`
@@ -112,7 +114,7 @@ export const UI = ({
       playerIndex={0}
     />
   );
-  const teammateUI = (
+  const teammateUI = playerData.length > 1 && (
     <PlayerUI
       playerData={playerData}
       kaijuData={kaijuData}
@@ -143,24 +145,24 @@ export const UI = ({
         {playerUI}
         {teammateUI}
       </div>
-      <DescriptionDisplay
-        playerData={playerData}
-        displayString={displayString}
-      />
-      <ButtonGroup>
-        <ButtonsWrapper>
-          <Button onClick={handleClickPause}>
-            <ButtonOutline zIndex={1} />
-            Pause
-          </Button>
-        </ButtonsWrapper>
-        <ButtonsWrapper>
-          <Button onClick={handleClickHome}>
-            <ButtonOutline zIndex={1} />
-            Home
-          </Button>
-        </ButtonsWrapper>
-      </ButtonGroup>
     </Wrapper>
   );
 };
+// <DescriptionDisplay
+//   playerData={playerData}
+//   displayString={displayString}
+// />
+// <ButtonGroup>
+//   <ButtonsWrapper>
+//     <Button onClick={handleClickPause}>
+//       <ButtonOutline zIndex={1} />
+//       Pause
+//     </Button>
+//   </ButtonsWrapper>
+//   <ButtonsWrapper>
+//     <Button onClick={handleClickHome}>
+//       <ButtonOutline zIndex={1} />
+//       Home
+//     </Button>
+//   </ButtonsWrapper>
+// </ButtonGroup>

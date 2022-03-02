@@ -157,6 +157,7 @@ export const PlayerUI = ({
         abilities={
           (playerData &&
             playerData.length &&
+            playerData[playerIndex] &&
             playerData[playerIndex].abilities) ||
           []
         }
