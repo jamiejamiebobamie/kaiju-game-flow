@@ -19,7 +19,6 @@ const Wrapper = styled.div`
   margin-right: 30px;
   height: 350px;
 `;
-
 const ButtonGroup = styled.div`
   position: absolute;
   bottom: 45px;
@@ -36,6 +35,9 @@ const ButtonGroup = styled.div`
   margin-bottom: 25px;
   margin-left: 50px;
   margin-right: 50px; */
+  display: flex;
+  flex-direction: column;
+  margin-left: 30px;
 `;
 const ButtonsWrapper = styled.div`
   position: relative;
@@ -43,7 +45,8 @@ const ButtonsWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
-  /* height: 100px; */
+  margin-bottom: 10px;
+  height: 40px;
 `;
 const Button = styled.div`
   display: flex;
@@ -88,6 +91,11 @@ const ButtonOutline = styled.div`
   border-right: 0.3px solid black;
   border-left: 0.3px solid black;
   border-bottom: 0.5px solid black;
+`;
+const Logo = styled.img`
+  position: absolute;
+  top: 10px;
+  right: 50px;
 `;
 export const UI = ({
   playerData,
@@ -135,15 +143,31 @@ export const UI = ({
         style={{
           display: "flex",
           flexDirection: "column",
-          // backgroundColor: "red",
-          // minWidth: "500px",
           width: "400px",
-          // height: "400px"
           alignSelf: "flex-end"
         }}
       >
+        <Logo src="logo1.png" />
         {playerUI}
         {teammateUI}
+        <ButtonGroup>
+          <div>
+            <ButtonsWrapper>
+              <Button onClick={handleClickPause}>
+                <ButtonOutline zIndex={1} />
+                Pause
+              </Button>
+            </ButtonsWrapper>
+          </div>
+          <div>
+            <ButtonsWrapper>
+              <Button onClick={handleClickHome}>
+                <ButtonOutline zIndex={1} />
+                Home
+              </Button>
+            </ButtonsWrapper>
+          </div>
+        </ButtonGroup>
       </div>
     </Wrapper>
   );
@@ -152,17 +176,3 @@ export const UI = ({
 //   playerData={playerData}
 //   displayString={displayString}
 // />
-// <ButtonGroup>
-//   <ButtonsWrapper>
-//     <Button onClick={handleClickPause}>
-//       <ButtonOutline zIndex={1} />
-//       Pause
-//     </Button>
-//   </ButtonsWrapper>
-//   <ButtonsWrapper>
-//     <Button onClick={handleClickHome}>
-//       <ButtonOutline zIndex={1} />
-//       Home
-//     </Button>
-//   </ButtonsWrapper>
-// </ButtonGroup>

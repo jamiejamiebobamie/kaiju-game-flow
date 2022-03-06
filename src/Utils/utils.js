@@ -682,7 +682,7 @@ export const updateTileState = (
                           nextTileForLightning.j
                         ][k] = {
                           dirs: [newDir],
-                          count: count - 1,
+                          count: count > 8 ? 8 : count - 1,
                           targetIndex,
                           startCount,
                           isInManaPool,

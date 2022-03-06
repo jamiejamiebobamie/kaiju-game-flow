@@ -83,6 +83,8 @@ const DescriptionDisplayWrapper = styled.div`
   justify-content: space-around;
   width: 100%;
   margin-top: 15px;
+  /* margin-bottom: 15px; */
+
   /* background-color: red; */
 `;
 export const ButtonGroup = styled.div`
@@ -149,7 +151,7 @@ const ClassTitlePopUp = styled.div`
   height: 200px;
   margin-left: -450px;
   margin-top: -150px;
-  color: #779b64;
+  color: #d064ed;
   z-index: 9999999999;
   opacity: 0;
   font-size: 50px;
@@ -181,7 +183,7 @@ const CheckboxWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   margin: 20px;
-  margin-top: -20px;
+  /* margin-top: -20px; */
 
   /* background-color: red; */
 `;
@@ -209,7 +211,7 @@ const Checkbox = styled.div`
   width: 10px;
   height: 10px;
   &:hover {
-    background-color: #779b64;
+    background-color: #d064ed;
   }
 `;
 const Checkmark = styled.i`

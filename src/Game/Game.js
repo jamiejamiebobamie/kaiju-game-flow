@@ -161,7 +161,8 @@ export const Game = ({
       setWinner(_winner);
     }
     console.log(playerData, playerKillCount);
-    if (playerKillCount >= playerData.length) setWinner(-1); // BUG!
+    if (playerData.length && playerKillCount >= playerData.length)
+      setWinner(-1); // BUG!
   }, [kaijuKillCount, playerKillCount]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {

@@ -44,10 +44,6 @@ export const Home = () => {
   };
   return (
     <>
-      <NavBar
-        handleClickHome={handleClickHome}
-        isLogoDisplayed={tutorialViewIndex !== -1}
-      />
       {tutorialViewIndex === -1 ? (
         <Wrapper>
           <Logo />
@@ -114,3 +110,7 @@ export const Home = () => {
     </>
   );
 };
+// <NavBar
+//   handleClickHome={handleClickHome}
+//   isLogoDisplayed={tutorialViewIndex !== -1}
+// />

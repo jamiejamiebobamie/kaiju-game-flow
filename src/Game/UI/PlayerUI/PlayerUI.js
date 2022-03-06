@@ -20,7 +20,6 @@ const Wrapper = styled.div`
   border-color: #db974f;
   box-shadow: 3px 7px 10px black;
   align-self: flex-end;
-
   border-style: solid;
   border-thickness: thin;
   border-color: #db974f;

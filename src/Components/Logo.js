@@ -10,8 +10,6 @@ import {
 import { SkyLineSVG } from "./SkyLineSVG";
 
 export const Logo = ({ isNavBar, handleClickHome, isDescription }) => {
-  // return isNavBar ? (
-  // ) : (
   return (
     <>
       <Title isDescription={isDescription}>
@@ -22,5 +20,3 @@ export const Logo = ({ isNavBar, handleClickHome, isDescription }) => {
     </>
   );
 };
-// <SkyLineSVG x={0} y={-30} zIndex={-100} />
-// <StyledStaticLogo onClick={handleClickHome} src="staticLogo.png" />

@@ -297,9 +297,11 @@ const Wrapper = styled.div`
     "padding: 20px; border-style: solid; border-thickness: thin; max-width: 400px;"}
   /* width: 100%; */
   width: 500px;
+  padding-left: 40px;
+  padding-right: 40px;
 
   height: 300px;
-  /* border-style: solid; */
+  border-style: solid;
   border-radius: 10px;
   border-color: #db974f;
   text-font: 30px;
