@@ -42,11 +42,7 @@ const getRandomAbilities = () => {
   return chosen.sort((a1, a2) => a1.localeCompare(a2));
 };
 
-export const lookupClassAndOrSetPassives = (
-  pickedAbilities,
-  setPlayerData,
-  setClassTitle
-) => {
+export const setPassives = (pickedAbilities, setPlayerData) => {
   const classLookup =
     pickedAbilities.length === 3 &&
     pickedAbilities
@@ -61,7 +57,6 @@ export const lookupClassAndOrSetPassives = (
   const abilities = pickedAbilities.map(
     ability => PLAYER_ABILITIES[ability.toLowerCase()]
   );
-  setClassTitle && playerClassObj && setClassTitle(playerClassObj.class_name);
   if (setPlayerData) {
     setPlayerData(_players => {
       return _players.map((p, i) => {
@@ -71,10 +66,10 @@ export const lookupClassAndOrSetPassives = (
         };
         return {
           ...newPlayer,
-          playerClass: playerClassObj && playerClassObj.class_name,
-          playerClassDescription:
-            playerClassObj && playerClassObj.player_class_description,
-          elements: classLookup,
+          // playerClass: playerClassObj && playerClassObj.class_name,
+          // playerClassDescription:
+          //   playerClassObj && playerClassObj.player_class_description,
+          // elements: classLookup,
           abilities: i === 0 ? abilities : []
         };
       });
@@ -240,7 +235,7 @@ export const initializeGameBoard = (
   const teammateAbilities = getRandomAbilities();
   const numPlayers = isTeammate ? 2 : 1;
   for (let k = 0; k < numPlayers; k++) {
-    const classDetails = lookupClassAndOrSetPassives(
+    const classDetails = setPassives(
       k === 0 ? pickedAbilities : teammateAbilities
     );
     const randomInt = getRandomIntInRange({

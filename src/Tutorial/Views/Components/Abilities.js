@@ -25,7 +25,7 @@ const AbilityTypeWrapper = styled.div`
   flex-direction: column;
   justify-content: space-around;
   border-radius: 30px;
-  border-style: solid;
+  // border-style: solid;
   border-width: thin;
   border-color: #db974f;
   padding: 10px;

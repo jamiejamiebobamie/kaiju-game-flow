@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
 import { GameMap } from "../../Components/GameMap.js";
 
-import { lookupClassAndOrSetPassives } from "../../Utils/utils";
+// import { lookupClassAndOrSetPassives } from "../../Utils/utils";
 import {
   Wrapper,
   TitleWrapper,
@@ -58,9 +58,9 @@ export const TutorialExplain = ({
     overflow:hidden;
     `;
   const mapStyles = `transform:scale(.5) translate(-125px);`;
-  useEffect(() => {
-    lookupClassAndOrSetPassives(pickedAbilities, setPlayerData);
-  }, [pickedAbilities]);
+  // useEffect(() => {
+  //   pickedAbilities && lookupClassAndOrSetPassives(pickedAbilities, setPlayerData);
+  // }, [pickedAbilities]);
   return (
     <Wrapper>
       <TitleWrapper>

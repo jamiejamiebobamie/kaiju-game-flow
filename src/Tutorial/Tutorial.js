@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import { ClassPicker } from "./Views/ClassPicker";
+// import { ClassPicker } from "./Views/ClassPicker";
 import { TutorialExplain } from "./Views/TutorialExplain";
 import { StyledIcon } from "./Views/Components/StyledComponents";
 import { PLAYER_ABILITIES } from "../Utils/gameState";
@@ -124,19 +124,7 @@ const TutorialWindowTitle = styled.div`
       ? `opacity:0; animation-name: titleFadeOut;`
       : `opacity:1; animation-name: titleFadeIn;`}
 `;
-export const Tutorial = ({
-  pickedAbilities,
-  setPickedAbilities,
-  handleClickPlay,
-  handleClickHome,
-  maxTutorialViewIndex,
-  tutorialViewIndex,
-  setTutorialViewIndex,
-  isMale,
-  setIsMale,
-  isTeammate,
-  setIsTeammate
-}) => {
+export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const tutorialSubjects = [
     "How to Move?",
     "Kaiju City?",
@@ -146,10 +134,12 @@ export const Tutorial = ({
     "Tile Statuses?",
     "Abilities?"
   ];
+  const maxTutorialViewIndex = 5;
   const width = 500;
   const height = 800;
   const scale = 0.3;
   const accTime = useRef(0);
+  const [tutorialViewIndex, setTutorialViewIndex] = useState(0);
   const [playerData, setPlayerData] = useState([]);
   const [shouldKaijuMove, setShouldKaijuMove] = useState(true);
   const [teleportData, setTeleportData] = useState([]);
@@ -169,43 +159,46 @@ export const Tutorial = ({
   const [backButtonContent, setBackButtonContent] = useState("");
   const [backButtonCallback, setBackButtonCallback] = useState(() => {});
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
-  const incrementTutorialViewIndex = () => {
-    setTutorialViewIndex(_i => (_i + 1 <= maxTutorialViewIndex ? _i + 1 : 0));
-  };
+  const incrementTutorialViewIndex = () =>
+    triggerTransition(() =>
+      setTutorialViewIndex(_i =>
+        _i + 1 <= maxTutorialViewIndex ? _i + 1 : handleClickHome()
+      )
+    );
   const decrementTutorialViewIndex = () => {
     setTutorialViewIndex(_i => (_i - 1 >= 0 ? _i - 1 : 0));
   };
-  useEffect(() => {
-    if (tutorialWindowTitle) {
-      let index = 7;
-      switch (tutorialWindowTitle) {
-        case "How to Move?":
-          index = 0;
-          break;
-        case "Kaiju City?":
-          index = 1;
-          break;
-        case "Kaiju?":
-          index = 2;
-          break;
-        case "You and Kaiju?":
-          index = 3;
-          break;
-        case "Teammate?":
-          index = 4;
-          break;
-        case "Tile Statuses?":
-          index = 5;
-          break;
-        case "Abilities?":
-          index = 5; // fix this.
-          break;
-      }
-      setTutorialViewIndex(index);
-    } else {
-      setTutorialViewIndex(7);
-    }
-  }, [tutorialWindowTitle]);
+  // useEffect(() => {
+  //   if (tutorialWindowTitle) {
+  //     let index = 7;
+  //     switch (tutorialWindowTitle) {
+  //       case "How to Move?":
+  //         index = 0;
+  //         break;
+  //       case "Kaiju City?":
+  //         index = 1;
+  //         break;
+  //       case "Kaiju?":
+  //         index = 2;
+  //         break;
+  //       case "You and Kaiju?":
+  //         index = 3;
+  //         break;
+  //       case "Teammate?":
+  //         index = 4;
+  //         break;
+  //       case "Tile Statuses?":
+  //         index = 5;
+  //         break;
+  //       case "Abilities?":
+  //         index = 5; // fix this.
+  //         break;
+  //     }
+  //     setTutorialViewIndex(index);
+  //   } else {
+  //     setTutorialViewIndex(7);
+  //   }
+  // }, [tutorialWindowTitle]);
   useEffect(() => {
     let playerSpawnPositions = [];
     let kaijuSpawnPositions = [];
@@ -218,7 +211,9 @@ export const Tutorial = ({
         setBackButtonContent("Home");
         setNextButtonContent("Got it!");
         setTitle(["This is you", "Click on a tile to walk to it"]);
-        setBackButtonCallback(() => () => handleClickHome()); // Toggle home screen
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => handleClickHome())
+        ); // Toggle home screen
         break;
       case 1:
         playerSpawnPositions = [];
@@ -227,7 +222,9 @@ export const Tutorial = ({
         setBackButtonContent("Back");
         setNextButtonContent("Yay!");
         setTitle(["This is Kaiju City"]);
-        setBackButtonCallback(() => decrementTutorialViewIndex);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => decrementTutorialViewIndex())
+        );
         break;
       case 2:
         playerSpawnPositions = [];
@@ -237,11 +234,13 @@ export const Tutorial = ({
         setNextButtonContent("Ok...");
         setTitle(["This is a Kaiju"]);
         setShouldKaijuMove(false);
-        setBackButtonCallback(() => decrementTutorialViewIndex);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => decrementTutorialViewIndex())
+        );
         break;
       case 3:
         playerSpawnPositions = [{ i: 11, j: 6 }];
-        // fix this... freezes witj Kaiju data.
+        // fix this... freezes with Kaiju data.
         kaijuSpawnPositions = [
           { i: 19, j: 3 },
           { i: 3, j: 3 },
@@ -251,7 +250,9 @@ export const Tutorial = ({
         setNextButtonContent("Oh no!");
         setTitle([`This is you and Kaiju`]);
         setShouldKaijuMove(true);
-        setBackButtonCallback(() => decrementTutorialViewIndex);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => decrementTutorialViewIndex())
+        );
         break;
       case 4:
         playerSpawnPositions = [
@@ -262,7 +263,9 @@ export const Tutorial = ({
         setBackButtonContent("Back");
         setNextButtonContent("Ok!");
         setTitle([`This is your teammate`]);
-        setBackButtonCallback(() => decrementTutorialViewIndex);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => decrementTutorialViewIndex())
+        );
         break;
       case 5:
         playerSpawnPositions = [
@@ -272,7 +275,7 @@ export const Tutorial = ({
         kaijuSpawnPositions = [{ i: 19, j: 3 }];
         abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
         setBackButtonContent("Back");
-        setNextButtonContent("Next");
+        setNextButtonContent("Home");
         setTitle([
           "You cast magic to attack and defend",
           <div
@@ -313,7 +316,9 @@ export const Tutorial = ({
             </div>
           </div>
         ]);
-        setBackButtonCallback(() => decrementTutorialViewIndex);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => decrementTutorialViewIndex())
+        );
         break;
       case maxTutorialViewIndex:
         playerSpawnPositions = [
@@ -449,7 +454,53 @@ export const Tutorial = ({
         ? 0
         : accTime.current + intervalTime;
   });
-  const content = tutorialWindowTitle && (
+  // const content = tutorialWindowTitle && (
+  //   <TutorialExplain
+  //     showCity={tutorialViewIndex === 1}
+  //     shiftContentOver={tutorialViewIndex === 6}
+  //     incrementTutorialViewIndex={incrementTutorialViewIndex}
+  //     decrementTutorialViewIndex={decrementTutorialViewIndex}
+  //     nextButtonContent={nextButtonContent}
+  //     backButtonContent={backButtonContent}
+  //     backButtonCallback={backButtonCallback}
+  //     title={title[0]}
+  //     title2={title.length > 1 && title.slice(1)}
+  //     isPaused={false}
+  //     powerUpData={[]}
+  //     playerData={playerData}
+  //     setPlayerData={setPlayerData}
+  //     setTeleportData={setTeleportData}
+  //     kaijuData={kaijuData}
+  //     setPlayerMoveToTiles={setPlayerMoveToTiles}
+  //     tileStatuses={tileStatuses}
+  //     setTileStatuses={setTileStatuses}
+  //     clickedTile={clickedTile}
+  //     setClickedTile={setClickedTile}
+  //     tiles={tiles}
+  //     path={path}
+  //     width={width}
+  //     height={height}
+  //     scale={scale}
+  //   />
+  // );
+  // need a child component that triggers the setTutorialWindowTitle,
+  // isHovered={tutorialViewIndex === i}
+
+  // const tutorialWindows = tutorialSubjects.map((title, i) => (
+  //   <TutorialWindow
+  //     key={`${title}`}
+  //     isHovered={tutorialWindowTitle === { title }}
+  //     tutorialWindowTitle={tutorialWindowTitle}
+  //     ref={setTutorialWindowTitle(title)}
+  //     aD={i * -4}
+  //   >
+  //     <TutorialWindowTitle isHovered={tutorialWindowTitle === { title }}>
+  //       {title}
+  //     </TutorialWindowTitle>
+  //     {tutorialWindowTitle === title && content}
+  //   </TutorialWindow>
+  // ));
+  return (
     <TutorialExplain
       showCity={tutorialViewIndex === 1}
       shiftContentOver={tutorialViewIndex === 6}
@@ -460,8 +511,6 @@ export const Tutorial = ({
       backButtonCallback={backButtonCallback}
       title={title[0]}
       title2={title.length > 1 && title.slice(1)}
-      pickedAbilities={pickedAbilities}
-      setPickedAbilities={setPickedAbilities}
       isPaused={false}
       powerUpData={[]}
       playerData={playerData}
@@ -479,57 +528,43 @@ export const Tutorial = ({
       height={height}
       scale={scale}
     />
-  );
-  // need a child component that triggers the setTutorialWindowTitle,
-  // isHovered={tutorialViewIndex === i}
-
-  const tutorialWindows = tutorialSubjects.map((title, i) => (
-    <TutorialWindow
-      key={`${title}`}
-      isHovered={tutorialWindowTitle === { title }}
-      tutorialWindowTitle={tutorialWindowTitle}
-      ref={setTutorialWindowTitle(title)}
-      aD={i * -4}
-    >
-      <TutorialWindowTitle isHovered={tutorialWindowTitle === { title }}>
-        {title}
-      </TutorialWindowTitle>
-      {tutorialWindowTitle === title && content}
-    </TutorialWindow>
-  ));
-  return tutorialViewIndex === maxTutorialViewIndex ? (
-    <ClassPicker
-      incrementTutorialViewIndex={incrementTutorialViewIndex}
-      decrementTutorialViewIndex={decrementTutorialViewIndex}
-      pickedAbilities={pickedAbilities}
-      setPickedAbilities={setPickedAbilities}
-      handleClickPlay={handleClickPlay}
-      isPaused={false}
-      powerUpData={[]}
-      playerData={playerData}
-      setPlayerData={setPlayerData}
-      setTeleportData={setTeleportData}
-      kaijuData={kaijuData}
-      setPlayerMoveToTiles={setPlayerMoveToTiles}
-      tileStatuses={tileStatuses}
-      setTileStatuses={setTileStatuses}
-      clickedTile={clickedTile}
-      setClickedTile={setClickedTile}
-      tiles={tiles}
-      path={path}
-      width={width}
-      height={height}
-      scale={scale}
-      numAbilitiesToPick={3}
-      isMale={isMale}
-      setIsMale={setIsMale}
-      isTeammate={isTeammate}
-      setIsTeammate={setIsTeammate}
-    />
-  ) : (
-    <TutorialWrapper>{tutorialWindows}</TutorialWrapper>
   );
 };
+
+//   tutorialViewIndex === maxTutorialViewIndex ?
+// <ClassPicker
+//   incrementTutorialViewIndex={incrementTutorialViewIndex}
+//   decrementTutorialViewIndex={decrementTutorialViewIndex}
+//   pickedAbilities={pickedAbilities}
+//   setPickedAbilities={setPickedAbilities}
+//   handleClickPlay={handleClickPlay}
+//   isPaused={false}
+//   powerUpData={[]}
+//   playerData={playerData}
+//   setPlayerData={setPlayerData}
+//   setTeleportData={setTeleportData}
+//   kaijuData={kaijuData}
+//   setPlayerMoveToTiles={setPlayerMoveToTiles}
+//   tileStatuses={tileStatuses}
+//   setTileStatuses={setTileStatuses}
+//   clickedTile={clickedTile}
+//   setClickedTile={setClickedTile}
+//   tiles={tiles}
+//   path={path}
+//   width={width}
+//   height={height}
+//   scale={scale}
+//   numAbilitiesToPick={3}
+//   isMale={isMale}
+//   setIsMale={setIsMale}
+//   isTeammate={isTeammate}
+//   setIsTeammate={setIsTeammate}
+// /> :
+
+// ) : (
+//   <TutorialWrapper>{tutorialWindows}</TutorialWrapper>
+// );
+
 // <TutorialWindow
 //   isHovered={tutorialWindowTitle === "How to Move?"}
 //   tutorialWindowTitle={tutorialWindowTitle}

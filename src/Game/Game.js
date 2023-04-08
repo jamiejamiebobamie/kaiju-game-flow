@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
+import { ClassPicker } from "./ClassPicker";
+
 import {
   useInterval,
   useKeyPress,
@@ -95,17 +97,15 @@ const ReplayModal = styled.div`
   ${props =>
     props.fontSize ? `font-size:${props.fontSize}px;` : "font-size:25px;"};
 `;
-export const Game = ({
-  pickedAbilities,
-  handleClickHome,
-  handleClickGame,
-  isMale,
-  isTeammate
-}) => {
+export const Game = ({ handleClickHome, triggerTransition }) => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
   const accTime = useRef(0);
+  const [isMale, setIsMale] = useState(true);
+  const [isTeammate, setIsTeammate] = useState(false);
+  const [pickedAbilities, setPickedAbilities] = useState([]);
+  const [isPlayingGame, setIsPlayingGame] = useState(false);
   const [winner, setWinner] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
@@ -123,6 +123,51 @@ export const Game = ({
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(1);
   const [replayModalMessage, setReplayModalMessage] = useState(null);
+
+  // useEffect(() => {
+  //   console.log({
+  //     isMale,
+  //     isTeammate,
+  //     isPlayingGame,
+  //     winner,
+  //     pickedAbilities,
+  //     isPaused,
+  //     dmgArray,
+  //     playerKillCount,
+  //     kaijuKillCount,
+  //     playerData,
+  //     teleportData,
+  //     tileStatuses,
+  //     kaijuData,
+  //     tiles,
+  //     clickedTile,
+  //     playerMoveToTiles,
+  //     highlightedTiles0,
+  //     path,
+  //     replayModalMessage
+  //   });
+  // }, [
+  //   isMale,
+  //   isTeammate,
+  //   isPlayingGame,
+  //   winner,
+  //   pickedAbilities,
+  //   isPaused,
+  //   dmgArray,
+  //   playerKillCount,
+  //   kaijuKillCount,
+  //   playerData,
+  //   teleportData,
+  //   tileStatuses,
+  //   kaijuData,
+  //   tiles,
+  //   clickedTile,
+  //   playerMoveToTiles,
+  //   highlightedTiles0,
+  //   path,
+  //   replayModalMessage
+  // ]);
+
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const handleClickPause = () => {
     setIsPaused(_isPaused => !_isPaused);
@@ -138,31 +183,36 @@ export const Game = ({
     },
     ["Escape"]
   );
-  useEffect(() => {
-    initializeGameBoard(
-      playerData,
-      setPlayerData,
-      pickedAbilities,
-      kaijuData,
-      width,
-      height,
-      scale,
-      setTiles,
-      setClickedTile,
-      setHoverRef,
-      tileStatuses,
-      setTileStatuses,
-      isTeammate
-    );
-  }, []);
+  // useEffect(() => {
+  //   setWinner(null);
+  //   setIntervalTime(1);
+  //   setPlayerKillCount(0);
+  //   setKaijuData([]);
+  //   setKaijuData([]);
+  //   setHighlightedTiles0([]);
+  //   initializeGameBoard(
+  //     playerData,
+  //     setPlayerData,
+  //     pickedAbilities,
+  //     kaijuData,
+  //     width,
+  //     height,
+  //     scale,
+  //     setTiles,
+  //     setClickedTile,
+  //     setHoverRef,
+  //     tileStatuses,
+  //     setTileStatuses,
+  //     isTeammate
+  //   );
+  // }, [isPlayingGame]);
   useEffect(() => {
     if (kaijuKillCount.length >= 5) {
       const _winner = 0;
       setWinner(_winner);
     }
-    console.log(playerData, playerKillCount);
     if (playerData.length && playerKillCount >= playerData.length)
-      setWinner(-1); // BUG!
+      setWinner(-1);
   }, [kaijuKillCount, playerKillCount]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
@@ -217,6 +267,7 @@ export const Game = ({
             ];
             break;
         }
+        setKaijuData([]);
         setReplayModalMessage(message);
         setIntervalTime(null);
       }
@@ -293,7 +344,57 @@ export const Game = ({
         ? 0
         : accTime.current + intervalTime;
   }, intervalTime);
-  return (
+  return !isPlayingGame ? (
+    <ClassPicker
+      handleClickHome={handleClickHome}
+      pickedAbilities={pickedAbilities}
+      setPickedAbilities={setPickedAbilities}
+      handleClickPlay={() => {
+        setWinner(null);
+        setIntervalTime(1);
+        setPlayerKillCount(0);
+        setKaijuData([]);
+        setHighlightedTiles0([]);
+        initializeGameBoard(
+          playerData,
+          setPlayerData,
+          pickedAbilities,
+          kaijuData,
+          width,
+          height,
+          scale,
+          setTiles,
+          setClickedTile,
+          setHoverRef,
+          tileStatuses,
+          setTileStatuses,
+          isTeammate
+        );
+        triggerTransition(() => setIsPlayingGame(bool => !bool), 500);
+      }}
+      isPaused={false}
+      powerUpData={[]}
+      playerData={playerData}
+      setPlayerData={setPlayerData}
+      setTeleportData={setTeleportData}
+      kaijuData={kaijuData}
+      setPlayerMoveToTiles={setPlayerMoveToTiles}
+      tileStatuses={tileStatuses}
+      setTileStatuses={setTileStatuses}
+      clickedTile={clickedTile}
+      setClickedTile={setClickedTile}
+      tiles={tiles}
+      path={path}
+      width={width}
+      height={height}
+      scale={scale}
+      numAbilitiesToPick={3}
+      isMale={isMale}
+      setIsMale={setIsMale}
+      isTeammate={isTeammate}
+      setIsTeammate={setIsTeammate}
+    />
+  ) : (
     <GameWrapper>
       {replayModalMessage && (
         <ReplayModal>
@@ -315,7 +416,19 @@ export const Game = ({
               </Button>
             </ButtonsWrapper>
             <ButtonsWrapper>
-              <Button onClick={handleClickGame}>
+              <Button
+                onClick={() =>
+                  triggerTransition(() => {
+                    setPickedAbilities([]);
+                    setIsPlayingGame(false);
+                    setReplayModalMessage(null);
+                    // setWinner(null);
+                    // setIntervalTime(1);
+                    // setPlayerKillCount(0);
+                    // setKaijuData([]);
+                  })
+                }
+              >
                 <ButtonOutline zIndex={1} />
                 Play Again
               </Button>

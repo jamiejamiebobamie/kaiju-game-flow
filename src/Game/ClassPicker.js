@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Abilities } from "./Components/Abilities";
-import { TutorialGameBoard } from "./Components/TutorialGameBoard";
-import { DescriptionDisplay } from "../../Game/UI/DescriptionDisplay";
-import { lookupClassAndOrSetPassives } from "../../Utils/utils";
+import { Abilities } from "../Tutorial/Views/Components/Abilities";
+import { TutorialGameBoard } from "../Tutorial/Views/Components/TutorialGameBoard";
+import { DescriptionDisplay } from "./UI/DescriptionDisplay";
+import { setPassives } from "../Utils/utils";
 import {
   ButtonsWrapper,
   Button,
   ButtonOutline
-} from "./Components/StyledComponents";
+} from "../Components/StyledComponents";
 
 const ClassPickerWrapper = styled.div`
   display: flex;
@@ -19,6 +19,7 @@ const ClassPickerWrapper = styled.div`
   background-color: #152642;
 
   flex-direction: column;
+  justify-content: center;
   align-self: center;
   align-items: center;
   border-radius: 10px;
@@ -58,6 +59,7 @@ const AbilityButtonsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  // border: 1px solid white;
   width: 100%;
   overflow: hidden;
   overflow-x: hidden;
@@ -69,7 +71,7 @@ const AbilityButtonsWrapper = styled.div`
   }
 `;
 const Title = styled.div`
-  font-size: 20px;
+  font-size: 29px;
   font-alignment: 30px;
   display: flex;
   align-self: flex-start;
@@ -83,9 +85,6 @@ const DescriptionDisplayWrapper = styled.div`
   justify-content: space-around;
   width: 100%;
   margin-top: 15px;
-  /* margin-bottom: 15px; */
-
-  /* background-color: red; */
 `;
 export const ButtonGroup = styled.div`
   /* position: absolute; */
@@ -138,46 +137,46 @@ const PlayButton = styled.div`
   }
   font-size: 20px;
 `;
-const ClassTitlePopUp = styled.div`
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  justify-content: center;
-  pointer-events: none;
-  left: 50%;
-  top: 45%;
-  width: 900px;
-  height: 200px;
-  margin-left: -450px;
-  margin-top: -150px;
-  color: #d064ed;
-  z-index: 9999999999;
-  opacity: 0;
-  font-size: 50px;
-  -webkit-animation-duration: 3s;
-  animation-duration: 3s;
-  -webkit-animation-name: fadeInFadeOutUp;
-  animation-name: fadeInRight;
-  @keyframes fadeInRight {
-    0% {
-      opacity: 0;
-      transform: translateY(0px);
-    }
-    50% {
-      opacity: 1;
-      transform: translateY(20px);
-    }
-    70% {
-      opacity: 1;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(0px);
-    }
-  }
-`;
+// const ClassTitlePopUp = styled.div`
+//   position: absolute;
+//   display: flex;
+//   flex-direction: column;
+//   text-align: center;
+//   justify-content: center;
+//   pointer-events: none;
+//   left: 50%;
+//   top: 45%;
+//   width: 900px;
+//   height: 200px;
+//   margin-left: -450px;
+//   margin-top: -150px;
+//   color: #d064ed;
+//   z-index: 9999999999;
+//   opacity: 0;
+//   font-size: 50px;
+//   -webkit-animation-duration: 3s;
+//   animation-duration: 3s;
+//   -webkit-animation-name: fadeInFadeOutUp;
+//   animation-name: fadeInRight;
+//   @keyframes fadeInRight {
+//     0% {
+//       opacity: 0;
+//       transform: translateY(0px);
+//     }
+//     50% {
+//       opacity: 1;
+//       transform: translateY(20px);
+//     }
+//     70% {
+//       opacity: 1;
+//       transform: translateY(20px);
+//     }
+//     100% {
+//       opacity: 0;
+//       transform: translateY(0px);
+//     }
+//   }
+// `;
 const CheckboxWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -199,6 +198,7 @@ const CheckboxText = styled.div`
   width: 200px;
   margin: 10px;
   color: #db974f;
+  // font-size: 19px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
 `;
@@ -219,6 +219,7 @@ const Checkmark = styled.i`
   margin-top: -5px;
 `;
 export const ClassPicker = ({
+  handleClickHome,
   pickedAbilities,
   setPickedAbilities,
   handleClickPlay,
@@ -245,7 +246,6 @@ export const ClassPicker = ({
   setIsTeammate
 }) => {
   const [displayString, setDisplayString] = useState(null);
-  const [classTitle, setClassTitle] = useState("");
   const handleChange = element => {
     if (pickedAbilities.includes(element)) {
       const _pickedAbilities = [...pickedAbilities, element]
@@ -259,69 +259,73 @@ export const ClassPicker = ({
       setPickedAbilities(_pickedAbilities);
     }
   };
-  useEffect(() => {
-    lookupClassAndOrSetPassives(pickedAbilities, setPlayerData, setClassTitle);
-  }, [pickedAbilities]);
-  useEffect(() => {
-    if (classTitle) setTimeout(() => setClassTitle(null), 3000);
-  }, [classTitle]);
+  // <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
   return (
-    <ClassPickerWrapper>
-      {classTitle && <ClassTitlePopUp>You are a {classTitle}</ClassTitlePopUp>}
-      <AbilityButtonsWrapper>
-        <div style={{ height: "75px" }}>
-          <br />
-          <Title>Choose your abilities</Title>
-          <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
-        </div>
-        <Abilities
-          handleChange={handleChange}
-          pickedAbilities={pickedAbilities}
-          setDisplayString={setDisplayString}
-        />
-      </AbilityButtonsWrapper>
-      <DescriptionDisplayWrapper>
-        <DescriptionDisplay
-          isClassWrapper={true}
-          displayString={displayString}
-          pickedAbilities={pickedAbilities}
-          playerData={playerData}
-          isTutorial={true}
-        />
-      </DescriptionDisplayWrapper>
-      <CheckboxWrapper>
-        <GenderWrapper>
+    <>
+      <ClassPickerWrapper>
+        <AbilityButtonsWrapper>
+          <div style={{ height: "75px" }}>
+            <br />
+            <Title>Choose your abilities!</Title>
+          </div>
+          <Abilities
+            handleChange={handleChange}
+            pickedAbilities={pickedAbilities}
+            setDisplayString={setDisplayString}
+          />
+        </AbilityButtonsWrapper>
+        <DescriptionDisplayWrapper>
+          <DescriptionDisplay
+            isClassWrapper={true}
+            displayString={displayString}
+            pickedAbilities={pickedAbilities}
+            playerData={playerData}
+            isTutorial={true}
+          />
+        </DescriptionDisplayWrapper>
+        <CheckboxWrapper>
+          <GenderWrapper>
+            <CheckboxText>
+              Male
+              <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
+                {isMale && <Checkmark className="fa fa-check" />}
+              </Checkbox>
+            </CheckboxText>
+            <CheckboxText>
+              Female
+              <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
+                {!isMale && <Checkmark className="fa fa-check" />}
+              </Checkbox>
+            </CheckboxText>
+          </GenderWrapper>
           <CheckboxText>
-            Male
-            <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
-              {isMale && <Checkmark className="fa fa-check" />}
+            Teammate?
+            <Checkbox onClick={() => setIsTeammate(_isT => !_isT)}>
+              {isTeammate && <Checkmark className="fa fa-check" />}
             </Checkbox>
           </CheckboxText>
-          <CheckboxText>
-            Female
-            <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
-              {!isMale && <Checkmark className="fa fa-check" />}
-            </Checkbox>
-          </CheckboxText>
-        </GenderWrapper>
-        <CheckboxText>
-          Teammate?
-          <Checkbox onClick={() => setIsTeammate(_isT => !_isT)}>
-            {isTeammate && <Checkmark className="fa fa-check" />}
-          </Checkbox>
-        </CheckboxText>
-      </CheckboxWrapper>
-      <ButtonGroup>
-        <ButtonsWrapper>
-          <Button onClick={handleClickPlay}>
-            <ButtonOutline zIndex={1} />
-            Play!
-          </Button>
-        </ButtonsWrapper>
-      </ButtonGroup>
-    </ClassPickerWrapper>
+        </CheckboxWrapper>
+        <ButtonGroup>
+          <ButtonsWrapper>
+            <Button onClick={handleClickPlay}>
+              <ButtonOutline zIndex={1} />
+              Play!
+            </Button>
+          </ButtonsWrapper>
+        </ButtonGroup>
+        <ButtonGroup>
+          <ButtonsWrapper>
+            <Button onClick={handleClickHome}>
+              <ButtonOutline zIndex={1} />
+              Home
+            </Button>
+          </ButtonsWrapper>
+        </ButtonGroup>
+      </ClassPickerWrapper>
+    </>
   );
 };
+
 // <PlayButton onClick={handleClickPlay}>Play!</PlayButton>
 
 // <TutorialGameBoard

@@ -18,6 +18,7 @@ const Wrapper = styled.div`
   margin-left: -130px;
   margin-right: 30px;
   height: 350px;
+  z-index: 999999999;
 `;
 const ButtonGroup = styled.div`
   position: absolute;
@@ -94,8 +95,8 @@ const ButtonOutline = styled.div`
 `;
 const Logo = styled.img`
   position: absolute;
-  top: 10px;
-  right: 50px;
+  top: 55px;
+  right: 65px;
 `;
 export const UI = ({
   playerData,

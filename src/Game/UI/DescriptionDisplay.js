@@ -1,7 +1,53 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Logo } from "../../Components/Logo";
-
+const ICON_LOOKUP = {
+  heart: {
+    Passive: "fa-gratipay",
+    Active: "fa-heart",
+    loader: "fa-spinner"
+  },
+  glass: {
+    Passive: "fa-tencent-weibo",
+    Active: "fa-ravelry",
+    loader: "fa-spinner"
+  },
+  fire: {
+    Passive: "fa-fire",
+    Active: "fa-free-code-camp",
+    loader: "fa-spinner"
+  },
+  wood: {
+    Passive: "fa-tree",
+    Active: "fa-leaf",
+    loader: "fa-spinner"
+  },
+  lightning: {
+    Passive: "fa-hourglass-half",
+    Active: "fa-bolt",
+    loader: "fa-spinner"
+  },
+  death: {
+    Passive: "fa-heartbeat",
+    Active: "fa-snapchat-ghost",
+    loader: "fa-spinner"
+  },
+  bubble: {
+    Passive: "fa-universal-access",
+    Active: "fa-question-circle-o",
+    loader: "fa-spinner"
+  },
+  metal: {
+    Passive: "fa-wrench",
+    Active: "fa-shield",
+    loader: "fa-spinner"
+  },
+  ice: {
+    Passive: "fa-thermometer-quarter",
+    Active: "fa-snowflake-o",
+    loader: "fa-spinner"
+  }
+};
 const getDescription = (string, playerData, playerIndex) => {
   switch (string) {
     case "modifiers":
@@ -288,6 +334,13 @@ const getDescription = (string, playerData, playerIndex) => {
       };
   }
 };
+const AbilityIcon = styled.i`
+  z-index: ${props => props.i};
+  justify-self: center;
+  align-self: center;
+  transform: scale(2);
+  color: ${props => (props.color ? props.color : "grey")};
+`;
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -300,16 +353,21 @@ const Wrapper = styled.div`
   padding-left: 40px;
   padding-right: 40px;
 
-  height: 300px;
+  // height: 300px;
   border-style: solid;
   border-radius: 10px;
   border-color: #db974f;
-  text-font: 30px;
+  // text-font: 30px;
   font-alignment: 30px;
   color: #db974f;
   /* background-color: green; */
   /* box-shadow: 3px 7px 10px black; */
   align-self: flex-end;
+  ${props =>
+    props.isContent
+      ? "height: 300px; border-width: 1px;"
+      : "height: 0px; border-width: 0px;"}
+  transition: height 1s, border-width 1s;
 `;
 export const DescriptionDisplay = ({
   hoveredContent = null,
@@ -319,22 +377,51 @@ export const DescriptionDisplay = ({
   pickedAbilities,
   isTutorial
 }) => {
+  const isContentRef = useRef(false);
+  const [isContent, setIsContent] = useState(true);
+  const [hasHovered, setHasHovered] = useState(false);
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
   const { title, description, effect1, effect2, img } = (displayString &&
-    getDescription(_string, playerData, Number(playerIndex))) ||
-    (isClassWrapper &&
-      pickedAbilities &&
-      pickedAbilities.length === 3 &&
-      getDescription("class", playerData, 0)) || {
-      title: "",
-      description: "",
-      img: "",
-      formatData: {}
-    };
+    getDescription(_string, playerData, Number(playerIndex))) || {
+    //   getDescription("class", playerData, 0)) //   pickedAbilities.length === 3 && //   pickedAbilities && // (isClassWrapper && // ||
+    title: "",
+    description: "",
+    img: "",
+    formatData: {}
+  };
+  useEffect(() => {
+    console.log(title);
+    if (!!title) {
+      setIsContent(true);
+      !hasHovered && setHasHovered(true);
+      isContentRef && clearTimeout(isContentRef.current);
+    } else {
+      if (hasHovered) {
+        isContentRef.current = setTimeout(() => setIsContent(false), 3000);
+      }
+    }
+  }, [title]);
   return (
-    <Wrapper isClassWrapper={isClassWrapper}>
-      <h2>{!isTutorial && !title ? <Logo isDescription={true} /> : title}</h2>
+    <Wrapper isContent={isContent} isClassWrapper={isClassWrapper}>
+      <h2
+        style={{
+          display: "flex",
+          justifyContent: "space-between"
+        }}
+      >
+        {!isTutorial && !title ? <Logo isDescription={true} /> : title}
+        {!!title && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end"
+            }}
+          >
+            <AbilityIcon color={"#db974f"} className={`fa fa-snowflake-o`} />
+          </div>
+        )}
+      </h2>
       <p>{description}</p>
       <p>{effect1}</p>
       <p>{effect2}</p>
