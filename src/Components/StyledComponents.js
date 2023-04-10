@@ -163,5 +163,6 @@ export const StyledSciFiTextShadow = styled.p`
 `;
 export const StyledStaticLogo = styled.img`
   cursor: pointer;
-  margin-left: 30px;
+  // margin-left: 30px;
+  width: 400px;
 `;

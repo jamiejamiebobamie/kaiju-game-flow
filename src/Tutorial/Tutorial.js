@@ -1,9 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-// import { ClassPicker } from "./Views/ClassPicker";
-import { TutorialExplain } from "./Views/TutorialExplain";
-import { StyledIcon } from "./Views/Components/StyledComponents";
-import { PLAYER_ABILITIES } from "../Utils/gameState";
+import { StyledIcon } from "./Components/StyledComponents";
+import { PLAYER_ABILITIES } from "Utils/gameState";
 import {
   useInterval,
   useHover,
@@ -15,7 +13,19 @@ import {
   initializeTutorialGameBoard,
   areTilesAdjacent,
   getAdjacentTilesTutorial
-} from "../Utils/utils";
+} from "Utils/utils";
+import { TutorialGameBoard } from "./Components/TutorialGameBoard";
+import { GameMap } from "Components/GameMap.js";
+import {
+  Wrapper,
+  TitleWrapper,
+  Title,
+  ButtonsWrapper,
+  Button,
+  ButtonGroup,
+  ButtonOutline,
+  BackgroundImage
+} from "./Components/StyledComponents";
 
 const TutorialWrapper = styled.div`
   display: flex;
@@ -90,11 +100,6 @@ const TutorialWindow = styled.div`
   transition: 4s;
   animation-name: goAround;
 `;
-// ${props =>
-//   props.isHovered ? `animation-name: "";` : `animation-name: goAround;`}
-// transform: scale(1) translate(0) rotateX(0deg) rotateY(0deg);
-// width: 700px;
-// height: 900px;
 const TutorialWindowTitle = styled.div`
   position: absolute;
   z-index: 5;
@@ -168,37 +173,6 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const decrementTutorialViewIndex = () => {
     setTutorialViewIndex(_i => (_i - 1 >= 0 ? _i - 1 : 0));
   };
-  // useEffect(() => {
-  //   if (tutorialWindowTitle) {
-  //     let index = 7;
-  //     switch (tutorialWindowTitle) {
-  //       case "How to Move?":
-  //         index = 0;
-  //         break;
-  //       case "Kaiju City?":
-  //         index = 1;
-  //         break;
-  //       case "Kaiju?":
-  //         index = 2;
-  //         break;
-  //       case "You and Kaiju?":
-  //         index = 3;
-  //         break;
-  //       case "Teammate?":
-  //         index = 4;
-  //         break;
-  //       case "Tile Statuses?":
-  //         index = 5;
-  //         break;
-  //       case "Abilities?":
-  //         index = 5; // fix this.
-  //         break;
-  //     }
-  //     setTutorialViewIndex(index);
-  //   } else {
-  //     setTutorialViewIndex(7);
-  //   }
-  // }, [tutorialWindowTitle]);
   useEffect(() => {
     let playerSpawnPositions = [];
     let kaijuSpawnPositions = [];
@@ -213,7 +187,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         setTitle(["This is you", "Click on a tile to walk to it"]);
         setBackButtonCallback(() => () =>
           triggerTransition(() => handleClickHome())
-        ); // Toggle home screen
+        );
         break;
       case 1:
         playerSpawnPositions = [];
@@ -240,7 +214,6 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         break;
       case 3:
         playerSpawnPositions = [{ i: 11, j: 6 }];
-        // fix this... freezes with Kaiju data.
         kaijuSpawnPositions = [
           { i: 19, j: 3 },
           { i: 3, j: 3 },
@@ -454,188 +427,67 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         ? 0
         : accTime.current + intervalTime;
   });
-  // const content = tutorialWindowTitle && (
-  //   <TutorialExplain
-  //     showCity={tutorialViewIndex === 1}
-  //     shiftContentOver={tutorialViewIndex === 6}
-  //     incrementTutorialViewIndex={incrementTutorialViewIndex}
-  //     decrementTutorialViewIndex={decrementTutorialViewIndex}
-  //     nextButtonContent={nextButtonContent}
-  //     backButtonContent={backButtonContent}
-  //     backButtonCallback={backButtonCallback}
-  //     title={title[0]}
-  //     title2={title.length > 1 && title.slice(1)}
-  //     isPaused={false}
-  //     powerUpData={[]}
-  //     playerData={playerData}
-  //     setPlayerData={setPlayerData}
-  //     setTeleportData={setTeleportData}
-  //     kaijuData={kaijuData}
-  //     setPlayerMoveToTiles={setPlayerMoveToTiles}
-  //     tileStatuses={tileStatuses}
-  //     setTileStatuses={setTileStatuses}
-  //     clickedTile={clickedTile}
-  //     setClickedTile={setClickedTile}
-  //     tiles={tiles}
-  //     path={path}
-  //     width={width}
-  //     height={height}
-  //     scale={scale}
-  //   />
-  // );
-  // need a child component that triggers the setTutorialWindowTitle,
-  // isHovered={tutorialViewIndex === i}
-
-  // const tutorialWindows = tutorialSubjects.map((title, i) => (
-  //   <TutorialWindow
-  //     key={`${title}`}
-  //     isHovered={tutorialWindowTitle === { title }}
-  //     tutorialWindowTitle={tutorialWindowTitle}
-  //     ref={setTutorialWindowTitle(title)}
-  //     aD={i * -4}
-  //   >
-  //     <TutorialWindowTitle isHovered={tutorialWindowTitle === { title }}>
-  //       {title}
-  //     </TutorialWindowTitle>
-  //     {tutorialWindowTitle === title && content}
-  //   </TutorialWindow>
-  // ));
+  const borderStyles = `
+    position:relative;
+    width:245px;
+    height:395px;
+    background-repeat: no-repeat;
+    margin-bottom: 30px;
+    border-radius: 5px;
+    border-style: solid;
+    border-thickness: thick;
+    border-color: #db974f;
+    box-shadow: 3px 7px 10px black;
+    overflow:hidden;
+    `;
+  const mapStyles = `transform:scale(.5) translate(-125px);`;
+  const shiftContentOver = tutorialViewIndex === 6;
   return (
-    <TutorialExplain
-      showCity={tutorialViewIndex === 1}
-      shiftContentOver={tutorialViewIndex === 6}
-      incrementTutorialViewIndex={incrementTutorialViewIndex}
-      decrementTutorialViewIndex={decrementTutorialViewIndex}
-      nextButtonContent={nextButtonContent}
-      backButtonContent={backButtonContent}
-      backButtonCallback={backButtonCallback}
-      title={title[0]}
-      title2={title.length > 1 && title.slice(1)}
-      isPaused={false}
-      powerUpData={[]}
-      playerData={playerData}
-      setPlayerData={setPlayerData}
-      setTeleportData={setTeleportData}
-      kaijuData={kaijuData}
-      setPlayerMoveToTiles={setPlayerMoveToTiles}
-      tileStatuses={tileStatuses}
-      setTileStatuses={setTileStatuses}
-      clickedTile={clickedTile}
-      setClickedTile={setClickedTile}
-      tiles={tiles}
-      path={path}
-      width={width}
-      height={height}
-      scale={scale}
-    />
+    <Wrapper>
+      <TitleWrapper>
+        <Title>{title[0]}</Title>
+      </TitleWrapper>
+      {tutorialViewIndex === 1 ? (
+        <GameMap borderStyles={borderStyles} mapStyles={mapStyles} />
+      ) : (
+        <TutorialGameBoard
+          shiftContentOver={shiftContentOver}
+          isPaused={false}
+          playerData={playerData}
+          setPlayerData={setPlayerData}
+          setTeleportData={setTeleportData}
+          kaijuData={kaijuData}
+          setPlayerMoveToTiles={setPlayerMoveToTiles}
+          tileStatuses={tileStatuses}
+          setTileStatuses={setTileStatuses}
+          clickedTile={clickedTile}
+          setClickedTile={setClickedTile}
+          tiles={tiles}
+          path={path}
+          width={width}
+          height={height}
+          scale={scale}
+        />
+      )}
+      {!!title[1] && (
+        <TitleWrapper>
+          <Title>{title[1]}</Title>
+        </TitleWrapper>
+      )}
+      <ButtonGroup>
+        <ButtonsWrapper>
+          <Button onClick={backButtonCallback}>
+            <ButtonOutline zIndex={1} />
+            {backButtonContent}
+          </Button>
+        </ButtonsWrapper>
+        <ButtonsWrapper>
+          <Button onClick={() => incrementTutorialViewIndex()}>
+            <ButtonOutline zIndex={1} />
+            {nextButtonContent}
+          </Button>
+        </ButtonsWrapper>
+      </ButtonGroup>
+    </Wrapper>
   );
 };
-
-//   tutorialViewIndex === maxTutorialViewIndex ?
-// <ClassPicker
-//   incrementTutorialViewIndex={incrementTutorialViewIndex}
-//   decrementTutorialViewIndex={decrementTutorialViewIndex}
-//   pickedAbilities={pickedAbilities}
-//   setPickedAbilities={setPickedAbilities}
-//   handleClickPlay={handleClickPlay}
-//   isPaused={false}
-//   powerUpData={[]}
-//   playerData={playerData}
-//   setPlayerData={setPlayerData}
-//   setTeleportData={setTeleportData}
-//   kaijuData={kaijuData}
-//   setPlayerMoveToTiles={setPlayerMoveToTiles}
-//   tileStatuses={tileStatuses}
-//   setTileStatuses={setTileStatuses}
-//   clickedTile={clickedTile}
-//   setClickedTile={setClickedTile}
-//   tiles={tiles}
-//   path={path}
-//   width={width}
-//   height={height}
-//   scale={scale}
-//   numAbilitiesToPick={3}
-//   isMale={isMale}
-//   setIsMale={setIsMale}
-//   isTeammate={isTeammate}
-//   setIsTeammate={setIsTeammate}
-// /> :
-
-// ) : (
-//   <TutorialWrapper>{tutorialWindows}</TutorialWrapper>
-// );
-
-// <TutorialWindow
-//   isHovered={tutorialWindowTitle === "How to Move?"}
-//   tutorialWindowTitle={tutorialWindowTitle}
-//   ref={setTutorialWindowTitle("How to Move?")}
-//   aD={0}
-// >
-//   <TutorialWindowTitle isHovered={tutorialWindowTitle === "How to Move?"}>
-//     How to Move?
-//   </TutorialWindowTitle>
-// </TutorialWindow>
-// <TutorialWindow
-//   isHovered={tutorialWindowTitle === "Kaiju City?"}
-//   tutorialWindowTitle={tutorialWindowTitle}
-//   ref={setTutorialWindowTitle("Kaiju City?")}
-//   aD={-4}
-// >
-//   <TutorialWindowTitle isHovered={tutorialWindowTitle === "Kaiju City?"}>
-//     Kaiju City?
-//   </TutorialWindowTitle>
-// </TutorialWindow>
-// <TutorialWindow
-//   isHovered={tutorialWindowTitle === "Kaiju?"}
-//   tutorialWindowTitle={tutorialWindowTitle}
-//   ref={setTutorialWindowTitle("Kaiju?")}
-//   aD={-8}
-// >
-//   <TutorialWindowTitle isHovered={tutorialWindowTitle === "Kaiju?"}>
-//     Kaiju?
-//   </TutorialWindowTitle>
-// </TutorialWindow>
-// <TutorialWindow
-//   isHovered={tutorialWindowTitle === "You and Kaiju?"}
-//   tutorialWindowTitle={tutorialWindowTitle}
-//   ref={setTutorialWindowTitle("You and Kaiju?")}
-//   aD={-12}
-// >
-//   <TutorialWindowTitle
-//     isHovered={tutorialWindowTitle === "You and Kaiju?"}
-//   >
-//     You and Kaiju?
-//   </TutorialWindowTitle>
-// </TutorialWindow>
-// <TutorialWindow
-//   isHovered={tutorialWindowTitle === "Teammate?"}
-//   tutorialWindowTitle={tutorialWindowTitle}
-//   ref={setTutorialWindowTitle("Teammate?")}
-//   aD={-16}
-// >
-//   <TutorialWindowTitle isHovered={tutorialWindowTitle === "Teammate?"}>
-//     Teammate?
-//   </TutorialWindowTitle>
-// </TutorialWindow>
-// <TutorialWindow
-//   isHovered={tutorialWindowTitle === "Tile Statuses?"}
-//   tutorialWindowTitle={tutorialWindowTitle}
-//   ref={setTutorialWindowTitle("Tile Statuses?")}
-//   aD={-20}
-// >
-//   <TutorialWindowTitle
-//     isHovered={tutorialWindowTitle === "Tile Statuses?"}
-//   >
-//     Tile Statuses?
-//   </TutorialWindowTitle>
-// </TutorialWindow>
-// <TutorialWindow
-//   isHovered={tutorialWindowTitle === "Abilities?"}
-//   tutorialWindowTitle={tutorialWindowTitle}
-//   ref={setTutorialWindowTitle("Abilities?")}
-//   aD={-24}
-// >
-//   <TutorialWindowTitle isHovered={tutorialWindowTitle === "Abilities?"}>
-//     Abilities?
-//   </TutorialWindowTitle>
-// </TutorialWindow>

@@ -8,18 +8,18 @@ const TransitionWrapper = styled.div`
   position: absolute;
   width: 100dvw;
   height: 100dvh;
-  // background-color: pink;
-  // opacity: 0.5;
-  z-index: 9999999999;
+  z-index: 99999999999;
   pointer-events: none;
 `;
-
 const TransitionStrip = styled.div`
   position: absolute;
   width: 100dvw;
   height: 150px;
   border-radius: 150px;
-  z-index: 99999999999;
+  ${props =>
+    props.duration !== undefined && `z-index: ${99999999999 + props.duration};`}
+  // filter: drop-shadow(5px 20px 3px);
+  // filter: drop-shadow(0 0 0.2rem purple);
   @keyframes moveRight {
     0% {
       right: -95dvw;
@@ -54,12 +54,12 @@ const TransitionStrip = styled.div`
         ? `
       left: -100dvw;
       animation-name: moveLeft;
-      background: linear-gradient(to right, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 1));
+      background: linear-gradient(to right, rgba(219, 151, 79, 0.2), rgba(219, 151, 79, 1));
       `
         : `
       right: 100dvw;
       animation-name: moveRight;
-      background: linear-gradient(to left, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 1));
+      background: linear-gradient(to left, rgba(219, 151, 79, 0.2), rgba(219, 151, 79, 1));
       `}
     `}
 `;
@@ -67,10 +67,7 @@ const TransitionStrip = styled.div`
 const App = () => {
   const ANIM_DELAY_MILLI = 1500;
   const [transition, setTransition] = useState([]);
-  const [shouldPlayAnim, setShouldPlayAnim] = useState(true);
-  useEffect(() => {
-    setTimeout(() => setShouldPlayAnim(false), 4000);
-  }, []);
+  const [shouldPlayAnim, setShouldPlayAnim] = useState(false);
   useEffect(() => {
     const seconds = ANIM_DELAY_MILLI / 1000;
     const durations = Array(44)
@@ -92,7 +89,7 @@ const App = () => {
   const triggerTransition = callback => {
     setShouldPlayAnim(shouldPlayAnim => {
       if (!shouldPlayAnim) {
-        setTimeout(() => setShouldPlayAnim(false), 3500);
+        setTimeout(() => setShouldPlayAnim(false), 3000);
         callback && setTimeout(() => callback(), 500);
         const shouldPlayAnim = true;
         return shouldPlayAnim;

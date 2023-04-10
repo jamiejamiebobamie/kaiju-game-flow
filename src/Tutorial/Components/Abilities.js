@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Ability } from "./Ability";
-import { PLAYER_ABILITIES } from "../../../Utils/gameState";
+import { PLAYER_ABILITIES } from "Utils/gameState";
 
 const Wrapper = styled.div`
   display: flex;

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Player } from "../../../Game/GameBoard/Pieces/PlayerPiece";
-import { Kaiju } from "../../../Game/GameBoard/Pieces/KaijuPiece";
-import { Abilities } from "../../../Game/UI/PlayerUI/Components/Abilities";
-import { getFlattenedArrayIndex } from "../../../Utils/utils";
+import { Player } from "Game/GameBoard/Pieces/PlayerPiece";
+import { Kaiju } from "Game/GameBoard/Pieces/KaijuPiece";
+import { Abilities } from "Game/UI/PlayerUI/Components/Abilities";
+import { getFlattenedArrayIndex } from "Utils/utils";
 
 const Board = styled.div`
   width: ${props => props.width}px;

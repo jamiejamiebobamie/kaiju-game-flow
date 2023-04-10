@@ -797,7 +797,9 @@ export const shootPower = ({
       const originTile = d.tile;
       const [targetTile, targetIndex] =
         statusKey === "isHealing"
-          ? [data[dataIndex === 0 ? 1 : 0].tile, dataIndex === 0 ? 1 : 0]
+          ? data.length > 1
+            ? [data[dataIndex === 0 ? 1 : 0].tile, dataIndex === 0 ? 1 : 0]
+            : [data[0].tile, 0]
           : getClosestEntityFromTile(targetData, originTile, scale);
       if (originTile && targetTile) {
         const tileStatusesCountModifier = ["isWooded", "isOnFire", "isHealing"];

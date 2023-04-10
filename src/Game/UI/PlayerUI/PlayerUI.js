@@ -39,11 +39,16 @@ const PlayerBorder = styled.div`
   overflow: hidden;
   /* pointer-events: none; */
 `;
-const PlayerPicture = styled.i`
-  margin-top: 70px;
-  margin-left: 68px;
-  transform: scale(10);
-  color: #db974f;
+const PlayerPicture = styled.img`
+  margin-top: -1px;
+  margin-left: 0px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-style: solid;
+  border-thickness: 10px;
+  border-radius: 100%;
+  border-color: #db974f;
+  filter: drop-shadow(0px 2px 50px black);
 `;
 const ClassPicture = styled.i`
   display: flex;
@@ -141,13 +146,10 @@ export const PlayerUI = ({
       )}
       <PlayerBorder isReversed={true}>
         <PlayerPicture
+          src={playerIndex === 0 ? "player_avatar.png" : "teammate_avatar.png"}
+          height="150px"
           ref={setHoverRef(`modifiers ${playerIndex}`)}
           className="fa fa-user-circle"
-        />
-        <ClassPicture
-          ref={setHoverRef(`class ${playerIndex}`)}
-          className="fa fa-magic"
-          isReversed={true}
         />
       </PlayerBorder>
       <PassiveAbilities
@@ -165,7 +167,3 @@ export const PlayerUI = ({
   );
   return _playerUI;
 };
-// <Kaiju
-//   kaijuArr={kaijuKillCount.filter(c => c === playerIndex)}
-//   setDisplayString={setDisplayString}
-// />

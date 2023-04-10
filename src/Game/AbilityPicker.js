@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Abilities } from "../Tutorial/Views/Components/Abilities";
-import { TutorialGameBoard } from "../Tutorial/Views/Components/TutorialGameBoard";
+import { Abilities } from "Tutorial/Components/Abilities";
+import { TutorialGameBoard } from "Tutorial/Components/TutorialGameBoard";
 import { DescriptionDisplay } from "./UI/DescriptionDisplay";
 import { setPassives } from "../Utils/utils";
 import {
@@ -10,12 +10,10 @@ import {
   ButtonOutline
 } from "../Components/StyledComponents";
 
-const ClassPickerWrapper = styled.div`
+const Wrapper = styled.div`
   display: flex;
   height: auto;
   width: auto;
-  /* padding: 5px; */
-  /* margin-top: 80px; */
   background-color: #152642;
 
   flex-direction: column;
@@ -71,13 +69,15 @@ const AbilityButtonsWrapper = styled.div`
   }
 `;
 const Title = styled.div`
-  font-size: 29px;
+  ${props =>
+    props.fontSize !== undefined
+      ? `font-size: ${props.fontSize}px;`
+      : "font-size: 29px;"}
   font-alignment: 30px;
   display: flex;
-  align-self: flex-start;
   margin-left: 50px;
-  align-content: center;
   color: #db974f;
+  align-items: center;
 `;
 const DescriptionDisplayWrapper = styled.div`
   display: flex;
@@ -137,54 +137,11 @@ const PlayButton = styled.div`
   }
   font-size: 20px;
 `;
-// const ClassTitlePopUp = styled.div`
-//   position: absolute;
-//   display: flex;
-//   flex-direction: column;
-//   text-align: center;
-//   justify-content: center;
-//   pointer-events: none;
-//   left: 50%;
-//   top: 45%;
-//   width: 900px;
-//   height: 200px;
-//   margin-left: -450px;
-//   margin-top: -150px;
-//   color: #d064ed;
-//   z-index: 9999999999;
-//   opacity: 0;
-//   font-size: 50px;
-//   -webkit-animation-duration: 3s;
-//   animation-duration: 3s;
-//   -webkit-animation-name: fadeInFadeOutUp;
-//   animation-name: fadeInRight;
-//   @keyframes fadeInRight {
-//     0% {
-//       opacity: 0;
-//       transform: translateY(0px);
-//     }
-//     50% {
-//       opacity: 1;
-//       transform: translateY(20px);
-//     }
-//     70% {
-//       opacity: 1;
-//       transform: translateY(20px);
-//     }
-//     100% {
-//       opacity: 0;
-//       transform: translateY(0px);
-//     }
-//   }
-// `;
 const CheckboxWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
   margin: 20px;
-  /* margin-top: -20px; */
-
-  /* background-color: red; */
 `;
 const GenderWrapper = styled.div`
   width: 50%;
@@ -198,7 +155,6 @@ const CheckboxText = styled.div`
   width: 200px;
   margin: 10px;
   color: #db974f;
-  // font-size: 19px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
 `;
@@ -218,7 +174,7 @@ const Checkmark = styled.i`
   margin-left: -2px;
   margin-top: -5px;
 `;
-export const ClassPicker = ({
+export const AbilityPicker = ({
   handleClickHome,
   pickedAbilities,
   setPickedAbilities,
@@ -240,8 +196,6 @@ export const ClassPicker = ({
   height,
   scale,
   numAbilitiesToPick,
-  isMale,
-  setIsMale,
   isTeammate,
   setIsTeammate
 }) => {
@@ -259,10 +213,9 @@ export const ClassPicker = ({
       setPickedAbilities(_pickedAbilities);
     }
   };
-  // <Title>{`Pick ${numAbilitiesToPick}:`}</Title>
   return (
     <>
-      <ClassPickerWrapper>
+      <Wrapper>
         <AbilityButtonsWrapper>
           <div style={{ height: "75px" }}>
             <br />
@@ -284,20 +237,9 @@ export const ClassPicker = ({
           />
         </DescriptionDisplayWrapper>
         <CheckboxWrapper>
-          <GenderWrapper>
-            <CheckboxText>
-              Male
-              <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
-                {isMale && <Checkmark className="fa fa-check" />}
-              </Checkbox>
-            </CheckboxText>
-            <CheckboxText>
-              Female
-              <Checkbox onClick={() => setIsMale(_isM => !_isM)}>
-                {!isMale && <Checkmark className="fa fa-check" />}
-              </Checkbox>
-            </CheckboxText>
-          </GenderWrapper>
+          <Title alignContent={"flex-start"} fontSize={15}>
+            Pick 3 abilities
+          </Title>
           <CheckboxText>
             Teammate?
             <Checkbox onClick={() => setIsTeammate(_isT => !_isT)}>
@@ -321,28 +263,7 @@ export const ClassPicker = ({
             </Button>
           </ButtonsWrapper>
         </ButtonGroup>
-      </ClassPickerWrapper>
+      </Wrapper>
     </>
   );
 };
-
-// <PlayButton onClick={handleClickPlay}>Play!</PlayButton>
-
-// <TutorialGameBoard
-//   isPaused={isPaused}
-//   powerUpData={powerUpData}
-//   playerData={playerData}
-//   setPlayerData={setPlayerData}
-//   setTeleportData={setTeleportData}
-//   kaijuData={kaijuData}
-//   setPlayerMoveToTiles={setPlayerMoveToTiles}
-//   tileStatuses={tileStatuses}
-//   setTileStatuses={setTileStatuses}
-//   clickedTile={clickedTile}
-//   setClickedTile={setClickedTile}
-//   tiles={tiles}
-//   path={path}
-//   width={width}
-//   height={height}
-//   scale={scale}
-// />

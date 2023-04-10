@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
-import { ClassPicker } from "./ClassPicker";
-
+import { AbilityPicker } from "./AbilityPicker";
 import {
   useInterval,
   useKeyPress,
@@ -16,32 +15,23 @@ import {
   initializeGameBoard,
   areTilesAdjacent,
   getAdjacentTiles
-} from "../Utils/utils";
+} from "Utils/utils";
 import {
   ButtonsWrapper,
   Button,
   ButtonGroup,
   ButtonOutline,
   BackgroundImage
-} from "../Tutorial/Views/Components/StyledComponents";
+} from "Tutorial/Components/StyledComponents";
 const GameWrapper = styled.div`
   position: relative;
   display: flex;
   align-self: center;
   justify-content: space-between;
-  /* width: auto; */
   width: 800px;
   height: 100%;
-
-  /* background-color: purple; */
   margin-top: 40px;
-  /* border-style: solid;
-  border-thickness: thin;
-  border-radius: 10px; */
-  /* background-color: #152642; */
-  /* border-color: #db974f; */
   overflow: hidden;
-  /* box-shadow: 3px 7px 10px black; */
 `;
 const ReplayTitle = styled.div`
   display: flex;
@@ -50,32 +40,27 @@ const ReplayTitle = styled.div`
   text-align: center;
   font-alignment: center;
   color: #db974f;
+  ${props =>
+    props.fontSize !== undefined &&
+    `font-size: ${props.fontSize}px !important;`}
 `;
 const ReplayModal = styled.div`
   position: absolute;
-  z-index: 9999999999;
-
+  z-index: 999999999;
   padding: 50px;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
-
   align-self: center;
   align-items: center;
-
   margin-left: 15%;
-
   width: 550px;
-  height: 350px;
-
+  height: 550px;
   border-radius: 10px;
   border-style: solid;
   border-thickness: thin;
   border-color: #db974f;
-
   background-color: #152642;
-
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
   -webkit-animation-name: fadeInUp;
@@ -97,12 +82,25 @@ const ReplayModal = styled.div`
   ${props =>
     props.fontSize ? `font-size:${props.fontSize}px;` : "font-size:25px;"};
 `;
+const ModalMessage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 50px;
+  line-height: 40px;
+`;
+const StyledImg = styled.img`
+  border-radius: 10px;
+  border-style: solid;
+  border-thickness: 1000rem;
+  border-color: #db974f;
+  padding: 5px;
+`;
 export const Game = ({ handleClickHome, triggerTransition }) => {
   const width = 500;
   const height = 800;
   const scale = 0.3;
   const accTime = useRef(0);
-  const [isMale, setIsMale] = useState(true);
   const [isTeammate, setIsTeammate] = useState(false);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
@@ -121,53 +119,28 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [tileStatuses, setTileStatuses] = useState(null);
   const [setHoverRef, hoverLookupString] = useHover();
   const [path, setPath] = useState(null);
-  const [intervalTime, setIntervalTime] = useState(1);
+  const [intervalTime, setIntervalTime] = useState(null);
   const [replayModalMessage, setReplayModalMessage] = useState(null);
-
-  // useEffect(() => {
-  //   console.log({
-  //     isMale,
-  //     isTeammate,
-  //     isPlayingGame,
-  //     winner,
-  //     pickedAbilities,
-  //     isPaused,
-  //     dmgArray,
-  //     playerKillCount,
-  //     kaijuKillCount,
-  //     playerData,
-  //     teleportData,
-  //     tileStatuses,
-  //     kaijuData,
-  //     tiles,
-  //     clickedTile,
-  //     playerMoveToTiles,
-  //     highlightedTiles0,
-  //     path,
-  //     replayModalMessage
-  //   });
-  // }, [
-  //   isMale,
-  //   isTeammate,
-  //   isPlayingGame,
-  //   winner,
-  //   pickedAbilities,
-  //   isPaused,
-  //   dmgArray,
-  //   playerKillCount,
-  //   kaijuKillCount,
-  //   playerData,
-  //   teleportData,
-  //   tileStatuses,
-  //   kaijuData,
-  //   tiles,
-  //   clickedTile,
-  //   playerMoveToTiles,
-  //   highlightedTiles0,
-  //   path,
-  //   replayModalMessage
-  // ]);
-
+  const resetState = () => {
+    setPickedAbilities([]);
+    setIsPlayingGame(false);
+    setWinner(null);
+    setIsPaused(false);
+    setDmgArray([]);
+    setKaijuKillCount([]);
+    setPlayerData([]);
+    setTeleportData([]);
+    setPlayerKillCount(0);
+    setKaijuData([]);
+    setClickedTile({ i: -1, j: -1 });
+    setHighlightedTiles0([]);
+    setTiles([]);
+    setPlayerMoveToTiles(null);
+    setTileStatuses(null);
+    setPath(null);
+    setIntervalTime(null);
+    setReplayModalMessage(null);
+  };
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const handleClickPause = () => {
     setIsPaused(_isPaused => !_isPaused);
@@ -183,29 +156,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     },
     ["Escape"]
   );
-  // useEffect(() => {
-  //   setWinner(null);
-  //   setIntervalTime(1);
-  //   setPlayerKillCount(0);
-  //   setKaijuData([]);
-  //   setKaijuData([]);
-  //   setHighlightedTiles0([]);
-  //   initializeGameBoard(
-  //     playerData,
-  //     setPlayerData,
-  //     pickedAbilities,
-  //     kaijuData,
-  //     width,
-  //     height,
-  //     scale,
-  //     setTiles,
-  //     setClickedTile,
-  //     setHoverRef,
-  //     tileStatuses,
-  //     setTileStatuses,
-  //     isTeammate
-  //   );
-  // }, [isPlayingGame]);
   useEffect(() => {
     if (kaijuKillCount.length >= 5) {
       const _winner = 0;
@@ -250,18 +200,29 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       if (!kaijuData.find(kaiju => kaiju.lives > 0) || winner === -1) {
         let message = "You won?";
         switch (winner) {
+          case 1:
+            message = [
+              <ReplayTitle fontSize={22}>
+                Kaiju have entered the city!
+              </ReplayTitle>,
+              <br />,
+              <StyledImg src="./start.png" width="250px" height="250px" />
+            ];
+            break;
           case 0:
             message = [
-              <ReplayTitle fontSize={35}>You saved the city!</ReplayTitle>,
+              <ReplayTitle fontSize={25}>You saved the city.</ReplayTitle>,
               <br />,
+              <StyledImg src="./you_won.png" width="250px" height="250px" />,
               <br />,
               <ReplayTitle>Play again?</ReplayTitle>
             ];
             break;
           case -1:
             message = [
-              <ReplayTitle fontSize={35}>You died</ReplayTitle>,
+              <ReplayTitle fontSize={25}>You lost.</ReplayTitle>,
               <br />,
+              <StyledImg src="./you_lost.png" width="250px" height="250px" />,
               <br />,
               <ReplayTitle>Play again?</ReplayTitle>
             ];
@@ -345,16 +306,12 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         : accTime.current + intervalTime;
   }, intervalTime);
   return !isPlayingGame ? (
-    <ClassPicker
+    <AbilityPicker
       handleClickHome={handleClickHome}
       pickedAbilities={pickedAbilities}
       setPickedAbilities={setPickedAbilities}
       handleClickPlay={() => {
-        setWinner(null);
-        setIntervalTime(1);
-        setPlayerKillCount(0);
-        setKaijuData([]);
-        setHighlightedTiles0([]);
+        setWinner(1);
         initializeGameBoard(
           playerData,
           setPlayerData,
@@ -370,7 +327,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           setTileStatuses,
           isTeammate
         );
-        triggerTransition(() => setIsPlayingGame(bool => !bool), 500);
+        triggerTransition(() => setIsPlayingGame(bool => !bool));
       }}
       isPaused={false}
       powerUpData={[]}
@@ -389,50 +346,59 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       height={height}
       scale={scale}
       numAbilitiesToPick={3}
-      isMale={isMale}
-      setIsMale={setIsMale}
       isTeammate={isTeammate}
       setIsTeammate={setIsTeammate}
     />
   ) : (
     <GameWrapper>
       {replayModalMessage && (
-        <ReplayModal>
-          <div
+        <ReplayModal
+        // onClick={() => {
+        //   setWinner(winner => (winner === 1 ? -1 : winner + 1));
+        //   setReplayModalMessage(null);
+        // }}
+        >
+          <ModalMessage
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              marginBottom: "50px"
+              marginBottom: "50px",
+              lineHeight: "40px"
             }}
           >
             {replayModalMessage}
-          </div>
+          </ModalMessage>
           <ButtonGroup>
-            <ButtonsWrapper>
-              <Button onClick={handleClickHome}>
-                <ButtonOutline zIndex={1} />
-                No Thanks
-              </Button>
-            </ButtonsWrapper>
-            <ButtonsWrapper>
-              <Button
-                onClick={() =>
-                  triggerTransition(() => {
-                    setPickedAbilities([]);
-                    setIsPlayingGame(false);
+            {winner === 1 ? (
+              <ButtonsWrapper>
+                <Button
+                  onClick={() => {
+                    setWinner(null);
                     setReplayModalMessage(null);
-                    // setWinner(null);
-                    // setIntervalTime(1);
-                    // setPlayerKillCount(0);
-                    // setKaijuData([]);
-                  })
-                }
-              >
-                <ButtonOutline zIndex={1} />
-                Play Again
-              </Button>
-            </ButtonsWrapper>
+                    setIntervalTime(1);
+                  }}
+                >
+                  <ButtonOutline zIndex={1} />
+                  Fight!
+                </Button>
+              </ButtonsWrapper>
+            ) : (
+              <>
+                <ButtonsWrapper>
+                  <Button onClick={handleClickHome}>
+                    <ButtonOutline zIndex={1} />
+                    No Thanks
+                  </Button>
+                </ButtonsWrapper>
+                <ButtonsWrapper>
+                  <Button onClick={() => triggerTransition(() => resetState())}>
+                    <ButtonOutline zIndex={1} />
+                    Play Again
+                  </Button>
+                </ButtonsWrapper>
+              </>
+            )}
           </ButtonGroup>
         </ReplayModal>
       )}
@@ -461,6 +427,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         handleClickHome={handleClickHome}
         handleClickPause={handleClickPause}
         scale={scale}
+        isTeammate={isTeammate}
       />
     </GameWrapper>
   );

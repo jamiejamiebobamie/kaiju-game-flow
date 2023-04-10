@@ -156,7 +156,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-heart",
+        color: "pink"
       };
     case "abilityHeartPassive":
       return {
@@ -165,7 +167,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-gratipay",
+        color: "pink"
       };
     case "abilityMetalPassive":
       return {
@@ -174,7 +178,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "+1 number of tiles modifier",
         effect2: "+1 tile count modifier",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-wrench",
+        color: "AntiqueWhite"
       };
     case "abilityMetalActive":
       return {
@@ -184,7 +190,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "Status remains on the tile until walked on",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-shield",
+        color: "AntiqueWhite"
       };
     case "abilityGlassPassive":
       return {
@@ -193,7 +201,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "-2 to move speed",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-tencent-weibo",
+        color: "BlueViolet"
       };
     case "abilityGlassActive":
       return {
@@ -202,7 +212,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-ravelry",
+        color: "BlueViolet"
       };
     case "abilityIcePassive":
       return {
@@ -211,7 +223,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "-1 to move speed",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-thermometer-quarter",
+        color: "PaleTurquoise"
       };
     case "abilityIceActive":
       return {
@@ -220,7 +234,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-snowflake-o",
+        color: "PaleTurquoise"
       };
     case "abilityFirePassive":
       return {
@@ -229,7 +245,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "+1 tile count modifier",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-fire",
+        color: "tomato"
       };
     case "abilityFireActive":
       return {
@@ -238,7 +256,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "Fire travels in the direction of your closest enemy",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-free-code-camp",
+        color: "tomato"
       };
     case "abilityWoodPassive":
       return {
@@ -247,7 +267,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "+1 to starting lives",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-tree",
+        color: "Chartreuse"
       };
     case "abilityWoodActive":
       return {
@@ -257,7 +279,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "Status remains on the tile until walked on",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-leaf",
+        color: "Chartreuse"
       };
     case "abilityLightningPassive":
       return {
@@ -266,7 +290,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "+1 to move speed",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-hourglass-half",
+        color: "cyan"
       };
     case "abilityLightningActive":
       return {
@@ -276,7 +302,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "Bolts ricochet off the walls of the map",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-bolt",
+        color: "cyan"
       };
     case "abilityDeathPassive":
       return {
@@ -285,7 +313,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "-1 to starting health",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-heartbeat",
+        color: "GhostWhite"
       };
     case "abilityDeathActive":
       return {
@@ -294,7 +324,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-snapchat-ghost",
+        color: "GhostWhite"
       };
     case "abilityBubblePassive":
       return {
@@ -303,7 +335,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "+1 number of tiles modifier",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-universal-access",
+        color: "Thistle"
       };
     case "abilityBubbleActive":
       return {
@@ -312,7 +346,9 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "Clears both positive and negative statuses",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: "fa-question-circle-o",
+        color: "Thistle"
       };
     case "healthBar":
       return {
@@ -321,7 +357,8 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: ""
       };
     case "Kaiju":
       return {
@@ -330,7 +367,8 @@ const getDescription = (string, playerData, playerIndex) => {
         effect1: "",
         effect2: "",
         img: "",
-        formatData: {}
+        formatData: {},
+        icon: ""
       };
   }
 };
@@ -382,7 +420,15 @@ export const DescriptionDisplay = ({
   const [hasHovered, setHasHovered] = useState(false);
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
-  const { title, description, effect1, effect2, img } = (displayString &&
+  const {
+    title,
+    description,
+    effect1,
+    effect2,
+    img,
+    icon,
+    color
+  } = (displayString &&
     getDescription(_string, playerData, Number(playerIndex))) || {
     //   getDescription("class", playerData, 0)) //   pickedAbilities.length === 3 && //   pickedAbilities && // (isClassWrapper && // ||
     title: "",
@@ -407,10 +453,17 @@ export const DescriptionDisplay = ({
       <h2
         style={{
           display: "flex",
-          justifyContent: "space-between"
+          justifyContent: "space-between",
+          fontSize: "25px",
+          minHeight: "70px",
+          alignItems: "center"
         }}
       >
-        {!isTutorial && !title ? <Logo isDescription={true} /> : title}
+        {!isTutorial && !title ? (
+          <Logo isDescription={true} />
+        ) : (
+          <span style={{ maxWidth: "450px" }}>{title}</span>
+        )}
         {!!title && (
           <div
             style={{
@@ -418,7 +471,7 @@ export const DescriptionDisplay = ({
               alignItems: "flex-end"
             }}
           >
-            <AbilityIcon color={"#db974f"} className={`fa fa-snowflake-o`} />
+            <AbilityIcon color={color} className={`fa ${icon}`} />
           </div>
         )}
       </h2>

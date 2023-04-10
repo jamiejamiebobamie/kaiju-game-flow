@@ -11,12 +11,10 @@ import { SkyLineSVG } from "./SkyLineSVG";
 
 export const Logo = ({ isNavBar, handleClickHome, isDescription }) => {
   return (
-    <>
-      <Title isDescription={isDescription}>
-        <StyledSpookyText isDescription={isDescription}>Kaiju</StyledSpookyText>{" "}
-        <StyledSciFiText>City</StyledSciFiText>
-        <StyledSpookyTextShadow>Kaiju</StyledSpookyTextShadow>{" "}
-      </Title>
-    </>
+    <Title isDescription={isDescription}>
+      <StyledSpookyText isDescription={isDescription}>Kaiju</StyledSpookyText>{" "}
+      <StyledSciFiText>City</StyledSciFiText>
+      <StyledSpookyTextShadow>Kaiju</StyledSpookyTextShadow>{" "}
+    </Title>
   );
 };
