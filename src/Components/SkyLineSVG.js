@@ -230,7 +230,8 @@ export const SkyLineSVG = ({ zIndex, isNavBar }) => {
         <path
           d={skylineCoords}
           fill="#152642"
-          // style={{ filter: "drop-shadow(0px -1px 50px #db974f)" }}
+          stroke="#634a30"
+          style={{ filter: "drop-shadow(0px -1px 50px #db974f)" }}
         />
         <path d={skylineCoords} fill="url(#cityFade)" />
         {cityLights}

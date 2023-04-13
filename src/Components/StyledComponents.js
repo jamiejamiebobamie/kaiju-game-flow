@@ -129,8 +129,8 @@ export const StyledSpookyText = styled.p`
   color: black;
 
   // -webkit-text-stroke: 1.1px purple;
-  -webkit-text-stroke: 2.5px purple;
-  filter: drop-shadow(0px 1px 1px black);
+  -webkit-text-stroke: 2px purple;
+  filter: drop-shadow(0px 1px 2px purple);
 
   ${props =>
     props.isDescription &&
@@ -154,8 +154,10 @@ export const StyledSpookyTextShadow = styled.p`
   margin-top: -191px;
   // color: black;
   // color: #1e1e1e;
-  color: #db974f;
-  filter: drop-shadow(0px -1px 3px black);
+  // color: #db974f;
+  // color: #91937f;
+  color: #b9bf82;
+  // filter: drop-shadow(0px -1px 1px black);
 `;
 export const StyledSciFiTextShadow = styled.p`
   position: absolute;
