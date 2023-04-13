@@ -20,27 +20,40 @@ const TransitionStrip = styled.div`
     props.duration !== undefined && `z-index: ${99999999999 + props.duration};`}
   // filter: drop-shadow(5px 20px 3px);
   // filter: drop-shadow(0 0 0.2rem purple);
+  // border: 1px solid purple;
   @keyframes moveRight {
     0% {
-      right: -95dvw;
+      right: -100dvw;
+    }
+    45% {
+      right: -5dvw;
     }
     50% {
+      right: 0dvw;
+    }
+    55% {
       right: -5dvw;
     }
     100% {
-      right: -95dvw;
+      right: -100dvw;
     }
   }
 
   @keyframes moveLeft {
     0% {
-      left: -95dvw;
+      left: -100dvw;
+    }
+    45% {
+      left: -5dvw;
     }
     50% {
+      left: 0dvw;
+    }
+    55% {
       left: -5dvw;
     }
     100% {
-      left: -95dvw;
+      left: -100dvw;
     }
   }
 

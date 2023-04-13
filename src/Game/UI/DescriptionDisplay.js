@@ -437,7 +437,6 @@ export const DescriptionDisplay = ({
     formatData: {}
   };
   useEffect(() => {
-    console.log(title);
     if (!!title) {
       setIsContent(true);
       !hasHovered && setHasHovered(true);

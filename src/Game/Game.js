@@ -39,6 +39,7 @@ const ReplayTitle = styled.div`
   text-alignment: center;
   text-align: center;
   font-alignment: center;
+  margin: 5px;
   color: #db974f;
   ${props =>
     props.fontSize !== undefined &&
@@ -53,7 +54,9 @@ const ReplayModal = styled.div`
   justify-content: center;
   align-self: center;
   align-items: center;
-  margin-left: 15%;
+  align-content: center;
+  margin-left: 5dvw;
+  margin-top: -5dvw;
   width: 550px;
   height: 550px;
   border-radius: 10px;
@@ -90,11 +93,12 @@ const ModalMessage = styled.div`
   line-height: 40px;
 `;
 const StyledImg = styled.img`
-  border-radius: 10px;
+  // margin-bottom: 5px;
+  border-radius: 5px;
   border-style: solid;
-  border-thickness: 1000rem;
+  border-thickness: thick;
   border-color: #db974f;
-  padding: 5px;
+  box-shadow: 3px 7px 10px black;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
   const width = 500;
@@ -203,7 +207,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           case 1:
             message = [
               <ReplayTitle fontSize={22}>
-                Kaiju have entered the city!
+                Evil Kaiju have appeared!
               </ReplayTitle>,
               <br />,
               <StyledImg src="./start.png" width="250px" height="250px" />
@@ -211,16 +215,16 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
             break;
           case 0:
             message = [
-              <ReplayTitle fontSize={25}>You saved the city.</ReplayTitle>,
+              <ReplayTitle fontSize={25}>You saved the city!</ReplayTitle>,
               <br />,
               <StyledImg src="./you_won.png" width="250px" height="250px" />,
               <br />,
-              <ReplayTitle>Play again?</ReplayTitle>
+              <ReplayTitle>Play again ?</ReplayTitle>
             ];
             break;
           case -1:
             message = [
-              <ReplayTitle fontSize={25}>You lost.</ReplayTitle>,
+              <ReplayTitle fontSize={25}>You lost...</ReplayTitle>,
               <br />,
               <StyledImg src="./you_lost.png" width="250px" height="250px" />,
               <br />,
@@ -228,7 +232,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
             ];
             break;
         }
-        setKaijuData([]);
         setReplayModalMessage(message);
         setIntervalTime(null);
       }

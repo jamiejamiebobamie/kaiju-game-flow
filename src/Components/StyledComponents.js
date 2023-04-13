@@ -98,7 +98,7 @@ export const Title = styled.div`
   color: #64939b;
   margin-bottom: 100px;
   transform: scale(1.5);
-  margin-top: -300px;
+  margin-top: -200px;
   pointer-events: none;
   /* isDescription */
   ${props =>
@@ -128,7 +128,9 @@ export const StyledSpookyText = styled.p`
   filter: drop-shadow(0 0 0.2rem purple);
   color: black;
 
-  -webkit-text-stroke: 1.1px purple;
+  // -webkit-text-stroke: 1.1px purple;
+  -webkit-text-stroke: 2.5px purple;
+  filter: drop-shadow(0px 1px 1px black);
 
   ${props =>
     props.isDescription &&
@@ -150,7 +152,10 @@ export const StyledSpookyTextShadow = styled.p`
   font-family: green_fuz;
   font-size: 90px;
   margin-top: -191px;
-  color: black;
+  // color: black;
+  // color: #1e1e1e;
+  color: #db974f;
+  filter: drop-shadow(0px -1px 3px black);
 `;
 export const StyledSciFiTextShadow = styled.p`
   position: absolute;
@@ -163,6 +168,49 @@ export const StyledSciFiTextShadow = styled.p`
 `;
 export const StyledStaticLogo = styled.img`
   cursor: pointer;
-  // margin-left: 30px;
   width: 400px;
+`;
+export const BannerImg = styled.img`
+  position: absolute;
+  ${props => props.zIndex && `z-index: ${props.zIndex};`}
+  ${props => props.marginLeft && `margin-left: ${props.marginLeft}px;`}
+    ${props => props.marginTop && `margin-top: ${props.marginTop}px;`}
+  // border-radius: 5px;
+  // border-style: solid;
+  // border-thickness: thick;
+  // border-color: #db974f;
+  // filter: drop-shadow(0px -2px 2px black);
+  filter: drop-shadow(0px -1px 1px #db974f);
+
+`;
+export const Oval = styled.div`
+  position: absolute;
+  z-index: -3;
+  margin-top: -550px;
+  border-radius: 50%;
+  width: 300px;
+  height: 300px;
+  // background-color: #db974f;
+  background-color: #ffffbf;
+
+  // background-color: #c73341;
+  // background-color: #621d75;
+
+  //linear-gradient(45deg, #d22b2b, #880808);
+
+  opacity: 0.5;
+  // border-style: solid;
+  // border-width: 30px;
+  // border-color: #621d75;
+  // border: solid 4px #621d75;
+  // border: solid 4px black;
+  filter: drop-shadow(0px -2px 2px #db974f);
+`;
+export const Rectangle = styled.div`
+  position: absolute;
+  z-index: -2;
+  margin-top: -257px;
+  width: 400px;
+  height: 150px;
+  background-color: #152642;
 `;

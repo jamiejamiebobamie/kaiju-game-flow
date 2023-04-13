@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { getRandomIntInRange } from "../Utils/utils";
+import { BannerImg } from "Components/StyledComponents";
 
 /* transform: scale(1, 1.25); */
 
@@ -10,7 +11,7 @@ const Wrapper = styled.svg`
   width: 75%;
   height: 350px;
   pointer-events: none;
-  top: ${props => (props.isNavBar ? "25px" : "-90px")};
+  top: ${props => (props.isNavBar ? "25px" : "-50px")};
   /* background-color: red; */
   /* align-self: flex-start; */
 `;
@@ -28,7 +29,7 @@ const StyledCircle = styled.circle`
     }
   }
 `;
-export const SkyLineSVG = ({ x, y, zIndex, isNavBar }) => {
+export const SkyLineSVG = ({ zIndex, isNavBar }) => {
   const [skylineCoords, setSkylineCoords] = useState("");
   const [cityLights, setCityLights] = useState("");
   const buildingArray = [
@@ -178,7 +179,6 @@ export const SkyLineSVG = ({ x, y, zIndex, isNavBar }) => {
                 randDur={Math.random() * 3 + 1}
               />
             );
-            console.log(`${acc.currWidth + lightCoords.x}`);
           });
         const currWidth = acc.currWidth + newPiece.width;
         const curr = {
@@ -227,7 +227,11 @@ export const SkyLineSVG = ({ x, y, zIndex, isNavBar }) => {
             </feMerge>
           </filter>
         </defs>
-        <path d={skylineCoords} fill="#152642" />
+        <path
+          d={skylineCoords}
+          fill="#152642"
+          // style={{ filter: "drop-shadow(0px -1px 50px #db974f)" }}
+        />
         <path d={skylineCoords} fill="url(#cityFade)" />
         {cityLights}
       </svg>

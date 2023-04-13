@@ -6,7 +6,8 @@ import {
   ButtonOutline,
   Button,
   StyledIcon,
-  StyledLink
+  StyledLink,
+  BannerImg
 } from "./Components/StyledComponents";
 import { Logo } from "./Components/Logo";
 import logo from "./logo.svg";
@@ -14,6 +15,21 @@ import logo from "./logo.svg";
 export const MainMenu = ({ handleClickGame, handleClickTutorial }) => {
   return (
     <Wrapper>
+      <BannerImg
+        width="300px"
+        zIndex={-1}
+        marginLeft={-150}
+        marginTop={-660}
+        src="kaiju_img.png"
+      />
+      <BannerImg
+        width="170px"
+        zIndex={-2}
+        marginLeft={270}
+        marginTop={-610}
+        src="kaiju_img2.png"
+      />
+
       <Logo />
       <ButtonGroup>
         <ButtonsWrapper>

@@ -14,9 +14,9 @@
     "ts-node": "^10.4.0"
   },
   "scripts": {
+    "build": "react-scripts build",
     "start": "react-scripts start",
     "start": "nodemon app.js",
-    "build": "react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject"
   },

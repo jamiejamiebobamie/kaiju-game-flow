@@ -48,7 +48,11 @@ const PlayerPicture = styled.img`
   border-thickness: 10px;
   border-radius: 100%;
   border-color: #db974f;
-  filter: drop-shadow(0px 2px 50px black);
+  background-color: rgba(0, 0, 0, 0.5);
+  ${props =>
+    props.isReversed
+      ? "filter: drop-shadow(20px -15px 25px salmon);"
+      : "filter: drop-shadow(20px -15px 25px blue);"}
 `;
 const ClassPicture = styled.i`
   display: flex;
@@ -150,6 +154,7 @@ export const PlayerUI = ({
           height="150px"
           ref={setHoverRef(`modifiers ${playerIndex}`)}
           className="fa fa-user-circle"
+          isReversed={isReversed}
         />
       </PlayerBorder>
       <PassiveAbilities

@@ -66,10 +66,6 @@ export const setPassives = (pickedAbilities, setPlayerData) => {
         };
         return {
           ...newPlayer,
-          // playerClass: playerClassObj && playerClassObj.class_name,
-          // playerClassDescription:
-          //   playerClassObj && playerClassObj.player_class_description,
-          // elements: classLookup,
           abilities: i === 0 ? abilities : []
         };
       });
@@ -163,8 +159,8 @@ export const initializeTutorialGameBoard = (
     isTutorial
   );
   const status = [];
-  const rowLength = 24; // Math.ceil(width / (70 * scale));
-  const colLength = 10; // Math.ceil(height / (75 * scale));
+  const rowLength = 24;
+  const colLength = 10;
   for (let i = 0; i < rowLength; i++) {
     const _status = [];
     for (let j = 0; j < colLength; j++) {
@@ -450,8 +446,8 @@ export const redrawTiles = (
   isTutorial
 ) => {
   if (tileStatuses) {
-    const rowLength = isTutorial ? 24 : 24; // Math.ceil(width / (70 * scale));
-    const colLength = isTutorial ? 10 : 36; //Math.ceil(height / (75 * scale));
+    const rowLength = 24;
+    const colLength = isTutorial ? 10 : 36;
     const _tiles = [];
     for (let i = 0; i < rowLength; i++) {
       for (let j = 0; j < colLength; j++) {
@@ -631,7 +627,7 @@ export const updateTileState = (
                       _statuses[nextTile.i][nextTile.j][k] = {
                         dirs: direction,
                         count:
-                          k === "isWooded" && // this is broken nextTile
+                          k === "isWooded" &&
                           dirs.length > 1 &&
                           l > 0 &&
                           nextTileCount < _count - 1
@@ -738,7 +734,7 @@ export const updateTileState = (
                   const dmgObj = {
                     isKaiju: !isKaiju, // to determine correct state array
                     key: entityOnTile.key, // to determine correct entity in array
-                    lifeDecrement: DEATH_TILE_STATUSES.includes(k) ? 1 : -1, //lives + or - // possible healing ability...
+                    lifeDecrement: DEATH_TILE_STATUSES.includes(k) ? 1 : -1, // lives + or -
                     accTime, // to remove stale data from the dmgArray
                     playerIndex // to determine who killed the Kaiju.
                   };
@@ -797,9 +793,9 @@ export const shootPower = ({
       const originTile = d.tile;
       const [targetTile, targetIndex] =
         statusKey === "isHealing"
-          ? data.length > 1
-            ? [data[dataIndex === 0 ? 1 : 0].tile, dataIndex === 0 ? 1 : 0]
-            : [data[0].tile, 0]
+          ? data.length < 2 || data[0].lives < data[1].lives
+            ? [data[0].tile, 0]
+            : [data[1].tile, 1]
           : getClosestEntityFromTile(targetData, originTile, scale);
       if (originTile && targetTile) {
         const tileStatusesCountModifier = ["isWooded", "isOnFire", "isHealing"];
@@ -1154,7 +1150,9 @@ export const movePlayerPieces = (
               const isEscapePowerAndIsInDanger =
                 a.type === "escape" && numTilesFromTarget <= 2;
               const isHealPowerAndIsTeammateHealthLow =
-                a.type === "heal" && data[0].lives <= 2;
+                a.type === "heal" &&
+                ((!!data[0].lives && data[0].lives < 4) ||
+                  (!!data[1].lives && data[1].lives < 4));
               if (
                 isOffensivePowerAndTargetInRange ||
                 isDefensivePowerAndIsInDanger ||
@@ -1185,7 +1183,6 @@ export const movePlayerPieces = (
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
             _data[i].isTeleported = !_data[i].isTeleported;
-            console.log(_data[i].isTeleported, i);
             const _path = findPath(
               _data[i].tile,
               getSafeTile(enemyData, tileStatuses, scale),
@@ -1434,21 +1431,19 @@ export const moveKaijuPieces = (
     }
     const newKaiju =
       !isTutorial &&
-      (winner === null) & (data.length < 7) &&
+      (winner === null) & (_data.length < 4) &&
       accTime &&
       !(accTime % 100) &&
-      spawnKaiju(data, enemyData, scale);
-    let isKaijuRespawned = false || winner !== null;
-    let isRespawn = true;
+      spawnKaiju(_data, enemyData, scale);
     const newKaijuData =
       !newKaiju &&
       accTime &&
       !(accTime % 3) &&
       _data.map(k =>
-        !isKaijuRespawned && !k.lives
+        winner === null && !k.lives
           ? {
               ...k,
-              ...spawnKaiju(data, enemyData, scale, isRespawn, isTutorial)
+              ...spawnKaiju(_data, enemyData, scale, true, isTutorial)
             }
           : k
       );

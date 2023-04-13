@@ -259,7 +259,6 @@ export const Player = ({
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [anim, setAnim] = useState("down");
   useEffect(() => {
-    console.log(dir, anim);
     dir && setAnim(dir === "idle" ? `${dir}${anim}` : dir);
   }, [dir]);
   useEffect(() => {
