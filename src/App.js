@@ -20,7 +20,8 @@ const TransitionStrip = styled.div`
     props.duration !== undefined && `z-index: ${99999999999 + props.duration};`}
   // filter: drop-shadow(5px 20px 3px);
   // filter: drop-shadow(0 0 0.2rem purple);
-  // border: 1px solid purple;
+  // filter: drop-shadow(0px 20px 5px #db974f);
+  // left: -100dvw;
   @keyframes moveRight {
     0% {
       right: -100dvw;
@@ -67,12 +68,17 @@ const TransitionStrip = styled.div`
         ? `
       left: -100dvw;
       animation-name: moveLeft;
-      background: linear-gradient(to right, rgba(219, 151, 79, 0.2), rgba(219, 151, 79, 1));
+      // 11, 20, 36
+      background: linear-gradient(to right, rgba(21, 38, 66, .2), rgba(11, 20, 36, 1));
+      border: 1px solid #db974f;
+
       `
         : `
       right: 100dvw;
       animation-name: moveRight;
-      background: linear-gradient(to left, rgba(219, 151, 79, 0.2), rgba(219, 151, 79, 1));
+      background: linear-gradient(to left, rgba(21, 38, 66, .2), rgba(11, 20, 36, 1));
+      border: 1px solid #db974f;
+
       `}
     `}
 `;
