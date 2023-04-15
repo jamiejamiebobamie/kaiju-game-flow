@@ -252,7 +252,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityFireActive":
       return {
         title: "Wildfire",
-        description: "Create a single, lateral line of fire.",
+        description: "Create a single, lateral line of fire",
         effect1: "Fire travels in the direction of your closest enemy",
         effect2: "",
         img: "",
@@ -401,11 +401,8 @@ const Wrapper = styled.div`
   /* background-color: green; */
   /* box-shadow: 3px 7px 10px black; */
   align-self: flex-end;
-  ${props =>
-    props.isContent
-      ? "height: 300px; border-width: 1px;"
-      : "height: 0px; border-width: 0px;"}
-  transition: height 1s, border-width 1s;
+  height: 300px;
+  border-width: 1px;
 `;
 export const DescriptionDisplay = ({
   hoveredContent = null,
@@ -415,9 +412,9 @@ export const DescriptionDisplay = ({
   pickedAbilities,
   isTutorial
 }) => {
-  const isContentRef = useRef(false);
+  // const isContentRef = useRef(false);
   const [isContent, setIsContent] = useState(true);
-  const [hasHovered, setHasHovered] = useState(false);
+  // const [hasHovered, setHasHovered] = useState(false);
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
   const {
@@ -436,19 +433,19 @@ export const DescriptionDisplay = ({
     img: "",
     formatData: {}
   };
-  useEffect(() => {
-    if (!!title) {
-      setIsContent(true);
-      !hasHovered && setHasHovered(true);
-      isContentRef && clearTimeout(isContentRef.current);
-    } else {
-      if (hasHovered) {
-        isContentRef.current = setTimeout(() => setIsContent(false), 3000);
-      }
-    }
-  }, [title]);
+  // useEffect(() => {
+  //   if (!!title) {
+  //     setIsContent(true);
+  //     !hasHovered && setHasHovered(true);
+  //     isContentRef && clearTimeout(isContentRef.current);
+  //   } else {
+  //     if (hasHovered) {
+  //       isContentRef.current = setTimeout(() => setIsContent(false), 3000);
+  //     }
+  //   }
+  // }, [title]);
   return (
-    <Wrapper isContent={isContent} isClassWrapper={isClassWrapper}>
+    <Wrapper isClassWrapper={isClassWrapper}>
       <h2
         style={{
           display: "flex",

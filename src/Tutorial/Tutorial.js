@@ -444,6 +444,30 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const shiftContentOver = tutorialViewIndex === 6;
   return (
     <Wrapper>
+      {tutorialViewIndex !== 0 && tutorialViewIndex !== 5 && (
+        <div
+          style={{
+            display: "flex",
+            width: "400px",
+            // backgroundColor: "red",
+            alignSelf: "flex-start",
+            marginTop: "-75px",
+            marginLeft: "-100px",
+            transform: "scale(.8)"
+          }}
+        >
+          <ButtonGroup>
+            <ButtonsWrapper>
+              <Button
+                onClick={() => triggerTransition(() => handleClickHome())}
+              >
+                <ButtonOutline zIndex={1} />
+                Home
+              </Button>
+            </ButtonsWrapper>
+          </ButtonGroup>
+        </div>
+      )}
       <TitleWrapper>
         <Title>{title[0]}</Title>
       </TitleWrapper>

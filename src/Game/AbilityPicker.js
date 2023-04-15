@@ -91,17 +91,17 @@ export const ButtonGroup = styled.div`
   /* z-index: 2; */
   display: flex;
   justify-content: flex-end;
-  flex-direction: column;
+  // flex-direction: row;
   align-items: center;
-  width: 250px;
+  width: 80%;
   height: 30px;
   top: 20px;
   right: 30px;
   bottom: 30px;
   transform: scale(1.2, 1.5);
-  margin-top: 20px;
-  margin-bottom: 40px;
-  /* background-color: orange; */
+  margin-top: 80px;
+  margin-bottom: 20px;
+  // /* background-color: orange; */
 `;
 
 const PlayButton = styled.div`
@@ -249,17 +249,15 @@ export const AbilityPicker = ({
         </CheckboxWrapper>
         <ButtonGroup>
           <ButtonsWrapper>
-            <Button onClick={handleClickPlay}>
-              <ButtonOutline zIndex={1} />
-              Play!
-            </Button>
-          </ButtonsWrapper>
-        </ButtonGroup>
-        <ButtonGroup>
-          <ButtonsWrapper>
             <Button onClick={handleClickHome}>
               <ButtonOutline zIndex={1} />
               Home
+            </Button>
+          </ButtonsWrapper>
+          <ButtonsWrapper>
+            <Button onClick={handleClickPlay}>
+              <ButtonOutline zIndex={1} />
+              Play!
             </Button>
           </ButtonsWrapper>
         </ButtonGroup>

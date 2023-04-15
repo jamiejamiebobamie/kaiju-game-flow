@@ -13,11 +13,6 @@ const Wrapper = styled.i`
   pointer-events: none;
 `;
 
-// ${props =>
-//   props.anim &&
-//   `animation: ${props.anim} 0.3s steps(${
-//     props.dir === "idle" ? 1 : 10
-//   }) infinite;`};
 const SpriteSheet = styled.div`
   pointer-events: none;
   ${props =>
