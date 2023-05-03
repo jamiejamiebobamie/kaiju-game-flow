@@ -25,14 +25,16 @@ const TransitionStrip = styled.div`
     }
     45% {
       right: 25dvw;
-    }
-    50% {
-      right: 50dvw;
       ${props =>
         props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
+    50% {
+      right: 50dvw;
+    }
     55% {
       right: 25dvw;
+      ${props =>
+        props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
     100% {
       right: -100dvw;
@@ -47,14 +49,16 @@ const TransitionStrip = styled.div`
     }
     45% {
       left: 25dvw;
-    }
-    50% {
-      left: 50dvw;
       ${props =>
         props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
+    50% {
+      left: 50dvw;
+    }
     55% {
       left: 25dvw;
+      ${props =>
+        props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
     100% {
       left: -100dvw;
@@ -72,12 +76,15 @@ const TransitionStrip = styled.div`
         ? `
       left: -100dvw;
       animation-name: moveLeft;
-      background: linear-gradient(to right, rgba(227, 241, 255, 1), rgba(227, 241, 255, 1));
+      // #c7e2fe
+      // #b5d9fe
+      // 181, 218, 254
+      background: linear-gradient(to right, rgba(181, 218, 254, 1), rgba(181, 218, 254, 1));
       `
         : `
       right: 100dvw;
       animation-name: moveRight;
-      background: linear-gradient(to left, rgba(227, 241, 255, 1), rgba(227, 241, 255, 1));
+      background: linear-gradient(to left, rgba(181, 218, 254, 1), rgba(181, 218, 254, 1));
       `}
     `}
 `;
@@ -119,6 +126,19 @@ const App = () => {
   };
   return (
     <div className="App">
+      <div
+        style={
+          {
+            // position: "absolute",
+            // backgroundColor: "red",
+            // width: "2000px",
+            // height: "1200px",
+            // zIndex: "9999999",
+            // opacity: ".4",
+            // pointerEvents: "none"
+          }
+        }
+      />
       <TransitionWrapper>{transition}</TransitionWrapper>
       <Home triggerTransition={triggerTransition} />
     </div>

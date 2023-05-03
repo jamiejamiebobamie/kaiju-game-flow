@@ -23,7 +23,7 @@ export const ButtonGroup = styled.div`
   align-items: center;
   width: 500px;
   height: 200px;
-  margin-top: 25px;
+  margin-top: 200px;
   transform: scale(1.2, 1.5);
 `;
 export const ButtonsWrapper = styled.div`
@@ -210,9 +210,35 @@ export const Oval = styled.div`
 `;
 export const Rectangle = styled.div`
   position: absolute;
-  z-index: -2;
+  z-index: -3;
   margin-top: -257px;
   width: 400px;
   height: 150px;
   background-color: #152642;
+`;
+// export const Cloud = styled.img`
+//   position: absolute;
+//   z-index: -2;
+//   ${props => props.marginTop && `margin-top: ${props.marginTop}px;`}
+//   ${props =>
+//     props.marginLeft &&
+//     `margin-left: ${props.marginLeft}px;`}
+//   transform: scale(0.7);
+//   filter: invert(75%);
+//   // drop-shadow(0px 0px 20px #b5d9fe)
+//   // background: #c7e2fe;
+// `;
+
+export const Cloud = styled.img`
+  position: absolute;
+  // z-index: -2;
+  ${props => props.width && `width: ${props.width}px;`}
+  height:15px;
+  border-radius: 15px;
+  ${props => props.marginTop && `margin-top: ${props.marginTop}px;`}
+  ${props =>
+    props.marginLeft &&
+    `margin-left: ${props.marginLeft}px;`}
+  background-color: #b5d9fe;
+  box-shadow: 15px 15px 20px black;
 `;

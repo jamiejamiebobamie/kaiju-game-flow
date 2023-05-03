@@ -124,6 +124,7 @@ export const PlayerUI = ({
           <HealthBar
             health={(playerData.length && playerData[playerIndex].lives) || 0}
             setDisplayString={setDisplayString}
+            isTeammate={isTeammate}
           />
         </>
       ) : (

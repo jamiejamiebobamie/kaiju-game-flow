@@ -1541,7 +1541,9 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 40,
+    // cooldownTimeAI: 40,
+    cooldownTimeAI: 50,
+
     cooldownTime: 5000,
     color: "PaleTurquoise"
   },
@@ -1582,7 +1584,8 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 3000,
-    cooldownTimeAI: 40,
+    // cooldownTimeAI: 40,
+    cooldownTimeAI: 50,
     color: "tomato"
   },
   wood: {
@@ -1621,7 +1624,9 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    cooldownTimeAI: 60,
+    // cooldownTimeAI: 60,
+    cooldownTimeAI: 50,
+
     color: "Chartreuse"
   },
   lightning: {
@@ -1660,7 +1665,9 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 3000,
-    cooldownTimeAI: 20,
+    // cooldownTimeAI: 20,
+    cooldownTimeAI: 35,
+
     color: "cyan"
   },
   death: {
@@ -1699,7 +1706,9 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 10000,
-    cooldownTimeAI: 150,
+    // cooldownTimeAI: 150,
+    cooldownTimeAI: 50,
+
     color: "GhostWhite"
   },
   bubble: {
@@ -1739,7 +1748,9 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 5000,
-    cooldownTimeAI: 80,
+    // cooldownTimeAI: 80,
+    cooldownTimeAI: 50,
+
     color: "Thistle"
   },
   metal: {
@@ -1781,7 +1792,9 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 5000,
-    cooldownTimeAI: 100,
+    // cooldownTimeAI: 100,
+    cooldownTimeAI: 50,
+
     color: "AntiqueWhite"
   },
   glass: {
@@ -1814,7 +1827,9 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 12000,
+    // cooldownTimeAI: 50,
     cooldownTimeAI: 50,
+
     color: "BlueViolet"
   },
   heart: {
@@ -1847,7 +1862,9 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 100,
+    // cooldownTimeAI: 100,
+    cooldownTimeAI: 50,
+
     cooldownTime: 10000,
     color: "pink"
   },
@@ -1882,6 +1899,8 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTimeAI: 200,
+    // cooldownTimeAI: 50,
+
     color: "#df73ff"
   }
 };

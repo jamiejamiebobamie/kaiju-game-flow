@@ -306,6 +306,7 @@ export const Kaiju = ({ zIndex, dir, charLocation, element, color, lives }) => {
   const [isDamaged, setIsDamaged] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [anim, setAnim] = useState("down");
+  // console.log(dir);
   useEffect(() => {
     dir && setAnim(dir === "idle" ? `${dir}${anim}` : dir);
   }, [dir]);

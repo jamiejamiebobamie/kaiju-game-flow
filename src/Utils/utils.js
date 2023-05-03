@@ -339,6 +339,33 @@ export const spawnKaiju = (
         ...location,
         scale
       });
+  const kaijuTileLocation = getTileXAndY({
+    i: kaijuTile.i,
+    j: kaijuTile.j,
+    scale: 0.3
+  });
+  const distance = getDistance(kaijuTileLocation, location);
+  const normVec = distance && {
+    x: (kaijuTileLocation.x - location.x) / distance,
+    y: (kaijuTileLocation.y - location.y) / distance
+  };
+  const dir = getMonsterSwimAnimDirFromNormVec(normVec);
+  // const [tile, _] = getAdjacentTilesFromNormVec(
+  //   kaijuTileLocation,
+  //   inverseNormVec,
+  //   0.3,
+  //   1
+  // );
+  // const dir = getDirFromTiles(tile, kaijuTile);
+  // const dir =
+  //   dirs && !!dirs.length
+  //     ? dirs[0] !== "idle"
+  //       ? `${dirs[0].split(" ")[0]}${dirs[0]
+  //           .split(" ")[1]
+  //           .slice(0, 1)
+  //           .toUpperCase() + dirs[0].split(" ")[1].slice(1)}`
+  //       : dirs[0]
+  //     : "idle";
   const key = Math.random();
   return isRespawn
     ? {
@@ -351,6 +378,7 @@ export const spawnKaiju = (
         isThere: false,
         lives: 3,
         isOnTiles: false,
+        dir,
         moveSpeed: kaijuData[0]
           ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < 4
             ? kaijuData[0].moveSpeed + 1
@@ -380,7 +408,8 @@ export const spawnKaiju = (
         numTilesModifier: 0,
         tileCountModifier: 0,
         isHealed: false,
-        isTeleported: false
+        isTeleported: false,
+        dir
       };
 };
 export const updateHighlightedTiles = (
@@ -762,6 +791,11 @@ export const updateTileState = (
     }
   });
 };
+const getMonsterSwimAnimDirFromNormVec = normVec => {
+  const xDir = normVec.x > 0 ? "Right" : "Left"; // go right
+  const yDir = normVec.y > 0 ? "down" : "up"; // go up
+  return `${yDir}${xDir}`;
+};
 const isTileOnGameBoardTutorial = tile => {
   return !!(0 <= tile.i && tile.i < 24 && 0 <= tile.j && tile.j < 10);
 };
@@ -1112,10 +1146,15 @@ export const movePlayerPieces = (
                 : [];
           }
           // use powers
+          const maxAccTime = _data[i].abilities
+            .map(({ accTime }) => Number(accTime))
+            .reduce((acc, item) => (acc < item ? item : acc), -1);
+          const hasWaited = accTime - maxAccTime > 25;
+          let hasUsedOnePower = false;
           _data[i].abilities.forEach((a, j) => {
             const isCooldownOver =
               accTime - a.accTime >= a.cooldownTimeAI || accTime < a.accTime;
-            if (isCooldownOver) {
+            if (isCooldownOver && hasWaited && !hasUsedOnePower) {
               const [targetTile, _] = getClosestEntityFromTile(
                 enemyData,
                 _data[i].tile,
@@ -1159,6 +1198,7 @@ export const movePlayerPieces = (
                 isEscapePowerAndIsInDanger ||
                 isHealPowerAndIsTeammateHealthLow
               ) {
+                hasUsedOnePower = true;
                 _data[i].abilities[j].accTime = accTime;
                 a.activateActive(
                   i,
@@ -1369,7 +1409,9 @@ export const moveKaijuPieces = (
           // - - - - - - - - - - -
           if (_data[i].isThere && _data[i].moveToTiles.length) {
             const [nextTile, ...tiles] = _data[i].moveToTiles;
-            const playerDirection = getDirFromTiles(_data[i].tile, nextTile);
+            const playerDirection = _data[i].isOnTiles
+              ? getDirFromTiles(_data[i].tile, nextTile)
+              : _data[i].dir;
             _data[i].dir = playerDirection;
             if (!tiles.length) {
               _data[i].moveToLocation =
@@ -1393,6 +1435,7 @@ export const moveKaijuPieces = (
           }
         }
         if (
+          _data[i].isOnTiles &&
           _data[i].isThere &&
           !_data[i].moveToTiles.length &&
           _data[i].dir !== "idle"
@@ -1431,7 +1474,7 @@ export const moveKaijuPieces = (
     }
     const newKaiju =
       !isTutorial &&
-      (winner === null) & (_data.length < 4) &&
+      (winner === null) & (_data.length < 7) &&
       accTime &&
       !(accTime % 100) &&
       spawnKaiju(_data, enemyData, scale);

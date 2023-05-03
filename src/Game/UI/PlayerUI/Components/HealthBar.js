@@ -4,12 +4,15 @@ import { useHover } from "../../../../Utils/utils";
 
 const Wrapper = styled.div`
   display: flex;
-  /* overflow: hidden; */
-  justify-content: flex-start;
+  ${props =>
+    !!props.health
+      ? "justify-content: flex-start;"
+      : "flex-direction: column; justify-content: center; text-align: center; font-size: 15px;"}
+  ${props =>
+    !!props.isTeammate && !props.health && "font-size: 19px;"}
   width: 230px;
   height: 30px;
   margin-left: 5px;
-  /* background-color: purple; */
 `;
 const Bar = styled.div`
   ${props =>
@@ -31,12 +34,24 @@ const Bar = styled.div`
   border-color: #db974f;
   margin: 5px;
 `;
-export const HealthBar = ({ setDisplayString, health = 1 }) => {
+export const HealthBar = ({
+  setDisplayString,
+  health = 1,
+  isTeammate = false
+}) => {
   const [setHoverRef, hoverLookupString] = useHover();
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const bars = [];
   for (let i = 0; i < health; i++) {
     bars.push(<Bar key={i} numHealth={health} />);
   }
-  return <Wrapper ref={setHoverRef("healthBar")}>{bars}</Wrapper>;
+  return (
+    <Wrapper
+      health={health}
+      isTeammate={isTeammate}
+      ref={setHoverRef("healthBar")}
+    >
+      {health ? bars : "Incapacitated!"}
+    </Wrapper>
+  );
 };
