@@ -42,7 +42,7 @@ const Image = styled.div`
 
   ${props =>
     props.color
-      ? `background-color: ${props.color}; opacity: .1;`
+      ? `background-color: ${props.color}; opacity: .2;`
       : `${
           props.isTutorial
             ? "background-color: #db974f; opacity: 0.1;"
@@ -52,14 +52,14 @@ const Image = styled.div`
   ${props =>
     props.isHighlighted0 &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: blue; opacity: .5;"}; // player1 #495a6e
+    "background-color: #55AAff; opacity: .4;"}; // player1 #495a6e
   ${props =>
     props.isKaiju &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
     "background-color: #BF40BF; opacity: .9;"}; // kaiju
   ${props =>
     props.isPlayer === 0
-      ? "background-color: blue; opacity: .6;" // player1 #495a6e
+      ? "background-color: #55AAff; opacity: .2;" // player1 #495a6e
       : props.isPlayer === 1
       ? "background-color: #FFA836; opacity: .6;" // player2
       : null};
