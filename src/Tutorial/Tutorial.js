@@ -472,7 +472,11 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         <Title>{title[0]}</Title>
       </TitleWrapper>
       {tutorialViewIndex === 1 ? (
-        <GameMap borderStyles={borderStyles} mapStyles={mapStyles} />
+        <GameMap
+          isTutorial={true}
+          borderStyles={borderStyles}
+          mapStyles={mapStyles}
+        />
       ) : (
         <TutorialGameBoard
           shiftContentOver={shiftContentOver}

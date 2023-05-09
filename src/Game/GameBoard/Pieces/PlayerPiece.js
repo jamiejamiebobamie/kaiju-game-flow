@@ -16,13 +16,13 @@ const Wrapper = styled.i`
 const SpriteSheet = styled.div`
   pointer-events: none;
   ${props =>
-    props.color === "blue"
+    props.isPlayerOne
       ? 'background: url("spritesheet/player.png");'
       : 'background: url("spritesheet/teammate.png");'}
   transform: scale(.4) translate(-130px, -165px);
   height: 200px;
   width: 152px;
-  ${props => `filter: drop-shadow(0 0 3px ${props.color});`}
+  ${props => `filter: drop-shadow(0 0 20px ${props.color});`}
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
@@ -309,7 +309,7 @@ export const Player = ({
     <Wrapper zIndex={zIndex} lives={lives} charLocation={charLocation}>
       {modifierText}
       <Character isDamaged={isDamaged}>
-        <SpriteSheet anim={anim} color={color} />
+        <SpriteSheet isPlayerOne={i === 0} anim={anim} color={color} />
       </Character>
     </Wrapper>
   );

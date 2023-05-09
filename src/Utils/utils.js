@@ -247,7 +247,7 @@ export const initializeGameBoard = (
       isInManaPool: false,
       isHealed: false,
       isTeleported: false,
-      color: k ? "salmon" : "blue",
+      color: k ? "salmon" : "lightblue",
       charLocation: location,
       moveFromLocation: location,
       moveToLocation: location,
@@ -491,6 +491,7 @@ export const redrawTiles = (
               i={i}
               j={j}
               scale={scale}
+              isTutorial={isTutorial}
               setClickedIndex={setClickedTile}
               tileLocation={tileLocation}
               isHighlighted0={highlightedTiles0.some(

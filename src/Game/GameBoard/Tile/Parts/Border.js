@@ -36,26 +36,36 @@ const HexagonHalf = styled.div`
 `;
 const Line = styled.div`
   position: absolute;
-  opacity: 0.3;
-  background-color: grey;
+  // opacity: 0.7;
+  // background-color: #a54dff;
+
+  ${props =>
+    props.color
+      ? `background-color: ${props.color}; opacity: .3;`
+      : `background-color: ${
+          props.isTutorial ? "#db974f" : "#a54dff"
+        }; opacity: 0.3;`}
+
+  // #db974f;
   width: 5px;
   height: 50px;
   border: 0.5px;
   border-radius: 50px;
   pointer-events: none;
+  // filter: drop-shadow(0 0 10px #a54dff);
 `;
-export const Border = () => {
+export const Border = ({ color, isTutorial }) => {
   return (
     <>
       <HexagonHalf>
-        <Line />
-        <Line />
-        <Line />
+        <Line isTutorial={isTutorial} color={color} />
+        <Line isTutorial={isTutorial} color={color} />
+        <Line isTutorial={isTutorial} color={color} />
       </HexagonHalf>
       <HexagonHalf isFlipped>
-        <Line />
-        <Line />
-        <Line />
+        <Line isTutorial={isTutorial} color={color} />
+        <Line isTutorial={isTutorial} color={color} />
+        <Line isTutorial={isTutorial} color={color} />
       </HexagonHalf>
     </>
   );

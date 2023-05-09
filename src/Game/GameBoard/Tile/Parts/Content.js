@@ -37,19 +37,30 @@ const Image = styled.div`
   -ms-transform: rotate(-60deg);
   -o-transform: rotate(-60deg);
   transform: rotate(-60deg);
+  // background-color: #a54dff;
+  // background-color: lightgrey;
+
+  ${props =>
+    props.color
+      ? `background-color: ${props.color}; opacity: .1;`
+      : `${
+          props.isTutorial
+            ? "background-color: lightgrey; opacity: 0.1;"
+            : "background-color: #a54dff; opacity: 0.2;"
+        }`}
   ${props =>
     props.isHighlighted0 &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: #495a6e;opacity: 0.5;"};
+    "background-color: blue;opacity: .9;"}; // player1 #495a6e
   ${props =>
     props.isKaiju &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: #BF40BF; opacity: 0.5;"};
+    "background-color: #BF40BF; opacity: .9;"}; // kaiju
   ${props =>
     props.isPlayer === 0
-      ? "background-color: #495a6e;opacity: .7;"
+      ? "background-color: blue; opacity: .9;" // player1 #495a6e
       : props.isPlayer === 1
-      ? "background-color: #FFA836;opacity: .3;"
+      ? "background-color: #FFA836; opacity: .6;" // player2
       : null};
 `;
 export const Content = ({
@@ -57,7 +68,9 @@ export const Content = ({
   onClick,
   index,
   setHoverRef,
-  status
+  status,
+  color,
+  isTutorial
 }) => {
   const { i, j } = index;
   return (
@@ -69,6 +82,8 @@ export const Content = ({
           isKaiju={status.isKaiju}
           isHighlighted0={isHighlighted0}
           isPlayer={status.isPlayer}
+          color={color}
+          isTutorial={isTutorial}
         />
       </ImageWrapper>
     </ContentWrapper>

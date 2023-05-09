@@ -68,7 +68,7 @@ const MonsterImg = styled.img`
 const SpriteSheet = styled.div`
   pointer-events: none;
   display: ${props => (props.lives > 0 ? "flex" : "none")};
-  background: url("spritesheet/kaiju.png");
+  background: url("spritesheet/kaiju_sprite.png");
   transform: scale(0.4) translate(-130px, -165px);
   height: 200px;
   width: 152px;
