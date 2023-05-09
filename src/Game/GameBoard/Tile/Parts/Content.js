@@ -45,20 +45,21 @@ const Image = styled.div`
       ? `background-color: ${props.color}; opacity: .1;`
       : `${
           props.isTutorial
-            ? "background-color: lightgrey; opacity: 0.1;"
-            : "background-color: #a54dff; opacity: 0.2;"
+            ? "background-color: #db974f; opacity: 0.1;"
+            : // : "background-color: #a54dff; opacity: .15;"
+              "background-color: lightgrey; opacity: .1;"
         }`}
   ${props =>
     props.isHighlighted0 &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: blue;opacity: .9;"}; // player1 #495a6e
+    "background-color: blue; opacity: .5;"}; // player1 #495a6e
   ${props =>
     props.isKaiju &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
     "background-color: #BF40BF; opacity: .9;"}; // kaiju
   ${props =>
     props.isPlayer === 0
-      ? "background-color: blue; opacity: .9;" // player1 #495a6e
+      ? "background-color: blue; opacity: .6;" // player1 #495a6e
       : props.isPlayer === 1
       ? "background-color: #FFA836; opacity: .6;" // player2
       : null};

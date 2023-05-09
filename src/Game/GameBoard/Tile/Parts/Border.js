@@ -42,9 +42,12 @@ const Line = styled.div`
   ${props =>
     props.color
       ? `background-color: ${props.color}; opacity: .3;`
-      : `background-color: ${
-          props.isTutorial ? "#db974f" : "#a54dff"
-        }; opacity: 0.3;`}
+      : `${
+          props.isTutorial
+            ? "background-color: #db974f; opacity: 0.3;"
+            : // : "background-color: #a54dff; opacity: .3;"
+              "background-color: lightgrey; opacity: .2;"
+        }`}
 
   // #db974f;
   width: 5px;

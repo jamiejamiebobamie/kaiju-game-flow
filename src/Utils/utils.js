@@ -247,7 +247,7 @@ export const initializeGameBoard = (
       isInManaPool: false,
       isHealed: false,
       isTeleported: false,
-      color: k ? "salmon" : "lightblue",
+      color: k ? "salmon" : "blue",
       charLocation: location,
       moveFromLocation: location,
       moveToLocation: location,
