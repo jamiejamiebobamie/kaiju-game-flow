@@ -52,16 +52,16 @@ const Image = styled.div`
   ${props =>
     props.isHighlighted0 &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: #55AAff; opacity: .4;"}; // player1 #495a6e
+    "background-color: #55AAff; opacity: .4;"}; // player1
   ${props =>
     props.isKaiju &&
     (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: #BF40BF; opacity: .9;"}; // kaiju
+    "background-color: #BF40BF; opacity: .4;"}; // kaiju
   ${props =>
     props.isPlayer === 0
-      ? "background-color: #55AAff; opacity: .2;" // player1 #495a6e
+      ? "background-color: #55AAff; opacity: .4;" // player1
       : props.isPlayer === 1
-      ? "background-color: #FFA836; opacity: .6;" // player2
+      ? "background-color: #FFA836; opacity: .4;" // player2
       : null};
 `;
 export const Content = ({

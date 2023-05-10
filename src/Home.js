@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tutorial } from "./Tutorial/Tutorial";
 import { Game } from "./Game/Game";
 import { MainMenu } from "./MainMenu";
@@ -14,15 +14,35 @@ export const Home = ({ triggerTransition }) => {
   const handleClickHome = () => {
     setIsTutorial(false);
     setIsGame(false);
+    window.history.pushState({}, "Kaiju City", "/home");
   };
   const handleClickGame = () => {
     setIsTutorial(false);
     setIsGame(true);
+    window.history.pushState({}, "Kaiju City", "/game");
   };
   const handleClickTutorial = () => {
     setIsTutorial(true);
     setIsGame(false);
+    window.history.pushState({}, "Kaiju City", "/tutorial");
   };
+
+  const { pathname } = window.location;
+
+  useEffect(() => {
+    switch (pathname) {
+      case "/game":
+        !isGame && handleClickGame();
+        break;
+      case "/tutorial":
+        !isTutorial && handleClickTutorial();
+        break;
+      default:
+        handleClickHome();
+        break;
+    }
+  }, [pathname, isGame, isTutorial]);
+
   return isTutorial ? (
     <Tutorial
       triggerTransition={triggerTransition}

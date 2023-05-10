@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Home } from "./Home";
 import styled, { css } from "styled-components";
-
 import "./App.css";
 
 const TransitionWrapper = styled.div`
@@ -124,21 +123,9 @@ const App = () => {
       }
     });
   };
+
   return (
     <div className="App">
-      <div
-        style={
-          {
-            // position: "absolute",
-            // backgroundColor: "red",
-            // width: "2000px",
-            // height: "1200px",
-            // zIndex: "9999999",
-            // opacity: ".4",
-            // pointerEvents: "none"
-          }
-        }
-      />
       <TransitionWrapper>{transition}</TransitionWrapper>
       <Home triggerTransition={triggerTransition} />
     </div>

@@ -741,6 +741,8 @@ export const updateTileState = (
                             count: 0
                           };
                     _statuses[i][j].updateKey = updateKey;
+                    if (_statuses[i][j][k] === undefined)
+                      delete _statuses[i][j][k];
                   });
               } else {
                 Array.isArray(dirs) &&
