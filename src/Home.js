@@ -33,15 +33,21 @@ export const Home = ({ triggerTransition }) => {
     switch (pathname) {
       case "/game":
         !isGame && handleClickGame();
+        console.log(pathname);
+        // handleClickGame();
         break;
       case "/tutorial":
         !isTutorial && handleClickTutorial();
+        console.log(pathname);
+        // handleClickTutorial();
         break;
       default:
+        // (isTutorial || isGame) && handleClickHome();
+        console.log(pathname);
         handleClickHome();
         break;
     }
-  }, [pathname, isGame, isTutorial]);
+  }, [pathname]);
 
   return isTutorial ? (
     <Tutorial
