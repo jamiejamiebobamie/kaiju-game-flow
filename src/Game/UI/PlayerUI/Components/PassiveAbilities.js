@@ -39,6 +39,7 @@ const PassiveAbility = styled.div`
   transform: rotate(
     ${props => (props.isReversed ? props.i * 18 - 90 : props.i * 18 - 30)}deg
   );
+  pointer-events: auto;
 `;
 const PassiveIcon = styled.i`
   display: flex;

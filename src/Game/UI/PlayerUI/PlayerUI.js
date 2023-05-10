@@ -27,6 +27,7 @@ const Wrapper = styled.div`
   background-color: #152642;
   ${props =>
     props.isTeammate && "align-content: flex-end; transform:scale(.75); "}
+  pointer-events: auto;
 `;
 const PlayerBorder = styled.div`
   position: absolute;

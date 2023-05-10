@@ -100,6 +100,8 @@ const Wrapper = styled.div`
       transform: rotate3d(0, 1, 0, 0deg);
     }
   }
+  pointer-events: auto;
+  
 `;
 const AbilityIcon = styled.i`
   color: ${props => props.color};

@@ -13,6 +13,8 @@ const Wrapper = styled.div`
   margin-right: 30px;
   height: 450px;
   z-index: 9999999;
+  // background-color: white;
+  pointer-events: none;
 `;
 const ButtonGroup = styled.div`
   z-index: 1;
@@ -27,6 +29,7 @@ const ButtonGroup = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 30px;
+  pointer-events: auto;
 `;
 const ButtonsWrapper = styled.div`
   position: relative;
@@ -36,6 +39,7 @@ const ButtonsWrapper = styled.div`
   width: 100%;
   margin-bottom: 10px;
   height: 40px;
+  pointer-events: auto;
 `;
 const Button = styled.div`
   display: flex;
@@ -61,6 +65,7 @@ const Button = styled.div`
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
   background-color: #376e5b;
+  pointer-events: auto;
 `;
 const ButtonOutline = styled.div`
   position: absolute;
@@ -75,11 +80,7 @@ const ButtonOutline = styled.div`
   border-right: 0.3px solid black;
   border-left: 0.3px solid black;
   border-bottom: 0.5px solid black;
-`;
-const Logo = styled.img`
-  position: absolute;
-  top: 55px;
-  right: 65px;
+  pointer-events: auto;
 `;
 export const UI = ({
   playerData,

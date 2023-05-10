@@ -36,26 +36,20 @@ const HexagonHalf = styled.div`
 `;
 const Line = styled.div`
   position: absolute;
-  // opacity: 0.7;
-  // background-color: #a54dff;
-
   ${props =>
     props.color
       ? `background-color: ${props.color}; opacity: .3;`
       : `${
           props.isTutorial
             ? "background-color: #db974f; opacity: 0.3;"
-            : // : "background-color: #a54dff; opacity: .3;"
-              "background-color: lightgrey; opacity: .2;"
+            : "background-color: lightgrey; opacity: .2;"
         }`}
 
-  // #db974f;
   width: 5px;
   height: 50px;
   border: 0.5px;
   border-radius: 50px;
   pointer-events: none;
-  // filter: drop-shadow(0 0 10px #a54dff);
 `;
 export const Border = ({ color, isTutorial }) => {
   return (

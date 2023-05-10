@@ -1670,7 +1670,14 @@ export const getAdjacentTilesTutorial = tile => {
 };
 const findPath = (start, goal, scale, isTutorial) => {
   let count = 0;
-  return recur(start, [], count);
+  return recur(start, [], count).reduce((acc, tile) => {
+          if(!!tile && !acc.lookup[`${tile.i} ${tile.j}`]){
+              acc.lookup[`${tile.i} ${tile.j}`] = true;
+              acc.result.push(tile);
+          }
+          return acc;
+      }, { lookup: {}, result: [] }
+  ).result;
   function recur(currTile, arr, count) {
     if ((currTile.i === goal.i && currTile.j === goal.j) || count > 400)
       return arr;
