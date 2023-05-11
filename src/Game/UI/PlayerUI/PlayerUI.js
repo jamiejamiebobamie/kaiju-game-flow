@@ -102,8 +102,8 @@ export const PlayerUI = ({
   isTeammate,
   scale
 }) => {
-  const [setHoverRef, hoverLookupString] = useHover();
-  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
+  // const [setHoverRef, hoverLookupString] = useHover();
+  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const _playerUI = (
     <Wrapper isTeammate={isTeammate}>
       {isReversed ? (
@@ -154,7 +154,7 @@ export const PlayerUI = ({
         <PlayerPicture
           src={playerIndex === 0 ? "player_avatar.png" : "teammate_avatar.png"}
           height="150px"
-          ref={setHoverRef(`modifiers ${playerIndex}`)}
+          // ref={setHoverRef(`modifiers ${playerIndex}`)}
           className="fa fa-user-circle"
           isReversed={isReversed}
         />

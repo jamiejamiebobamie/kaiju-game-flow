@@ -33,13 +33,13 @@ export const Kaiju = ({
   setDisplayString,
   isReversed
 }) => {
-  const [setHoverRef, hoverLookupString] = useHover();
-  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
+  // const [setHoverRef, hoverLookupString] = useHover();
+  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const kaijuIcons = kaijuArr.map((kaiju, i) => (
     <KaijuIcon
       key={i}
       className="fa fa-optin-monster"
-      ref={setHoverRef(`Kaiju`)}
+      // ref={setHoverRef(`Kaiju`)}
       title={`Kaiju #${i + 1}`}
       alt={""}
     />

@@ -77,9 +77,9 @@ export const Content = ({
   return (
     <ContentWrapper>
       <ImageWrapper>
-        <Image
-          ref={setHoverRef(`${i} ${j}`)}
-          onClick={onClick}
+         <Image
+          ref={isTutorial ? setHoverRef(`${i} ${j}`) : undefined}
+          onClick={isTutorial ? onClick : undefined}
           isKaiju={status.isKaiju}
           isHighlighted0={isHighlighted0}
           isPlayer={status.isPlayer}

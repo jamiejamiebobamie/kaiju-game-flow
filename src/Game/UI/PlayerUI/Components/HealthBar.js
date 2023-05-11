@@ -39,8 +39,8 @@ export const HealthBar = ({
   health = 1,
   isTeammate = false
 }) => {
-  const [setHoverRef, hoverLookupString] = useHover();
-  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
+  // const [setHoverRef, hoverLookupString] = useHover();
+  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const bars = [];
   for (let i = 0; i < health; i++) {
     bars.push(<Bar key={i} numHealth={health} />);
@@ -49,7 +49,7 @@ export const HealthBar = ({
     <Wrapper
       health={health}
       isTeammate={isTeammate}
-      ref={setHoverRef("healthBar")}
+      // ref={setHoverRef("healthBar")}
     >
       {health ? bars : "Incapacitated!"}
     </Wrapper>

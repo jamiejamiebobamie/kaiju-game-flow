@@ -4,7 +4,7 @@ import { Player } from "./Pieces/PlayerPiece";
 import { Kaiju } from "./Pieces/KaijuPiece";
 import { PauseModal } from "./PauseModal";
 import { GameMap } from "../../Components/GameMap.js";
-import { getFlattenedArrayIndex } from "../../Utils/utils";
+import { getFlattenedArrayIndex, getDistance } from "../../Utils/utils";
 const Board = styled.div`
   position: relative;
   width: 500px;
@@ -20,47 +20,12 @@ const Board = styled.div`
   border-thickness: medium;
   border-radius: 10px;
   border-color: #db974f;
+  cursor: pointer;
 `;
 const ShiftContentOver = styled.div`
   margin-top: -30px;
   margin-left: -5px;
   position: absolute;
-`;
-const RoadsImage = styled.img`
-  position: absolute;
-  ${props => props.zIndex && `z-index: -${props.zIndex};`};
-  pointer-events: none;
-  background-color: transparent;
-  opacity: 0.5;
-  ${props =>
-    props.speed && `animation: glitter ${props.speed}s linear infinite;`};
-  @keyframes glitter {
-    0% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 0.9;
-    }
-    100% {
-      opacity: 0.5;
-    }
-  }
-`;
-
-// const BackgroundImage = styled.svg`
-//   margin-left: -55px;
-//   pointer-events: none;
-//   background-color: #06080c;
-// `;
-
-// stroke-width: 1px;
-
-const Peninsula = styled.path`
-  fill: #1b2536;
-`;
-
-const GreenSpaces = styled.path`
-  fill: #173e41;
 `;
 export const GameBoard = ({
   isClassWrapper = false,
@@ -76,10 +41,10 @@ export const GameBoard = ({
   path,
   width,
   height,
-  scale
+  scale,
+  hoverLookupString,
+  setHoverLookupString
 }) => {
-  const [speed1, setSpeed1] = useState(Math.random() * 10 + 10);
-  const [speed2, setSpeed2] = useState(Math.random() * 10 + 10);
   useEffect(() => {
     const { i, _ } = clickedTile;
     if (i !== -1) {
@@ -112,12 +77,43 @@ export const GameBoard = ({
       zIndex={getFlattenedArrayIndex(p.tile)}
     />
   ));
-
-  // <BackgroundImage src={"mapPic.png"} width={500} />
-  // <RoadsImage zIndex={1} speed={3} src={"testRoads1.png"} width={500} />
-
   return (
-    <Board width={width} height={height}>
+    <Board
+      onClick={e => {
+          var rect = e.target.getBoundingClientRect();
+          var x = e.clientX - 23 - rect.left; // x position within the gameboard w/ offset: -23
+          var y = e.clientY - rect.top;  // y position within the gameboard.
+          const test = tiles && tiles.reduce((acc, {props : { i, j, tileLocation }}) =>
+                        {
+                            const distance = getDistance({ x, y }, tileLocation);
+                            return acc.distance > distance ? ({key: `${i} ${j}`, distance }) : acc;
+
+                        }  , {
+                            distance: Number.MAX_SAFE_INTEGER,
+                            key: undefined
+                          }
+                     )
+        test.key && setClickedTile(test.key);
+
+      }}
+      onMouseMove={e => {
+          var rect = e.target.getBoundingClientRect();
+          var x = e.clientX - 23 - rect.left; // x position within the gameboard w/ offset: -23
+          var y = e.clientY + 8 - rect.top;  // y position within the gameboard.
+          const test = tiles && tiles.reduce((acc, {props : { i, j, tileLocation }}) =>
+                        {
+                            const distance = getDistance({ x, y }, tileLocation);
+                            return acc.distance > distance ? ({key: `${i} ${j}`, distance }) : acc;
+
+                        }  , {
+                            distance: Number.MAX_SAFE_INTEGER,
+                            key: undefined
+                          }
+                     )
+        test.key && test.key !== hoverLookupString && setHoverLookupString(test.key);
+      }}
+      width={width}
+      height={height}>
       {isPaused && <PauseModal />}
       <ShiftContentOver scale={scale}>
         {tiles}

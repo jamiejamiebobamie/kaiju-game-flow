@@ -101,7 +101,7 @@ const Wrapper = styled.div`
     }
   }
   pointer-events: auto;
-  
+
 `;
 const AbilityIcon = styled.i`
   color: ${props => props.color};
@@ -167,8 +167,8 @@ export const Ability = ({
     accTime,
     color
   } = abilityData;
-  const [setHoverRef, hoverLookupString] = useHover();
-  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
+  // const [setHoverRef, hoverLookupString] = useHover();
+  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
@@ -209,7 +209,7 @@ export const Ability = ({
         handleClick();
       }}
       isAnimating={isAnimating}
-      ref={setHoverRef(`${displayLookup}Active`)}
+      // ref={setHoverRef(`${displayLookup}Active`)}
       title={activeName}
       color={color}
     >

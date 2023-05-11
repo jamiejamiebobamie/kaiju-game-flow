@@ -8,6 +8,7 @@ const Hexagon = styled.div`
   ${props =>
     `transform: translate(${props.x}px, ${props.y}px) scale(${props.scale});`};
   zindex: ${props => props.zIndex};
+  ${props => !props.isTutorial && "pointer-events: none;"}
 `;
 export const HexagonTile = ({
   tileLocation,
@@ -76,6 +77,7 @@ export const HexagonTile = ({
       scale={scale}
       x={tileLocation.x}
       y={tileLocation.y}
+      isTutorial={isTutorial}
     >
       <Content
         onClick={() =>

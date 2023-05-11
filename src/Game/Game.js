@@ -106,6 +106,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const scale = 0.3;
   const accTime = useRef(0);
   const [isTeammate, setIsTeammate] = useState(false);
+  const [isHoveringOnGameBoard, setIsHoveringOnGameBoard] = useState(false);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
   const [winner, setWinner] = useState(null);
@@ -121,7 +122,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [tiles, setTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
-  const [setHoverRef, hoverLookupString] = useHover();
+  const [hoverLookupString, setHoverLookupString] = useState('');
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
   const [replayModalMessage, setReplayModalMessage] = useState(null);
@@ -237,6 +238,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       }
     }
   }, [kaijuData, winner]);
+  // event tick
   useInterval(() => {
     updateHighlightedTiles(
       setHighlightedTiles0,
@@ -260,7 +262,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       );
     redrawTiles(
       highlightedTiles0,
-      setHoverRef,
+      () => {},
       setClickedTile,
       setTiles,
       playerData,
@@ -325,7 +327,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           scale,
           setTiles,
           setClickedTile,
-          setHoverRef,
+          () => {},
           tileStatuses,
           setTileStatuses,
           isTeammate
@@ -419,6 +421,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         width={width}
         height={height}
         scale={scale}
+        hoverLookupString={hoverLookupString}
+        setHoverLookupString={setHoverLookupString}
       />
       <UI
         playerData={playerData}

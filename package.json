@@ -65,6 +65,7 @@
     "start": "node scripts/start.js",
     "start": "nodemon app.js",
 
+
     "test": "jest"
   },
   "eslintConfig": {

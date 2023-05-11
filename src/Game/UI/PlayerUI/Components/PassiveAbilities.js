@@ -50,8 +50,8 @@ export const PassiveAbilities = ({
   isReversed,
   abilities = []
 }) => {
-  const [setHoverRef, hoverLookupString] = useHover();
-  useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
+  // const [setHoverRef, hoverLookupString] = useHover();
+  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const ICON_LOOKUP = {
     heart: "fa-gratipay",
     glass: "fa-tencent-weibo",
@@ -66,7 +66,7 @@ export const PassiveAbilities = ({
   const abilityButtons = abilities.map((data, i) => (
     <PassiveAbilityWrapper i={i}>
       <PassiveAbility
-        ref={setHoverRef(`${data.displayLookup}Passive`)}
+        // ref={setHoverRef(`${data.displayLookup}Passive`)}
         key={i}
         isReversed={isReversed}
         i={i}

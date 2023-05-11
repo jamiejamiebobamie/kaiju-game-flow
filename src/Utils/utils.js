@@ -281,7 +281,7 @@ export const initializeGameBoard = (
   // TILES      - - - - - - - - - -
   redrawTiles(
     [],
-    setHoverRef,
+    () => {},
     setClickedTile,
     setTiles,
     playerData,
@@ -1054,7 +1054,7 @@ const getCharXAndY = ({ i, j, scale }) => {
   const y = (i % 2 ? j * 80 + 40 : j * 80) * scale + 42.5 * scale;
   return { x, y };
 };
-const getDistance = (to, from) => {
+export const getDistance = (to, from) => {
   return Math.sqrt(
     (to.x - from.x) * (to.x - from.x) + (to.y - from.y) * (to.y - from.y)
   );
