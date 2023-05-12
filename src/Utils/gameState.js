@@ -1898,7 +1898,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 200,
+    cooldownTimeAI: 300,
     // cooldownTimeAI: 50,
 
     color: "#df73ff"

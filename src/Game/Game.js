@@ -101,6 +101,7 @@ const StyledImg = styled.img`
   box-shadow: 3px 7px 10px black;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
+  const TOTAL_KAIJU_SPAWNED = 7;
   const width = 500;
   const height = 800;
   const scale = 0.3;
@@ -162,7 +163,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     ["Escape"]
   );
   useEffect(() => {
-    if (kaijuKillCount.length >= 5) {
+    if (kaijuKillCount.length >= TOTAL_KAIJU_SPAWNED) {
       const _winner = 0;
       setWinner(_winner);
     }

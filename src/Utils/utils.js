@@ -367,6 +367,7 @@ export const spawnKaiju = (
   //       : dirs[0]
   //     : "idle";
   const key = Math.random();
+  const MAX_MOVE_SPEED = 2
   return isRespawn
     ? {
         key,
@@ -380,9 +381,9 @@ export const spawnKaiju = (
         isOnTiles: false,
         dir,
         moveSpeed: kaijuData[0]
-          ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < 4
+          ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < MAX_MOVE_SPEED
             ? kaijuData[0].moveSpeed + 1
-            : 4
+            : MAX_MOVE_SPEED
           : 1
       }
     : {
@@ -830,7 +831,7 @@ export const shootPower = ({
       const originTile = d.tile;
       const [targetTile, targetIndex] =
         statusKey === "isHealing"
-          ? data.length < 2 || data[0].lives < data[1].lives
+          ? data.length < 2 || !data[1].lives || data[0].lives < data[1].lives
             ? [data[0].tile, 0]
             : [data[1].tile, 1]
           : getClosestEntityFromTile(targetData, originTile, scale);
@@ -1140,19 +1141,18 @@ export const movePlayerPieces = (
               // const pathLength = Object.keys(path).length;
               // const moveToTiles = Array(pathLength).fill(0).map((_, i) => path[i]);
 
-              const moveToTiles = findPath(
+              const moveToSafetyTiles = findPath(
                   _data[1].tile,
-                  getSafeTile(enemyData, tileStatuses, scale),
+                  safeTile,
                   scale,
                   isTutorial
                 );
+              const isEnemyTooClose = moveToEnemyTiles.length < powerRangeAvg - 1;
+              const isEnemyTooFar = moveToEnemyTiles.length > powerRangeAvg + 10;
+              const moveCloserTiles = isEnemyTooFar ? moveToEnemyTiles.slice(0, moveToEnemyTiles.length - powerRangeAvg) : [];
+              const moveToTiles = _data[1].moveToTiles
 
-              _data[1].moveToTiles =
-                moveToEnemyTiles.length < powerRangeAvg - 1
-                  ? moveToTiles
-                    : moveToEnemyTiles.length > powerRangeAvg + 10
-                        ? moveToEnemyTiles.slice(0, moveToTiles.length - powerRangeAvg)
-                        : moveToTiles;
+              _data[1].moveToTiles = isEnemyTooClose ? moveToSafetyTiles : isEnemyTooFar ? moveCloserTiles : moveToTiles;
 
 
              // _data[1].moveToTiles =
@@ -1510,9 +1510,10 @@ export const moveKaijuPieces = (
           });
       }
     }
+    const MAX_KAIJU = 5
     const newKaiju =
       !isTutorial &&
-      (winner === null) & (_data.length < 7) &&
+      (winner === null) & (_data.length < MAX_KAIJU) &&
       accTime &&
       !(accTime % 100) &&
       spawnKaiju(_data, enemyData, scale);
@@ -1757,7 +1758,9 @@ const findPath = (start, goal, scale, isTutorial) => {
   }
 };
 
-const findPath2 = ({ numTiles,
+// not working
+const findPath2 = ({
+                     numTiles,
                      currTile,
                      pathLookup,
                      goalTile,
@@ -1774,8 +1777,9 @@ const findPath2 = ({ numTiles,
 
      const { i, j } = currTile;
 
-     // if currTile === goalTile, return path with lowest accumulated weight(?)
+     // if currTile is goalTile, return pathLookup object
      if (goalTile.i === i && goalTile.j === j){
+            console.log()
             return pathLookup
      }
 
@@ -1817,6 +1821,6 @@ const findPath2 = ({ numTiles,
                       enemyData });
                   }).reduce((acc, item) =>
                     item.weight < acc.weight ? item : acc,
-                        { weight: Number.MAX_SAFE_INTEGER, path: [] })
-      : { weight: Number.MAX_SAFE_INTEGER, path: [] }
+                        { weight: Number.MAX_SAFE_INTEGER, path: {} })
+      : { weight: Number.MAX_SAFE_INTEGER, path: {} }
 };
