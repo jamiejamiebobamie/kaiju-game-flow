@@ -1116,25 +1116,60 @@ export const movePlayerPieces = (
                 attackPowersRangeAcc / attackPowersCount
               );
               // get path
-              const moveToTiles =
+              const moveToEnemyTiles =
                 _data[1].tile &&
                 targetTile &&
                 findPath(_data[1].tile, targetTile, scale, isTutorial);
-              _data[i].moveToTiles =
-                moveToTiles.length < powerRangeAvg - 1
-                  ? findPath(
-                      _data[1].tile,
-                      getSafeTile(enemyData, tileStatuses, scale),
-                      scale
-                    )
-                  : moveToTiles.length > powerRangeAvg + 10
-                  ? moveToTiles.slice(0, moveToTiles.length - powerRangeAvg)
-                  : findPath(
-                      _data[1].tile,
-                      getSafeTile(enemyData, tileStatuses, scale),
-                      scale,
-                      isTutorial
-                    );
+
+              const safeTile = getSafeTile(enemyData, tileStatuses, scale);
+
+              // // new get path
+              // const goalLocation = getCharXAndY({ ...targetTile, scale });
+              // const currTile = _data[1].tile;
+              // const path = currTile &&
+              //                 targetTile &&
+              //                   findPath2({ numTiles: 0,
+              //                               currTile,
+              //                               pathLookup: {weight: 0, path: []},
+              //                               goalTile: safeTile,
+              //                               goalLocation,
+              //                               scale,
+              //                               isTutorial,
+              //                               enemyData
+              //                    }).path;
+              // const pathLength = Object.keys(path).length;
+              // const moveToTiles = Array(pathLength).fill(0).map((_, i) => path[i]);
+
+              const moveToTiles = findPath(
+                  _data[1].tile,
+                  getSafeTile(enemyData, tileStatuses, scale),
+                  scale,
+                  isTutorial
+                );
+
+              _data[1].moveToTiles =
+                moveToEnemyTiles.length < powerRangeAvg - 1
+                  ? moveToTiles
+                    : moveToEnemyTiles.length > powerRangeAvg + 10
+                        ? moveToEnemyTiles.slice(0, moveToTiles.length - powerRangeAvg)
+                        : moveToTiles;
+
+
+             // _data[1].moveToTiles =
+             //   moveToTiles.length < powerRangeAvg - 1
+             //     ? findPath(
+             //         _data[1].tile,
+             //         getSafeTile(enemyData, tileStatuses, scale),
+             //         scale
+             //       )
+             //     : moveToTiles.length > powerRangeAvg + 10
+             //     ? moveToTiles.slice(0, moveToTiles.length - powerRangeAvg)
+             //     : findPath(
+             //         _data[1].tile,
+             //         getSafeTile(enemyData, tileStatuses, scale),
+             //         scale,
+             //         isTutorial
+             //       );
             }
           } else {
             // teammate should stay by player to protect him.
@@ -1720,4 +1755,68 @@ const findPath = (start, goal, scale, isTutorial) => {
       return [];
     }
   }
+};
+
+const findPath2 = ({ numTiles,
+                     currTile,
+                     pathLookup,
+                     goalTile,
+                     goalLocation,
+                     scale,
+                     isTutorial,
+                     enemyData
+                   }) => {
+
+     // update values
+     numTiles += 1
+     const path = { ...pathLookup.path };
+     path[numTiles] = currTile;
+
+     const { i, j } = currTile;
+
+     // if currTile === goalTile, return path with lowest accumulated weight(?)
+     if (goalTile.i === i && goalTile.j === j){
+            return pathLookup
+     }
+
+      /*
+        compute path weight:
+        new accumulated weight = distance of current tile from goalTile
+            + enemy on currTile + 75 + accumulated weight
+      */
+      const enemyTileKeys = enemyData.filter(({ lives }) => !!lives).map(
+          ({ i, j }) => `${i} ${j}`);
+      // if enemy is on tile add 50 to the weight (tile size = ~27)
+      const enemyOnTileCost = enemyTileKeys.some(
+          key => key === `${i} ${j}`) ? 50 : 0;
+      const currTileLocation = getCharXAndY({ ...currTile, scale });
+      const distance = getDistance(currTileLocation, goalLocation);
+      const weight = Math.trunc(distance) + enemyOnTileCost + pathLookup.weight
+
+      // getAdjacentTiles, do not duplicate tiles in path
+      const currTileKeysInPathLookup = Object.values(pathLookup.path).reduce(
+          (acc, tile) => { acc[`${tile.i} ${tile.j}`] = true; return acc; } , [])
+      const getAdjTiles = isTutorial ?
+        getAdjacentTilesTutorial : getAdjacentTiles;
+      const adjacentTiles = getAdjTiles(currTile).filter(
+          tile => !currTileKeysInPathLookup[`${tile.i} ${tile.j}`]);
+
+      // console.log(adjacentTiles, path, weight);
+
+      // return path with lowest accumulated weight
+      return !!adjacentTiles.length ?
+                adjacentTiles.map(tile => {
+                    return findPath2({
+                      numTiles,
+                      currTile: tile,
+                      pathLookup: { weight, path },
+                      goalTile,
+                      goalLocation,
+                      scale,
+                      isTutorial,
+                      enemyData });
+                  }).reduce((acc, item) =>
+                    item.weight < acc.weight ? item : acc,
+                        { weight: Number.MAX_SAFE_INTEGER, path: [] })
+      : { weight: Number.MAX_SAFE_INTEGER, path: [] }
 };

@@ -63,8 +63,8 @@
     "build": "node scripts/build.js",
 
     "start": "node scripts/start.js",
-    "start": "nodemon app.js",
 
+    "start": "nodemon app.js",
 
     "test": "jest"
   },
