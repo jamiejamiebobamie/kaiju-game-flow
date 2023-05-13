@@ -124,7 +124,7 @@ export const initializeTutorialGameBoard = (
       dir: "idle",
       i: k,
       isThere: true,
-      moveSpeed: 5,
+      moveSpeed: 6,
       lives: Number.MAX_SAFE_INTEGER,
       isOnTiles: true,
       isKaiju: false,
@@ -331,7 +331,8 @@ export const spawnKaiju = (
   const location = isTutorial
     ? getCharXAndY({ ...kaijuData[0].tile, scale })
     : randBool1
-    ? { x: randIntX, y: randBool2 ? minY : maxY }
+    // ? { x: randIntX, y: randBool2 ? minY : maxY }
+    ? { x: randIntX, y: minY }
     : { x: randBool2 ? minX : maxX, y: randIntY };
   const kaijuTile = isTutorial
     ? kaijuData[0].tile
@@ -367,7 +368,7 @@ export const spawnKaiju = (
   //       : dirs[0]
   //     : "idle";
   const key = Math.random();
-  const MAX_MOVE_SPEED = 2
+  const MAX_MOVE_SPEED = 3
   return isRespawn
     ? {
         key,
@@ -380,11 +381,12 @@ export const spawnKaiju = (
         lives: 3,
         isOnTiles: false,
         dir,
-        moveSpeed: kaijuData[0]
-          ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < MAX_MOVE_SPEED
-            ? kaijuData[0].moveSpeed + 1
-            : MAX_MOVE_SPEED
-          : 1
+        moveSpeed: MAX_MOVE_SPEED
+        // kaijuData[0]
+        //   ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < MAX_MOVE_SPEED
+        //     ? kaijuData[0].moveSpeed + 1
+        //     : MAX_MOVE_SPEED
+        //   : 1
       }
     : {
         key,
@@ -396,11 +398,13 @@ export const spawnKaiju = (
         color: "purple",
         isThere: false,
         lives: 3,
-        moveSpeed: kaijuData[0]
-          ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < 4
-            ? kaijuData[0].moveSpeed + 1
-            : 4
-          : 1,
+        moveSpeed: MAX_MOVE_SPEED
+        // kaijuData[0]
+        //   ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < MAX_MOVE_SPEED
+        //     ? kaijuData[0].moveSpeed + 1
+        //     : MAX_MOVE_SPEED
+        //   : 1
+          ,
         lastDmg: 0,
         abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
         isKaiju: true,
@@ -1515,7 +1519,7 @@ export const moveKaijuPieces = (
       !isTutorial &&
       (winner === null) & (_data.length < MAX_KAIJU) &&
       accTime &&
-      !(accTime % 100) &&
+      !(accTime % 300) &&
       spawnKaiju(_data, enemyData, scale);
     const newKaijuData =
       !newKaiju &&
