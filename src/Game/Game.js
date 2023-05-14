@@ -101,7 +101,7 @@ const StyledImg = styled.img`
   box-shadow: 3px 7px 10px black;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
-  const TOTAL_KAIJU_SPAWNED = 7;
+  const TOTAL_KAIJU_SPAWNED = 15;
   const width = 500;
   const height = 800;
   const scale = 0.3;
@@ -127,6 +127,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
   const [replayModalMessage, setReplayModalMessage] = useState(null);
+  // const [totalKaijuToKill, setTotalKaijuToKill] = useState(5);
   const resetState = () => {
     setPickedAbilities([]);
     setIsPlayingGame(false);
@@ -162,6 +163,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     },
     ["Escape"]
   );
+  // useEffect(() => setTotalKaijuToKill(isTeammate ? 7 : 5), [isTeammate]);
   useEffect(() => {
     if (kaijuKillCount.length >= TOTAL_KAIJU_SPAWNED) {
       const _winner = 0;

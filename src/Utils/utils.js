@@ -1514,7 +1514,7 @@ export const moveKaijuPieces = (
           });
       }
     }
-    const MAX_KAIJU = 5
+    const MAX_KAIJU = 8
     const newKaiju =
       !isTutorial &&
       (winner === null) & (_data.length < MAX_KAIJU) &&

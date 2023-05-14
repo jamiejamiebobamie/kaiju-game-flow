@@ -1530,7 +1530,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 15,
+        count: 10,
         statusKey: "isCold",
         numTiles: 6,
         setTileStatuses
@@ -1543,8 +1543,7 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     // cooldownTimeAI: 40,
     cooldownTimeAI: 50,
-
-    cooldownTime: 5000,
+    cooldownTime: 1000,
     color: "PaleTurquoise"
   },
   fire: {
@@ -1566,7 +1565,7 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-    ) =>
+  ) => {
       shootPower({
         data,
         dataIndex: k,
@@ -1576,14 +1575,28 @@ export const PLAYER_ABILITIES = {
         statusKey: "isOnFire",
         numTiles: 3,
         setTileStatuses
-      }),
+      })
+      setTimeout(()=>
+       shootPower({
+              data,
+              dataIndex: k,
+              targetData,
+              scale,
+              count: 10,
+              statusKey: "isOnFire",
+              numTiles: 3,
+              setTileStatuses
+          })
+          , 100);
+  }
+,
     displayLookup: "abilityFire",
     elementUppercase: "Fire",
     element: "fire",
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 3000,
+    cooldownTime: 1000,
     // cooldownTimeAI: 40,
     cooldownTimeAI: 50,
     color: "tomato"
@@ -1664,7 +1677,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 3000,
+    cooldownTime: 1000,
     // cooldownTimeAI: 20,
     cooldownTimeAI: 35,
 
@@ -1747,7 +1760,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 5000,
+    cooldownTime: 1000,
     // cooldownTimeAI: 80,
     cooldownTimeAI: 50,
 
@@ -1791,7 +1804,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 5000,
+    cooldownTime: 4000,
     // cooldownTimeAI: 100,
     cooldownTimeAI: 50,
 
@@ -1865,7 +1878,7 @@ export const PLAYER_ABILITIES = {
     // cooldownTimeAI: 100,
     cooldownTimeAI: 50,
 
-    cooldownTime: 10000,
+    cooldownTime: 5000,
     color: "pink"
   },
   kaijuFire: {
