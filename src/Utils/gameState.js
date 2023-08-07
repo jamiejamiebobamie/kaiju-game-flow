@@ -1565,7 +1565,8 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-  ) => {
+  ) =>
+  // {
       shootPower({
         data,
         dataIndex: k,
@@ -1576,19 +1577,19 @@ export const PLAYER_ABILITIES = {
         numTiles: 3,
         setTileStatuses
       })
-      setTimeout(()=>
-       shootPower({
-              data,
-              dataIndex: k,
-              targetData,
-              scale,
-              count: 10,
-              statusKey: "isOnFire",
-              numTiles: 3,
-              setTileStatuses
-          })
-          , 100);
-  }
+      // setTimeout(()=>
+      //  shootPower({
+      //         data,
+      //         dataIndex: k,
+      //         targetData,
+      //         scale,
+      //         count: 10,
+      //         statusKey: "isOnFire",
+      //         numTiles: 3,
+      //         setTileStatuses
+      //     })
+      //     , 100);
+  // }
 ,
     displayLookup: "abilityFire",
     elementUppercase: "Fire",

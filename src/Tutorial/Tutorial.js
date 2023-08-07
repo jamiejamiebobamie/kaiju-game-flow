@@ -416,6 +416,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         scale,
         accTime.current,
         playerData,
+        setPlayerData,
         dmgArray,
         () => {},
         true,
@@ -502,7 +503,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           <Title>{title[1]}</Title>
         </TitleWrapper>
       )}
-      <ButtonGroup>
+      <ButtonGroup isPaddingBottom={tutorialViewIndex === 1}>
         <ButtonsWrapper>
           <Button onClick={backButtonCallback}>
             <ButtonOutline zIndex={1} />

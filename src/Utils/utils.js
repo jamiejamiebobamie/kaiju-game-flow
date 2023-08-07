@@ -194,7 +194,7 @@ export const initializeTutorialGameBoard = (
       color: "purple",
       isThere: true,
       lives: 3,
-      moveSpeed: kaijuMoveSpeed !== undefined ? kaijuMoveSpeed : 2,
+      moveSpeed: 2, //kaijuMoveSpeed !== undefined ? kaijuMoveSpeed : 2,
       lastDmg: 0,
       abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
       isKaiju: true,
@@ -368,7 +368,7 @@ export const spawnKaiju = (
   //       : dirs[0]
   //     : "idle";
   const key = Math.random();
-  const MAX_MOVE_SPEED = 3
+  const MAX_MOVE_SPEED = 2 // 3
   return isRespawn
     ? {
         key,
@@ -1356,7 +1356,8 @@ export const moveKaijuPieces = (
   setTileStatuses,
   scale,
   accTime,
-  enemyData,
+  enemyData, // playerData
+  setEnemyData, // setPlayerData
   dmgArray,
   setKaijuKillCount,
   isTutorial,
@@ -1484,6 +1485,7 @@ export const moveKaijuPieces = (
         ) {
           _data[i].dir = "idle";
         }
+        // const playerHealthBonusFromKaijuDeath = [0, 0]; // [player, teammate]
         dmgArray
           .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju)
           .forEach(dmg => {
@@ -1508,10 +1510,19 @@ export const moveKaijuPieces = (
                   _data[i].isHealed = !_data[i].isHealed;
                 if (!_data[i].lives) {
                   setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
+                  // playerHealthBonusFromKaijuDeath[dmg.playerIndex] += 1;
                 }
               }
             }
           });
+      //     setEnemyData(players =>
+      //         players.map(( p, i ) =>
+      //           p.lives === 5 ?
+      //               p
+      //               :
+      //               p.lives + playerHealthBonusFromKaijuDeath[i] <= 4 ?
+      //                   ({ ...p, lives: 4 })
+      //               : ({...p, lives: p.lives + playerHealthBonusFromKaijuDeath[i] }) ));
       }
     }
     const MAX_KAIJU = 8

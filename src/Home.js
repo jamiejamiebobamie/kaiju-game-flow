@@ -5,9 +5,8 @@ import { MainMenu } from "./MainMenu";
 
 export const Home = ({ triggerTransition }) => {
   /*
+        TO-DO:
         detect browser -> if not Chrome, show "Best experienced on Chrome" banner on bottom left of menu with link.
-        add clouds to bottom of title
-        transition anim -> make clouds
     */
   const [isTutorial, setIsTutorial] = useState(false);
   const [isGame, setIsGame] = useState(false);
