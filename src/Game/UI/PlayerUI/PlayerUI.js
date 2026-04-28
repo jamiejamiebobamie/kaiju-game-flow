@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Abilities } from "./Components/Abilities";
 import { HealthBar } from "./Components/HealthBar";
-import { Kaiju } from "./Components/Kaiju";
 import { PassiveAbilities } from "./Components/PassiveAbilities";
-import { useHover } from "../../../Utils/utils";
 
 const Wrapper = styled.div`
   position: relative;
@@ -26,7 +24,7 @@ const Wrapper = styled.div`
   color: #db974f;
   background-color: #152642;
   ${props =>
-    props.isTeammate && "align-content: flex-end; transform:scale(.75); "}
+    props.isTeammate && "align-content: flex-end; transform:scale(.75); left: 50px;"}
   pointer-events: auto;
 `;
 const PlayerBorder = styled.div`
@@ -38,7 +36,6 @@ const PlayerBorder = styled.div`
   height: 150px;
   border-radius: 100%;
   overflow: hidden;
-  /* pointer-events: none; */
 `;
 const PlayerPicture = styled.img`
   margin-top: -1px;
@@ -53,24 +50,7 @@ const PlayerPicture = styled.img`
   ${props =>
     props.isReversed
       ? "filter: drop-shadow(20px -15px 25px salmon);"
-      : "filter: drop-shadow(20px -15px 25px blue);"}
-`;
-const ClassPicture = styled.i`
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  right: 20px;
-  bottom: 10px;
-  z-index: 2;
-  width: 30px;
-  height: 30px;
-  border-radius: 100%;
-  border-style: solid;
-  border-thickness: thin;
-  border-color: #152642;
-  color: #152642;
-  background-color: #db974f;
-  align-items: center;
+      : "filter: drop-shadow(20px -15px 25px blue);"}  
 `;
 export const PlayerUI = ({
   playerData = [
@@ -98,12 +78,10 @@ export const PlayerUI = ({
   setTeleportData,
   setTileStatuses,
   playerIndex,
-  kaijuKillCount,
+  _,
   isTeammate,
   scale
 }) => {
-  // const [setHoverRef, hoverLookupString] = useHover();
-  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const _playerUI = (
     <Wrapper isTeammate={isTeammate}>
       {isReversed ? (
@@ -154,7 +132,6 @@ export const PlayerUI = ({
         <PlayerPicture
           src={playerIndex === 0 ? "player_avatar.png" : "teammate_avatar.png"}
           height="150px"
-          // ref={setHoverRef(`modifiers ${playerIndex}`)}
           className="fa fa-user-circle"
           isReversed={isReversed}
         />

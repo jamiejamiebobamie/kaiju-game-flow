@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { PlayerUI } from "./PlayerUI/PlayerUI";
-import { DescriptionDisplay } from "./DescriptionDisplay";
 
 const Wrapper = styled.div`
   display: flex;
@@ -10,10 +9,9 @@ const Wrapper = styled.div`
   border-radius: 10px;
   align-self: center;
   margin-left: -130px;
-  margin-right: 30px;
+  margin-right: 0px;
   height: 450px;
   z-index: 9999999;
-  // background-color: white;
   pointer-events: none;
 `;
 const ButtonGroup = styled.div`

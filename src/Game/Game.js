@@ -6,14 +6,12 @@ import { AbilityPicker } from "./AbilityPicker";
 import {
   useInterval,
   useKeyPress,
-  useHover,
   movePlayerPieces,
   moveKaijuPieces,
   updateTileState,
   redrawTiles,
   updateHighlightedTiles,
   initializeGameBoard,
-  areTilesAdjacent,
   getAdjacentTiles
 } from "Utils/utils";
 import {
@@ -21,7 +19,6 @@ import {
   Button,
   ButtonGroup,
   ButtonOutline,
-  BackgroundImage
 } from "Tutorial/Components/StyledComponents";
 const GameWrapper = styled.div`
   position: relative;
@@ -101,13 +98,13 @@ const StyledImg = styled.img`
   box-shadow: 3px 7px 10px black;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
-  const TOTAL_KAIJU_SPAWNED = 15;
+  const TURN_DELAY = 100;
+  const TOTAL_KAIJU_SPAWNED = 7;
   const width = 500;
   const height = 800;
   const scale = 0.3;
   const accTime = useRef(0);
-  const [isTeammate, setIsTeammate] = useState(false);
-  const [isHoveringOnGameBoard, setIsHoveringOnGameBoard] = useState(false);
+  const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
   const [winner, setWinner] = useState(null);
@@ -151,7 +148,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const handleClickPause = () => {
     setIsPaused(_isPaused => !_isPaused);
-    setIntervalTime(_intervalTime => (_intervalTime === null ? 1 : null));
+    setIntervalTime(_intervalTime => (_intervalTime === null ? TURN_DELAY : null));
   };
   useKeyPress(
     code => {
@@ -163,7 +160,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     },
     ["Escape"]
   );
-  // useEffect(() => setTotalKaijuToKill(isTeammate ? 7 : 5), [isTeammate]);
   useEffect(() => {
     if (kaijuKillCount.length >= TOTAL_KAIJU_SPAWNED) {
       const _winner = 0;
@@ -211,7 +207,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           case 1:
             message = [
               <ReplayTitle fontSize={22}>
-                Evil Kaiju have appeared!
+                Kaiju have appeared!
               </ReplayTitle>,
               <br />,
               <StyledImg src="./start.png" width="250px" height="250px" />
@@ -309,7 +305,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     );
     // update accumulated time.
     accTime.current =
-      accTime > Number.MAX_SAFE_INTEGER - 10000
+      accTime.current > Number.MAX_SAFE_INTEGER - 10000
         ? 0
         : accTime.current + intervalTime;
   }, intervalTime);
@@ -360,12 +356,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   ) : (
     <GameWrapper>
       {replayModalMessage && (
-        <ReplayModal
-        // onClick={() => {
-        //   setWinner(winner => (winner === 1 ? -1 : winner + 1));
-        //   setReplayModalMessage(null);
-        // }}
-        >
+        <ReplayModal>
           <ModalMessage
             style={{
               display: "flex",
@@ -384,7 +375,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
                   onClick={() => {
                     setWinner(null);
                     setReplayModalMessage(null);
-                    setIntervalTime(1);
+                    setIntervalTime(TURN_DELAY);
                   }}
                 >
                   <ButtonOutline zIndex={1} />

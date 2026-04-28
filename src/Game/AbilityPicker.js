@@ -15,7 +15,6 @@ const Wrapper = styled.div`
   height: auto;
   width: auto;
   background-color: #152642;
-
   flex-direction: column;
   justify-content: center;
   align-self: center;
@@ -249,15 +248,15 @@ export const AbilityPicker = ({
         </CheckboxWrapper>
         <ButtonGroup>
           <ButtonsWrapper>
-            <Button onClick={handleClickHome}>
-              <ButtonOutline zIndex={1} />
-              Home
-            </Button>
-          </ButtonsWrapper>
-          <ButtonsWrapper>
             <Button onClick={handleClickPlay}>
               <ButtonOutline zIndex={1} />
               Play!
+            </Button>
+          </ButtonsWrapper>
+          <ButtonsWrapper>
+            <Button onClick={handleClickHome}>
+              <ButtonOutline zIndex={1} />
+              Back
             </Button>
           </ButtonsWrapper>
         </ButtonGroup>

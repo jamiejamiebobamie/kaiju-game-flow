@@ -17,42 +17,19 @@ export const Logo = ({ isNavBar, handleClickHome, isDescription }) => {
     <img
       style={{
         position: "absolute",
-        // backgroundColor: "red",
         top: "0px",
         width: "600px",
-        height: "350px",
-        // marginTop: "-50px",
+        height: "300px",
+        marginTop: "40px",
+        marginBottom: "30px",
+        marginLeft: "20px",
         zIndex: "999999",
-        // opacity: ".4",
         display: "flex",
         justifyContent: "space-between",
-        // filter: "drop-shadow(0px 10px 5px black)",
-
         pointerEvents: "none"
       }}
-      src="./Logo.gif"
+      // src="./Logo.gif"
+      src="./staticLogo.png"
     />
   );
 };
-// OLD LOGO, BEFORE FIVERR
-// <>
-//   <Oval />
-//   <Rectangle />
-//   <Title isDescription={isDescription}>
-//     <StyledSpookyText isDescription={isDescription}>Kaiju</StyledSpookyText>{" "}
-//     <StyledSciFiText>City</StyledSciFiText>
-//     <StyledSpookyTextShadow>Kaiju</StyledSpookyTextShadow>{" "}
-//   </Title>
-//   <SkyLineSVG zIndex={-1} isNavBar={false} />
-//   <div
-//     style={{
-//       position: "absolute",
-//       zIndex: "-2",
-//       width: "566px",
-//       height: "150px",
-//       // backgroundColor: "red",
-//       marginTop: "-250px",
-//       overflow: "hidden"
-//     }}
-//   ></div>
-// </>

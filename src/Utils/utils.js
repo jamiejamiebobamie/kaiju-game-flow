@@ -856,22 +856,24 @@ export const shootPower = ({
             : numTiles
         );
         setTileStatuses(_tiles => {
-          _tiles[tile.i][tile.j] = {
-            ..._tiles[tile.i][tile.j],
-            [statusKey]: {
-              dirs,
-              count:
-                data[dataIndex].tileCountModifier &&
-                tileStatusesCountModifier.includes(statusKey)
-                  ? count + data[dataIndex].tileCountModifier
-                  : count,
-              targetIndex,
-              isKaiju: d.isKaiju || statusKey === "isHealing",
-              startCount: count,
-              isInManaPool: d.isInManaPool,
-              playerIndex: d.isKaiju ? undefined : dataIndex
-            }
-          };
+          if(!!tile && !!_tiles && !!_tiles[tile.i] && !!_tiles[tile.i][tile.j]){
+            _tiles[tile.i][tile.j] = {
+              ..._tiles[tile.i][tile.j],
+              [statusKey]: {
+                dirs,
+                count:
+                  data[dataIndex].tileCountModifier &&
+                  tileStatusesCountModifier.includes(statusKey)
+                    ? count + data[dataIndex].tileCountModifier
+                    : count,
+                targetIndex,
+                isKaiju: d.isKaiju || statusKey === "isHealing",
+                startCount: count,
+                isInManaPool: d.isInManaPool,
+                playerIndex: d.isKaiju ? undefined : dataIndex
+              }
+            };
+          }
           return _tiles;
         });
       }
@@ -1128,23 +1130,6 @@ export const movePlayerPieces = (
 
               const safeTile = getSafeTile(enemyData, tileStatuses, scale);
 
-              // // new get path
-              // const goalLocation = getCharXAndY({ ...targetTile, scale });
-              // const currTile = _data[1].tile;
-              // const path = currTile &&
-              //                 targetTile &&
-              //                   findPath2({ numTiles: 0,
-              //                               currTile,
-              //                               pathLookup: {weight: 0, path: []},
-              //                               goalTile: safeTile,
-              //                               goalLocation,
-              //                               scale,
-              //                               isTutorial,
-              //                               enemyData
-              //                    }).path;
-              // const pathLength = Object.keys(path).length;
-              // const moveToTiles = Array(pathLength).fill(0).map((_, i) => path[i]);
-
               const moveToSafetyTiles = findPath(
                   _data[1].tile,
                   safeTile,
@@ -1157,23 +1142,6 @@ export const movePlayerPieces = (
               const moveToTiles = _data[1].moveToTiles
 
               _data[1].moveToTiles = isEnemyTooClose ? moveToSafetyTiles : isEnemyTooFar ? moveCloserTiles : moveToTiles;
-
-
-             // _data[1].moveToTiles =
-             //   moveToTiles.length < powerRangeAvg - 1
-             //     ? findPath(
-             //         _data[1].tile,
-             //         getSafeTile(enemyData, tileStatuses, scale),
-             //         scale
-             //       )
-             //     : moveToTiles.length > powerRangeAvg + 10
-             //     ? moveToTiles.slice(0, moveToTiles.length - powerRangeAvg)
-             //     : findPath(
-             //         _data[1].tile,
-             //         getSafeTile(enemyData, tileStatuses, scale),
-             //         scale,
-             //         isTutorial
-             //       );
             }
           } else {
             // teammate should stay by player to protect him.
@@ -1188,15 +1156,11 @@ export const movePlayerPieces = (
                 : [];
           }
           // use powers
-          const maxAccTime = _data[i].abilities
-            .map(({ accTime }) => Number(accTime))
-            .reduce((acc, item) => (acc < item ? item : acc), -1);
-          const hasWaited = accTime - maxAccTime > 25;
           let hasUsedOnePower = false;
           _data[i].abilities.forEach((a, j) => {
-            const isCooldownOver =
-              accTime - a.accTime >= a.cooldownTimeAI || accTime < a.accTime;
-            if (isCooldownOver && hasWaited && !hasUsedOnePower) {
+            const diff = accTime - a.accTime;
+            const isCooldownOver = !a.accTime || (diff > a.cooldownTimeAI);
+            if (isCooldownOver && !hasUsedOnePower) {
               const [targetTile, _] = getClosestEntityFromTile(
                 enemyData,
                 _data[i].tile,
@@ -1327,7 +1291,7 @@ export const movePlayerPieces = (
           .forEach(dmg => {
             if (_data[i].key === dmg.key && _data[i].lives) {
               if (
-                accTime - _data[i].lastDmg > 20 ||
+                accTime - _data[i].lastDmg > 1000 ||
                 accTime - _data[i].lastDmg < 0
               ) {
                 // can only get damaged once every 1 second.
@@ -1493,7 +1457,7 @@ export const moveKaijuPieces = (
               _data[i].isOnTiles
             ) {
               if (
-                accTime - _data[i].lastDmg > 5 ||
+                accTime - _data[i].lastDmg > 1000 ||
                 accTime - _data[i].lastDmg < 0
               ) {
                 // can only get damaged once every 1 second.
@@ -1514,12 +1478,12 @@ export const moveKaijuPieces = (
           });
       }
     }
-    const MAX_KAIJU = 8
+    const MAX_KAIJU = 3
     const newKaiju =
       !isTutorial &&
       (winner === null) & (_data.length < MAX_KAIJU) &&
       accTime &&
-      !(accTime % 300) &&
+      !(accTime % 10000) &&
       spawnKaiju(_data, enemyData, scale);
     const newKaijuData =
       !newKaiju &&

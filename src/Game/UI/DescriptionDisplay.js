@@ -1,53 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
+import { PLAYER_CLASSES } from "Utils/gameState";
 import styled from "styled-components";
 import { Logo } from "../../Components/Logo";
-const ICON_LOOKUP = {
-  heart: {
-    Passive: "fa-gratipay",
-    Active: "fa-heart",
-    loader: "fa-spinner"
-  },
-  glass: {
-    Passive: "fa-tencent-weibo",
-    Active: "fa-ravelry",
-    loader: "fa-spinner"
-  },
-  fire: {
-    Passive: "fa-fire",
-    Active: "fa-free-code-camp",
-    loader: "fa-spinner"
-  },
-  wood: {
-    Passive: "fa-tree",
-    Active: "fa-leaf",
-    loader: "fa-spinner"
-  },
-  lightning: {
-    Passive: "fa-hourglass-half",
-    Active: "fa-bolt",
-    loader: "fa-spinner"
-  },
-  death: {
-    Passive: "fa-heartbeat",
-    Active: "fa-snapchat-ghost",
-    loader: "fa-spinner"
-  },
-  bubble: {
-    Passive: "fa-universal-access",
-    Active: "fa-question-circle-o",
-    loader: "fa-spinner"
-  },
-  metal: {
-    Passive: "fa-wrench",
-    Active: "fa-shield",
-    loader: "fa-spinner"
-  },
-  ice: {
-    Passive: "fa-thermometer-quarter",
-    Active: "fa-snowflake-o",
-    loader: "fa-spinner"
-  }
-};
 const getDescription = (string, playerData, playerIndex) => {
   switch (string) {
     case "modifiers":
@@ -174,7 +128,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityMetalPassive":
       return {
         title: "Builder",
-        description: "Your magic is larger, goes farther, and lasts longer",
+        description: "Your powers are larger, goes farther, and lasts longer",
         effect1: "+1 number of tiles modifier",
         effect2: "+1 tile count modifier",
         img: "",
@@ -241,7 +195,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityFirePassive":
       return {
         title: "Fuel to Burn",
-        description: "All of your magic goes farther and lasts longer",
+        description: "All of your powers go farther and lasts longer",
         effect1: "+1 tile count modifier",
         effect2: "",
         img: "",
@@ -331,7 +285,7 @@ const getDescription = (string, playerData, playerIndex) => {
     case "abilityBubblePassive":
       return {
         title: "So Many Bubbles",
-        description: "Your magic is more effective",
+        description: "Your powers are more effective",
         effect1: "+1 number of tiles modifier",
         effect2: "",
         img: "",
@@ -405,18 +359,27 @@ const Wrapper = styled.div`
   border-width: 1px;
 `;
 export const DescriptionDisplay = ({
-  hoveredContent = null,
   displayString,
   playerData,
   isClassWrapper,
   pickedAbilities,
   isTutorial
 }) => {
-  // const isContentRef = useRef(false);
-  const [isContent, setIsContent] = useState(true);
-  // const [hasHovered, setHasHovered] = useState(false);
+
+  const classObject = Array.isArray(pickedAbilities) && 
+    pickedAbilities.length === 3 &&
+    Array.isArray(PLAYER_CLASSES) &&
+    !!PLAYER_CLASSES.find(classObject =>
+      typeof(classObject.elems) == 'string'
+        && classObject.elems.split(",").sort((a1, a2) => a1.localeCompare(a2)).join(",") === pickedAbilities.join(",")) ?
+      PLAYER_CLASSES.find(classObject =>
+      typeof(classObject.elems) == 'string'
+        && classObject.elems.split(",").sort((a1, a2) => a1.localeCompare(a2)).join(",") === pickedAbilities.join(","))
+      : null;
+
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
+
   const {
     title,
     description,
@@ -426,24 +389,19 @@ export const DescriptionDisplay = ({
     icon,
     color
   } = (displayString &&
-    getDescription(_string, playerData, Number(playerIndex))) || {
-    //   getDescription("class", playerData, 0)) //   pickedAbilities.length === 3 && //   pickedAbilities && // (isClassWrapper && // ||
+    getDescription(_string, playerData, Number(playerIndex))) || 
+    (!!classObject && getDescription("class", [{
+      playerClass: classObject.class_name,
+      playerClassDescription: classObject.player_class_description,
+      elements: classObject.elems
+    }], Number(playerIndex))) ||
+   {
     title: "",
     description: "",
     img: "",
     formatData: {}
   };
-  // useEffect(() => {
-  //   if (!!title) {
-  //     setIsContent(true);
-  //     !hasHovered && setHasHovered(true);
-  //     isContentRef && clearTimeout(isContentRef.current);
-  //   } else {
-  //     if (hasHovered) {
-  //       isContentRef.current = setTimeout(() => setIsContent(false), 3000);
-  //     }
-  //   }
-  // }, [title]);
+
   return (
     <Wrapper isClassWrapper={isClassWrapper}>
       <h2
@@ -478,5 +436,3 @@ export const DescriptionDisplay = ({
     </Wrapper>
   );
 };
-// <h2>{!isTutorial && !title ? "Press ESC to pause" : title}</h2>;
-// <h2>{title}</h2>

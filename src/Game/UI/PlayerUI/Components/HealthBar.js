@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
-import { useHover } from "../../../../Utils/utils";
 
 const Wrapper = styled.div`
   display: flex;
@@ -35,12 +34,9 @@ const Bar = styled.div`
   margin: 5px;
 `;
 export const HealthBar = ({
-  setDisplayString,
   health = 1,
   isTeammate = false
 }) => {
-  // const [setHoverRef, hoverLookupString] = useHover();
-  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const bars = [];
   for (let i = 0; i < health; i++) {
     bars.push(<Bar key={i} numHealth={health} />);
@@ -49,9 +45,8 @@ export const HealthBar = ({
     <Wrapper
       health={health}
       isTeammate={isTeammate}
-      // ref={setHoverRef("healthBar")}
     >
-      {health ? bars : "Incapacitated!"}
+      {health ? bars : "Unalived!"}
     </Wrapper>
   );
 };

@@ -11,7 +11,6 @@ import {
   redrawTiles,
   updateHighlightedTiles,
   initializeTutorialGameBoard,
-  areTilesAdjacent,
   getAdjacentTilesTutorial
 } from "Utils/utils";
 import { TutorialGameBoard } from "./Components/TutorialGameBoard";
@@ -24,121 +23,10 @@ import {
   Button,
   ButtonGroup,
   ButtonOutline,
-  BackgroundImage
 } from "./Components/StyledComponents";
 
-const TutorialWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  background-color: red;
-  height: 100vh;
-  align-content: center;
-  align-items: center;
-  perspective: 500px;
-`;
-const TutorialWindow = styled.div`
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-self: center;
-  align-content: center;
-  text-align: center;
-  align-items: center;
-  font-size: 25px;
-  width: 300px;
-  height: 200px;
-  -webkit-animation-duration: 28s;
-  animation-duration: 28s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  border-style: solid;
-  border-thickness: thin;
-  border-radius: 10px;
-  background-color: #152642;
-  border-color: #db974f;
-  box-shadow: 3px 7px 10px black;
-  ${props => `animation-delay: ${props.aD}s;`};
-  @keyframes goAround {
-    0% {
-      transform: scale(1.3, 1) translate(0vw, -10vh) rotateY(0deg) rotate(0deg);
-      z-index: 3;
-    }
-    25% {
-      transform: scale(0.5) translate(75vw, -40vh) rotateX(-20deg)
-        rotateY(30deg) rotate(-45deg);
-      z-index: 2;
-    }
-    50% {
-      transform: scale(0.3) translate(0vw, -80vh) rotateY(180deg) rotate(0deg);
-      z-index: 0;
-    }
-    75% {
-      transform: scale(0.5) translate(-75vw, -40vh) rotateY(330deg)
-        rotateX(20deg) rotate(45deg);
-      z-index: 2;
-    }
-    100% {
-      transform: scale(1.3, 1) translate(0vw, -10vh) rotateY(360deg)
-        rotate(0deg);
-      z-index: 3;
-    }
-  }
-  ${props => props.tutorialWindowTitle && "animation-play-state: paused;"}
-  animation-name: goAround;
-  &:hover {
-    transform: scale(1) translate(0) rotateX(0deg) rotateY(0deg);
-    z-index: 5;
-    width: 900px;
-    height: 900px;
-  }
-  /* max-width: 800px;
-  height: 300px;
-  overflow-y: hidden;
-  transition: height 4s linear; */
-  transition: 4s;
-  animation-name: goAround;
-`;
-const TutorialWindowTitle = styled.div`
-  position: absolute;
-  z-index: 5;
-
-  @keyframes titleFadeOut {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-  @keyframes titleFadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  color: #db974f;
-  pointer-events: none;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-  ${props =>
-    props.isHovered
-      ? `opacity:0; animation-name: titleFadeOut;`
-      : `opacity:1; animation-name: titleFadeIn;`}
-`;
 export const Tutorial = ({ handleClickHome, triggerTransition }) => {
-  const tutorialSubjects = [
-    "How to Move?",
-    "Kaiju City?",
-    "Kaiju?",
-    "You and Kaiju?",
-    "Teammate?",
-    "Tile Statuses?",
-    "Abilities?"
-  ];
+  const TURN_DELAY = 100;
   const maxTutorialViewIndex = 5;
   const width = 500;
   const height = 800;
@@ -156,9 +44,8 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
   const [setHoverRef, hoverLookupString] = useHover();
-  const [setTutorialWindowTitle, tutorialWindowTitle] = useHover();
   const [path, setPath] = useState(null);
-  const [intervalTime, setIntervalTime] = useState(1);
+  const [intervalTime, setIntervalTime] = useState(TURN_DELAY);
   const [title, setTitle] = useState([]);
   const [nextButtonContent, setNextButtonContent] = useState("");
   const [backButtonContent, setBackButtonContent] = useState("");
@@ -184,7 +71,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         kaijuSpawnPositions = [];
         setBackButtonContent("Home");
         setNextButtonContent("Got it!");
-        setTitle(["This is you", "Click on a tile to walk to it"]);
+        setTitle(["This is you, a Kaiju warrior.", "Click on a tile to walk to it"]);
         setBackButtonCallback(() => () =>
           triggerTransition(() => handleClickHome())
         );
@@ -194,7 +81,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         kaijuSpawnPositions = [];
         // display map gif.
         setBackButtonContent("Back");
-        setNextButtonContent("Yay!");
+        setNextButtonContent("Cool");
         setTitle(["This is Kaiju City"]);
         setBackButtonCallback(() => () =>
           triggerTransition(() => decrementTutorialViewIndex())
@@ -221,7 +108,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         ];
         setBackButtonContent("Back");
         setNextButtonContent("Oh no!");
-        setTitle([`This is you and Kaiju`]);
+        setTitle([`Kaiju eat humans and destroy the city!`]);
         setShouldKaijuMove(true);
         setBackButtonCallback(() => () =>
           triggerTransition(() => decrementTutorialViewIndex())
@@ -250,7 +137,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         setBackButtonContent("Back");
         setNextButtonContent("Home");
         setTitle([
-          "You cast magic to attack and defend",
+          "Use your abilities to attack and defend",
           <div
             style={{
               width: "100%",
@@ -362,7 +249,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
       scale,
       isTutorial
     );
-    if (shouldUpdate(accTime.current, 3))
+    if (shouldUpdate(accTime.current, TURN_DELAY))
       updateTileState(
         playerData,
         kaijuData,
@@ -423,10 +310,10 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
       );
     // update accumulated time.
     accTime.current =
-      accTime > Number.MAX_SAFE_INTEGER - 10000
+      accTime.current > Number.MAX_SAFE_INTEGER - 10000
         ? 0
         : accTime.current + intervalTime;
-  });
+  }, intervalTime);
   const borderStyles = `
     position:relative;
     width:245px;
@@ -449,7 +336,6 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           style={{
             display: "flex",
             width: "400px",
-            // backgroundColor: "red",
             alignSelf: "flex-start",
             marginTop: "-75px",
             marginLeft: "-100px",

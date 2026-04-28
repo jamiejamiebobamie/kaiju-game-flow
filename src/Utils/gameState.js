@@ -1541,9 +1541,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    // cooldownTimeAI: 40,
-    cooldownTimeAI: 50,
-    cooldownTime: 1000,
+    cooldownTimeAI: 3000,
+    cooldownTime: 2000,
     color: "PaleTurquoise"
   },
   fire: {
@@ -1576,18 +1575,6 @@ export const PLAYER_ABILITIES = {
         numTiles: 3,
         setTileStatuses
       })
-      setTimeout(()=>
-       shootPower({
-              data,
-              dataIndex: k,
-              targetData,
-              scale,
-              count: 10,
-              statusKey: "isOnFire",
-              numTiles: 3,
-              setTileStatuses
-          })
-          , 100);
   }
 ,
     displayLookup: "abilityFire",
@@ -1597,8 +1584,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1000,
-    // cooldownTimeAI: 40,
-    cooldownTimeAI: 50,
+    cooldownTimeAI: 2000,
     color: "tomato"
   },
   wood: {
@@ -1637,8 +1623,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    // cooldownTimeAI: 60,
-    cooldownTimeAI: 50,
+    cooldownTimeAI: 4000,
 
     color: "Chartreuse"
   },
@@ -1678,8 +1663,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1000,
-    // cooldownTimeAI: 20,
-    cooldownTimeAI: 35,
+    cooldownTimeAI: 1700,
 
     color: "cyan"
   },
@@ -1719,8 +1703,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 10000,
-    // cooldownTimeAI: 150,
-    cooldownTimeAI: 50,
+    cooldownTimeAI: 9000,
 
     color: "GhostWhite"
   },
@@ -1761,8 +1744,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1000,
-    // cooldownTimeAI: 80,
-    cooldownTimeAI: 50,
+    cooldownTimeAI: 1400,
 
     color: "Thistle"
   },
@@ -1805,8 +1787,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    // cooldownTimeAI: 100,
-    cooldownTimeAI: 50,
+    cooldownTimeAI: 4500,
 
     color: "AntiqueWhite"
   },
@@ -1840,8 +1821,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 12000,
-    // cooldownTimeAI: 50,
-    cooldownTimeAI: 50,
+    cooldownTimeAI: 8000,
 
     color: "BlueViolet"
   },
@@ -1875,9 +1855,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    // cooldownTimeAI: 100,
-    cooldownTimeAI: 50,
-
+    cooldownTimeAI: 5000,
     cooldownTime: 5000,
     color: "pink"
   },
@@ -1911,9 +1889,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 300,
-    // cooldownTimeAI: 50,
-
+    cooldownTimeAI: 12000,
     color: "#df73ff"
   }
 };
@@ -1940,7 +1916,7 @@ export const PLAYER_CLASSES = [
     elems: "Bubble,Death,Heart",
     class_name: "Wild Mage",
     player_class_description:
-      "Your magic deals with life and death ...and bubbles?"
+      "Your powers deal with life and death ...and bubbles?"
   },
   {
     elems: "Bubble,Death,Ice",
