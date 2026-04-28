@@ -80,10 +80,32 @@ const ButtonOutline = styled.div`
   border-bottom: 0.5px solid black;
   pointer-events: auto;
 `;
+const ProgressCounter = styled.div`
+  width: 270px;
+  height: 40px;
+
+  position: absolute;
+  z-index: 1111111110;
+
+  display: flex;
+  justify-content: space-between;
+
+  margin-left: 130px;
+  margin-top: -60px;
+
+  border-color: rgb(219, 151, 79);
+  color: rgb(219, 151, 79);
+  font-size: 25px;
+  -webkit-text-stroke: 0.5px rgb(219, 151, 79);
+  -webkit-box-pack: end;
+
+  pointer-events: none;
+`;
 export const UI = ({
   playerData,
   kaijuData,
   kaijuKillCount,
+  kaijuKilledToWin,
   setPlayerData,
   setTeleportData,
   setTileStatuses,
@@ -131,6 +153,12 @@ export const UI = ({
           alignSelf: "flex-end"
         }}
       >
+        <ProgressCounter>
+          <div>Kaiju:</div>
+          <div>
+            {`${Array.isArray(kaijuKillCount) ? kaijuKillCount.length : 0} / ${kaijuKilledToWin + 2}`}
+          </div>
+        </ProgressCounter>
         {playerUI}
         {teammateUI}
         <ButtonGroup isTeammate={isTeammate}>

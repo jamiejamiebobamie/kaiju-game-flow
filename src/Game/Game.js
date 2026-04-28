@@ -422,6 +422,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       <UI
         playerData={playerData}
         kaijuKillCount={kaijuKillCount}
+        kaijuKilledToWin={TOTAL_KAIJU_SPAWNED}
         kaijuData={kaijuData}
         setPlayerData={setPlayerData}
         setTeleportData={setTeleportData}

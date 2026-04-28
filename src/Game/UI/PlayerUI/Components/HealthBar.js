@@ -5,13 +5,13 @@ const Wrapper = styled.div`
   display: flex;
   ${props =>
     !!props.health
-      ? "justify-content: flex-start;"
-      : "flex-direction: column; justify-content: center; text-align: center; font-size: 15px;"}
+      ? ""
+      : "flex-direction: column; margin-left: 25px; text-align: center; font-size: 15px;"}
   ${props =>
     !!props.isTeammate && !props.health && "font-size: 19px;"}
   width: 230px;
   height: 30px;
-  margin-left: 5px;
+  justify-content: flex-start;
 `;
 const Bar = styled.div`
   ${props =>
