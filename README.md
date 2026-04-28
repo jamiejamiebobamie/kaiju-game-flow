@@ -1,12 +1,17 @@
 # Kaiju City
 
-This is a web game I made using React, the UI library.
+This is a web game I made using React.
 
-* Kaiju City is a top-down, real-time strategy game where the player uses his abilities and positioning on the gameboard to defeat the godzilla-like monsters and save the city. The game features:
-    - emergent gameplay based on tile statuses
-    - an enemy and teammate AI
-    - a short tutorial
-    - AI-generated art assets
+Players use their abilities, positioning on the gameboard, and AI teammate to defeat the godzilla-like monsters and save the city.
+
+The game features:
+- a top-down viewpoint
+- emergent gameplay based on tile statuses
+- enemy and teammate AI
+- a short tutorial
+- AI-generated art assets
+- 9 passive and 9 active abilities
+- basic class system based on chosen abilities
 
 ## Getting Started
 
