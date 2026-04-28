@@ -124,7 +124,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
   const [replayModalMessage, setReplayModalMessage] = useState(null);
-  // const [totalKaijuToKill, setTotalKaijuToKill] = useState(5);
+
   const resetState = () => {
     setPickedAbilities([]);
     setIsPlayingGame(false);

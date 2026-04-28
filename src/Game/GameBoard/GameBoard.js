@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Player } from "./Pieces/PlayerPiece";
+import { UnalivePlayer } from "./Pieces/UnalivePlayerPiece";
 import { Kaiju } from "./Pieces/KaijuPiece";
 import { PauseModal } from "./PauseModal";
 import { GameMap } from "../../Components/GameMap.js";
@@ -28,13 +29,10 @@ const ShiftContentOver = styled.div`
   position: absolute;
 `;
 export const GameBoard = ({
-  isClassWrapper = false,
   isPaused,
   playerData,
   kaijuData,
   setPlayerMoveToTiles,
-  tileStatuses,
-  setTileStatuses,
   clickedTile,
   setClickedTile,
   tiles,
@@ -74,6 +72,15 @@ export const GameBoard = ({
       isHealed={p.isHealed}
       isTeleported={p.isTeleported}
       dir={p.dir}
+      zIndex={getFlattenedArrayIndex(p.tile)}
+    />
+  ));
+  const unalivePlayers = playerData.filter(({ lives }) => lives < 1).map(p => (
+    <UnalivePlayer
+      key={p.i}
+      i={p.i}
+      charLocation={p.charLocation}
+      color={p.color}
       zIndex={getFlattenedArrayIndex(p.tile)}
     />
   ));
@@ -119,6 +126,7 @@ export const GameBoard = ({
         {tiles}
         {kaiju}
         {players}
+        {unalivePlayers}
       </ShiftContentOver>
       <GameMap />
     </Board>

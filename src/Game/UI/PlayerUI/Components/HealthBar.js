@@ -6,7 +6,7 @@ const Wrapper = styled.div`
   ${props =>
     !!props.health
       ? ""
-      : "flex-direction: column; margin-left: 25px; text-align: center; font-size: 15px;"}
+      : "flex-direction: column; margin-left: -10px; text-align: center; font-size: 15px;"}
   ${props =>
     !!props.isTeammate && !props.health && "font-size: 19px;"}
   width: 230px;
