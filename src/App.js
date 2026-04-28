@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Home } from "./Home";
+import { Logo } from "./Components/Logo";
 import styled, { css } from "styled-components";
 import "./App.css";
 
@@ -25,7 +26,7 @@ const TransitionStrip = styled.div`
     45% {
       right: 25dvw;
       ${props =>
-        props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
+    props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
     50% {
       right: 50dvw;
@@ -33,7 +34,7 @@ const TransitionStrip = styled.div`
     55% {
       right: 25dvw;
       ${props =>
-        props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
+    props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
     100% {
       right: -100dvw;
@@ -49,7 +50,7 @@ const TransitionStrip = styled.div`
     45% {
       left: 25dvw;
       ${props =>
-        props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
+    props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
     50% {
       left: 50dvw;
@@ -57,7 +58,7 @@ const TransitionStrip = styled.div`
     55% {
       left: 25dvw;
       ${props =>
-        props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
+    props.duration !== undefined && `width: ${90 / props.duration}dvw;`}
     }
     100% {
       left: -100dvw;
@@ -87,12 +88,19 @@ const TransitionStrip = styled.div`
       `}
     `}
 `;
-// top={i - (i % 2) - 1}
 
 const App = () => {
   const ANIM_DELAY_MILLI = 1500;
   const [transition, setTransition] = useState([]);
   const [shouldPlayAnim, setShouldPlayAnim] = useState(false);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+
+  // show splash screen for 5 seconds on first load of site
+  useEffect(() => setTimeout(() => {
+    setTimeout(() => setIsFirstLoad(false), 750);
+    triggerTransition();
+  }, 5000), []);
+
   useEffect(() => {
     const seconds = ANIM_DELAY_MILLI / 1000;
     const durations = Array(44)
@@ -111,6 +119,7 @@ const App = () => {
       ));
     setTransition(transition);
   }, [shouldPlayAnim]);
+
   const triggerTransition = callback => {
     setShouldPlayAnim(shouldPlayAnim => {
       if (!shouldPlayAnim) {
@@ -124,10 +133,14 @@ const App = () => {
     });
   };
 
+  const appContent = isFirstLoad ?
+    <Logo isSplashScreen={true} />
+      : <Home triggerTransition={triggerTransition} />;
+
   return (
     <div className="App">
       <TransitionWrapper>{transition}</TransitionWrapper>
-      <Home triggerTransition={triggerTransition} />
+      {appContent}
     </div>
   );
 };

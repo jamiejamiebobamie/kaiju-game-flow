@@ -228,7 +228,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               <br />,
               <StyledImg src="./you_lost.png" width="250px" height="250px" />,
               <br />,
-              <ReplayTitle>Play again?</ReplayTitle>
+              <ReplayTitle>Play again ?</ReplayTitle>
             ];
             break;
         }

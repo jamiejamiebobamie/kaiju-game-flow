@@ -129,9 +129,9 @@ export const Title = styled.div`
     `margin-left: 120px; transform: scale(1.2); margin-top: -75px;
     -webkit-animation-duration: 1s;
     animation-duration: 1s;
-    -webkit-animation-name: fadeInLogo;
-    animation-name: fadeInLogo;
-    @keyframes fadeInLogo {
+    -webkit-animation-name: fadeIn;
+    animation-name: fadeIn;
+    @keyframes fadeIn {
       0% {
         opacity: 0;
       }
