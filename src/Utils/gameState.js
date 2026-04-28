@@ -1564,7 +1564,7 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-  ) => {
+  ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -1574,9 +1574,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isOnFire",
         numTiles: 3,
         setTileStatuses
-      })
-  }
-,
+      }),
     displayLookup: "abilityFire",
     elementUppercase: "Fire",
     element: "fire",

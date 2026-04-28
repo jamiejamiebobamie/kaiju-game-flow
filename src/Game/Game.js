@@ -298,6 +298,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       scale,
       accTime.current,
       playerData,
+      setPlayerData,
       dmgArray,
       setKaijuKillCount,
       false,

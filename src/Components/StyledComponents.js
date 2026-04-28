@@ -18,13 +18,36 @@ export const Wrapper = styled.div`
 `;
 export const ButtonGroup = styled.div`
   display: flex;
-  justify-content: space-around;
   flex-direction: column;
-  align-items: center;
-  width: 500px;
-  height: 200px;
+  // justify-content: space-between;
+  // align-items: center;
+  // justify-items: center;
+  // width:50vw;
+  // min-width: 350px;
+  // max-width: 500px;
+  // width:400px;
+  width:100vw;
+  height: 190px;
+  padding-top: 20px;
   margin-top: 200px;
   transform: scale(1.2, 1.5);
+  // background-color: #13142e;
+  // background-color: #4c2472;
+  // background-color: #181c4c;
+  // background-color: #18434c;
+  // background-color: #183b4c;
+  background-color: #18324c;
+
+
+  border-radius: 10px;
+  border-color: #18434c;
+  // border-color: #13142e;
+  border-width: 1px;
+  border-style: solid;
+  border-bottom: 1px solid #13142e;
+  // display:none;
+  // filter: drop-shadow(0 0 0.2rem purple);
+
 `;
 export const ButtonsWrapper = styled.div`
   position: relative;

@@ -35,9 +35,10 @@ export const ButtonGroup = styled.div`
   height: 50px;
   transform: scale(1.2, 1.5);
   margin-top: 25px;
-  margin-bottom: 25px;
+
   margin-left: 50px;
   margin-right: 50px;
+  ${props => !!props.isPaddingBottom ? 'margin-bottom: 40px;' : 'margin-bottom: 25px;'}
 `;
 export const ButtonsWrapper = styled.div`
   position: relative;

@@ -39,12 +39,7 @@ const Line = styled.div`
   ${props =>
     props.color
       ? `background-color: ${props.color}; opacity: .3;`
-      : `${
-          props.isTutorial
-            ? "background-color: #db974f; opacity: 0.3;"
-            : "background-color: lightgrey; opacity: .2;"
-        }`}
-
+      : `background-color: lightgrey; opacity: .2;`}
   width: 5px;
   height: 50px;
   border: 0.5px;
@@ -67,3 +62,10 @@ export const Border = ({ color, isTutorial }) => {
     </>
   );
 };
+
+
+// `${
+//     props.isTutorial
+//       ? "background-color: #db974f; opacity: 0.3;"
+//       : "background-color: lightgrey; opacity: .2;"
+//   }`}

@@ -13,7 +13,9 @@ This is a web game I made using React, the UI library.
 1. Clone the repo locally.
 2. In your terminal, navigate to the main folder of the cloned repo and type:
 ```npm install```
-**If you are having issues npm-installing, remove ```  "type": "module", ``` from your package.json (second line) and try installing again. (Just be sure to add the line back after install.)**
+3. After install, type:
+```npm run-script build```
+**If you are having issues building, remove ```  "type": "module", ``` from your package.json (second line) and try building again. (Just be sure to add the line back after building.)**
 3. Once installed, type:
 ```npm start```
 and open http://localhost:9000/ in your browser.
