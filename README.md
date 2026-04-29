@@ -27,7 +27,7 @@ and open http://localhost:9000/ in your browser.
 
 ### Prerequisites
 
-You will need the node and npm to play.
+You will need node and npm installed on your machine.
 
 ### Note
 
