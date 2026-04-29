@@ -72,7 +72,7 @@ const SpriteSheet = styled.div`
   transform: scale(0.4) translate(-130px, -165px);
   height: 200px;
   width: 152px;
-  filter: drop-shadow(0 0 3px #bf40bf);
+  ${props => `filter: drop-shadow(0 0 ${props.dropShadowSize}px #bf40bf)`};
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
@@ -301,12 +301,12 @@ const Character = styled.div`
   }
 }
 `;
-export const Kaiju = ({ zIndex, dir, charLocation, element, color, lives }) => {
+export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize }) => {
   const [healthModifierText, setHealthModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [anim, setAnim] = useState("down");
-  // console.log(dir);
+
   useEffect(() => {
     dir && setAnim(dir === "idle" ? `${dir}${anim}` : dir);
   }, [dir]);
@@ -326,15 +326,13 @@ export const Kaiju = ({ zIndex, dir, charLocation, element, color, lives }) => {
   }, [lives]);
   const bars = [];
   for (let i = 0; i < lives; i++) bars.push(<Bar lives={lives} key={i} />);
-  // <p style={{ position: "absolute", zIndex: 3, color: "white" }}>{dir}</p>
   return (
     <Monster zIndex={zIndex} lives={lives} charLocation={charLocation}>
       {healthModifierText}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <Character isDamaged={isDamaged}>
-        <SpriteSheet lives={lives} anim={anim} color={color} />
+        <SpriteSheet lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
       </Character>
     </Monster>
   );
 };
-// <MonsterImg lives={lives} isDamaged={isDamaged} src={"kaiju.png"} />

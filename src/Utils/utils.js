@@ -351,22 +351,6 @@ export const spawnKaiju = (
     y: (kaijuTileLocation.y - location.y) / distance
   };
   const dir = getMonsterSwimAnimDirFromNormVec(normVec);
-  // const [tile, _] = getAdjacentTilesFromNormVec(
-  //   kaijuTileLocation,
-  //   inverseNormVec,
-  //   0.3,
-  //   1
-  // );
-  // const dir = getDirFromTiles(tile, kaijuTile);
-  // const dir =
-  //   dirs && !!dirs.length
-  //     ? dirs[0] !== "idle"
-  //       ? `${dirs[0].split(" ")[0]}${dirs[0]
-  //           .split(" ")[1]
-  //           .slice(0, 1)
-  //           .toUpperCase() + dirs[0].split(" ")[1].slice(1)}`
-  //       : dirs[0]
-  //     : "idle";
   const key = Math.random();
   const MAX_MOVE_SPEED = 2 // 3
   return isRespawn
@@ -382,11 +366,6 @@ export const spawnKaiju = (
         isOnTiles: false,
         dir,
         moveSpeed: MAX_MOVE_SPEED
-        // kaijuData[0]
-        //   ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < MAX_MOVE_SPEED
-        //     ? kaijuData[0].moveSpeed + 1
-        //     : MAX_MOVE_SPEED
-        //   : 1
       }
     : {
         key,
@@ -398,13 +377,7 @@ export const spawnKaiju = (
         color: "purple",
         isThere: false,
         lives: 3,
-        moveSpeed: MAX_MOVE_SPEED
-        // kaijuData[0]
-        //   ? kaijuData[0].moveSpeed && kaijuData[0].moveSpeed < MAX_MOVE_SPEED
-        //     ? kaijuData[0].moveSpeed + 1
-        //     : MAX_MOVE_SPEED
-        //   : 1
-          ,
+        moveSpeed: MAX_MOVE_SPEED,
         lastDmg: 0,
         abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
         isKaiju: true,
@@ -1360,7 +1333,13 @@ export const moveKaijuPieces = (
                   scale
                 );
               }
+            } else {
+                // update dropShadowSize to show how close a Kaiju is to shooting fire.
+                const diff = accTime - a.accTime;
+                const dropShadowSize = 7 * diff / a.cooldownTimeAI + 2;
+                _data[i].dropShadowSize = dropShadowSize;
             }
+            _data[i].gameTimeMilliseconds = accTime;
           });
         }
         // - - - - - - - - - - -

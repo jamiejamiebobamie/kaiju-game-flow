@@ -59,6 +59,7 @@ export const GameBoard = ({
       scale={scale}
       lives={k.lives}
       zIndex={getFlattenedArrayIndex(k.tile)}
+      dropShadowSize={k.dropShadowSize}
     />
   ));
   const players = playerData.map(p => (
