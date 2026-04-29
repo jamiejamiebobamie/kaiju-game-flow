@@ -1336,7 +1336,9 @@ export const moveKaijuPieces = (
             } else {
                 // update dropShadowSize to show how close a Kaiju is to shooting fire.
                 const diff = accTime - a.accTime;
-                const dropShadowSize = 7 * diff / a.cooldownTimeAI + 2;
+                const HIGH = 20;
+                const LOW = 2;
+                const dropShadowSize = (HIGH - LOW) * diff / a.cooldownTimeAI + LOW;
                 _data[i].dropShadowSize = dropShadowSize;
             }
             _data[i].gameTimeMilliseconds = accTime;
