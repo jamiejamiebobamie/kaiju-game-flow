@@ -14,6 +14,25 @@ const Monster = styled.div`
     left: ${props => `${props.charLocation.x}px`};
     top: ${props => `${props.charLocation.y}px`};
     pointer-events: none;
+
+    -webkit-animation-name: fadeOut;
+    animation-name: fadeOut;
+    -webkit-animation-duration: 10s;
+    animation-duration: 10s;
+
+    opacity: 0;
+
+    @keyframes fadeOut {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+
 }`;
 const SpriteSheet = styled.div`
   pointer-events: none;

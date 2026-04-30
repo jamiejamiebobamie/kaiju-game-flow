@@ -2329,3 +2329,26 @@ export const PLAYER_CLASSES = [
     player_class_description: "Urban camo."
   }
 ];
+
+export const TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES = [
+ // bottom-left:
+ {
+    "i": 0,
+    "j": 9
+  },
+  // top-left: 
+  {
+    "i": 0,
+    "j": 0
+  },
+  // top-right:    
+  {
+    "i": 23,
+    "j": 0
+  },
+  // bottom-right:
+  {
+    "i": 23,
+    "j": 9
+  }  
+]

@@ -70,8 +70,8 @@ const SpriteSheet = styled.div`
   display: ${props => (props.lives > 0 ? "flex" : "none")};
   background: url("spritesheet/kaiju_sprite.png");
   transform: scale(0.4) translate(-130px, -165px);
-  height: 200px;
-  width: 152px;
+  height: 230.2px;
+  width: 153px;
   ${props => `filter: drop-shadow(0 0 ${props.dropShadowSize}px #bf40bf)`};
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;

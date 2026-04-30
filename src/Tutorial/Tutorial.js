@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import styled from "styled-components";
 import { StyledIcon } from "./Components/StyledComponents";
 import { PLAYER_ABILITIES } from "Utils/gameState";
 import {
@@ -38,6 +37,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const [teleportData, setTeleportData] = useState([]);
   const [dmgArray, setDmgArray] = useState([]);
   const [kaijuData, setKaijuData] = useState([]);
+  const [deadKaijuLocations, setDeadKaijuLocations] = useState([]);
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
   const [highlightedTiles0, setHighlightedTiles0] = useState([]);
   const [tiles, setTiles] = useState([]);
@@ -137,7 +137,25 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         setBackButtonContent("Back");
         setNextButtonContent("Home");
         setTitle([
-          "Use your abilities to attack and defend",
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-around",
+              alignSelf: "center",
+              marginBottom:"5px"
+            }}
+          >
+            <div style={{ marginBottom:"5px" }}>
+              Click on ability buttons</div>
+            <div style={{ marginBottom:"5px" }}>
+              or use num keys 1-9
+            </div>
+            <div style={{ marginBottom:"5px" }}>
+              to attack and defend
+            </div>
+          </div>,
           <div
             style={{
               width: "100%",
@@ -307,7 +325,8 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         dmgArray,
         () => {},
         true,
-        null
+        null,
+        setDeadKaijuLocations
       );
     // update accumulated time.
     accTime.current =
@@ -382,6 +401,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           width={width}
           height={height}
           scale={scale}
+          deadKaijuLocations={deadKaijuLocations}
         />
       )}
       {!!title[1] && (

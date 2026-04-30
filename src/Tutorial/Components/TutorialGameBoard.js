@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Player } from "Game/GameBoard/Pieces/PlayerPiece";
 import { Kaiju } from "Game/GameBoard/Pieces/KaijuPiece";
+import { ExplodingKaiju } from "Game/GameBoard/Pieces/ExplodingKaijuPiece";
 import { Abilities } from "Game/UI/PlayerUI/Components/Abilities";
 import { getFlattenedArrayIndex } from "Utils/utils";
 
@@ -53,7 +54,8 @@ export const TutorialGameBoard = ({
   path,
   width,
   height,
-  scale
+  scale,
+  deadKaijuLocations
 }) => {
   useEffect(() => {
     const { i, _ } = clickedTile;
@@ -87,11 +89,20 @@ export const TutorialGameBoard = ({
       zIndex={getFlattenedArrayIndex(p.tile)}
     />
   ));
+    const kaijuRemains = deadKaijuLocations.map(k => (
+      <ExplodingKaiju
+        key={k.key}
+        charLocation={k.charLocation}
+        color={k.color}
+        zIndex={getFlattenedArrayIndex(k.tile)}
+      />
+    ));
   return (
     <Board width={width} height={height}>
       <ShiftContentOver scale={scale}>
         {tiles}
         {kaiju}
+        {kaijuRemains}
         {players}
       </ShiftContentOver>
       <AbilitiesWrapper>

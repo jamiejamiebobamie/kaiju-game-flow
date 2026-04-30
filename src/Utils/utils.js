@@ -6,7 +6,8 @@ import {
   PLAYER_ABILITIES,
   PERIMETER_TILES_VALS,
   DEATH_TILE_STATUSES,
-  PLAYER_CLASSES
+  PLAYER_CLASSES,
+  TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 
@@ -328,14 +329,17 @@ export const spawnKaiju = (
   const randIntY = getRandomIntInRange({ min: minY, max: maxY });
   const randBool1 = Math.random() > 0.5;
   const randBool2 = Math.random() > 0.5;
+
+  const randomCornerTile = Math.floor(4 * Math.random());
+
   const location = isTutorial
-    ? getCharXAndY({ ...kaijuData[0].tile, scale })
+    ? getCharXAndY({ ...TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES[randomCornerTile], scale })//getCharXAndY({ ...kaijuData[0].tile, scale })
     : randBool1
     // ? { x: randIntX, y: randBool2 ? minY : maxY }
     ? { x: randIntX, y: minY }
     : { x: randBool2 ? minX : maxX, y: randIntY };
   const kaijuTile = isTutorial
-    ? kaijuData[0].tile
+    ? TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES[randomCornerTile]//kaijuData[0].tile
     : getClosestPerimeterTileFromLocation({
         ...location,
         scale
