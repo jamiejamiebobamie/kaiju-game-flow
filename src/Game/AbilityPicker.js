@@ -218,7 +218,7 @@ export const AbilityPicker = ({
         <AbilityButtonsWrapper>
           <div style={{ height: "75px" }}>
             <br />
-            <Title>Choose your abilities!</Title>
+            <Title>Choose your abilities</Title>
           </div>
           <Abilities
             handleChange={handleChange}

@@ -46,7 +46,7 @@ export const HealthBar = ({
       health={health}
       isTeammate={isTeammate}
     >
-      {health ? bars : "Unalived!"}
+      {health ? bars : "Deceased!"}
     </Wrapper>
   );
 };

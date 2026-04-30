@@ -1298,7 +1298,8 @@ export const moveKaijuPieces = (
   dmgArray,
   setKaijuKillCount,
   isTutorial,
-  winner
+  winner,
+  setDeadKaijuLocations
 ) =>
   setData(_data => {
     for (let i = 0; i < _data.length; i++) {
@@ -1337,7 +1338,7 @@ export const moveKaijuPieces = (
                 // update dropShadowSize to show how close a Kaiju is to shooting fire.
                 const diff = accTime - a.accTime;
                 const HIGH = 20;
-                const LOW = 2;
+                const LOW = 0;
                 const dropShadowSize = (HIGH - LOW) * diff / a.cooldownTimeAI + LOW;
                 _data[i].dropShadowSize = dropShadowSize;
             }
@@ -1455,19 +1456,11 @@ export const moveKaijuPieces = (
                   _data[i].isHealed = !_data[i].isHealed;
                 if (!_data[i].lives) {
                   setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
-                  // playerHealthBonusFromKaijuDeath[dmg.playerIndex] += 1;
+                  setDeadKaijuLocations(deadKaijuLocations => [...deadKaijuLocations, { charLocation: _data[i].charLocation, color: _data[i].color, tile: _data[i].tile }]);
                 }
               }
             }
           });
-      //     setEnemyData(players =>
-      //         players.map(( p, i ) =>
-      //           p.lives === 5 ?
-      //               p
-      //               :
-      //               p.lives + playerHealthBonusFromKaijuDeath[i] <= 4 ?
-      //                   ({ ...p, lives: 4 })
-      //               : ({...p, lives: p.lives + playerHealthBonusFromKaijuDeath[i] }) ));
       }
     }
     const MAX_KAIJU = 3
@@ -1739,7 +1732,6 @@ const findPath2 = ({
 
      // if currTile is goalTile, return pathLookup object
      if (goalTile.i === i && goalTile.j === j){
-            console.log()
             return pathLookup
      }
 
@@ -1764,8 +1756,6 @@ const findPath2 = ({
         getAdjacentTilesTutorial : getAdjacentTiles;
       const adjacentTiles = getAdjTiles(currTile).filter(
           tile => !currTileKeysInPathLookup[`${tile.i} ${tile.j}`]);
-
-      // console.log(adjacentTiles, path, weight);
 
       // return path with lowest accumulated weight
       return !!adjacentTiles.length ?

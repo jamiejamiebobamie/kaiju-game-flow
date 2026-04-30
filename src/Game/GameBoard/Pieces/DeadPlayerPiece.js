@@ -17,8 +17,8 @@ const SpriteSheet = styled.div`
 
   ${props =>
     props.isPlayerOne
-      ? 'background: url("unalive_player.png");'
-      : 'background: url("Unalive_teammate.png");'}
+      ? 'background: url("dead_player.png");'
+      : 'background: url("dead_teammate.png");'}
 
   background-position: center;
   background-repeat: no-repeat;
@@ -42,7 +42,7 @@ const Character = styled.div`
     animation-iteration-count: 2s;
 `;
 
-export const UnalivePlayer = ({
+export const DeadPlayer = ({
   charLocation,
   color,
   zIndex,

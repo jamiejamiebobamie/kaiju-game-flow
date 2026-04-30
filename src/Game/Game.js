@@ -45,17 +45,17 @@ const ReplayTitle = styled.div`
 const ReplayModal = styled.div`
   position: absolute;
   z-index: 999999999;
-  padding: 50px;
+  padding: 0px 50px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-self: center;
   align-items: center;
   align-content: center;
-  margin-left: 5dvw;
-  margin-top: -5dvw;
-  width: 550px;
-  height: 550px;
+  // margin-left: 5dvw;
+  // margin-top: -5dvw;
+  // width: 550px;
+  // height: 550px;
   border-radius: 10px;
   border-style: solid;
   border-thickness: thin;
@@ -86,11 +86,12 @@ const ModalMessage = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 50px;
+  // margin-bottom: 50px;
+  margin: 25px 0px 0px 0px;
   line-height: 40px;
 `;
 const StyledImg = styled.img`
-  // margin-bottom: 5px;
+  margin: 10px 0px;
   border-radius: 5px;
   border-style: solid;
   border-thickness: thick;
@@ -124,6 +125,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
   const [replayModalMessage, setReplayModalMessage] = useState(null);
+  const [deadKaijuLocations, setDeadKaijuLocations] = useState([]);
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -144,6 +146,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setPath(null);
     setIntervalTime(null);
     setReplayModalMessage(null);
+    setDeadKaijuLocations([]);
   };
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const handleClickPause = () => {
@@ -207,27 +210,22 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           case 1:
             message = [
               <ReplayTitle fontSize={22}>
-                Kaiju have appeared!
+                Wild Kaiju have appeared!
               </ReplayTitle>,
-              <br />,
-              <StyledImg src="./start.png" width="250px" height="250px" />
+              <StyledImg src="./start.png" width="535px" height="535px" />
             ];
             break;
           case 0:
             message = [
               <ReplayTitle fontSize={25}>You saved the city!</ReplayTitle>,
-              <br />,
-              <StyledImg src="./you_won.png" width="250px" height="250px" />,
-              <br />,
+              <StyledImg src="./you_won.png" width="535px" height="535px" />,
               <ReplayTitle>Play again ?</ReplayTitle>
             ];
             break;
           case -1:
             message = [
               <ReplayTitle fontSize={25}>You lost...</ReplayTitle>,
-              <br />,
-              <StyledImg src="./you_lost.png" width="250px" height="250px" />,
-              <br />,
+              <StyledImg src="./you_lost.png" width="535px" height="535px" />,
               <ReplayTitle>Play again ?</ReplayTitle>
             ];
             break;
@@ -302,7 +300,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       dmgArray,
       setKaijuKillCount,
       false,
-      winner
+      winner,
+      setDeadKaijuLocations
     );
     // update accumulated time.
     accTime.current =
@@ -355,15 +354,15 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       setIsTeammate={setIsTeammate}
     />
   ) : (
-    <GameWrapper>
-      {replayModalMessage && (
+    <>
+          {replayModalMessage && (
         <ReplayModal>
           <ModalMessage
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              marginBottom: "50px",
+              // marginBottom: "50px",
               lineHeight: "40px"
             }}
           >
@@ -402,6 +401,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           </ButtonGroup>
         </ReplayModal>
       )}
+      <GameWrapper>
       <GameBoard
         isPaused={isPaused}
         playerData={playerData}
@@ -418,6 +418,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         scale={scale}
         hoverLookupString={hoverLookupString}
         setHoverLookupString={setHoverLookupString}
+        deadKaijuLocations={deadKaijuLocations}
       />
       <UI
         playerData={playerData}
@@ -433,5 +434,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         isTeammate={isTeammate}
       />
     </GameWrapper>
+    </>
   );
 };

@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Player } from "./Pieces/PlayerPiece";
-import { UnalivePlayer } from "./Pieces/UnalivePlayerPiece";
+import { DeadPlayer } from "./Pieces/DeadPlayerPiece";
+import { ExplodingKaiju } from "./Pieces/ExplodingKaijuPiece";
 import { Kaiju } from "./Pieces/KaijuPiece";
 import { PauseModal } from "./PauseModal";
 import { GameMap } from "../../Components/GameMap.js";
@@ -41,7 +42,8 @@ export const GameBoard = ({
   height,
   scale,
   hoverLookupString,
-  setHoverLookupString
+  setHoverLookupString,
+  deadKaijuLocations
 }) => {
   useEffect(() => {
     const { i, _ } = clickedTile;
@@ -50,7 +52,7 @@ export const GameBoard = ({
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
-  const kaiju = kaijuData.map((k, i) => (
+  const kaiju = kaijuData.map(k => (
     <Kaiju
       key={k.key}
       dir={k.dir}
@@ -76,13 +78,21 @@ export const GameBoard = ({
       zIndex={getFlattenedArrayIndex(p.tile)}
     />
   ));
-  const unalivePlayers = playerData.filter(({ lives }) => lives < 1).map(p => (
-    <UnalivePlayer
+  const deadPlayers = playerData.filter(({ lives }) => lives < 1).map(p => (
+    <DeadPlayer
       key={p.i}
       i={p.i}
       charLocation={p.charLocation}
       color={p.color}
       zIndex={getFlattenedArrayIndex(p.tile)}
+    />
+  ));
+  const kaijuRemains = deadKaijuLocations.map(k => (
+    <ExplodingKaiju
+      key={k.key}
+      charLocation={k.charLocation}
+      color={k.color}
+      zIndex={getFlattenedArrayIndex(k.tile)}
     />
   ));
   return (
@@ -127,7 +137,8 @@ export const GameBoard = ({
         {tiles}
         {kaiju}
         {players}
-        {unalivePlayers}
+        {deadPlayers}
+        {kaijuRemains}
       </ShiftContentOver>
       <GameMap />
     </Board>
