@@ -26,7 +26,7 @@ import {
 
 export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const TURN_DELAY = 100;
-  const maxTutorialViewIndex = 5;
+  const maxTutorialViewIndex = 7;
   const width = 500;
   const height = 800;
   const scale = 0.3;
@@ -71,7 +71,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         kaijuSpawnPositions = [];
         setBackButtonContent("Home");
         setNextButtonContent("Got it!");
-        setTitle(["This is you, a Kaiju warrior.", "Click on a tile to walk to it"]);
+        setTitle(["This is you.", "Click on a tile to walk to it"]);
         setBackButtonCallback(() => () =>
           triggerTransition(() => handleClickHome())
         );
@@ -79,15 +79,26 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
       case 1:
         playerSpawnPositions = [];
         kaijuSpawnPositions = [];
+        setBackButtonContent("Back");
+        setNextButtonContent("Ok");
+        // display Kaiju_Warrior png.
+        setTitle(["You are a Kaiju Warrior, the best of the best."]);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => handleClickHome())
+        );
+        break;        
+      case 2:
+        playerSpawnPositions = [];
+        kaijuSpawnPositions = [];
         // display map gif.
         setBackButtonContent("Back");
         setNextButtonContent("Ok");
-        setTitle(["This is Kaiju City"]);
+        setTitle(["This is Kaiju City, the city you love, your home."]);
         setBackButtonCallback(() => () =>
           triggerTransition(() => decrementTutorialViewIndex())
         );
         break;
-      case 2:
+      case 3:
         playerSpawnPositions = [];
         kaijuSpawnPositions = [{ i: 11, j: 4 }];
         kaijuMoveSpeed = 0;
@@ -99,7 +110,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           triggerTransition(() => decrementTutorialViewIndex())
         );
         break;
-      case 3:
+      case 4:
         playerSpawnPositions = [{ i: 11, j: 6 }];
         kaijuSpawnPositions = [
           { i: 19, j: 3 },
@@ -107,14 +118,14 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           { i: 11, j: 1 }
         ];
         setBackButtonContent("Back");
-        setNextButtonContent("Oh no!");
-        setTitle([`Kaiju eat humans and destroy the city!`]);
+        setNextButtonContent("Ahh!");
+        setTitle([`Every night, the Kaiju come out of the sea to feast on their favorite meal: people, well-done!`]);
         setShouldKaijuMove(true);
         setBackButtonCallback(() => () =>
           triggerTransition(() => decrementTutorialViewIndex())
         );
         break;
-      case 4:
+      case 5:
         playerSpawnPositions = [
           { i: 11, j: 7 },
           { i: 3, j: 3 }
@@ -122,12 +133,12 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         kaijuSpawnPositions = [];
         setBackButtonContent("Back");
         setNextButtonContent("Ok!");
-        setTitle([`This is your teammate`]);
+        setTitle([`This is your teammate, another Kaiju warrior.`]);
         setBackButtonCallback(() => () =>
           triggerTransition(() => decrementTutorialViewIndex())
         );
         break;
-      case 5:
+      case 6:
         playerSpawnPositions = [
           { i: 11, j: 7 },
           { i: 3, j: 3 }
@@ -144,7 +155,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
               flexDirection: "column",
               justifyContent: "space-around",
               alignSelf: "center",
-              marginBottom:"5px"
+              margin:"10px 0px"
             }}
           >
             <div style={{ marginBottom:"5px" }}>
@@ -198,13 +209,24 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           triggerTransition(() => decrementTutorialViewIndex())
         );
         break;
-      case maxTutorialViewIndex:
-        playerSpawnPositions = [
-          { i: 11, j: 7 },
-          { i: 3, j: 3 }
-        ];
-        kaijuSpawnPositions = [{ i: 19, j: 3 }];
-        break;
+      case 7:
+        playerSpawnPositions = [];
+        kaijuSpawnPositions = [];
+        setBackButtonContent("Back");
+        setNextButtonContent("Ok");
+        // display Kaiju_Warrior png.
+        setTitle(["Fight back the Kaiju and save the people and your city!"]);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => handleClickHome())
+        );
+        break; 
+      // case maxTutorialViewIndex:
+      //   playerSpawnPositions = [
+      //     { i: 11, j: 7 },
+      //     { i: 3, j: 3 }
+      //   ];
+      //   kaijuSpawnPositions = [{ i: 19, j: 3 }];
+      //   break;
     }
     initializeTutorialGameBoard(
       playerData,
@@ -348,10 +370,10 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
     overflow:hidden;
     `;
   const mapStyles = `transform:scale(.5) translate(-125px);`;
-  const shiftContentOver = tutorialViewIndex === 6;
+  const shiftContentOver = tutorialViewIndex === 7;
   return (
     <Wrapper>
-      {tutorialViewIndex !== 0 && tutorialViewIndex !== 5 && (
+      {tutorialViewIndex !== 0 && tutorialViewIndex !== 6 && (
         <div
           style={{
             display: "flex",
@@ -377,7 +399,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
       <TitleWrapper>
         <Title>{title[0]}</Title>
       </TitleWrapper>
-      {tutorialViewIndex === 1 ? (
+      {tutorialViewIndex === 2 ? (
         <GameMap
           isTutorial={true}
           borderStyles={borderStyles}
@@ -409,7 +431,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           <Title>{title[1]}</Title>
         </TitleWrapper>
       )}
-      <ButtonGroup isPaddingBottom={tutorialViewIndex === 1}>
+      <ButtonGroup isPaddingBottom={tutorialViewIndex === 2}>
         <ButtonsWrapper>
           <Button onClick={backButtonCallback}>
             <ButtonOutline zIndex={1} />
