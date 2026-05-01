@@ -1660,8 +1660,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 1000,
-    cooldownTimeAI: 1700,
+    cooldownTime: 1500,
+    cooldownTimeAI: 3000,
 
     color: "cyan"
   },
@@ -1700,7 +1700,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 10000,
+    cooldownTime: 8000,
     cooldownTimeAI: 9000,
 
     color: "GhostWhite"
@@ -1742,7 +1742,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1000,
-    cooldownTimeAI: 1400,
+    cooldownTimeAI: 2000,
 
     color: "Thistle"
   },
@@ -1853,8 +1853,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 5000,
-    cooldownTime: 5000,
+    cooldownTimeAI: 10000,
+    cooldownTime: 10000,
     color: "pink"
   },
   kaijuFire: {

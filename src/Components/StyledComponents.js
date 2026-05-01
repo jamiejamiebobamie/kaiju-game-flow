@@ -77,15 +77,17 @@ export const Button = styled.div`
   filter: drop-shadow(0px 3px 1px black);
 
   &:hover {
-    border-bottom: 3px solid #5a8a7a;
+    ${props => props.disabled ? ''  : `border-bottom: 3px solid #5a8a7a;
     transform: translate(0px, 3px);
-    filter: drop-shadow(0px 0px 0px black);
+    filter: drop-shadow(0px 0px 0px black);` }
   }
 
   font-size: 15px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
   background-color: #376e5b;
+
+  ${props => props.disabled && `filter: hue-rotate(180deg); cursor: not-allowed;`}
 `;
 export const ButtonOutline = styled.div`
   position: absolute;

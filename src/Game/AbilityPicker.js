@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Abilities } from "Tutorial/Components/Abilities";
-import { TutorialGameBoard } from "Tutorial/Components/TutorialGameBoard";
 import { DescriptionDisplay } from "./UI/DescriptionDisplay";
-import { setPassives } from "../Utils/utils";
 import {
   ButtonsWrapper,
   Button,
@@ -42,15 +40,6 @@ const Wrapper = styled.div`
       transform: translateY(0);
     }
   }
-`;
-const AbilityPickerWrapper = styled.div`
-  border-radius: 10px;
-  border-style: solid;
-  border-thickness: thin;
-  border-radius: 10px;
-  border-color: #db974f;
-  margin: 10px;
-  padding: 10px;
 `;
 const AbilityButtonsWrapper = styled.div`
   display: flex;
@@ -102,52 +91,11 @@ export const ButtonGroup = styled.div`
   margin-bottom: 20px;
   // /* background-color: orange; */
 `;
-
-const PlayButton = styled.div`
-  /* position: absolute;
-  z-index: 2; */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-content: flex-end;
-  align-self: flex-end;
-
-  min-width: 150px;
-  height: 50px;
-
-  right: 30px;
-  bottom: 30px;
-
-  font-alignment: center;
-  text-align: center;
-
-  cursor: pointer;
-
-  border-radius: 5px;
-  border-style: solid;
-  border-thickness: thin;
-  border-bottom: 5px solid;
-  border-color: #64939b;
-  color: #64939b;
-
-  &:hover {
-    border-bottom: 3px solid;
-    transform: translate(0px, 3px);
-  }
-  font-size: 20px;
-`;
 const CheckboxWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
   margin: 20px;
-`;
-const GenderWrapper = styled.div`
-  width: 50%;
-  display: flex;
-  justify-content: space-around;
-  margin-left: 30px;
-}}
 `;
 const CheckboxText = styled.div`
   display: flex;
@@ -178,22 +126,7 @@ export const AbilityPicker = ({
   pickedAbilities,
   setPickedAbilities,
   handleClickPlay,
-  isPaused,
-  powerUpData,
   playerData,
-  setPlayerData,
-  setTeleportData,
-  kaijuData,
-  setPlayerMoveToTiles,
-  tileStatuses,
-  setTileStatuses,
-  clickedTile,
-  setClickedTile,
-  tiles,
-  path,
-  width,
-  height,
-  scale,
   numAbilitiesToPick,
   isTeammate,
   setIsTeammate
@@ -212,6 +145,7 @@ export const AbilityPicker = ({
       setPickedAbilities(_pickedAbilities);
     }
   };
+  const isPlayButtonDisabled = Array.isArray(pickedAbilities) && pickedAbilities.length < 3;
   return (
     <>
       <Wrapper>
@@ -248,7 +182,7 @@ export const AbilityPicker = ({
         </CheckboxWrapper>
         <ButtonGroup>
           <ButtonsWrapper>
-            <Button onClick={handleClickPlay}>
+            <Button disabled={isPlayButtonDisabled} onClick={isPlayButtonDisabled ? () => {} : handleClickPlay}>
               <ButtonOutline zIndex={1} />
               Play!
             </Button>

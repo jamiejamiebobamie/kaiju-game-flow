@@ -151,36 +151,33 @@ export const Ability = ({
   abilityData,
   playerData,
   kaijuData,
-  setPlayerData,
   setTeleportData,
   setTileStatuses,
   scale,
-  setDisplayString,
   keyNum
 }) => {
   const {
     activeName,
     activateActive,
     cooldownTime,
-    displayLookup,
     element,
     accTime,
     color
   } = abilityData;
-  // const [setHoverRef, hoverLookupString] = useHover();
-  // useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   const [isActive, setIsActive] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
+
+  const isPlayerAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && playerData[playerIndex] && !!playerData[playerIndex].lives;
+
   useKeyPress(
     () =>
-      // playerIndex === 0 &&
-      handleClick(),
-    `Digit${keyNum}`
+    handleClick(),
+    `Digit${keyNum}`,
+    !isPlayerAlive // isPlayerDead
   );
   useEffect(() => {
-    if (isActive) {
-      // playerIndex === 0 &&
+    if (isActive && isPlayerAlive) {
       activateActive(
         playerIndex,
         playerData,
@@ -201,15 +198,11 @@ export const Ability = ({
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
-  const handleClick = () => !isActive && setIsActive(true);
+  const handleClick = () => !isActive && isPlayerAlive && setIsActive(true);
   return (
     <Wrapper
-      onClick={() => {
-        // playerIndex === 0 &&
-        handleClick();
-      }}
+      onClick={() => isPlayerAlive && handleClick()}
       isAnimating={isAnimating}
-      // ref={setHoverRef(`${displayLookup}Active`)}
       title={activeName}
       color={color}
     >

@@ -10,6 +10,7 @@ import {
   TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
+import { StyledIcon } from "Tutorial/Components/StyledComponents";
 
 export const getFlattenedArrayIndex = tile => {
   const { i, j } = tile;
@@ -104,8 +105,7 @@ export const initializeTutorialGameBoard = (
   setTileStatuses,
   playerSpawnPositions,
   kaijuSpawnPositions,
-  abilities,
-  kaijuMoveSpeed
+  abilities
 ) => {
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
@@ -131,7 +131,7 @@ export const initializeTutorialGameBoard = (
       isKaiju: false,
       lastDmg: 0,
       isInManaPoolAccTime: 0,
-      abilities: abilities && k === 1 ? abilities : [],
+      abilities: abilities ? abilities : [],
       abilityCooldowns: [],
       numTilesModifier: 0,
       tileCountModifier: 0,
@@ -1557,20 +1557,22 @@ export const useHover = () => {
   }, [ref.current]);
   return [saveRef, value];
 };
-export const useKeyPress = (callback, keyCodes, state) => {
+export const useKeyPress = (callback, keyCodes, isPlayerDead) => {
   const handler = ({ code }) => {
     if (Array.isArray(keyCodes) && keyCodes.includes(code)) {
-      state ? callback(code, state) : callback(code);
+      callback(code);
     } else if (keyCodes === code) {
-      state ? callback(code, state) : callback(code);
+      callback(code);
     }
   };
   useEffect(() => {
-    window.addEventListener("keydown", handler);
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, []);
+    if (!isPlayerDead){
+      window.addEventListener("keydown", handler);
+      return () => {
+        window.removeEventListener("keydown", handler);
+      };
+    }
+  }, [isPlayerDead]);
 };
 const getRandomTileOnBoard = (scale, isTutorial) => {
   if (isTutorial) {
@@ -1778,3 +1780,358 @@ const findPath2 = ({
                         { weight: Number.MAX_SAFE_INTEGER, path: {} })
       : { weight: Number.MAX_SAFE_INTEGER, path: {} }
 };
+
+export const shouldUpdate = (accTime, interval) => !(accTime % interval);
+
+export const useEventTick = ({
+      playerData,
+      setPlayerData,
+      hoverLookupString,
+      path,
+      setPath,
+      scale,
+      kaijuData,
+      setKaijuData,
+      dmgArray,
+      setDmgArray,
+      tileStatuses,
+      setTileStatuses,
+      width,
+      height,
+      accTime,
+      setHoverRef,
+      setClickedTile,
+      setTiles,
+      teleportData,
+      setTeleportData,
+      setDeadKaijuLocations,
+      TURN_DELAY,
+      highlightedTiles0,
+      setHighlightedTiles0,
+      shouldKaijuMove,
+      intervalTime
+  }) => useInterval(() => {
+    const isTutorial = true;
+    updateHighlightedTiles(
+      setHighlightedTiles0,
+      playerData,
+      hoverLookupString,
+      path,
+      setPath,
+      scale,
+      isTutorial
+    );
+    if (shouldUpdate(accTime.current, TURN_DELAY)){
+      updateTileState(
+        playerData,
+        kaijuData,
+        setDmgArray,
+        setTileStatuses,
+        width,
+        height,
+        scale,
+        accTime.current,
+        isTutorial
+      );
+    }
+    redrawTiles(
+      highlightedTiles0,
+      setHoverRef,
+      setClickedTile,
+      setTiles,
+      playerData,
+      kaijuData,
+      tileStatuses,
+      setTileStatuses,
+      width,
+      height,
+      scale,
+      isTutorial
+    );
+    // move players
+    playerData.length &&
+      movePlayerPieces(
+        playerData,
+        setPlayerData,
+        tileStatuses,
+        setTileStatuses,
+        scale,
+        accTime.current,
+        kaijuData,
+        dmgArray,
+        () => {},
+        teleportData,
+        setTeleportData,
+        true,
+        null
+      );
+    // move monsters
+    kaijuData.length &&
+      shouldKaijuMove &&
+      moveKaijuPieces(
+        kaijuData,
+        setKaijuData,
+        tileStatuses,
+        setTileStatuses,
+        scale,
+        accTime.current,
+        playerData,
+        setPlayerData,
+        dmgArray,
+        () => {},
+        true,
+        null,
+        setDeadKaijuLocations
+      );
+    // update accumulated time.
+    accTime.current =
+      accTime.current > Number.MAX_SAFE_INTEGER - 10000
+        ? 0
+        : accTime.current + intervalTime;
+  }, intervalTime);
+
+  export const useUpdateClickedMovetoTile = ({
+    playerMoveToTiles,
+    setPlayerData,
+    setPlayerMoveToTiles
+  }) => {
+    useEffect(() => {
+    if (playerMoveToTiles !== null) {
+      const adjTilesToPath = playerMoveToTiles[0] && [
+        playerMoveToTiles[0],
+        ...getAdjacentTilesTutorial(playerMoveToTiles[0])
+      ];
+      setPlayerData(_playerData =>
+        _playerData.map((p, i) => {
+          if (i === 0) {
+            const adjTilesToPlayer = p.tile && [
+              p.tile,
+              ...getAdjacentTilesTutorial(p.tile)
+            ];
+            const shouldSet =
+              adjTilesToPlayer &&
+              adjTilesToPath &&
+              adjTilesToPlayer.some(t =>
+                adjTilesToPath.some(_t => _t.i === t.i && _t.j === t.j)
+              );
+            return {
+              ...p,
+              moveToTiles: shouldSet ? playerMoveToTiles : p.moveToTiles
+            };
+          } else {
+            return p;
+          }
+        })
+      );
+    }
+    setPlayerMoveToTiles(null);
+  }, [playerMoveToTiles]);
+  }
+
+export const useUpdateTutorialScreenContent = ({
+    tutorialViewIndex,
+    setBackButtonContent,
+    setNextButtonContent,
+    setTitle,
+    setBackButtonCallback,
+    setShouldKaijuMove,
+    triggerTransition,
+    handleClickHome,
+    handleClickGame,
+    incrementTutorialViewIndex,
+    decrementTutorialViewIndex,
+    setFullScreenPageData,
+    playerData,
+    setPlayerData,
+    kaijuData,
+    setKaijuData,
+    width,
+    height,
+    scale,
+    setTiles,
+    setClickedTile,
+    setHoverRef,
+    tileStatuses,
+    setTileStatuses,
+    backButtonCallback,
+    setIsHomeButton
+}) => {
+    useEffect(() => {
+
+    // gameboard variables  
+    let playerSpawnPositions = [];
+    let kaijuSpawnPositions = [];
+    let abilities = [];
+    let kaijuMoveSpeed = undefined;
+
+    // full-page screen variables
+    let text, buttons, image, homeButtonOnClick = undefined;
+
+    switch (tutorialViewIndex) {
+      case 0:
+        playerSpawnPositions = [{ i: 11, j: 5 }];
+        kaijuSpawnPositions = [];
+        setBackButtonContent("Home");
+        setNextButtonContent("Got it!");
+        setTitle(["This is you.", "Click on a tile to walk to it"]);
+        setBackButtonCallback(() => () =>
+          triggerTransition(() => handleClickHome())
+        );
+        setIsHomeButton(false);
+        break;
+      case 1:
+        text = ["You are a Kaiju Warrior,", "the best of the best."];
+        buttons = [
+          {text:"Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex())}, 
+          {text:"Ok", onClick: incrementTutorialViewIndex}
+        ];
+        image = {src: './story_images/tutorial_kaiju_warrior.png', width: '896px', height: '1200px'};
+        homeButtonOnClick = () => triggerTransition(() => handleClickHome());
+        setBackButtonCallback(() => () => triggerTransition(() => decrementTutorialViewIndex()));
+        setIsHomeButton(true);
+        break;        
+      case 2:
+        text = ["This is Kaiju City.", "The city you love, your home."];
+        buttons = [{text:"Back", onClick: backButtonCallback}, {text:"Ok", onClick: incrementTutorialViewIndex}];
+        image = {src: './Map.gif', width: '500px', height: '800px'};
+        homeButtonOnClick = () => triggerTransition(() => handleClickHome());
+        break;
+      case 3:
+        playerSpawnPositions = [];
+        kaijuSpawnPositions = [{ i: 11, j: 4 }];
+        kaijuMoveSpeed = 0;
+        setBackButtonContent("Back");
+        setNextButtonContent("Ok...");
+        setTitle(["This is a Kaiju"]);
+        setShouldKaijuMove(false);
+        break;
+      case 4:
+        playerSpawnPositions = [{ i: 11, j: 6 }];
+        kaijuSpawnPositions = [
+          { i: 19, j: 3 },
+          { i: 3, j: 3 },
+          { i: 11, j: 1 }
+        ];
+        setBackButtonContent("Back");
+        setNextButtonContent("Ahhh!");
+        setTitle([`Kaiju eat people, after cooking them!`]);
+        setShouldKaijuMove(true);
+        break;
+      case 5:
+        playerSpawnPositions = [
+          { i: 11, j: 7 },
+          { i: 3, j: 3 }
+        ];
+        kaijuSpawnPositions = [];
+        setBackButtonContent("Back");
+        setNextButtonContent("Ok!");
+        setTitle([`This is your teammate.`]);
+        setIsHomeButton(true);
+        break;
+      case 6:
+        playerSpawnPositions = [
+          { i: 11, j: 7 },
+          { i: 3, j: 3 }
+        ];
+        kaijuSpawnPositions = [{ i: 19, j: 3 }];
+        abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
+        setBackButtonContent("Back");
+        setNextButtonContent("Next");
+        setIsHomeButton(false);
+        setTitle([
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-around",
+              alignSelf: "center",
+              margin: "20px 0px -5px 0px"
+            }}
+          >
+              <div style={{ margin:"10px" }}>
+              Click on ability buttons</div>
+              <div style={{ margin:"10px" }}>
+              or use num keys 1-9
+            </div>
+              <div style={{ margin:"10px" }}>
+              to attack and defend.
+            </div>
+          </div>,
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-around",
+              alignSelf: "center"
+            }}
+          >
+            <p>Right tile statuses replace left:</p>
+            <br />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-around"
+              }}
+            >
+              <StyledIcon className="fa fa-leaf" color="Chartreuse" />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-around",
+                  alignSelf: "center"
+                }}
+              >
+                <StyledIcon className="fa fa-free-code-camp" color="#df73ff" />
+                <StyledIcon className="fa fa-free-code-camp" color="tomato" />
+              </div>
+              <StyledIcon className="fa fa-shield" color="AntiqueWhite" />
+              <StyledIcon className="fa fa-snowflake-o" color="PaleTurquoise" />
+              <StyledIcon className="fa fa-bolt" color="cyan" />
+              <StyledIcon className="fa fa-snapchat-ghost" color="GhostWhite" />
+              <StyledIcon className="fa fa-question-circle-o" color="Thistle" />
+              <StyledIcon className="fa fa-heart" color="pink" />
+            </div>
+          </div>
+        ]);
+        break;
+      case 7:
+        text = ["Fight the Kaiju.", "Save the people.", "Take back your city!"];
+        buttons = [
+          {text:"Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex())}, 
+          {text:"Play", onClick: () => triggerTransition(() => handleClickGame())}
+        ];
+        image = {src: './story_images/tutorial_exit.png', width: '895px', height: '1200px'};
+        homeButtonOnClick = () => triggerTransition(() => handleClickHome());
+        break; 
+    }
+    
+    !!buttons ? setFullScreenPageData({ 
+      text,
+      buttons,
+      image,
+      homeButtonOnClick
+     }) : setFullScreenPageData(undefined);
+
+    initializeTutorialGameBoard(
+      playerData,
+      setPlayerData,
+      kaijuData,
+      setKaijuData,
+      width,
+      height,
+      scale,
+      setTiles,
+      setClickedTile,
+      setHoverRef,
+      tileStatuses,
+      setTileStatuses,
+      playerSpawnPositions,
+      kaijuSpawnPositions,
+      abilities,
+      kaijuMoveSpeed
+    );
+  }, [tutorialViewIndex]);
+}

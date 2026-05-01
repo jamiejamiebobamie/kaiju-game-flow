@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Player } from "Game/GameBoard/Pieces/PlayerPiece";
 import { Kaiju } from "Game/GameBoard/Pieces/KaijuPiece";
 import { ExplodingKaiju } from "Game/GameBoard/Pieces/ExplodingKaijuPiece";
-import { Abilities } from "Game/UI/PlayerUI/Components/Abilities";
+import { Abilities, TutorialAbilitiesWrapper } from "Game/UI/PlayerUI/Components/Abilities";
 import { getFlattenedArrayIndex } from "Utils/utils";
 
 const Board = styled.div`
@@ -14,22 +14,14 @@ const Board = styled.div`
   margin-top: 40px;
   margin-bottom: 10px;
 `;
-const ShiftContentOver = styled.div`
+const PiecesWrapper = styled.div`
   margin-top: -30px;
   margin-left: -5px;
   position: absolute;
 `;
-const AbilitiesWrapper = styled.div`
-  display: flex;
-  margin-left: 5px;
-  margin-top: 200px;
-  height: 105px;
-`;
+
 const Title = styled.div`
   display: flex;
-  align-self: flex-end;
-  align-content: flex-end;
-  font-alignment: flex-end;
   width: 70px;
   height: 70px;
   margin-top: 40px;
@@ -39,14 +31,11 @@ const Title = styled.div`
   color: #db974f;
 `;
 export const TutorialGameBoard = ({
-  shiftContentOver,
-  isClassWrapper = false,
   playerData,
   setPlayerData,
   setTeleportData,
   kaijuData,
   setPlayerMoveToTiles,
-  tileStatuses,
   setTileStatuses,
   clickedTile,
   setClickedTile,
@@ -99,20 +88,19 @@ export const TutorialGameBoard = ({
     ));
   return (
     <Board width={width} height={height}>
-      <ShiftContentOver scale={scale}>
+      <PiecesWrapper scale={scale}>
         {tiles}
         {kaiju}
         {kaijuRemains}
         {players}
-      </ShiftContentOver>
-      <AbilitiesWrapper>
+      </PiecesWrapper>
+      <TutorialAbilitiesWrapper>
         {playerData.length &&
         Array.isArray(playerData[0].abilities) &&
         playerData[0].abilities.length ? (
           <Title>Click: </Title>
         ) : null}
         <Abilities
-          shiftContentOver={shiftContentOver}
           playerData={playerData}
           setPlayerData={setPlayerData}
           kaijuData={kaijuData}
@@ -123,7 +111,7 @@ export const TutorialGameBoard = ({
           playerIndex={0}
           setTeleportData={setTeleportData}
         />
-      </AbilitiesWrapper>
+      </TutorialAbilitiesWrapper>
     </Board>
   );
 };
