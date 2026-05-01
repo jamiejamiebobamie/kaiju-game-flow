@@ -45,7 +45,7 @@ const SpriteSheet = styled.div`
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
-  animation: exploding 1.5s steps(5) 1 normal forwards;
+  animation: exploding 1.3s steps(5) 1 normal forwards;
   @keyframes exploding {
     from {
       background-position-x: 0px;

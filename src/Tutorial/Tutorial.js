@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { StyledIcon } from "./Components/StyledComponents";
+import { FullscreenPage } from "Components/FullscreenPage.js";
 import { PLAYER_ABILITIES } from "Utils/gameState";
 import {
   useInterval,
@@ -22,9 +22,11 @@ import {
   Button,
   ButtonGroup,
   ButtonOutline,
+  StyledIcon
 } from "./Components/StyledComponents";
 
-export const Tutorial = ({ handleClickHome, triggerTransition }) => {
+
+export const Tutorial = ({ handleClickHome, handleClickGame, triggerTransition }) => {
   const TURN_DELAY = 100;
   const maxTutorialViewIndex = 7;
   const width = 500;
@@ -50,6 +52,8 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const [nextButtonContent, setNextButtonContent] = useState("");
   const [backButtonContent, setBackButtonContent] = useState("");
   const [backButtonCallback, setBackButtonCallback] = useState(() => {});
+  const [fullScreenPageData, setFullScreenPageData] = useState(undefined);
+
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const incrementTutorialViewIndex = () =>
     triggerTransition(() =>
@@ -65,6 +69,9 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
     let kaijuSpawnPositions = [];
     let abilities = [];
     let kaijuMoveSpeed = undefined;
+
+    let text, buttons, image, homeButtonOnClick = undefined;
+
     switch (tutorialViewIndex) {
       case 0:
         playerSpawnPositions = [{ i: 11, j: 5 }];
@@ -77,26 +84,20 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         );
         break;
       case 1:
-        playerSpawnPositions = [];
-        kaijuSpawnPositions = [];
-        setBackButtonContent("Back");
-        setNextButtonContent("Ok");
-        // display Kaiju_Warrior png.
-        setTitle(["You are a Kaiju Warrior, the best of the best."]);
-        setBackButtonCallback(() => () =>
-          triggerTransition(() => handleClickHome())
-        );
+        text = ["You are a Kaiju Warrior,", "the best of the best."];
+        buttons = [
+          {text:"Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex())}, 
+          {text:"Ok", onClick: incrementTutorialViewIndex}
+        ];
+        image = {src: './story_images/tutorial_kaiju_warrior.png', width: '896px', height: '1200px'};
+        homeButtonOnClick = () => triggerTransition(() => handleClickHome());
+        setBackButtonCallback(() => () => triggerTransition(() => decrementTutorialViewIndex()));
         break;        
       case 2:
-        playerSpawnPositions = [];
-        kaijuSpawnPositions = [];
-        // display map gif.
-        setBackButtonContent("Back");
-        setNextButtonContent("Ok");
-        setTitle(["This is Kaiju City, the city you love, your home."]);
-        setBackButtonCallback(() => () =>
-          triggerTransition(() => decrementTutorialViewIndex())
-        );
+        text = ["This is Kaiju City.", "The city you love, your home."];
+        buttons = [{text:"Back", onClick: backButtonCallback}, {text:"Ok", onClick: incrementTutorialViewIndex}];
+        image = {src: './Map.gif', width: '500px', height: '800px'};
+        homeButtonOnClick = () => triggerTransition(() => handleClickHome());
         break;
       case 3:
         playerSpawnPositions = [];
@@ -106,9 +107,6 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         setNextButtonContent("Ok...");
         setTitle(["This is a Kaiju"]);
         setShouldKaijuMove(false);
-        setBackButtonCallback(() => () =>
-          triggerTransition(() => decrementTutorialViewIndex())
-        );
         break;
       case 4:
         playerSpawnPositions = [{ i: 11, j: 6 }];
@@ -118,12 +116,9 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
           { i: 11, j: 1 }
         ];
         setBackButtonContent("Back");
-        setNextButtonContent("Ahh!");
-        setTitle([`Every night, the Kaiju come out of the sea to feast on their favorite meal: people, well-done!`]);
+        setNextButtonContent("Ahhh!");
+        setTitle([`Kaiju eat people, after cooking them!`]);
         setShouldKaijuMove(true);
-        setBackButtonCallback(() => () =>
-          triggerTransition(() => decrementTutorialViewIndex())
-        );
         break;
       case 5:
         playerSpawnPositions = [
@@ -133,10 +128,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         kaijuSpawnPositions = [];
         setBackButtonContent("Back");
         setNextButtonContent("Ok!");
-        setTitle([`This is your teammate, another Kaiju warrior.`]);
-        setBackButtonCallback(() => () =>
-          triggerTransition(() => decrementTutorialViewIndex())
-        );
+        setTitle([`This is your teammate.`]);
         break;
       case 6:
         playerSpawnPositions = [
@@ -146,7 +138,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
         kaijuSpawnPositions = [{ i: 19, j: 3 }];
         abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
         setBackButtonContent("Back");
-        setNextButtonContent("Home");
+        setNextButtonContent("Next");
         setTitle([
           <div
             style={{
@@ -155,15 +147,15 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
               flexDirection: "column",
               justifyContent: "space-around",
               alignSelf: "center",
-              margin:"10px 0px"
+              margin:"20px 0px"
             }}
           >
-            <div style={{ marginBottom:"5px" }}>
+              <div style={{ margin:"10px" }}>
               Click on ability buttons</div>
-            <div style={{ marginBottom:"5px" }}>
+              <div style={{ margin:"10px" }}>
               or use num keys 1-9
             </div>
-            <div style={{ marginBottom:"5px" }}>
+              <div style={{ margin:"10px" }}>
               to attack and defend
             </div>
           </div>,
@@ -205,29 +197,21 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
             </div>
           </div>
         ]);
-        setBackButtonCallback(() => () =>
-          triggerTransition(() => decrementTutorialViewIndex())
-        );
         break;
       case 7:
-        playerSpawnPositions = [];
-        kaijuSpawnPositions = [];
-        setBackButtonContent("Back");
-        setNextButtonContent("Ok");
-        // display Kaiju_Warrior png.
-        setTitle(["Fight back the Kaiju and save the people and your city!"]);
-        setBackButtonCallback(() => () =>
-          triggerTransition(() => handleClickHome())
-        );
+        text = ["Fight the Kaiju.", "Save the people.", "Take back your city!"];
+        buttons = [{text:"Home", onClick: () => triggerTransition(() => handleClickHome())}, {text:"Play", onClick: () => triggerTransition(() => handleClickGame())}];
+        image = {src: './story_images/tutorial_exit.png', width: '895px', height: '1200px'};
         break; 
-      // case maxTutorialViewIndex:
-      //   playerSpawnPositions = [
-      //     { i: 11, j: 7 },
-      //     { i: 3, j: 3 }
-      //   ];
-      //   kaijuSpawnPositions = [{ i: 19, j: 3 }];
-      //   break;
     }
+    
+    !!buttons ? setFullScreenPageData({ 
+      text,
+      buttons,
+      image,
+      homeButtonOnClick
+     }) : setFullScreenPageData(undefined);
+
     initializeTutorialGameBoard(
       playerData,
       setPlayerData,
@@ -247,6 +231,7 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
       kaijuMoveSpeed
     );
   }, [tutorialViewIndex]);
+
   useEffect(() => {
     if (playerMoveToTiles !== null) {
       const adjTilesToPath = playerMoveToTiles[0] && [
@@ -372,79 +357,88 @@ export const Tutorial = ({ handleClickHome, triggerTransition }) => {
   const mapStyles = `transform:scale(.5) translate(-125px);`;
   const shiftContentOver = tutorialViewIndex === 7;
   return (
-    <Wrapper>
-      {tutorialViewIndex !== 0 && tutorialViewIndex !== 6 && (
-        <div
-          style={{
-            display: "flex",
-            width: "400px",
-            alignSelf: "flex-start",
-            marginTop: "-75px",
-            marginLeft: "-100px",
-            transform: "scale(.8)"
-          }}
-        >
-          <ButtonGroup>
-            <ButtonsWrapper>
-              <Button
-                onClick={() => triggerTransition(() => handleClickHome())}
-              >
-                <ButtonOutline zIndex={1} />
-                Home
-              </Button>
-            </ButtonsWrapper>
-          </ButtonGroup>
-        </div>
-      )}
-      <TitleWrapper>
-        <Title>{title[0]}</Title>
-      </TitleWrapper>
-      {tutorialViewIndex === 2 ? (
-        <GameMap
-          isTutorial={true}
-          borderStyles={borderStyles}
-          mapStyles={mapStyles}
-        />
-      ) : (
-        <TutorialGameBoard
-          shiftContentOver={shiftContentOver}
-          isPaused={false}
-          playerData={playerData}
-          setPlayerData={setPlayerData}
-          setTeleportData={setTeleportData}
-          kaijuData={kaijuData}
-          setPlayerMoveToTiles={setPlayerMoveToTiles}
-          tileStatuses={tileStatuses}
-          setTileStatuses={setTileStatuses}
-          clickedTile={clickedTile}
-          setClickedTile={setClickedTile}
-          tiles={tiles}
-          path={path}
-          width={width}
-          height={height}
-          scale={scale}
-          deadKaijuLocations={deadKaijuLocations}
-        />
-      )}
-      {!!title[1] && (
+    <>
+      {fullScreenPageData &&
+        <FullscreenPage
+          text={fullScreenPageData.text}
+          buttons={fullScreenPageData.buttons}
+          image={fullScreenPageData.image}
+          homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
+          />}
+      <Wrapper>
+        {tutorialViewIndex !== 0 && tutorialViewIndex !== 6 && (
+          <div
+            style={{
+              display: "flex",
+              width: "400px",
+              alignSelf: "flex-start",
+              marginTop: "-75px",
+              marginLeft: "-100px",
+              transform: "scale(.8)"
+            }}
+          >
+            <ButtonGroup>
+              <ButtonsWrapper>
+                <Button
+                  onClick={() => triggerTransition(() => handleClickHome())}
+                >
+                  <ButtonOutline zIndex={1} />
+                  Home
+                </Button>
+              </ButtonsWrapper>
+            </ButtonGroup>
+          </div>
+        )}
         <TitleWrapper>
-          <Title>{title[1]}</Title>
+          <Title>{title[0]}</Title>
         </TitleWrapper>
-      )}
-      <ButtonGroup isPaddingBottom={tutorialViewIndex === 2}>
-        <ButtonsWrapper>
-          <Button onClick={backButtonCallback}>
-            <ButtonOutline zIndex={1} />
-            {backButtonContent}
-          </Button>
-        </ButtonsWrapper>
-        <ButtonsWrapper>
-          <Button onClick={() => incrementTutorialViewIndex()}>
-            <ButtonOutline zIndex={1} />
-            {nextButtonContent}
-          </Button>
-        </ButtonsWrapper>
-      </ButtonGroup>
-    </Wrapper>
+        {tutorialViewIndex === 2 ? (
+          <GameMap
+            isTutorial={true}
+            borderStyles={borderStyles}
+            mapStyles={mapStyles}
+          />
+        ) : (
+          <TutorialGameBoard
+            shiftContentOver={shiftContentOver}
+            isPaused={false}
+            playerData={playerData}
+            setPlayerData={setPlayerData}
+            setTeleportData={setTeleportData}
+            kaijuData={kaijuData}
+            setPlayerMoveToTiles={setPlayerMoveToTiles}
+            tileStatuses={tileStatuses}
+            setTileStatuses={setTileStatuses}
+            clickedTile={clickedTile}
+            setClickedTile={setClickedTile}
+            tiles={tiles}
+            path={path}
+            width={width}
+            height={height}
+            scale={scale}
+            deadKaijuLocations={deadKaijuLocations}
+          />
+        )}
+        {!!title[1] && (
+          <TitleWrapper>
+            <Title>{title[1]}</Title>
+          </TitleWrapper>
+        )}
+        <ButtonGroup isPaddingBottom={tutorialViewIndex === 2}>
+          <ButtonsWrapper>
+            <Button onClick={backButtonCallback}>
+              <ButtonOutline zIndex={1} />
+              {backButtonContent}
+            </Button>
+          </ButtonsWrapper>
+          <ButtonsWrapper>
+            <Button onClick={() => incrementTutorialViewIndex()}>
+              <ButtonOutline zIndex={1} />
+              {nextButtonContent}
+            </Button>
+          </ButtonsWrapper>
+        </ButtonGroup>
+      </Wrapper>
+    </>
   );
 };

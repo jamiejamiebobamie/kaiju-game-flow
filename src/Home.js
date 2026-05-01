@@ -41,6 +41,7 @@ export const Home = ({ triggerTransition }) => {
     <Tutorial
       triggerTransition={triggerTransition}
       handleClickHome={handleClickHome}
+      handleClickGame={handleClickGame}
     />
   ) : isGame ? (
     <Game

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Wrapper,
   ButtonGroup,
@@ -7,7 +7,6 @@ import {
   Button,
   StyledIcon,
   StyledLink,
-  BannerImg
 } from "./Components/StyledComponents";
 import { Logo } from "./Components/Logo";
 import logo from "./logo.svg";

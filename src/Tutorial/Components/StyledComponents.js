@@ -100,7 +100,7 @@ export const TitleWrapper = styled.div`
   padding-left: 50px;
   padding-right: 50px;
 
-  height: 130px;
+  min-height: 130px;
   /* background-color: #614324; */
   /* border-radius: 3px;
   border-style: none;

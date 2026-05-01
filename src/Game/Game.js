@@ -14,12 +14,7 @@ import {
   initializeGameBoard,
   getAdjacentTiles
 } from "Utils/utils";
-import {
-  ButtonsWrapper,
-  Button,
-  ButtonGroup,
-  ButtonOutline,
-} from "Tutorial/Components/StyledComponents";
+import { FullscreenPage } from "Components/FullscreenPage.js";
 const GameWrapper = styled.div`
   position: relative;
   display: flex;
@@ -29,74 +24,6 @@ const GameWrapper = styled.div`
   height: 100%;
   margin-top: 40px;
   overflow: hidden;
-`;
-const ReplayTitle = styled.div`
-  display: flex;
-  align-self: center;
-  text-alignment: center;
-  text-align: center;
-  font-alignment: center;
-  margin: 5px;
-  color: #db974f;
-  ${props =>
-    props.fontSize !== undefined &&
-    `font-size: ${props.fontSize}px !important;`}
-`;
-const ReplayModal = styled.div`
-  position: absolute;
-  z-index: 999999999;
-  padding: 0px 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-self: center;
-  align-items: center;
-  align-content: center;
-  // margin-left: 5dvw;
-  // margin-top: -5dvw;
-  // width: 550px;
-  // height: 550px;
-  border-radius: 10px;
-  border-style: solid;
-  border-thickness: thin;
-  border-color: #db974f;
-  background-color: #152642;
-  -webkit-animation-duration: 1s;
-  animation-duration: 1s;
-  -webkit-animation-name: fadeInUp;
-  animation-name: fadeInUp;
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    10% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  ${props =>
-    props.fontSize ? `font-size:${props.fontSize}px;` : "font-size:25px;"};
-`;
-const ModalMessage = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  // margin-bottom: 50px;
-  margin: 25px 0px 0px 0px;
-  line-height: 40px;
-`;
-const StyledImg = styled.img`
-  margin: 10px 0px;
-  border-radius: 5px;
-  border-style: solid;
-  border-thickness: thick;
-  border-color: #db974f;
-  box-shadow: 3px 7px 10px black;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
   const TURN_DELAY = 100;
@@ -124,8 +51,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [hoverLookupString, setHoverLookupString] = useState('');
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
-  const [replayModalMessage, setReplayModalMessage] = useState(null);
   const [deadKaijuLocations, setDeadKaijuLocations] = useState([]);
+  const [fullScreenPageData, setFullScreenPageData] = useState(undefined);
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -145,7 +72,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setTileStatuses(null);
     setPath(null);
     setIntervalTime(null);
-    setReplayModalMessage(null);
+    setFullScreenPageData(undefined);
     setDeadKaijuLocations([]);
   };
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
@@ -202,39 +129,43 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     }
     setPlayerMoveToTiles(null);
   }, [playerMoveToTiles]);
+
   useEffect(() => {
-    if (winner !== null && !replayModalMessage) {
+    if (winner !== null && !fullScreenPageData) {
+      let text, buttons, image = undefined;
+
       if (!kaijuData.find(kaiju => kaiju.lives > 0) || winner === -1) {
-        let message = "You won?";
         switch (winner) {
           case 1:
-            message = [
-              <ReplayTitle fontSize={22}>
-                Wild Kaiju have appeared!
-              </ReplayTitle>,
-              <StyledImg src="./start.png" width="535px" height="535px" />
+            text = ["Wild Kaiju have appeared!"];
+            buttons = [
+              { text:"Fight!",
+                onClick: () => {
+                    setWinner(null);
+                    setIntervalTime(TURN_DELAY);
+                    setFullScreenPageData(undefined);
+                  }
+              }
             ];
+            image = {src: './story_images/match_start.png', width: '535px', height: '535px'};
             break;
           case 0:
-            message = [
-              <ReplayTitle fontSize={25}>You saved the city!</ReplayTitle>,
-              <StyledImg src="./you_won.png" width="535px" height="535px" />,
-              <ReplayTitle>Play again ?</ReplayTitle>
-            ];
+            text = ["You saved the city!", "Play again ?"];
+            buttons = [{text:"Yes", onClick: () => triggerTransition(() => resetState())}, {text:"No", onClick: handleClickHome}];
+            image = {src: './story_images/match_won.png', width: '535px', height: '535px'};
             break;
           case -1:
-            message = [
-              <ReplayTitle fontSize={25}>You lost...</ReplayTitle>,
-              <StyledImg src="./you_lost.png" width="535px" height="535px" />,
-              <ReplayTitle>Play again ?</ReplayTitle>
-            ];
+            text = ["You lost...", "Play again ?"];
+            buttons = [{text:"Yes", onClick: () => triggerTransition(() => resetState())}, {text:"No", onClick: handleClickHome}];
+            image = {src: './story_images/match_lost.png', width: '535px', height: '535px'};
             break;
         }
-        setReplayModalMessage(message);
+        !!buttons ? setFullScreenPageData({ text, buttons, image }) : setFullScreenPageData(undefined);
         setIntervalTime(null);
       }
     }
   }, [kaijuData, winner]);
+
   // event tick
   useInterval(() => {
     updateHighlightedTiles(
@@ -355,52 +286,13 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     />
   ) : (
     <>
-          {replayModalMessage && (
-        <ReplayModal>
-          <ModalMessage
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              // marginBottom: "50px",
-              lineHeight: "40px"
-            }}
-          >
-            {replayModalMessage}
-          </ModalMessage>
-          <ButtonGroup>
-            {winner === 1 ? (
-              <ButtonsWrapper>
-                <Button
-                  onClick={() => {
-                    setWinner(null);
-                    setReplayModalMessage(null);
-                    setIntervalTime(TURN_DELAY);
-                  }}
-                >
-                  <ButtonOutline zIndex={1} />
-                  Fight!
-                </Button>
-              </ButtonsWrapper>
-            ) : (
-              <>
-                <ButtonsWrapper>
-                  <Button onClick={handleClickHome}>
-                    <ButtonOutline zIndex={1} />
-                    No Thanks
-                  </Button>
-                </ButtonsWrapper>
-                <ButtonsWrapper>
-                  <Button onClick={() => triggerTransition(() => resetState())}>
-                    <ButtonOutline zIndex={1} />
-                    Play Again
-                  </Button>
-                </ButtonsWrapper>
-              </>
-            )}
-          </ButtonGroup>
-        </ReplayModal>
-      )}
+      {fullScreenPageData &&
+        <FullscreenPage
+          text={fullScreenPageData.text}
+          buttons={fullScreenPageData.buttons}
+          image={fullScreenPageData.image}
+          homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
+          />}
       <GameWrapper>
       <GameBoard
         isPaused={isPaused}
