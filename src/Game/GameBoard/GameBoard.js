@@ -45,6 +45,10 @@ export const GameBoard = ({
   setHoverLookupString,
   deadKaijuLocations
 }) => {
+  const playerIndex = 0;
+
+  const isPlayerDead = !!playerData[playerIndex] && typeof(playerData[playerIndex].lives) === "number" && playerData[playerIndex].lives < 1;
+
   useEffect(() => {
     const { i, _ } = clickedTile;
     if (i !== -1) {
@@ -98,8 +102,9 @@ export const GameBoard = ({
   return (
     <Board
       onClick={e => {
+        if(!isPlayerDead){
           var rect = e.target.getBoundingClientRect();
-          var x = e.clientX - 23 - rect.left; // x position within the gameboard w/ offset: -23
+          var x = e.clientX - rect.left - 23; // x position within the gameboard w/ offset: -23
           var y = e.clientY - rect.top;  // y position within the gameboard.
           const test = tiles && tiles.reduce((acc, {props : { i, j, tileLocation }}) =>
                         {
@@ -112,28 +117,32 @@ export const GameBoard = ({
                           }
                      )
         test.key && setClickedTile(test.key);
-
+        }
       }}
       onMouseMove={e => {
-          var rect = e.target.getBoundingClientRect();
-          var x = e.clientX - 23 - rect.left; // x position within the gameboard w/ offset: -23
-          var y = e.clientY + 8 - rect.top;  // y position within the gameboard.
-          const test = tiles && tiles.reduce((acc, {props : { i, j, tileLocation }}) =>
-                        {
-                            const distance = getDistance({ x, y }, tileLocation);
-                            return acc.distance > distance ? ({key: `${i} ${j}`, distance }) : acc;
+        if(!isPlayerDead){
+            var rect = e.target.getBoundingClientRect();
+            var x = e.clientX - rect.left - 23; // x position within the gameboard w/ offset: -23
+            var y = e.clientY - rect.top + 8;  // y position within the gameboard.
+            const test = tiles && tiles.reduce((acc, {props : { i, j, tileLocation }}) =>
+                          {
+                              const distance = getDistance({ x, y }, tileLocation);
+                              return acc.distance > distance ? ({key: `${i} ${j}`, distance }) : acc;
 
-                        }  , {
-                            distance: Number.MAX_SAFE_INTEGER,
-                            key: undefined
-                          }
-                     )
-        test.key && test.key !== hoverLookupString && setHoverLookupString(test.key);
+                          }  , {
+                              distance: Number.MAX_SAFE_INTEGER,
+                              key: undefined
+                            }
+                      )
+          test.key && test.key !== hoverLookupString && setHoverLookupString(test.key);
+        } else if (isPlayerDead && hoverLookupString != '') {
+          setHoverLookupString('');
+        } 
       }}
       width={width}
       height={height}>
       {isPaused && <PauseModal />}
-      <ShiftContentOver scale={scale}>
+      <ShiftContentOver>
         {tiles}
         {kaiju}
         {players}

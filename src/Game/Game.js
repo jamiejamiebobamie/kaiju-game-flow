@@ -294,37 +294,37 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
           />}
       <GameWrapper>
-      <GameBoard
-        isPaused={isPaused}
-        playerData={playerData}
-        kaijuData={kaijuData}
-        setPlayerMoveToTiles={setPlayerMoveToTiles}
-        tileStatuses={tileStatuses}
-        setTileStatuses={setTileStatuses}
-        clickedTile={clickedTile}
-        setClickedTile={setClickedTile}
-        tiles={tiles}
-        path={path}
-        width={width}
-        height={height}
-        scale={scale}
-        hoverLookupString={hoverLookupString}
-        setHoverLookupString={setHoverLookupString}
-        deadKaijuLocations={deadKaijuLocations}
-      />
-      <UI
-        playerData={playerData}
-        kaijuKillCount={kaijuKillCount}
-        kaijuKilledToWin={TOTAL_KAIJU_SPAWNED}
-        kaijuData={kaijuData}
-        setPlayerData={setPlayerData}
-        setTeleportData={setTeleportData}
-        setTileStatuses={setTileStatuses}
-        handleClickHome={handleClickHome}
-        handleClickPause={handleClickPause}
-        scale={scale}
-        isTeammate={isTeammate}
-      />
+        <GameBoard
+          isPaused={isPaused}
+          playerData={playerData}
+          kaijuData={kaijuData}
+          setPlayerMoveToTiles={setPlayerMoveToTiles}
+          tileStatuses={tileStatuses}
+          setTileStatuses={setTileStatuses}
+          clickedTile={clickedTile}
+          setClickedTile={setClickedTile}
+          tiles={tiles}
+          path={path}
+          width={width}
+          height={height}
+          scale={scale}
+          hoverLookupString={hoverLookupString}
+          setHoverLookupString={setHoverLookupString}
+          deadKaijuLocations={deadKaijuLocations}
+        />
+        <UI
+          playerData={playerData}
+          kaijuKillCount={kaijuKillCount}
+          kaijuKilledToWin={TOTAL_KAIJU_SPAWNED}
+          kaijuData={kaijuData}
+          setPlayerData={setPlayerData}
+          setTeleportData={setTeleportData}
+          setTileStatuses={setTileStatuses}
+          handleClickHome={handleClickHome}
+          handleClickPause={handleClickPause}
+          scale={scale}
+          isTeammate={isTeammate}
+        />
     </GameWrapper>
     </>
   );
