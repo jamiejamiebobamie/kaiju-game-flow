@@ -9,9 +9,9 @@ import {
   StyledLink,
 } from "./Components/StyledComponents";
 import { Logo } from "./Components/Logo";
-import logo from "./logo.svg";
+import { AvatarSelection } from "./Components/AvatarSelection";
 
-export const MainMenu = ({ handleClickGame, handleClickTutorial }) => (
+export const MainMenu = ({ handleClickGame, handleClickTutorial, setSelectedAvatar }) => (
   <Wrapper>
     <Logo />
     <ButtonGroup>
@@ -42,9 +42,6 @@ export const MainMenu = ({ handleClickGame, handleClickTutorial }) => (
         </Button>
       </ButtonsWrapper>
     </ButtonGroup>
-    <footer className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <p style={{ fontSize: "10px" }}>Made with React</p>
-    </footer>
+    <AvatarSelection />
   </Wrapper>
 );

@@ -71,7 +71,6 @@ export const GameBoard = ({
   const players = playerData.map(p => (
     <Player
       key={p.i}
-      i={p.i}
       charLocation={p.charLocation}
       color={p.color}
       scale={scale}
@@ -80,6 +79,7 @@ export const GameBoard = ({
       isTeleported={p.isTeleported}
       dir={p.dir}
       zIndex={getFlattenedArrayIndex(p.tile)}
+      gender={p.gender}
     />
   ));
   const deadPlayers = playerData.filter(({ lives }) => lives < 1).map(p => (

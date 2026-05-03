@@ -138,7 +138,6 @@ export const UI = ({
       setTileStatuses={setTileStatuses}
       scale={scale}
       setDisplayString={setDisplayString}
-      isReversed={true}
       playerIndex={1}
       isTeammate={true}
     />

@@ -90,7 +90,7 @@ export const setPassives = (pickedAbilities, setPlayerData) => {
       }
     ];
 };
-export const initializeTutorialGameBoard = (
+export const initializeTutorialGameBoard = ({
   playerData,
   setPlayerData,
   kaijuData,
@@ -105,8 +105,9 @@ export const initializeTutorialGameBoard = (
   setTileStatuses,
   playerSpawnPositions,
   kaijuSpawnPositions,
-  abilities
-) => {
+  abilities,
+  selectedAvatar
+}) => {
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
   for (let k = 0; k < playerSpawnPositions.length; k++) {
@@ -116,7 +117,8 @@ export const initializeTutorialGameBoard = (
       isInManaPool: false,
       isHealed: false,
       isTeleported: false,
-      color: k ? "salmon" : "#55AAff",
+      color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1  ? "salmon" : "#55AAff",
+      gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy", 
       charLocation: location,
       moveFromLocation: location,
       moveToLocation: location,
@@ -145,8 +147,8 @@ export const initializeTutorialGameBoard = (
   // PLAYERS    - - - - - - - - - -
   // TILES      - - - - - - - - - -
   const isTutorial = true;
-  redrawTiles(
-    [],
+  redrawTiles({
+    highlightedTiles0: [],
     setHoverRef,
     setClickedTile,
     setTiles,
@@ -154,11 +156,9 @@ export const initializeTutorialGameBoard = (
     kaijuData,
     tileStatuses,
     setTileStatuses,
-    width,
-    height,
     scale,
-    isTutorial
-  );
+    isTutorial,
+});
   const status = [];
   const rowLength = 24;
   const colLength = 10;
@@ -167,9 +167,9 @@ export const initializeTutorialGameBoard = (
     for (let j = 0; j < colLength; j++) {
       _status.push({
         updateKey: Math.random(),
-        isPlayer:
+        playerGender:
           playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
-          playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
+          playerData.find(({ tile }) => tile.i === i && tile.j === j).gender,
         isKaiju: kaijuData
           .filter(k => k.isOnTiles)
           .find(key => key === `${i} ${j}`)
@@ -211,7 +211,7 @@ export const initializeTutorialGameBoard = (
   setKaijuData(kaijuDataArr);
   // KAIJU      - - - - - - - - - -
 };
-export const initializeGameBoard = (
+export const initializeGameBoard = ({
   playerData,
   setPlayerData,
   pickedAbilities,
@@ -224,8 +224,9 @@ export const initializeGameBoard = (
   setHoverRef,
   tileStatuses,
   setTileStatuses,
-  isTeammate
-) => {
+  isTeammate,
+  selectedAvatar
+}) => {
   const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   // PLAYERS - - - - - - - - - - - -
   const _players = [];
@@ -248,7 +249,8 @@ export const initializeGameBoard = (
       isInManaPool: false,
       isHealed: false,
       isTeleported: false,
-      color: k ? "salmon" : "#55AAff",
+      color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1  ? "salmon" : "#55AAff",
+      gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy", 
       charLocation: location,
       moveFromLocation: location,
       moveToLocation: location,
@@ -280,19 +282,17 @@ export const initializeGameBoard = (
   setPlayerData(_players);
   // PLAYERS    - - - - - - - - - -
   // TILES      - - - - - - - - - -
-  redrawTiles(
-    [],
-    () => {},
+  redrawTiles({
+    highlightedTiles0: [],
+    setHoverRef: () => {},
     setClickedTile,
     setTiles,
     playerData,
     kaijuData,
     tileStatuses,
     setTileStatuses,
-    width,
-    height,
-    scale
-  );
+    scale,
+});
   const status = [];
   const rowLength = Math.ceil(width / (70 * scale));
   const colLength = Math.ceil(height / (75 * scale));
@@ -301,9 +301,9 @@ export const initializeGameBoard = (
     for (let j = 0; j < colLength; j++) {
       _status.push({
         updateKey: Math.random(),
-        isPlayer:
+        playerGender:
           playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
-          playerData.find(({ tile }) => tile.i === i && tile.j === j).i,
+          playerData.find(({ tile }) => tile.i === i && tile.j === j).gender,
         isKaiju: kaijuData
           .filter(k => k.isOnTiles)
           .find(key => key === `${i} ${j}`)
@@ -442,7 +442,7 @@ export const updateHighlightedTiles = (
   }
   setHighlightedTiles(_highlightedTiles);
 };
-export const redrawTiles = (
+export const redrawTiles = ({
   highlightedTiles0,
   setHoverRef,
   setClickedTile,
@@ -450,12 +450,9 @@ export const redrawTiles = (
   playerData,
   kaijuData,
   tileStatuses,
-  setTileStatuses,
-  width,
-  height,
   scale,
-  isTutorial
-) => {
+  isTutorial,
+}) => {
   if (tileStatuses) {
     const rowLength = 24;
     const colLength = isTutorial ? 10 : 36;
@@ -481,14 +478,14 @@ export const redrawTiles = (
               )}
               status={{
                 ...tileStatuses[i][j],
-                isPlayer:
+                playerGender:
                   playerData.find(
                     ({ tile, lives }) =>
                       tile && lives && tile.i === i && tile.j === j
                   ) &&
                   playerData.find(
                     ({ tile }) => tile && tile.i === i && tile.j === j
-                  ).i,
+                  ).gender,
                 isKaiju: kaijuData
                   .filter(k => k.isOnTiles && k.lives)
                   .find(({ tile }) => tile && tile.i === i && tile.j === j)
@@ -1834,7 +1831,7 @@ export const useEventTick = ({
         isTutorial
       );
     }
-    redrawTiles(
+    redrawTiles({
       highlightedTiles0,
       setHoverRef,
       setClickedTile,
@@ -1843,11 +1840,9 @@ export const useEventTick = ({
       kaijuData,
       tileStatuses,
       setTileStatuses,
-      width,
-      height,
       scale,
       isTutorial
-    );
+  });
     // move players
     playerData.length &&
       movePlayerPieces(
@@ -1954,7 +1949,8 @@ export const useUpdateTutorialScreenContent = ({
     tileStatuses,
     setTileStatuses,
     backButtonCallback,
-    setIsHomeButton
+    setIsHomeButton,
+    selectedAvatar
 }) => {
     useEffect(() => {
 
@@ -2115,7 +2111,7 @@ export const useUpdateTutorialScreenContent = ({
       homeButtonOnClick
      }) : setFullScreenPageData(undefined);
 
-    initializeTutorialGameBoard(
+    initializeTutorialGameBoard({
       playerData,
       setPlayerData,
       kaijuData,
@@ -2131,9 +2127,9 @@ export const useUpdateTutorialScreenContent = ({
       playerSpawnPositions,
       kaijuSpawnPositions,
       abilities,
-      kaijuMoveSpeed
-    );
-  }, [tutorialViewIndex]);
+      selectedAvatar
+    });
+  }, [tutorialViewIndex, selectedAvatar]);
 }
 export const getAbilityPickerDescription = (string, playerData, playerIndex) => {
   switch (string) {

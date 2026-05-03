@@ -76,6 +76,7 @@ export const TutorialGameBoard = ({
       isTeleported={p.isTeleported}
       dir={p.dir}
       zIndex={getFlattenedArrayIndex(p.tile)}
+      gender={p.gender}
     />
   ));
     const kaijuRemains = deadKaijuLocations.map(k => (

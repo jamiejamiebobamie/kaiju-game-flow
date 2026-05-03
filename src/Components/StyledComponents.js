@@ -19,34 +19,22 @@ export const Wrapper = styled.div`
 export const ButtonGroup = styled.div`
   display: flex;
   flex-direction: column;
-  // justify-content: space-between;
-  // align-items: center;
-  // justify-items: center;
-  // width:50vw;
-  // min-width: 350px;
-  // max-width: 500px;
-  // width:400px;
-  width:100vw;
   height: 190px;
   padding-top: 20px;
   margin-top: 200px;
   transform: scale(1.2, 1.5);
-  // background-color: #13142e;
-  // background-color: #4c2472;
-  // background-color: #181c4c;
-  // background-color: #18434c;
-  // background-color: #183b4c;
-  background-color: #18324c;
 
 
-  border-radius: 10px;
-  border-color: #18434c;
-  // border-color: #13142e;
-  border-width: 1px;
-  border-style: solid;
-  border-bottom: 1px solid #13142e;
-  // display:none;
-  // filter: drop-shadow(0 0 0.2rem purple);
+  width: fit-content;
+  z-index: 2;  
+
+  // background-color: #18324c;
+  // border-radius: 10px;
+  // border-color: #18434c;
+  // border-width: 1px;
+  // border-style: solid;
+  // border-bottom: 1px solid #13142e;
+
 
 `;
 export const ButtonsWrapper = styled.div`
@@ -57,6 +45,7 @@ export const ButtonsWrapper = styled.div`
   width: 100%;
   height: 100px;
 `;
+
 export const Button = styled.div`
   display: flex;
   align-self: center;

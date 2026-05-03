@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import "App.css";
+
 
 const LogoWrapper = styled.img`
 
@@ -44,8 +46,15 @@ const LogoWrapper = styled.img`
 
 
 export const Logo = ({ isSplashScreen }) => {
-  return <LogoWrapper
-    src={isSplashScreen ? "./Logo.gif" : "./staticLogo.png"}
-    isSplashScreen={isSplashScreen}
-  />
+  return <>
+    <LogoWrapper
+      src={isSplashScreen ? "./Logo.gif" : "./staticLogo.png"}
+      isSplashScreen={isSplashScreen}
+    />
+    {/* {isSplashScreen && <footer className="App-header">
+      <img src={"./logo.svg"} className="App-logo" alt="logo" />
+      <p style={{ fontSize: "10px" }}>Made with React</p>
+    </footer>} */}
+  </>
 };
+

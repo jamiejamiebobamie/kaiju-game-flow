@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import styled from "styled-components";
+import { SelectedAvatarContext } from 'Home';
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
 import { AbilityPicker } from "./AbilityPicker";
@@ -32,6 +33,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const height = 800;
   const scale = 0.3;
   const accTime = useRef(0);
+  const { selectedAvatar } = useContext(SelectedAvatarContext);
   const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
@@ -160,8 +162,12 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
             image = {src: './story_images/match_lost.png', width: '535px', height: '535px'};
             break;
         }
-        !!buttons ? setFullScreenPageData({ text, buttons, image }) : setFullScreenPageData(undefined);
-        setIntervalTime(null);
+        if(!!buttons){
+          setTimeout(() => setFullScreenPageData({ text, buttons, image }), 2000);
+          setIntervalTime(null);
+        } else { 
+          setFullScreenPageData(undefined);
+        }
       }
     }
   }, [kaijuData, winner]);
@@ -177,7 +183,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       scale,
       0
     );
-    if (shouldUpdate(accTime.current, 3))
+    if (shouldUpdate(accTime.current, 3)){
       updateTileState(
         playerData,
         kaijuData,
@@ -188,19 +194,18 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         scale,
         accTime.current
       );
-    redrawTiles(
+    }
+    redrawTiles({
       highlightedTiles0,
-      () => {},
+      setHoverRef: () => {},
       setClickedTile,
       setTiles,
       playerData,
       kaijuData,
       tileStatuses,
       setTileStatuses,
-      width,
-      height,
-      scale
-    );
+      scale,
+  });
     // move players
     movePlayerPieces(
       playerData,
@@ -247,7 +252,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       setPickedAbilities={setPickedAbilities}
       handleClickPlay={() => {
         setWinner(1);
-        initializeGameBoard(
+        initializeGameBoard({
           playerData,
           setPlayerData,
           pickedAbilities,
@@ -257,11 +262,12 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           scale,
           setTiles,
           setClickedTile,
-          () => {},
+          setHoverRef: () => {},
           tileStatuses,
           setTileStatuses,
-          isTeammate
-        );
+          isTeammate,
+          selectedAvatar
+      });
         triggerTransition(() => setIsPlayingGame(bool => !bool));
       }}
       isPaused={false}

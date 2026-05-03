@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import { Tutorial } from "./Tutorial/Tutorial";
 import { Game } from "./Game/Game";
 import { MainMenu } from "./MainMenu";
 
+export const SelectedAvatarContext = createContext("guy");
+
 export const Home = ({ triggerTransition }) => {
+  const [selectedAvatar, setSelectedAvatar] = useState("guy");
   const [isTutorial, setIsTutorial] = useState(false);
   const [isGame, setIsGame] = useState(false);
   const handleClickHome = () => {
@@ -37,21 +40,23 @@ export const Home = ({ triggerTransition }) => {
     }
   }, [pathname]);
 
-  return isTutorial ? (
-    <Tutorial
-      triggerTransition={triggerTransition}
-      handleClickHome={handleClickHome}
-      handleClickGame={handleClickGame}
-    />
-  ) : isGame ? (
-    <Game
-      triggerTransition={triggerTransition}
-      handleClickHome={() => triggerTransition(handleClickHome)}
-    />
-  ) : (
-    <MainMenu
-      handleClickGame={() => triggerTransition(handleClickGame)}
-      handleClickTutorial={() => triggerTransition(handleClickTutorial)}
-    />
-  );
+  return <SelectedAvatarContext.Provider value={{ selectedAvatar, setSelectedAvatar }}>
+    {isTutorial ? (
+      <Tutorial
+        triggerTransition={triggerTransition}
+        handleClickHome={handleClickHome}
+        handleClickGame={handleClickGame}
+      />
+    ) : isGame ? (
+      <Game
+        triggerTransition={triggerTransition}
+        handleClickHome={() => triggerTransition(handleClickHome)}
+      />
+    ) : (
+      <MainMenu
+        handleClickGame={() => triggerTransition(handleClickGame)}
+        handleClickTutorial={() => triggerTransition(handleClickTutorial)}
+      />
+    )}
+  </SelectedAvatarContext.Provider>
 };

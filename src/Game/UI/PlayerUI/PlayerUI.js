@@ -48,9 +48,9 @@ const PlayerPicture = styled.img`
   border-color: #db974f;
   background-color: rgba(0, 0, 0, 0.5);
   ${props =>
-    props.isReversed
-      ? "filter: drop-shadow(20px -15px 25px salmon);"
-      : "filter: drop-shadow(20px -15px 25px blue);"}  
+    props.isBlue
+      ? "filter: drop-shadow(20px -15px 25px blue);"
+      : "filter: drop-shadow(20px -15px 25px salmon);"}  
 `;
 export const PlayerUI = ({
   playerData = [
@@ -60,7 +60,8 @@ export const PlayerUI = ({
       moveSpeed: "",
       modifiers: "",
       abilities: [],
-      accessory: { displayLookup: "" }
+      accessory: { displayLookup: "" },
+      gender: "guy"
     },
     {
       lives: 0,
@@ -68,11 +69,11 @@ export const PlayerUI = ({
       moveSpeed: "",
       modifiers: "",
       abilities: [],
-      accessory: { displayLookup: "" }
+      accessory: { displayLookup: "" },
+      gender: "girl"
     }
   ],
   kaijuData = [],
-  isReversed,
   setDisplayString,
   setPlayerData,
   setTeleportData,
@@ -82,6 +83,9 @@ export const PlayerUI = ({
   isTeammate,
   scale
 }) => {
+  const { gender } = playerData[playerIndex];
+  const isReversed = isTeammate;
+
   const _playerUI = (
     <Wrapper isTeammate={isTeammate}>
       {isReversed ? (
@@ -128,12 +132,12 @@ export const PlayerUI = ({
           />
         </>
       )}
-      <PlayerBorder isReversed={true}>
+      <PlayerBorder isReversed={isReversed}>
         <PlayerPicture
-          src={playerIndex === 0 ? "player_avatar.png" : "teammate_avatar.png"}
+          src={gender == "guy" ? "player_avatar.png" : "teammate_avatar.png"}
           height="150px"
           className="fa fa-user-circle"
-          isReversed={isReversed}
+          isBlue={gender == "guy" ? true : false}
         />
       </PlayerBorder>
       <PassiveAbilities

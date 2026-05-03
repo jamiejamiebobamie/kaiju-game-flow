@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext }  from "react";
 import styled from "styled-components";
+import { SelectedAvatarContext } from 'Home';
 
 const ContentWrapper = styled.div`
   width: 400px;
@@ -50,18 +51,17 @@ const Image = styled.div`
               "background-color: lightgrey; opacity: .1;"
         }`}
   ${props =>
-    props.isHighlighted0 &&
-    (props.isPlayer !== 0 || props.isPlayer !== 1) &&
-    "background-color: #55AAff; opacity: .4;"}; // player1
+    props.isHighlighted0 && !props.playerGender &&
+    `background-color: ${props.selectedAvatar == "guy" ? "#55AAff" : "salmon"}; opacity: .4;`} // player1
   ${props =>
     props.isKaiju &&
-    (props.isPlayer !== 0 || props.isPlayer !== 1) &&
+    !props.playerGender &&
     "background-color: #BF40BF; opacity: .4;"}; // kaiju
   ${props =>
-    props.isPlayer === 0
+    props.playerGender == "guy"
       ? "background-color: #55AAff; opacity: .4;" // player1
-      : props.isPlayer === 1
-      ? "background-color: #FFA836; opacity: .4;" // player2
+      : props.playerGender == "girl"
+      ? "background-color: salmon; opacity: .4;" // player2
       : null};
 `;
 export const Content = ({
@@ -71,9 +71,10 @@ export const Content = ({
   setHoverRef,
   status,
   color,
-  isTutorial
+  isTutorial,
 }) => {
   const { i, j } = index;
+  const { selectedAvatar } = useContext(SelectedAvatarContext);
   return (
     <ContentWrapper>
       <ImageWrapper>
@@ -82,7 +83,8 @@ export const Content = ({
           onClick={isTutorial ? onClick : undefined}
           isKaiju={status.isKaiju}
           isHighlighted0={isHighlighted0}
-          isPlayer={status.isPlayer}
+          selectedAvatar={selectedAvatar}
+          playerGender={status.playerGender}
           color={color}
           isTutorial={isTutorial}
         />

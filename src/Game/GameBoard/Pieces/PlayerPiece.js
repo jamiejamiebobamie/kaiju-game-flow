@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import _ from "lodash";
 
 const Wrapper = styled.i`
   display: ${props => (props.lives > 0 ? "flex" : "none")};
@@ -16,7 +15,7 @@ const Wrapper = styled.i`
 const SpriteSheet = styled.div`
   pointer-events: none;
   ${props =>
-    props.isPlayerOne
+    props.gender == "guy"
       ? 'background: url("spritesheet/player.png");'
       : 'background: url("spritesheet/teammate.png");'}
   transform: scale(.4) translate(-130px, -165px);
@@ -244,7 +243,7 @@ export const Player = ({
   isTeleported,
   color,
   zIndex,
-  i = 0
+  gender
 }) => {
   const [modifierText, setModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
@@ -309,7 +308,7 @@ export const Player = ({
     <Wrapper zIndex={zIndex} lives={lives} charLocation={charLocation}>
       {modifierText}
       <Character isDamaged={isDamaged}>
-        <SpriteSheet isPlayerOne={i === 0} anim={anim} color={color} />
+        <SpriteSheet gender={gender} anim={anim} color={color} />
       </Character>
     </Wrapper>
   );
