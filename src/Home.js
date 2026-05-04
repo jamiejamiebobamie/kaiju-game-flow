@@ -3,10 +3,11 @@ import { Tutorial } from "./Tutorial/Tutorial";
 import { Game } from "./Game/Game";
 import { MainMenu } from "./MainMenu";
 
-export const SelectedAvatarContext = createContext("guy");
+export const SelectedAvatarContext = createContext({ selectedAvatar: "guy", setSelectedAvatar: () => {}, isAvatarChangedOnce: false, setIsAvatarChangedOnce: () => {} });
 
 export const Home = ({ triggerTransition }) => {
   const [selectedAvatar, setSelectedAvatar] = useState("guy");
+  const [isAvatarChangedOnce, setIsAvatarChangedOnce] = useState(false);
   const [isTutorial, setIsTutorial] = useState(false);
   const [isGame, setIsGame] = useState(false);
   const handleClickHome = () => {
@@ -40,7 +41,7 @@ export const Home = ({ triggerTransition }) => {
     }
   }, [pathname]);
 
-  return <SelectedAvatarContext.Provider value={{ selectedAvatar, setSelectedAvatar }}>
+  return <SelectedAvatarContext.Provider value={{ selectedAvatar, setSelectedAvatar, isAvatarChangedOnce, setIsAvatarChangedOnce }}>
     {isTutorial ? (
       <Tutorial
         triggerTransition={triggerTransition}

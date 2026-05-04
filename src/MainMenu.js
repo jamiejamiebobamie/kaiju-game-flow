@@ -28,6 +28,12 @@ export const MainMenu = ({ handleClickGame, handleClickTutorial, setSelectedAvat
         </Button>
       </ButtonsWrapper>
       <ButtonsWrapper>
+        <Button onClick={handleClickTutorial}>
+          <ButtonOutline zIndex={1} />
+          Settings
+        </Button>
+      </ButtonsWrapper>
+      <ButtonsWrapper>
         <Button>
           <ButtonOutline zIndex={1} color={"black"} />
           <StyledLink></StyledLink>
