@@ -1,5 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+import {
+  Title,
+  StyledSpookyText,
+  StyledSciFiText,
+  StyledSpookyTextShadow
+} from './StyledComponents'
 import "App.css";
 
 
@@ -7,7 +13,7 @@ const LogoWrapper = styled.img`
 
   pointer-events: none;
   position: absolute;
-  z-index: 999999;
+  z-index: 9;
   display: flex;
 
   ${props => `src: ${props.src};`}
@@ -47,14 +53,14 @@ const LogoWrapper = styled.img`
 
 export const Logo = ({ isSplashScreen }) => {
   return <>
+    {!isSplashScreen && <Title isDescription={false}>
+      <StyledSpookyText isDescription={true}>Kaiju</StyledSpookyText>{" "}
+      <StyledSciFiText>City</StyledSciFiText>
+      <StyledSpookyTextShadow>Kaiju</StyledSpookyTextShadow>{" "}
+    </Title>}
     <LogoWrapper
-      src={isSplashScreen ? "./Logo.gif" : "./staticLogo.png"}
+      src={isSplashScreen ? "./Logo.gif" : "./SVG_logo.svg"}
       isSplashScreen={isSplashScreen}
     />
-    {/* {isSplashScreen && <footer className="App-header">
-      <img src={"./logo.svg"} className="App-logo" alt="logo" />
-      <p style={{ fontSize: "10px" }}>Made with React</p>
-    </footer>} */}
   </>
 };
-

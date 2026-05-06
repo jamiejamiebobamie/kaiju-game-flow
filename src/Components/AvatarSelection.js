@@ -33,6 +33,9 @@ const SpriteSheet = styled.div`
   height: 230px;
   width: 152px;
 
+  position: absolute;
+  z-index: 107;
+
   ${props => `filter: drop-shadow(0 0 2px ${props.gender == 'guy' ? "#55AAff" : "salmon"});`}
 
   -webkit-transition-duration: 0.4s;
@@ -43,7 +46,7 @@ const SpriteSheet = styled.div`
   background-position: 0 -460px;
 
   &:hover{
-    ${props => `animation: ${props.anim} 4.8s steps(6) -1.8s infinite;`}
+    ${props => `animation: ${props.anim} 1.2s steps(6) -.4s infinite;`}
   }
   
   @keyframes cycleThroughIdleAnims {
@@ -59,6 +62,8 @@ const SpriteSheet = styled.div`
 `;
 
 const SpritesWrapper = styled.div`
+
+    transform: translate(-66px, -100px);
     display: flex;
     width: 100%;
     align-self: center;
@@ -244,23 +249,28 @@ const FadeInOutEffect = styled.div`
 `;
 
 const DoodadTransform = styled.div`
-  transition: transform 1s;
+  transition: transform 1.5s;
   ${props => `transform: scale(.45) translate(${props.translation});`}
 `;
 
-const BackgroundTest = styled.div`
+const CircuitDiscSpriteSheet = styled.div`
   position: absolute;
+
   ${props => props.zIndex && `z-index: ${props.zIndex};`}
 
-  pointer-events: none;
-  background: url(spritesheet/selected_avatar_background.png);
+  transform: translate(-220px, 0px) scale(.8, .4);
 
-  width: 358.4px;
-  height: 592px;
+  ${props => `filter: hue-rotate(${props.isRed ? 315 : 195}deg) saturate(150%);`}
+
+  pointer-events: none;
+  background: url(spritesheet/horizontal_circuit_disc_sprite.png);
+
+  width: 592px;
+  height: 359px;
 
   // filter: drop-shadow(0 0 5px #80EF80);
 
-  animation: playSpriteSheet 2s steps(5) infinite;
+  animation: playSpriteSheet 2s steps(9) infinite;
 
   @keyframes playSpriteSheet {
     0% {
@@ -268,7 +278,7 @@ const BackgroundTest = styled.div`
       background-position-y: 0px;
     }                         
     100% {
-      background-position-x: -1792px;
+      background-position-x: -5328px;
       background-position-y: 0px;
     }
   }  
@@ -307,42 +317,55 @@ const useOpacityEffect = ({ show, opacity, setOpacity, activeInterval }) => useE
   }
 }, [show]);
 
-const useTranslationEffect = ({ STARTING_POSTIONS, opacity, setTranslations, activeInterval }) => {
+const useTranslationEffect = ({ STARTING_POSTIONS, show, setTranslations, activeInterval, accumulator }) => {
   const TRANSLATION_RANGE = 25; // max range
   useEffect(() => {
     activeInterval.current = setInterval(() => {
-      if (opacity <= 0) clearInterval(activeInterval.current);
+      if (!show) clearInterval(activeInterval.current);
       setTranslations(ts => ts.map((t, i) => {
         if (i >= STARTING_POSTIONS.length) return t;
 
-        const start = STARTING_POSTIONS[i];
-        const dx = Math.abs(t.x - start.x);
-        const dy = Math.abs(t.y - start.y);
+        // try to update 1-2 doodad(s) at a time
+        const mod = i + 4;
+        const shouldUpdate = accumulator.current % mod == 0;
 
-        if (dx > TRANSLATION_RANGE && dy > TRANSLATION_RANGE) {
-          return start;
-        } else {
-          const negX = Math.random() > .5;
-          const negY = Math.random() > .5;
-          const x = Math.random() * TRANSLATION_RANGE;
-          const y = Math.random() * TRANSLATION_RANGE;
-          return { x: start.x + (negX ? -x : x), y: start.y + (negY ? -y : y) };
+        accumulator.current += 3;
+
+        if (!shouldUpdate) return t;
+
+        if(shouldUpdate){
+          const start = STARTING_POSTIONS[i];
+          const dx = Math.abs(t.x - start.x);
+          const dy = Math.abs(t.y - start.y);
+
+          if (dx > TRANSLATION_RANGE && dy > TRANSLATION_RANGE) {
+            return start;
+          } else {
+            const negX = Math.random() > .5;
+            const negY = Math.random() > .5;
+            const x = Math.random() * TRANSLATION_RANGE;
+            const y = Math.random() * TRANSLATION_RANGE;
+            return { x: start.x + (negX ? -x : x), y: start.y + (negY ? -y : y) };
+          }
         }
       }));
-    }, 5000);
-  }, [opacity]);
+    }, 750);
+  }, [show]);
 }
 
-const Doodads = ({ show, globalTranslation }) => {
-  const STARTING_POSTIONS = [{ x: -100, y: -400 }, { x: 70, y: -280 }, { x: 70, y: -470 }];
+const Doodads = ({ persistDisc, show, globalTranslation, isRed }) => {
+  const STARTING_POSTIONS = [{ x: -100, y: 70 }, { x: 70, y: 100 }, { x: 70, y: 0 }];
+
 
   const activeOpacityInterval = useRef();
   const activeTranslationInterval = useRef();
+  const accumulator = useRef(0);
+
 
   const [opacity, setOpacity] = useState(0);
   const [translations, setTranslations] = useState(STARTING_POSTIONS);
 
-  useTranslationEffect({ STARTING_POSTIONS, opacity, setTranslations, activeInterval: activeTranslationInterval });
+  useTranslationEffect({ STARTING_POSTIONS, show, setTranslations, activeInterval: activeTranslationInterval, accumulator });
   useOpacityEffect({ show, opacity, setOpacity, activeInterval: activeOpacityInterval, });
 
   return <DoodadsWrapper translation={globalTranslation}>
@@ -371,7 +394,11 @@ const Doodads = ({ show, globalTranslation }) => {
           />
         </DoodadTransform>
       </BlinkFadeEffect>
+      <BlinkFadeEffect>
+        <CircuitDiscSpriteSheet isRed={isRed} zIndex={105} />
+      </BlinkFadeEffect>
     </FadeInOutEffect>
+    {persistDisc &&<BlinkFadeEffect><CircuitDiscSpriteSheet isRed={isRed} zIndex={105} /></BlinkFadeEffect> }
   </DoodadsWrapper>
 };
 
@@ -392,8 +419,7 @@ export const AvatarSelection = () => {
           gender={'girl'}
           anim={"girl" == selectedAvatar ? "" : 'cycleThroughIdleAnims'}
         />
-        <Doodads globalTranslation={"-5px, 0px"} show={hoverLookupString == 'girl' && "guy" == selectedAvatar} />
-        {/* <BackgroundTest zIndex={105} /> */}
+        <Doodads isRed={true} persistDisc={"girl" == selectedAvatar} globalTranslation={"-5px, 0px"} show={hoverLookupString == 'girl' && "guy" == selectedAvatar} />
       </div>
       <div>
         <SpriteSheet
@@ -402,8 +428,7 @@ export const AvatarSelection = () => {
           gender={'guy'}
           anim={"guy" == selectedAvatar ? "" : 'cycleThroughIdleAnims'}
         />
-        <Doodads globalTranslation={"5px, 0px"} show={hoverLookupString == 'guy' && "girl" == selectedAvatar} />
-        {/* <BackgroundTest zIndex={106} /> */}
+        <Doodads persistDisc={"guy" == selectedAvatar} globalTranslation={"5px, 0px"} show={hoverLookupString == 'guy' && "girl" == selectedAvatar} />
       </div>
     </SpritesWrapper>
     <CenteredLabelsContainer>

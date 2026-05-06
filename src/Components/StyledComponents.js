@@ -106,13 +106,14 @@ export const StyledIcon = styled.i`
   transform: scale(1.2, 1);
 `;
 export const Title = styled.div`
-  position: relative;
+  position: absolute;
+    z-index: 10;
   font-size: 40px;
   border-color: #64939b;
   color: #64939b;
   margin-bottom: 100px;
   transform: scale(1.5);
-  margin-top: -200px;
+  margin-top: -344px;
   pointer-events: none;
   /* isDescription */
   ${props =>
@@ -166,11 +167,11 @@ export const StyledSpookyTextShadow = styled.p`
   font-family: green_fuz;
   font-size: 90px;
   margin-top: -191px;
-  // color: black;
+  color: black;
   // color: #1e1e1e;
   // color: #db974f;
   // color: #91937f;
-  color: #b9bf82;
+  // color: #b9bf82;
   // filter: drop-shadow(0px -1px 1px black);
 `;
 export const StyledSciFiTextShadow = styled.p`
