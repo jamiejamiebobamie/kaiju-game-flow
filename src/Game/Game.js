@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import styled from "styled-components";
-import { SelectedAvatarContext } from 'Home';
+import { GlobalSettingsContext } from "Home";
 import { GameBoard } from "./GameBoard/GameBoard";
 import { UI } from "./UI/UI";
 import { AbilityPicker } from "./AbilityPicker";
@@ -13,7 +13,8 @@ import {
   redrawTiles,
   updateHighlightedTiles,
   initializeGameBoard,
-  getAdjacentTiles
+  getAdjacentTiles,
+  determineKaijuQuantity
 } from "Utils/utils";
 import { FullscreenPage } from "Components/FullscreenPage.js";
 const GameWrapper = styled.div`
@@ -27,13 +28,15 @@ const GameWrapper = styled.div`
   overflow: hidden;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
+  const { selectedAvatar, selectedDifficulty } = useContext(GlobalSettingsContext);
+
+  const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
+
   const TURN_DELAY = 100;
-  const TOTAL_KAIJU_SPAWNED = 7;
   const width = 500;
   const height = 800;
   const scale = 0.3;
   const accTime = useRef(0);
-  const { selectedAvatar } = useContext(SelectedAvatarContext);
   const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
@@ -93,13 +96,13 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     ["Escape"]
   );
   useEffect(() => {
-    if (kaijuKillCount.length >= TOTAL_KAIJU_SPAWNED) {
+    if (kaijuKillCount.length >= MAX_TO_WIN) {
       const _winner = 0;
       setWinner(_winner);
     }
     if (playerData.length && playerKillCount >= playerData.length)
       setWinner(-1);
-  }, [kaijuKillCount, playerKillCount]);
+  }, [kaijuKillCount, playerKillCount, MAX_TO_WIN]);
   useEffect(() => {
     if (playerMoveToTiles !== null) {
       const adjTilesToPath = playerMoveToTiles[0] && [
@@ -224,21 +227,22 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       playerKillCount
     );
     // move monsters
-    moveKaijuPieces(
-      kaijuData,
-      setKaijuData,
-      tileStatuses,
-      setTileStatuses,
-      scale,
-      accTime.current,
-      playerData,
-      setPlayerData,
-      dmgArray,
-      setKaijuKillCount,
-      false,
-      winner,
-      setDeadKaijuLocations
-    );
+    moveKaijuPieces({
+      data: kaijuData,
+      setData: setKaijuData,
+      tileStatuses: tileStatuses,
+      setTileStatuses: setTileStatuses,
+      scale: scale,
+      accTime: accTime.current,
+      enemyData: playerData,
+      setEnemyData: setPlayerData,
+      dmgArray: dmgArray,
+      setKaijuKillCount: setKaijuKillCount,
+      isTutorial: false,
+      winner: winner,
+      setDeadKaijuLocations: setDeadKaijuLocations,
+      difficulty: selectedDifficulty
+  });
     // update accumulated time.
     accTime.current =
       accTime.current > Number.MAX_SAFE_INTEGER - 10000
@@ -321,7 +325,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         <UI
           playerData={playerData}
           kaijuKillCount={kaijuKillCount}
-          kaijuKilledToWin={TOTAL_KAIJU_SPAWNED}
+          kaijuKilledToWin={MAX_TO_WIN}
           kaijuData={kaijuData}
           setPlayerData={setPlayerData}
           setTeleportData={setTeleportData}

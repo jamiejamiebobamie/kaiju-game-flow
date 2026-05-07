@@ -1,6 +1,6 @@
 import React, { useContext }  from "react";
 import styled from "styled-components";
-import { SelectedAvatarContext } from 'Home';
+import { GlobalSettingsContext } from 'Home';
 
 const ContentWrapper = styled.div`
   width: 400px;
@@ -74,7 +74,7 @@ export const Content = ({
   isTutorial,
 }) => {
   const { i, j } = index;
-  const { selectedAvatar } = useContext(SelectedAvatarContext);
+  const { selectedAvatar } = useContext(GlobalSettingsContext);
   return (
     <ContentWrapper>
       <ImageWrapper>

@@ -11,6 +11,8 @@ import {
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 import { StyledIcon } from "Tutorial/Components/StyledComponents";
+import { Difficulty } from "Home";
+
 
 export const getFlattenedArrayIndex = tile => {
   const { i, j } = tile;
@@ -319,7 +321,8 @@ export const spawnKaiju = (
   playerData,
   scale,
   isRespawn,
-  isTutorial
+  isTutorial,
+  difficulty
 ) => {
   const minX = 0;
   const minY = 30;
@@ -356,7 +359,7 @@ export const spawnKaiju = (
   };
   const dir = getMonsterSwimAnimDirFromNormVec(normVec);
   const key = Math.random();
-  const MAX_MOVE_SPEED = 2 // 3
+  const { KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED } = determineKaijuQuantity(difficulty);
   return isRespawn
     ? {
         key,
@@ -366,10 +369,10 @@ export const spawnKaiju = (
         moveToTiles: [kaijuTile],
         tile: kaijuTile,
         isThere: false,
-        lives: 3,
+        lives: KAIJU_MAX_HEALTH,
         isOnTiles: false,
         dir,
-        moveSpeed: MAX_MOVE_SPEED
+        moveSpeed: KAIJU_MAX_SPEED
       }
     : {
         key,
@@ -380,8 +383,8 @@ export const spawnKaiju = (
         tile: kaijuTile,
         color: "purple",
         isThere: false,
-        lives: 3,
-        moveSpeed: MAX_MOVE_SPEED,
+        lives: KAIJU_MAX_HEALTH,
+        moveSpeed: KAIJU_MAX_SPEED,
         lastDmg: 0,
         abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
         isKaiju: true,
@@ -1287,7 +1290,7 @@ export const movePlayerPieces = (
     teleportData && teleportData.length && setTeleportData([]);
     return _data;
   });
-export const moveKaijuPieces = (
+export const moveKaijuPieces = ({
   data,
   setData,
   tileStatuses,
@@ -1300,9 +1303,13 @@ export const moveKaijuPieces = (
   setKaijuKillCount,
   isTutorial,
   winner,
-  setDeadKaijuLocations
-) =>
+  setDeadKaijuLocations,
+  difficulty
+}) =>
   setData(_data => {
+
+  const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(difficulty);
+
     for (let i = 0; i < _data.length; i++) {
       if (_data[i].lives) {
         // use powers
@@ -1464,25 +1471,41 @@ export const moveKaijuPieces = (
           });
       }
     }
-    const MAX_KAIJU = 3
+
+    let currKillCount = 0;
+    setKaijuKillCount(kc => {
+      if (Array.isArray(kc)){
+        currKillCount = kc.length;
+      }
+      return kc;
+  });
+
+  const numAlive = _data.filter(({ lives }) => lives > 0).length;
+  let remainingNeeded = MAX_TO_WIN - (currKillCount + numAlive);
+
     const newKaiju =
       !isTutorial &&
-      (winner === null) & (_data.length < MAX_KAIJU) &&
+      remainingNeeded > 0 &&
+      (winner === null) & (_data.length < MAX_AT_ONCE) &&
       accTime &&
       !(accTime % 10000) &&
-      spawnKaiju(_data, enemyData, scale);
+      spawnKaiju(_data, enemyData, scale, false, isTutorial, difficulty);
+
     const newKaijuData =
       !newKaiju &&
       accTime &&
       !(accTime % 3) &&
-      _data.map(k =>
-        winner === null && !k.lives
-          ? {
+      winner === null && 
+      _data.map(k => {
+          if(!k.lives && remainingNeeded > 0){
+            remainingNeeded -= 1;
+            return {
               ...k,
-              ...spawnKaiju(_data, enemyData, scale, true, isTutorial)
-            }
-          : k
-      );
+              ...spawnKaiju(_data, enemyData, scale, true, isTutorial, difficulty)
+            };
+          }
+          return k;
+      });
     return newKaiju
       ? [..._data, newKaiju]
       : newKaijuData
@@ -1863,21 +1886,21 @@ export const useEventTick = ({
     // move monsters
     kaijuData.length &&
       shouldKaijuMove &&
-      moveKaijuPieces(
-        kaijuData,
-        setKaijuData,
-        tileStatuses,
-        setTileStatuses,
-        scale,
-        accTime.current,
-        playerData,
-        setPlayerData,
-        dmgArray,
-        () => {},
-        true,
-        null,
-        setDeadKaijuLocations
-      );
+      moveKaijuPieces({
+        data: kaijuData,
+        setData: setKaijuData,
+        tileStatuses: tileStatuses,
+        setTileStatuses: setTileStatuses,
+        scale: scale,
+        accTime: accTime.current,
+        enemyData: playerData,
+        setEnemyData: setPlayerData,
+        dmgArray: dmgArray,
+        setKaijuKillCount: () => {},
+        isTutorial: true,
+        winner: null,
+        setDeadKaijuLocations: setDeadKaijuLocations
+  });
     // update accumulated time.
     accTime.current =
       accTime.current > Number.MAX_SAFE_INTEGER - 10000
@@ -2131,6 +2154,66 @@ export const useUpdateTutorialScreenContent = ({
     });
   }, [tutorialViewIndex, selectedAvatar]);
 }
+
+export const useUpdateSettingsScreen = ({
+    currAbility,
+    setTitle,
+    setShouldKaijuMove,
+    playerData,
+    setPlayerData,
+    kaijuData,
+    setKaijuData,
+    width,
+    height,
+    scale,
+    setTiles,
+    setClickedTile,
+    setHoverRef,
+    tileStatuses,
+    setTileStatuses,
+    selectedAvatar
+}) => {
+    useEffect(() => {
+       const playerSpawnPositions = [
+          { i: 3, j: 3 }
+        ];
+        const kaijuSpawnPositions = [{ i: 19, j: 3 }];
+        const abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
+        setShouldKaijuMove(false);
+        setTitle([
+          <>
+            <StyledIcon className="fa fa-leaf" color="Chartreuse" />
+            <StyledIcon className="fa fa-free-code-camp" color="tomato" />
+            <StyledIcon className="fa fa-shield" color="AntiqueWhite" />
+            <StyledIcon className="fa fa-snowflake-o" color="PaleTurquoise" />
+            <StyledIcon className="fa fa-bolt" color="cyan" />
+            <StyledIcon className="fa fa-snapchat-ghost" color="GhostWhite" />
+            <StyledIcon className="fa fa-question-circle-o" color="Thistle" />
+            <StyledIcon className="fa fa-heart" color="pink" />
+          </>
+        ]);
+
+    initializeTutorialGameBoard({
+      playerData,
+      setPlayerData,
+      kaijuData,
+      setKaijuData,
+      width,
+      height,
+      scale,
+      setTiles,
+      setClickedTile,
+      setHoverRef,
+      tileStatuses,
+      setTileStatuses,
+      playerSpawnPositions,
+      kaijuSpawnPositions,
+      abilities,
+      selectedAvatar
+    });
+  }, [currAbility]);
+}
+
 export const getAbilityPickerDescription = (string, playerData, playerIndex) => {
   switch (string) {
     case "modifiers":
@@ -2455,3 +2538,33 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
   }
 };
+
+export const determineKaijuQuantity = difficulty => {
+  let MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED = undefined;
+  switch (difficulty){
+    case Difficulty.Easy:
+      MAX_AT_ONCE = 1;
+      MAX_TO_WIN = 5;
+      KAIJU_MAX_HEALTH = 2;
+      KAIJU_MAX_SPEED = 2;
+      break;
+    case Difficulty.Hard:
+      MAX_AT_ONCE = 4;
+      MAX_TO_WIN = 12;
+      KAIJU_MAX_HEALTH = 3;
+      KAIJU_MAX_SPEED = 2;    
+      break;
+    case Difficulty.Xtreme:
+      MAX_AT_ONCE = 5;
+      MAX_TO_WIN = 17;
+      KAIJU_MAX_HEALTH = 4;
+      KAIJU_MAX_SPEED = 3;                    
+      break;
+    default: // Difficulty.Medium
+      MAX_AT_ONCE = 3;
+      MAX_TO_WIN = 9;
+      KAIJU_MAX_HEALTH = 3;
+      KAIJU_MAX_SPEED = 2;                     
+  }
+  return { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED };
+}

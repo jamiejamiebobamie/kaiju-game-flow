@@ -11,7 +11,7 @@ import {
 import { Logo } from "./Components/Logo";
 import { AvatarSelection } from "./Components/AvatarSelection";
 
-export const MainMenu = ({ handleClickGame, handleClickTutorial, setSelectedAvatar }) => (
+export const MainMenu = ({ handleClickGame, handleClickTutorial, handleClickSettings }) => (
   <Wrapper>
     <Logo />
     <ButtonGroup>
@@ -28,7 +28,7 @@ export const MainMenu = ({ handleClickGame, handleClickTutorial, setSelectedAvat
         </Button>
       </ButtonsWrapper>
       <ButtonsWrapper>
-        <Button onClick={handleClickTutorial}>
+        <Button onClick={handleClickSettings}>
           <ButtonOutline zIndex={1} />
           Settings
         </Button>

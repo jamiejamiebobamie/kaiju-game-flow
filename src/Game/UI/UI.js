@@ -155,7 +155,7 @@ export const UI = ({
         <ProgressCounter>
           <div>Kaiju:</div>
           <div>
-            {`${Array.isArray(kaijuKillCount) ? kaijuKillCount.length : 0} / ${kaijuKilledToWin + 2}`}
+            {`${Array.isArray(kaijuKillCount) ? kaijuKillCount.length : 0} / ${kaijuKilledToWin}`}
           </div>
         </ProgressCounter>
         {playerUI}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { SelectedAvatarContext } from 'Home';
+import { GlobalSettingsContext } from 'Home';
 import { useHover } from "Utils/utils";
 import styled from "styled-components";
 
@@ -403,7 +403,7 @@ const Doodads = ({ persistDisc, show, globalTranslation, isRed }) => {
 };
 
 export const AvatarSelection = () => {
-  const { selectedAvatar, setSelectedAvatar, isAvatarChangedOnce, setIsAvatarChangedOnce } = useContext(SelectedAvatarContext);
+  const { selectedAvatar, setSelectedAvatar, isAvatarChangedOnce, setIsAvatarChangedOnce } = useContext(GlobalSettingsContext);
   const [setHoverRef, hoverLookupString] = useHover();
 
   return <AvatarSelectionWrapper>

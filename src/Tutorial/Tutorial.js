@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext } from "react";
 import { FullscreenPage } from "Components/FullscreenPage.js";
-import { SelectedAvatarContext } from 'Home';
+import { GlobalSettingsContext } from 'Home';
 import {
   useHover,
   useEventTick,
@@ -26,7 +26,7 @@ export const Tutorial = ({ handleClickHome, handleClickGame, triggerTransition }
   const height = 800;
   const scale = 0.3;
   const accTime = useRef(0);
-  const { selectedAvatar } = useContext(SelectedAvatarContext);
+  const { selectedAvatar } = useContext(GlobalSettingsContext);
   const [tutorialViewIndex, setTutorialViewIndex] = useState(0);
   const [playerData, setPlayerData] = useState([]);
   const [shouldKaijuMove, setShouldKaijuMove] = useState(true);
