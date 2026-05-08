@@ -167,13 +167,8 @@ export const StyledSpookyTextShadow = styled.p`
   z-index: -1;
   font-family: green_fuz;
   font-size: 90px;
-  margin-top: -191px;
+  top: 0px;
   color: black;
-  // color: #1e1e1e;
-  // color: #db974f;
-  // color: #91937f;
-  // color: #b9bf82;
-  // filter: drop-shadow(0px -1px 1px black);
 `;
 export const StyledSciFiTextShadow = styled.p`
   position: absolute;

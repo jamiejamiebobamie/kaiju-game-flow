@@ -36,7 +36,7 @@ const SpriteSheet = styled.div`
   position: absolute;
   z-index: 107;
 
-  ${props => `filter: drop-shadow(0 0 2px ${props.gender == 'guy' ? "#55AAff" : "salmon"});`}
+  ${props => `filter: drop-shadow(0 0 2px color-mix(in srgb, #80EF80 calc(${props.opacity} * 100%), ${props.gender == 'guy' ? "#55AAff" : "#fa8072"}));`}
 
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
@@ -93,7 +93,7 @@ const LabelContainer = styled.div`
     transition-property: transform, color;
     transition-duration: 1s;
 
-    color: ${props => props.selectedGender == 'guy' && props.labelContent == 'Player' || props.selectedGender == 'girl' && props.labelContent == 'Teammate' ? "#55AAff" : "salmon"};
+    color: ${props => props.selectedGender == 'guy' && props.labelContent == 'Player' || props.selectedGender == 'girl' && props.labelContent == 'Teammate' ? "#55AAff" : "#fa8072"};
 `;
 
 const SlidingLabel = styled.span`
@@ -184,16 +184,16 @@ const BlinkFadeEffectParam = styled.div`
   @keyframes blink-fade {
       0%, 100% {
           ${props => `opacity: ${props.low};`
-      }
+  }
       20% {
           ${props => `opacity: ${props.high};`
-      }
+  }
       80% {
           ${props => `opacity: ${props.high};`
-      }
+  }
       100% {
           ${props => `opacity: ${props.low};`
-      }   
+  }   
   }
 `;
 
@@ -260,15 +260,18 @@ const CircuitDiscSpriteSheet = styled.div`
 
   transform: translate(-220px, 0px) scale(.8, .4);
 
-  ${props => `filter: hue-rotate(${props.isRed ? 315 : 195}deg) saturate(150%);`}
+  ${props => `filter:${props.persistDisc ?
+    props.isRed ?
+      ' drop-shadow(0 0 5px #fa8072) contrast(40%) saturate(300%)'
+      : ' drop-shadow(0px 0px 5px #55aaff) contrast(40%) saturate(300%)'
+    : ' drop-shadow(0 0 5px #80EF80) contrast(40%) saturate(300%)'};`}
+
 
   pointer-events: none;
   background: url(spritesheet/horizontal_circuit_disc_sprite.png);
 
   width: 592px;
   height: 359px;
-
-  // filter: drop-shadow(0 0 5px #80EF80);
 
   animation: playSpriteSheet 2s steps(9) infinite;
 
@@ -333,7 +336,7 @@ const useTranslationEffect = ({ STARTING_POSTIONS, show, setTranslations, active
 
         if (!shouldUpdate) return t;
 
-        if(shouldUpdate){
+        if (shouldUpdate) {
           const start = STARTING_POSTIONS[i];
           const dx = Math.abs(t.x - start.x);
           const dy = Math.abs(t.y - start.y);
@@ -353,21 +356,17 @@ const useTranslationEffect = ({ STARTING_POSTIONS, show, setTranslations, active
   }, [show]);
 }
 
-const Doodads = ({ persistDisc, show, globalTranslation, isRed }) => {
+const Doodads = ({ persistDisc, show, globalTranslation, isRed, opacity, setOpacity }) => {
   const STARTING_POSTIONS = [{ x: -100, y: 70 }, { x: 70, y: 100 }, { x: 70, y: 0 }];
-
-
   const activeOpacityInterval = useRef();
   const activeTranslationInterval = useRef();
   const accumulator = useRef(60);
 
-
-  const [opacity, setOpacity] = useState(0);
   const [translations, setTranslations] = useState(STARTING_POSTIONS);
 
   // turning-off for now...
   useTranslationEffect({ STARTING_POSTIONS, show, setTranslations, activeInterval: activeTranslationInterval, accumulator });
-  useOpacityEffect({ show, opacity, setOpacity, activeInterval: activeOpacityInterval, });
+  useOpacityEffect({ show, opacity, setOpacity, activeInterval: activeOpacityInterval });
 
   return <DoodadsWrapper translation={globalTranslation}>
     <FadeInOutEffect opacity={opacity}>
@@ -396,21 +395,59 @@ const Doodads = ({ persistDisc, show, globalTranslation, isRed }) => {
         </DoodadTransform>
       </BlinkFadeEffect>
       <BlinkFadeEffect>
-        <CircuitDiscSpriteSheet isRed={isRed} zIndex={105} />
+        <CircuitDiscSpriteSheet isRed={!!isRed} zIndex={105} />
       </BlinkFadeEffect>
     </FadeInOutEffect>
-    {persistDisc &&<BlinkFadeEffect><CircuitDiscSpriteSheet isRed={isRed} zIndex={105} /></BlinkFadeEffect> }
+    {persistDisc && <BlinkFadeEffect><CircuitDiscSpriteSheet persistDisc={true} isRed={!!isRed} zIndex={106} /></BlinkFadeEffect>}
   </DoodadsWrapper>
 };
 
+const Sprite = ({ gender, onClick, selectedAvatar, globalTranslation }) => {
+
+  const [setHoverRef, hoverLookupString] = useHover();
+  const [opacity, setOpacity] = useState(0);
+
+  return (<div>
+    <SpriteSheet
+      ref={setHoverRef(gender)}
+      onClick={onClick}
+      gender={gender}
+      anim={gender == selectedAvatar ? "" : 'cycleThroughIdleAnims'}
+      opacity={opacity}
+    />
+    <Doodads
+      opacity={opacity}
+      setOpacity={setOpacity}
+      isRed={gender == 'girl'}
+      persistDisc={gender == selectedAvatar}
+      globalTranslation={globalTranslation}
+      show={hoverLookupString == gender && selectedAvatar != gender} />
+  </div>);
+}
+
 export const AvatarSelection = () => {
   const { selectedAvatar, setSelectedAvatar, isAvatarChangedOnce, setIsAvatarChangedOnce } = useContext(GlobalSettingsContext);
-  const [setHoverRef, hoverLookupString] = useHover();
 
   return <AvatarSelectionWrapper>
     <SpritesWrapper>
       {!isAvatarChangedOnce && <PopupSpan />}
-      <div>
+
+      <Sprite
+        gender={'girl'}
+        onClick={() => {
+          setIsAvatarChangedOnce(true);
+          setSelectedAvatar('girl');
+        }}
+        selectedAvatar={selectedAvatar}
+        globalTranslation={"-5px, 0px"}
+      />
+      <Sprite
+        gender={'guy'}
+        onClick={() => setSelectedAvatar('guy')}
+        selectedAvatar={selectedAvatar}
+        globalTranslation={"5px, 0px"}
+      />
+      {/* <div>
         <SpriteSheet
           ref={setHoverRef('girl')}
           onClick={() => {
@@ -419,8 +456,16 @@ export const AvatarSelection = () => {
           }}
           gender={'girl'}
           anim={"girl" == selectedAvatar ? "" : 'cycleThroughIdleAnims'}
+          isHover={hoverLookupString == 'girl' && "guy" == selectedAvatar}
+          opacity={opacity}
         />
-        <Doodads isRed={true} persistDisc={"girl" == selectedAvatar} globalTranslation={"-5px, 0px"} show={hoverLookupString == 'girl' && "guy" == selectedAvatar} />
+        <Doodads
+          opacity={opacity}
+          setOpacity={setOpacity}
+          isRed={true}
+          persistDisc={"girl" == selectedAvatar}
+          globalTranslation={"-5px, 0px"}
+          show={hoverLookupString == 'girl' && "guy" == selectedAvatar} />
       </div>
       <div>
         <SpriteSheet
@@ -428,9 +473,15 @@ export const AvatarSelection = () => {
           onClick={() => setSelectedAvatar('guy')}
           gender={'guy'}
           anim={"guy" == selectedAvatar ? "" : 'cycleThroughIdleAnims'}
+          isHover={hoverLookupString == 'guy' && "girl" == selectedAvatar}
+          opacity={opacity}
+
         />
-        <Doodads persistDisc={"guy" == selectedAvatar} globalTranslation={"5px, 0px"} show={hoverLookupString == 'guy' && "girl" == selectedAvatar} />
-      </div>
+        <Doodads
+          opacity={opacity}
+          setOpacity={setOpacity}
+          persistDisc={"guy" == selectedAvatar} globalTranslation={"5px, 0px"} show={hoverLookupString == 'guy' && "girl" == selectedAvatar} />
+      </div> */}
     </SpritesWrapper>
     <CenteredLabelsContainer>
       {/* default is "girl" = "Teammate", "guy" = "Player" */}
