@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Home } from "./Home";
-import { Logo } from "./Components/Logo";
+import { SplashScreen } from "./Components/SplashScreen";
 import styled, { css } from "styled-components";
 import "./App.css";
 
@@ -133,9 +133,7 @@ const App = () => {
     });
   };
 
-  const appContent = isFirstLoad ?
-    <Logo isSplashScreen={true} />
-      : <Home triggerTransition={triggerTransition} />;
+  const appContent = isFirstLoad ? <SplashScreen /> : <Home triggerTransition={triggerTransition} />;
 
   return (
     <div className="App">

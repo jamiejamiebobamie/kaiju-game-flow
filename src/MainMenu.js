@@ -11,43 +11,46 @@ import {
 import { Logo } from "./Components/Logo";
 import { AvatarSelection } from "./Components/AvatarSelection";
 
-export const MainMenu = ({ handleClickGame, handleClickTutorial, handleClickSettings }) => (
-  <Wrapper>
+export const MainMenu = ({ handleClickGame, handleClickTutorial, handleClickSettings }) => {
+
+  const navButtons = (<ButtonGroup>
+    <ButtonsWrapper>
+      <Button onClick={handleClickGame}>
+        <ButtonOutline zIndex={1} />
+        Game
+      </Button>
+    </ButtonsWrapper>
+    <ButtonsWrapper>
+      <Button onClick={handleClickTutorial}>
+        <ButtonOutline zIndex={1} />
+        Tutorial
+      </Button>
+    </ButtonsWrapper>
+    <ButtonsWrapper>
+      <Button onClick={handleClickSettings}>
+        <ButtonOutline zIndex={1} />
+        Settings
+      </Button>
+    </ButtonsWrapper>
+    <ButtonsWrapper>
+      <Button>
+        <ButtonOutline zIndex={1} color={"black"} />
+        <StyledLink></StyledLink>
+        <StyledLink
+          target="_blank"
+          href="https://github.com/jamiejamiebobamie/kaiju-game-flow"
+          rel="noreferrer"
+        >
+          Code
+          <StyledIcon className="fa fa-github-alt" />
+        </StyledLink>
+      </Button>
+    </ButtonsWrapper>
+  </ButtonGroup>);
+
+  return <Wrapper>
     <Logo />
-    <ButtonGroup>
-      <ButtonsWrapper>
-        <Button onClick={handleClickGame}>
-          <ButtonOutline zIndex={1} />
-          Game
-        </Button>
-      </ButtonsWrapper>
-      <ButtonsWrapper>
-        <Button onClick={handleClickTutorial}>
-          <ButtonOutline zIndex={1} />
-          Tutorial
-        </Button>
-      </ButtonsWrapper>
-      <ButtonsWrapper>
-        <Button onClick={handleClickSettings}>
-          <ButtonOutline zIndex={1} />
-          Settings
-        </Button>
-      </ButtonsWrapper>
-      <ButtonsWrapper>
-        <Button>
-          <ButtonOutline zIndex={1} color={"black"} />
-          <StyledLink></StyledLink>
-          <StyledLink
-            target="_blank"
-            href="https://github.com/jamiejamiebobamie/kaiju-game-flow"
-            rel="noreferrer"
-          >
-            Code
-            <StyledIcon className="fa fa-github-alt" />
-          </StyledLink>
-        </Button>
-      </ButtonsWrapper>
-    </ButtonGroup>
+    {navButtons}
     <AvatarSelection />
   </Wrapper>
-);
+}

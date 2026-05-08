@@ -106,14 +106,15 @@ export const StyledIcon = styled.i`
   transform: scale(1.2, 1);
 `;
 export const Title = styled.div`
+  align-self: center;
   position: absolute;
-    z-index: 10;
+  z-index: 10;
   font-size: 40px;
   border-color: #64939b;
   color: #64939b;
-  margin-bottom: 100px;
+  // margin-bottom: 100px;
   transform: scale(1.5);
-  margin-top: -344px;
+  // margin-top: -344px;
   pointer-events: none;
   /* isDescription */
   ${props =>

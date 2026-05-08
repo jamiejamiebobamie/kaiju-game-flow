@@ -349,7 +349,7 @@ const useTranslationEffect = ({ STARTING_POSTIONS, show, setTranslations, active
           }
         }
       }));
-    }, 750);
+    }, 500);
   }, [show]);
 }
 
@@ -359,12 +359,13 @@ const Doodads = ({ persistDisc, show, globalTranslation, isRed }) => {
 
   const activeOpacityInterval = useRef();
   const activeTranslationInterval = useRef();
-  const accumulator = useRef(0);
+  const accumulator = useRef(60);
 
 
   const [opacity, setOpacity] = useState(0);
   const [translations, setTranslations] = useState(STARTING_POSTIONS);
 
+  // turning-off for now...
   useTranslationEffect({ STARTING_POSTIONS, show, setTranslations, activeInterval: activeTranslationInterval, accumulator });
   useOpacityEffect({ show, opacity, setOpacity, activeInterval: activeOpacityInterval, });
 
