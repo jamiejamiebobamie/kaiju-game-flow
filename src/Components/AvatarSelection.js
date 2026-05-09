@@ -34,7 +34,7 @@ const SpriteSheet = styled.div`
   width: 152px;
 
   position: absolute;
-  z-index: 107;
+  z-index: 109;
 
   ${props => `filter: drop-shadow(0 0 2px color-mix(in srgb, #80EF80 calc(${props.opacity} * 100%), ${props.gender == 'guy' ? "#55AAff" : "#fa8072"}));`}
 
@@ -157,43 +157,21 @@ const StyledMsg = styled.div`
 `;
 
 const BlinkFadeEffect = styled.div`
-    animation: blink-fade .05s linear infinite;
+  animation: blink-fade-${props => `${props.time ? props.time : 5}-${props.low ? props.low : 3}-${props.high ? props.high : 59}`} ${props => props.time ? props.time / 100 : .05}s linear infinite;
 
-    @keyframes blink-fade {
-        0%, 100% {
-            opacity: .3;
-        }
-        20% {
-            opacity: 0.59;
-        }
-        80% {
-            opacity: 0.59;
-        }
-        100% {
-            opacity: .3;
-        }   
+  @keyframes blink-fade-${props => `${props.time ? props.time : 5}-${props.low ? props.low : 3}-${props.high ? props.high : 59}`} {
+    0% {
+      ${props => `opacity: ${props.low ? props.low / 100 : .3};`}
     }
-`;
-
-const BlinkFadeEffectParam = styled.div`
-
-  &:hover{
-      ${props => `animation: blink-fade ${props.time}s linear infinite;`}
-  }
-
-  @keyframes blink-fade {
-      0%, 100% {
-          ${props => `opacity: ${props.low};`
-  }
-      20% {
-          ${props => `opacity: ${props.high};`
-  }
-      80% {
-          ${props => `opacity: ${props.high};`
-  }
-      100% {
-          ${props => `opacity: ${props.low};`
-  }   
+    20% {
+      ${props => `opacity: ${props.high ? props.high / 100 : .59};`}
+    }
+    80% {
+      ${props => `opacity: ${props.high ? props.high / 100 : .59};`}
+    }
+    100% {
+      ${props => `opacity: ${props.low ? props.low / 100 : .3};`}
+    }   
   }
 `;
 
@@ -222,14 +200,29 @@ const DoodadSpriteSheet = styled.div`
   }  
 `;
 
+const GreenGraphDoodad = styled.div`
+  position: absolute;
+
+  opacity: .8;
+
+  ${props => props.zIndex && `z-index: ${props.zIndex};`}
+  pointer-events: none;
+  background: url('GreenGraph.png');
+
+  width: 123px;
+  height: 194px;
+
+  filter: drop-shadow(0 0 5px #80EF80);
+
+  transition: transform 1.5s;
+  ${props => `transform: scale(${props.scale}) translate(${props.translation});`}
+
+`;
+
 const AlignSelfCenter = styled.div`
     display: flex;
     flex-direction: column;
     align-self: center;
-`;
-
-const PositionAbsolute = styled.div`
-    position: absolute;
 `;
 
 const DoodadsWrapper = styled.div`
@@ -250,7 +243,7 @@ const FadeInOutEffect = styled.div`
 
 const DoodadTransform = styled.div`
   transition: transform 1.5s;
-  ${props => `transform: scale(.45) translate(${props.translation});`}
+  ${props => `transform: scale(${props.scale}) translate(${props.translation});`}
 `;
 
 const CircuitDiscSpriteSheet = styled.div`
@@ -265,7 +258,6 @@ const CircuitDiscSpriteSheet = styled.div`
       ' drop-shadow(0 0 5px #fa8072) contrast(40%) saturate(300%)'
       : ' drop-shadow(0px 0px 5px #55aaff) contrast(40%) saturate(300%)'
     : ' drop-shadow(0 0 5px #80EF80) contrast(40%) saturate(300%)'};`}
-
 
   pointer-events: none;
   background: url(spritesheet/horizontal_circuit_disc_sprite.png);
@@ -321,43 +313,52 @@ const useOpacityEffect = ({ show, opacity, setOpacity, activeInterval }) => useE
 }, [show]);
 
 const useTranslationEffect = ({ STARTING_POSTIONS, show, setTranslations, activeInterval, accumulator }) => {
-  const TRANSLATION_RANGE = 25; // max range
+  const TRANSLATION_RANGE = 25; // max range // 25
   useEffect(() => {
     activeInterval.current = setInterval(() => {
-      if (!show) clearInterval(activeInterval.current);
+      if (!show) {
+        clearInterval(activeInterval.current);
+        accumulator.current = 60;
+      }
       setTranslations(ts => ts.map((t, i) => {
         if (i >= STARTING_POSTIONS.length) return t;
 
         // try to update 1-2 doodad(s) at a time
-        const mod = i + 4;
-        const shouldUpdate = accumulator.current % mod == 0;
+        // const mod = i + 4;
+        // const shouldUpdate = accumulator.current % mod == 0;
 
-        accumulator.current += 3;
+        // accumulator.current += 3;
 
-        if (!shouldUpdate) return t;
+        // if (!shouldUpdate) return t;
 
-        if (shouldUpdate) {
-          const start = STARTING_POSTIONS[i];
-          const dx = Math.abs(t.x - start.x);
-          const dy = Math.abs(t.y - start.y);
+        // if (shouldUpdate) {
+        const start = STARTING_POSTIONS[i];
+        const dx = Math.abs(t.x - start.x);
+        const dy = Math.abs(t.y - start.y);
 
-          if (dx > TRANSLATION_RANGE && dy > TRANSLATION_RANGE) {
-            return start;
-          } else {
-            const negX = Math.random() > .5;
-            const negY = Math.random() > .5;
-            const x = Math.random() * TRANSLATION_RANGE;
-            const y = Math.random() * TRANSLATION_RANGE;
-            return { x: start.x + (negX ? -x : x), y: start.y + (negY ? -y : y) };
-          }
+        if (dx > TRANSLATION_RANGE && dy > TRANSLATION_RANGE) {
+          return start;
+        } else {
+          const negX = Math.random() > .5;
+          const negY = Math.random() > .5;
+          // i == 3 is the green graph doodad. restrict this doodad's movement
+          const x = Math.random() * (i == 3 ? TRANSLATION_RANGE / 5 : TRANSLATION_RANGE);
+          const y = Math.random() * (i == 3 ? TRANSLATION_RANGE / 5 : TRANSLATION_RANGE);
+          return { x: start.x + (negX ? -x : x), y: start.y + (negY ? -y : y) };
         }
+        // }
       }));
     }, 500);
   }, [show]);
 }
 
 const Doodads = ({ persistDisc, show, globalTranslation, isRed, opacity, setOpacity }) => {
-  const STARTING_POSTIONS = [{ x: -100, y: 70 }, { x: 70, y: 100 }, { x: 70, y: 0 }];
+  const STARTING_POSTIONS = [
+    { x: -130, y: 30, scaleX: 0.45, scaleY: 0.45 },
+    { x: 120, y: -310, scaleX: 0.45, scaleY: -0.45 },
+    { x: -220, y: -400, scaleX: -0.45, scaleY: -0.45 },
+    { x: 22, y: 25, scaleX: .7, scaleY: .77 }
+  ];
   const activeOpacityInterval = useRef();
   const activeTranslationInterval = useRef();
   const accumulator = useRef(60);
@@ -370,37 +371,37 @@ const Doodads = ({ persistDisc, show, globalTranslation, isRed, opacity, setOpac
 
   return <DoodadsWrapper translation={globalTranslation}>
     <FadeInOutEffect opacity={opacity}>
-      <BlinkFadeEffect>
-        <DoodadTransform translation={`${translations[0].x}px, ${translations[0].y}px`}>
+      <BlinkFadeEffect high={69} low={40}>
+        <DoodadTransform scale={`${STARTING_POSTIONS[0].scaleX}, ${STARTING_POSTIONS[0].scaleY}`} translation={`${translations[0].x}px, ${translations[0].y}px`}>
           <DoodadSpriteSheet
             src={"spritesheet/doo_dad_bars.png"}
-            zIndex={101}
+            zIndex={110}
           />
         </DoodadTransform>
-      </BlinkFadeEffect>
-      <BlinkFadeEffect>
-        <DoodadTransform translation={`${translations[1].x}px, ${translations[1].y}px`}>
+        <DoodadTransform scale={`${STARTING_POSTIONS[1].scaleX}, ${STARTING_POSTIONS[1].scaleY}`} translation={`${translations[1].x}px, ${translations[1].y}px`}>
           <DoodadSpriteSheet
             src={"spritesheet/doo_dad_heartbeat.png"}
-            zIndex={102}
+            zIndex={111}
           />
         </DoodadTransform>
-      </BlinkFadeEffect>
-      <BlinkFadeEffect>
-        <DoodadTransform translation={`${translations[2].x}px, ${translations[2].y}px`}>
+        <DoodadTransform scale={`${STARTING_POSTIONS[2].scaleX}, ${STARTING_POSTIONS[2].scaleY}`} translation={`${translations[2].x}px, ${translations[2].y}px`}>
           <DoodadSpriteSheet
             src={"spritesheet/doo_dad_vertices.png"}
-            zIndex={103}
+            zIndex={112}
           />
         </DoodadTransform>
+        <GreenGraphDoodad scale={`${STARTING_POSTIONS[3].scaleX}, ${STARTING_POSTIONS[3].scaleY}`} translation={`${translations[3].x}px, ${translations[3].y}px`} zIndex={108} />
       </BlinkFadeEffect>
-      <BlinkFadeEffect>
-        <CircuitDiscSpriteSheet isRed={!!isRed} zIndex={105} />
-      </BlinkFadeEffect>
+
+      <BlinkFadeEffect high={20} low={59} time={400}><CircuitDiscSpriteSheet isRed={!!isRed} zIndex={107} /></BlinkFadeEffect>
+      {persistDisc && <BlinkFadeEffect high={59} low={30}><CircuitDiscSpriteSheet isRed={!!isRed} zIndex={106} /></BlinkFadeEffect>}
+
     </FadeInOutEffect>
-    {persistDisc && <BlinkFadeEffect><CircuitDiscSpriteSheet persistDisc={true} isRed={!!isRed} zIndex={106} /></BlinkFadeEffect>}
+    {persistDisc && <BlinkFadeEffect high={59} low={30}><CircuitDiscSpriteSheet persistDisc={true} isRed={!!isRed} zIndex={105} /></BlinkFadeEffect>}
   </DoodadsWrapper>
 };
+
+// 
 
 const Sprite = ({ gender, onClick, selectedAvatar, globalTranslation }) => {
 
@@ -447,41 +448,6 @@ export const AvatarSelection = () => {
         selectedAvatar={selectedAvatar}
         globalTranslation={"5px, 0px"}
       />
-      {/* <div>
-        <SpriteSheet
-          ref={setHoverRef('girl')}
-          onClick={() => {
-            setIsAvatarChangedOnce(true);
-            setSelectedAvatar('girl');
-          }}
-          gender={'girl'}
-          anim={"girl" == selectedAvatar ? "" : 'cycleThroughIdleAnims'}
-          isHover={hoverLookupString == 'girl' && "guy" == selectedAvatar}
-          opacity={opacity}
-        />
-        <Doodads
-          opacity={opacity}
-          setOpacity={setOpacity}
-          isRed={true}
-          persistDisc={"girl" == selectedAvatar}
-          globalTranslation={"-5px, 0px"}
-          show={hoverLookupString == 'girl' && "guy" == selectedAvatar} />
-      </div>
-      <div>
-        <SpriteSheet
-          ref={setHoverRef('guy')}
-          onClick={() => setSelectedAvatar('guy')}
-          gender={'guy'}
-          anim={"guy" == selectedAvatar ? "" : 'cycleThroughIdleAnims'}
-          isHover={hoverLookupString == 'guy' && "girl" == selectedAvatar}
-          opacity={opacity}
-
-        />
-        <Doodads
-          opacity={opacity}
-          setOpacity={setOpacity}
-          persistDisc={"guy" == selectedAvatar} globalTranslation={"5px, 0px"} show={hoverLookupString == 'guy' && "girl" == selectedAvatar} />
-      </div> */}
     </SpritesWrapper>
     <CenteredLabelsContainer>
       {/* default is "girl" = "Teammate", "guy" = "Player" */}
@@ -490,7 +456,7 @@ export const AvatarSelection = () => {
           selectedGender={selectedAvatar}
           labelContent={"Teammate"}
         >
-          <BlinkFadeEffect>
+          <BlinkFadeEffect high={59} low={30}>
             <UpDownAnim>
               <AlignSelfCenter>
                 <StyledIcon className="fa fa-caret-up" />
@@ -505,7 +471,7 @@ export const AvatarSelection = () => {
           selectedGender={selectedAvatar}
           labelContent={"Player"}
         >
-          <BlinkFadeEffect>
+          <BlinkFadeEffect high={59} low={30}>
             <UpDownAnim>
               <AlignSelfCenter>
                 <StyledIcon className="fa fa-caret-up" />
