@@ -150,6 +150,7 @@ export const Tutorial = ({ handleClickHome, handleClickGame, triggerTransition }
       buttons={fullScreenPageData.buttons}
       image={fullScreenPageData.image}
       homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
+      backgroundImgs={fullScreenPageData.backgroundImgs}
     />
 
   const gameboardPage = <Wrapper>

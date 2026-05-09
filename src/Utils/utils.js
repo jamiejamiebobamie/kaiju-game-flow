@@ -1984,7 +1984,7 @@ export const useUpdateTutorialScreenContent = ({
     let kaijuMoveSpeed = undefined;
 
     // full-page screen variables
-    let text, buttons, image, homeButtonOnClick = undefined;
+    let text, buttons, image, backgroundImgs, homeButtonOnClick = undefined;
 
     switch (tutorialViewIndex) {
       case 0:
@@ -2005,14 +2005,64 @@ export const useUpdateTutorialScreenContent = ({
           {text:"Ok", onClick: incrementTutorialViewIndex}
         ];
         image = {src: './story_images/tutorial_kaiju_warrior.png', width: '896px', height: '1200px'};
+        backgroundImgs = [
+          {
+            src: './Background_Wires.png',
+            width: 901,
+            height: 942,
+            styles: `filter: opacity(.2) saturate(.4); position: absolute; z-index: -1; transition: transform 1.5s; transform: scale(1, .8) translate(400px, 0px);`
+          }
+        ]
         homeButtonOnClick = () => triggerTransition(() => handleClickHome());
         setBackButtonCallback(() => () => triggerTransition(() => decrementTutorialViewIndex()));
         setIsHomeButton(true);
         break;        
       case 2:
-        text = ["This is Kaiju City.", "The city you love, your home."];
+        text = ["This is your home, Kaiju City."];
         buttons = [{text:"Back", onClick: backButtonCallback}, {text:"Ok", onClick: incrementTutorialViewIndex}];
         image = {src: './Map.gif', width: '500px', height: '800px'};
+        backgroundImgs = [
+          // TO-DO: Add anim: "bobbing" - - - - - -
+          // NIGHT CLOUD (bottom-left):
+          {
+            src: './Night_Cloud.png',
+            width: 647,
+            height: 367,
+            styles: `position: absolute; z-index: 0; bottom: -70px; left: -300px; transform: scale(-.7, .7);`
+          },
+            // NIGHT CLOUD (top-right):
+          {
+            src: './Night_Cloud.png',
+            width: 647,
+            height: 367,
+            styles: `position: absolute; z-index: 0; top: -120px; right: -300px; transform: scale(-.9, -.6);`
+          },
+          // - - - - - - - - - - - - - - - - - - - - -
+
+          // TO-DO: Add anim: "moving off-screen left to right, off-screen" - - - - - -
+          // NIGHT CLOUD (moving, big cloud, front):
+          {
+            src: './Night_Cloud.png',
+            width: 647,
+            height: 367,
+            styles: `position: absolute; z-index: 1; transition: transform 1.5s; transform: scale(.7) translate(700px, 300px); filter: drop-shadow(0px 500px 20px black);`
+          },
+            // NIGHT CLOUD (moving, medium cloud, middle):
+          {
+            src: './Night_Cloud.png',
+            width: 647,
+            height: 367,
+            styles: `    position: absolute; z-index: -1; transition: transform 1.5s; transform: scale(.4) translate(600px, 340px); filter: drop-shadow(0px 500px 20px black);`
+          },
+            // NIGHT CLOUD (moving, little cloud, back):
+          {
+            src: './Night_Cloud.png',
+            width: 647,
+            height: 367,
+            styles: `position: absolute; z-index: -2; transition: transform 1.5s; transform: scale(.2) translate(4000px, 600px); filter: drop-shadow(0px 500px 20px black);`
+          }
+          // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        ];
         homeButtonOnClick = () => triggerTransition(() => handleClickHome());
         break;
       case 3:
@@ -2033,7 +2083,7 @@ export const useUpdateTutorialScreenContent = ({
         ];
         setBackButtonContent("Back");
         setNextButtonContent("Ahhh!");
-        setTitle([`Kaiju eat people, after cooking them!`]);
+        setTitle([`Kaiju eat people!`]);
         setShouldKaijuMove(true);
         break;
       case 5:
@@ -2117,12 +2167,36 @@ export const useUpdateTutorialScreenContent = ({
         ]);
         break;
       case 7:
-        text = ["Fight the Kaiju.", "Save the people.", "Take back your city!"];
+        text = ["Defeat the Kaiju", "and save your city!"];
         buttons = [
           {text:"Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex())}, 
           {text:"Play", onClick: () => triggerTransition(() => handleClickGame())}
         ];
         image = {src: './story_images/tutorial_exit.png', width: '895px', height: '1200px'};
+        backgroundImgs = [
+          // TO-DO: Add anim: "move to position (position = bottom/top/left/right) from off-screen left, then bobbing infinite once in position" - - - - - -
+          // DAY CLOUD (top-left, smallest):
+          {
+            src: './Day_Cloud.png',
+            width: 660,
+            height: 417,
+            styles: `position: absolute; z-index: -1; transition: transform 1.5s; top: -140px; right: 50px; transform: scale(-.2, 0.15) translate(0px, 0px);`
+          },
+          // DAY CLOUD (top-right, medium):
+          {
+            src: './Day_Cloud.png',
+            width: 660,
+            height: 417,
+            styles: `position: absolute; z-index: 1; transition: transform 1.5s; top: -120px; right: -200px; transform: scale(-.4, .35) translate(0px, 0px);`
+          },
+          // DAY CLOUD (bottom-middle, largest):
+          {
+            src: './Day_Cloud.png',
+            width: 660,
+            height: 417,
+            styles: `position: absolute; z-index: 1; transition: transform 1.5s; bottom: -115px; right: 260px; transform: scale(-.6, .4) translate(0px, 0px);`
+          }                    
+        ]
         homeButtonOnClick = () => triggerTransition(() => handleClickHome());
         break; 
     }
@@ -2131,6 +2205,7 @@ export const useUpdateTutorialScreenContent = ({
       text,
       buttons,
       image,
+      backgroundImgs,
       homeButtonOnClick
      }) : setFullScreenPageData(undefined);
 

@@ -392,16 +392,12 @@ const Doodads = ({ persistDisc, show, globalTranslation, isRed, opacity, setOpac
         </DoodadTransform>
         <GreenGraphDoodad scale={`${STARTING_POSTIONS[3].scaleX}, ${STARTING_POSTIONS[3].scaleY}`} translation={`${translations[3].x}px, ${translations[3].y}px`} zIndex={108} />
       </BlinkFadeEffect>
-
       <BlinkFadeEffect high={20} low={59} time={400}><CircuitDiscSpriteSheet isRed={!!isRed} zIndex={107} /></BlinkFadeEffect>
       {persistDisc && <BlinkFadeEffect high={59} low={30}><CircuitDiscSpriteSheet isRed={!!isRed} zIndex={106} /></BlinkFadeEffect>}
-
     </FadeInOutEffect>
     {persistDisc && <BlinkFadeEffect high={59} low={30}><CircuitDiscSpriteSheet persistDisc={true} isRed={!!isRed} zIndex={105} /></BlinkFadeEffect>}
   </DoodadsWrapper>
 };
-
-// 
 
 const Sprite = ({ gender, onClick, selectedAvatar, globalTranslation }) => {
 
@@ -432,7 +428,6 @@ export const AvatarSelection = () => {
   return <AvatarSelectionWrapper>
     <SpritesWrapper>
       {!isAvatarChangedOnce && <PopupSpan />}
-
       <Sprite
         gender={'girl'}
         onClick={() => {

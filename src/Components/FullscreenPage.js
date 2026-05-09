@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import {
-    ButtonsWrapper,
-    Button,
-    ButtonGroup,
-    ButtonOutline,
+  ButtonsWrapper,
+  Button,
+  ButtonGroup,
+  ButtonOutline,
 } from "Tutorial/Components/StyledComponents";
 
 const Wrapper = styled.div`
@@ -120,42 +120,145 @@ const StyledText = styled.div`
   margin: 5px;
   color: #db974f;
   ${props =>
-        props.fontSize !== undefined &&
-        `font-size: ${props.fontSize}px !important;`}
+    props.fontSize !== undefined &&
+    `font-size: ${props.fontSize}px !important;`}
 `;
 
-export const FullscreenPage = ({ text, buttons, image, homeButtonOnClick = undefined }) => {
-    const homeButton = homeButtonOnClick ? 
+const StyledBackgroundImg = styled.img`
+
+    position: absolute;
+    z-index: -1;
+
+    ${props => `width: ${props.width};`}
+    ${props => `height: ${props.height};`}
+
+    ${props => props.styles && `${props.styles}`}
+`;
+
+/*
+  - - - - - - - -
+
+SCENE: "You are a Kaiju Warrior,", "the best of the best."
+
+  WIRES:
+    filter: opacity(.2) saturate(.4);
+    position: absolute;
+    z-index: -1;
+    transition: transform 1.5s;
+    transform: scale(1, .8) translate(400px, 0px);
+
+    src={'./Background_Wires.png'} width={901} height={942}
+  - - - - - - - -
+  
+SCENE: "This is your home, Kaiju City."
+
+  src={'./Night_Cloud.png'} width={647} height={367}
+
+  ADD ANIM: "bobbing" - - - - - -
+  NIGHT CLOUD (bottom-left):
+    position: absolute;
+    z-index: 0;
+    bottom: -70px;
+    left: -300px;
+    transform: scale(-.7, .7);
+
+  NIGHT CLOUD (top-right):
+    position: absolute;
+    z-index: 0;
+    top: -120px;
+    right: -300px;
+    transform: scale(-.9, -.6);
+  - - - - - - - - - - - - - - - - -
+
+  ADD ANIM: "moving off-screen left to right, off-screen" - - - - - -
+  NIGHT CLOUD (moving, big cloud, front):
+    position: absolute;
+    z-index: 1;
+    transition: transform 1.5s;
+    transform: scale(.7) translate(700px, 300px);
+    filter: drop-shadow(0px 500px 20px black);
+
+  NIGHT CLOUD (moving, medium cloud, middle):
+    position: absolute;
+    z-index: -1;
+    transition: transform 1.5s;
+    transform: scale(.4) translate(600px, 340px);
+    filter: drop-shadow(0px 500px 20px black); 
+    
+  NIGHT CLOUD (moving, little cloud, back):
+    position: absolute;
+    z-index: -2;
+    transition: transform 1.5s;
+    transform: scale(.2) translate(4000px, 600px);
+    filter: drop-shadow(0px 500px 20px black);
+  - - - - - - - - - - - - - - - - -
+
+  SCENE: "Defeat the Kaiju", "and save your city!"
+
+  src={'./Day_Cloud.png'} width={660} height={417}
+
+  ADD ANIM: "move to position (position = bottom/top/left/right) from off-screen left, then bobbing infinite once in position" - - - - - -
+  DAY CLOUD (top-left, smallest):
+    position: absolute;
+    z-index: -1;
+    transition: transform 1.5s;
+    top: -140px;
+    right: 50px;
+    transform: scale(-.2, 0.15) translate(0px, 0px);
+
+  DAY CLOUD (top-right, medium):
+    position: absolute;
+    z-index: 1;
+    transition: transform 1.5s;
+    top: -120px;
+    right: -200px;
+    transform: scale(-.4, .35) translate(0px, 0px);
+
+  DAY CLOUD (bottom-middle, largest):
+    position: absolute;
+    z-index: 1;
+    transition: transform 1.5s;
+    bottom: -115px;
+    right: 260px;
+    transform: scale(-.6, .4) translate(0px, 0px);   
+  - - - - - - - - - - - - - - - - -
+*/
+
+export const FullscreenPage = ({ text, buttons, image, homeButtonOnClick = undefined, backgroundImgs=[] }) => {
+  const bImgs = backgroundImgs.map(({ src, width, height, styles }) => (
+    <StyledBackgroundImg src={src} width={width} height={height} styles={styles} />));
+  const homeButton = homeButtonOnClick ?
     <HomeButtonWrapper>
-        <ButtonGroup style={{ marginLeft: "0px" }}>
-            <ButtonsWrapper>
-                <Button
-                    onClick={homeButtonOnClick}
-                >
-                    <ButtonOutline zIndex={1} />
-                    Home
-                </Button>
-            </ButtonsWrapper>
-        </ButtonGroup>
+      <ButtonGroup style={{ marginLeft: "0px" }}>
+        <ButtonsWrapper>
+          <Button
+            onClick={homeButtonOnClick}
+          >
+            <ButtonOutline zIndex={1} />
+            Home
+          </Button>
+        </ButtonsWrapper>
+      </ButtonGroup>
     </HomeButtonWrapper> : null;
 
-    return <Wrapper>
-        <ImgWrapper>
-            {homeButton}
-            <StyledImg src={image.src} width={image.width} height={image.height} />
-        </ImgWrapper>
-        <ContentWrapper>
-            <TextWrapper>
-                {text.map(t => <StyledText fontSize={22}>{t}</StyledText>)}
-            </TextWrapper>
-            {<ButtonGroup>
-                {buttons.map(b => <ButtonsWrapper>
-                    <Button onClick={b.onClick}>
-                        <ButtonOutline zIndex={1} />
-                        {b.text}
-                    </Button>
-                </ButtonsWrapper>)}
-            </ButtonGroup >}
-        </ContentWrapper>
-    </Wrapper>
+  return <Wrapper>
+    {bImgs}
+    <ImgWrapper>
+      {homeButton}
+      <StyledImg src={image.src} width={image.width} height={image.height} />
+    </ImgWrapper>
+    <ContentWrapper>
+      <TextWrapper>
+        {text.map(t => <StyledText fontSize={22}>{t}</StyledText>)}
+      </TextWrapper>
+      {<ButtonGroup>
+        {buttons.map(b => <ButtonsWrapper>
+          <Button onClick={b.onClick}>
+            <ButtonOutline zIndex={1} />
+            {b.text}
+          </Button>
+        </ButtonsWrapper>)}
+      </ButtonGroup >}
+    </ContentWrapper>
+  </Wrapper>
 }
