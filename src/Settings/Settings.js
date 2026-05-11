@@ -44,6 +44,7 @@ export const SectionHeader = styled.div`
   ${props => props.padding ? `padding: ${props.padding};` : "padding: 40px 0px 20px 30px;"}
   color: rgb(219, 151, 79);
   font-size: 20px;
+  ${props => props.textAlign && `text-align: ${props.textAlign};`}
 `;
 
 export const DifficultyWrapper = styled.div`
@@ -94,12 +95,9 @@ export const RadioButton = styled.div`
   }
 
   ${props => props.last &&
-    `
-    border-right: 3px solid #5a8a7a;
+    `border-right: 3px solid #5a8a7a;
     border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    `
-  }
+    border-bottom-right-radius: 5px;`}
 
   color: #5a8a7a;
   filter: drop-shadow(0px 3px 1px black);
@@ -116,10 +114,19 @@ export const RadioButton = styled.div`
   ${props => props.selected &&
     `border-bottom: 3px solid #5a8a7a;
     transform: translate(0px, 1px);
-    filter: drop-shadow(0px 0px 4px #fff080);
     -webkit-text-stroke: 0.5px #fff080;
-    `
-  }
+    color: #d1c569;
+    filter: drop-shadow(rgb(255, 240, 128) 0px 0px 3px);
+    `}
+
+
+  ${props => props.selected && !(props.first || props.last) &&
+    `border-right: solid #fff080 .75px;
+    border-left: solid #fff080 .75px;`}
+
+  ${props => props.selected && props.first && `border-right: solid #fff080 .75px;`}    
+ 
+  ${props => props.selected && props.last && `border-left: solid #fff080 .75px;`}    
 
   font-size: 25px;
   text-stroke: 0.5px black;
@@ -151,6 +158,18 @@ ${props => props.last &&
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;`}
 
+${props => props.first && props.selected &&
+    `border-left: 0.3px solid #fff080;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;`}
+
+${props => props.last && props.selected &&
+    `border-right: 0.3px solid #fff080;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;`}    
+
+${props => props.selected && `border-top: 0.75px solid #fff080; border-bottom: 0.5px solid #fff080;`}    
+
 `;
 
 export const AbilityEditorSectionWrapper = styled.div`
@@ -168,10 +187,7 @@ export const AbilityEditorButton = styled.div`
   align-self: center;
   justify-content: center;
 
-  // margin: 0px 0px 170px;
-
-  width: 700px;
-  // min-width: 200px;
+  width: 550px;
   height: 50px;
 
   font-alignment: center;
@@ -183,17 +199,19 @@ export const AbilityEditorButton = styled.div`
   border-top: 3px solid #5a8a7a;
   border-right: 4px solid #5a8a7a;
   border-left: 4px solid #5a8a7a;
-  border-bottom: 5px solid #5a8a7a;
+  border-bottom: 7px solid #5a8a7a;
   color: #5a8a7a;
   filter: drop-shadow(0px 3px 1px black);
 
   &:hover {
-    border-bottom: 3px solid #5a8a7a;
-    transform: translate(0px, 1px);
+    // margin-top: 4px;
+    border-bottom: 4px solid #5a8a7a;
+    transform: translate(0px, 5px);
     filter: drop-shadow(0px 0px 0px black);
   }
 
-  font-size: 35px;
+  line-height: 48px;
+  font-size: 31px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
   background-color: #376e5b;
@@ -202,7 +220,7 @@ export const AbilityEditorButton = styled.div`
 export const AbilityEditorButtonOutline = styled.div`
   position: absolute;
   z-index: ${props => props.zIndex};
-  width: 700px;
+  width: 550px;
   height: 49.5px;
   margin-top: -0.5px;
   pointer-events: none;
@@ -213,24 +231,27 @@ export const AbilityEditorButtonOutline = styled.div`
   border-bottom: 0.5px solid black;
 `;
 
-export const BackButtonSectionWrapper = styled.div`
-    position: relative;
+export const NavButtonSectionWrapper = styled.div`
+    // position: relative;
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 0px 0px 0px 60px;`;
+    // flex-direction: column;
+    // justify-content: flex-end;
+    // padding: 0px 0px 0px 60px;
+    justify-content: space-around;
+    margin-bottom: 130px;
+    `;
 
-export const BackButton = styled.div`
+export const NavButton = styled.div`
   display: flex;
-  align-self: flex-start;
+  align-self: flex-end;
   justify-content: center;
 
-  width: 250px;
-  height: 30px;
+  width: 240px;
+  height: 45px;
 
-  margin: 0px 0px 70px;
+  margin: 0px 0px 110px;
 
   font-alignment: center;
   cursor: pointer;
@@ -238,29 +259,31 @@ export const BackButton = styled.div`
   border-radius: 5px;
   border-style: solid;
 
-  border: 3px solid #5a8a7a;
-  border-bottom: 5px solid #5a8a7a;
+  border: 4px solid #5a8a7a;
+  border-bottom: 7px solid #5a8a7a;
   color: #5a8a7a;
   filter: drop-shadow(0px 3px 1px black);
 
   &:hover {
-    border-bottom: 3px solid #5a8a7a;
+    border-bottom: 5px solid #5a8a7a;
     transform: translate(0px, 3px);
     filter: drop-shadow(0px 0px 0px black);
   }
 
-  font-size: 23px;
+  font-size: 27px;
+  line-height: 45px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
   background-color: #376e5b;
+
+  ${props => props.margin && `margin: ${props.margin};`}
 `;
 
-export const BackButtonOutline = styled.div`
+export const NavButtonOutline = styled.div`
   position: absolute;
   z-index: ${props => props.zIndex};
-  width: 250px;
-  /* min-width: 200px; */
-  height: 29.5px;
+  width: 240px;
+  height: 44.5px;
   margin-top: -0.5px;
   pointer-events: none;
   border-radius: 3px;
@@ -407,44 +430,48 @@ export const Settings = ({ handleClickHome, handleClickGame, triggerTransition }
         <RadioButton
           selected={selectedDifficulty == Difficulty.Easy}
           first={true} onClick={() => setSelectedDifficulty(Difficulty.Easy)}>
-          <RadioButtonOutline first={true} zIndex={1} />
+          <RadioButtonOutline selected={selectedDifficulty == Difficulty.Easy} first={true} zIndex={1} />
           Easy
         </RadioButton>
         <RadioButton
           selected={selectedDifficulty == Difficulty.Medium}
           onClick={() => setSelectedDifficulty(Difficulty.Medium)}>
-          <RadioButtonOutline zIndex={1} />
+          <RadioButtonOutline selected={selectedDifficulty == Difficulty.Medium} zIndex={1} />
           Medium
         </RadioButton>
         <RadioButton
           selected={selectedDifficulty == Difficulty.Hard}
           onClick={() => setSelectedDifficulty(Difficulty.Hard)}>
-          <RadioButtonOutline zIndex={1} />
+          <RadioButtonOutline selected={selectedDifficulty == Difficulty.Hard} zIndex={1} />
           Hard
         </RadioButton>
         <RadioButton
           selected={selectedDifficulty == Difficulty.Xtreme}
           last={true} onClick={() => setSelectedDifficulty(Difficulty.Xtreme)}>
-          <RadioButtonOutline last={true} zIndex={1} />
+          <RadioButtonOutline selected={selectedDifficulty == Difficulty.Xtreme} last={true} zIndex={1} />
           Xtreme
         </RadioButton>
       </DifficultyButtonWrapper>
     </DifficultyWrapper>
     <AbilityEditorSectionWrapper>
-      <SectionHeader padding={'100px 0px 50px 30px'}>
-        Edit the lifespan and spawn count of your active abilities:
+      <SectionHeader padding={'100px 0px 40px 0px'} textAlign={"center"}>
+        Edit the properties of your abilities:
       </SectionHeader>
       <AbilityEditorButton onClick={() => { }}>
         <AbilityEditorButtonOutline zIndex={1} />
         Ability Editor
       </AbilityEditorButton>
     </AbilityEditorSectionWrapper>
-    <BackButtonSectionWrapper>
-      <BackButton onClick={handleClickHome}>
-        <BackButtonOutline zIndex={1} />
+    <NavButtonSectionWrapper>
+      <NavButton margin={'0px 0px 0px 50px'} onClick={handleClickHome}>
+        <NavButtonOutline zIndex={1} />
         Back
-      </BackButton>
-    </BackButtonSectionWrapper>
+      </NavButton>
+      <NavButton margin={'0px 50px 0px 0px'} onClick={handleClickGame}>
+        <NavButtonOutline zIndex={1} />
+        Play
+      </NavButton>
+    </NavButtonSectionWrapper>
 
     {/* {isHomeButton && homeButton}
     <TitleWrapper>

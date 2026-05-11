@@ -53,9 +53,8 @@ const KaijuWrapper = styled.div`
   pointer-events: none;
 
   position: absolute;
-  z-index: 8;
 
-  filter: drop-shadow(rgb(191, 64, 191) 0px 0px 1px);
+  ${props => props.isSmoke ? "z-index: 9; filter: invert(1) blur(1px) drop-shadow(0px 0px 1px rgb(191, 64, 191)) opacity(.25);" :  "z-index: 8; filter: drop-shadow(0px 0px 1px rgb(191, 64, 191));" }
 
   animation: fadeKaijuWalk linear 60s infinite;
 
@@ -110,31 +109,51 @@ const SpriteSheet = styled.div`
   display: flex;
 
   background-color: #101c30;
-  
-  -webkit-mask-image: url('spritesheet/kaiju_sprite.png');
-  mask-image: url('spritesheet/kaiju_sprite.png');
 
-  transform: scale(0.4) translate(-130px, -165px);
-  height: 230.2px;
-  width: 153px;
+  ${props => props.isSmoke ?
+    "background: url('spritesheet/kaiju-walk-smoke.png');"
+    : "  -webkit-mask-image: url('spritesheet/kaiju-walk.png'); mask-image: url('spritesheet/kaiju-walk.png');"
+  }
+
+  ${props => props.isSmoke && "filter: hue-rotate(180deg);"}
+
+    ${props => props.isSmoke ? "transform: scale(0.7, 0.4) translate(-90px, -165px);" : "transform: scale(0.4) translate(-130px, -165px);"}
+  
+  width: 180px;
+  height: 231px;
 
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
 
-  animation: upRight 5s steps(10) infinite;
+   ${props => props.isSmoke ? 'animation: smoke-flow 5s steps(10) infinite;' : 'animation: walk 5s steps(10) infinite;'}
 
-  @keyframes upRight {
+  @keyframes walk {
     0% {
-      -webkit-mask-position: -152px 0px; 
-      mask-position: -152px 0px;
+      -webkit-mask-position: 0px 0px; 
+      mask-position: 0px 0px;
     }
   
     100% {
-      -webkit-mask-position: -1682px 0px; 
-      mask-position: -1682px 0px;
+      -webkit-mask-position: -1800px 0px; 
+      mask-position: -1800px 0px;
     }
   }
+
+    @keyframes smoke-flow {
+    0% {
+        background-position-x: 0px;
+        background-position-y: 0px;
+    }
+  
+    100% {
+      background-position-x: -1800px;
+      background-position-y: 0px;
+    }
+  }
+
+
+
 `;
 
 export const Logo = () => (<LogoWrapper>
@@ -146,5 +165,8 @@ export const Logo = () => (<LogoWrapper>
   <LogoImage src={"./SVG_logo.svg"} />
   <KaijuWrapper >
     <SpriteSheet />
+  </KaijuWrapper>
+  <KaijuWrapper isSmoke={true}>
+    <SpriteSheet isSmoke={true}/>
   </KaijuWrapper>
 </LogoWrapper>);
