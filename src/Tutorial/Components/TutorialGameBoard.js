@@ -11,7 +11,7 @@ const Board = styled.div`
   min-width: ${props => props.width}px;
   height: ${props => props.height}px;
   max-height: 300px;
-  margin-top: 40px;
+  margin-top: ${props => props.marginTop ? props.marginTop : 40}px;
   margin-bottom: 10px;
 `;
 const PiecesWrapper = styled.div`
@@ -44,7 +44,8 @@ export const TutorialGameBoard = ({
   width,
   height,
   scale,
-  deadKaijuLocations
+  deadKaijuLocations,
+  marginTop
 }) => {
   useEffect(() => {
     const { i, _ } = clickedTile;
@@ -88,7 +89,7 @@ export const TutorialGameBoard = ({
       />
     ));
   return (
-    <Board width={width} height={height}>
+    <Board width={width} height={height} marginTop={marginTop}>
       <PiecesWrapper scale={scale}>
         {tiles}
         {kaiju}

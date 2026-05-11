@@ -9,14 +9,10 @@ import { GameMap } from "../../Components/GameMap.js";
 import { getFlattenedArrayIndex, getDistance } from "../../Utils/utils";
 const Board = styled.div`
   position: relative;
-  width: 500px;
-  min-width: 500px;
-  height: 790px;
-  minwidth: 790px;
+  ${props => props.width ? `width: ${props.width}px;` : 'width: 500px;'}
+  // crop bottom of image. use 98% of required height.
+  ${props => props.height ? `height: ${props.height * .98}px;` : 'height: 790px;'}
   overflow: hidden;
-  /* border-top: 0px;
-  border-left: 0px;
-  border-bottom: 0px; */
 
   border-style: solid;
   border-thickness: medium;
@@ -24,6 +20,7 @@ const Board = styled.div`
   border-color: #db974f;
   cursor: pointer;
 `;
+
 const ShiftContentOver = styled.div`
   margin-top: -30px;
   margin-left: -5px;
@@ -149,7 +146,7 @@ export const GameBoard = ({
         {deadPlayers}
         {kaijuRemains}
       </ShiftContentOver>
-      <GameMap />
+      <GameMap width={width} height={height} />
     </Board>
   );
 };

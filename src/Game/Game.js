@@ -22,9 +22,10 @@ const GameWrapper = styled.div`
   display: flex;
   align-self: center;
   justify-content: space-between;
-  width: 800px;
+  // width: 800px;
+  ${props => props.width ? `width: ${props.width};` : "width:800px;"}
   height: 100%;
-  margin-top: 40px;
+  // margin-top: 40px;
   overflow: hidden;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
@@ -33,9 +34,18 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
 
   const TURN_DELAY = 100;
-  const width = 500;
-  const height = 800;
-  const scale = 0.3;
+
+  // 100%, "normal size":
+  const SCALE = 0.3;
+  const WIDTH = 500;
+  const HEIGHT = 800;
+  // - - - - - - - - - - -
+  const percentZoom = 90 / 100;
+  const scale = SCALE * percentZoom;
+  const width = WIDTH * percentZoom;
+  const height = HEIGHT * percentZoom;
+
+
   const accTime = useRef(0);
   const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
@@ -303,7 +313,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           image={fullScreenPageData.image}
           homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
           />}
-      <GameWrapper>
+      <GameWrapper width={width}>
         <GameBoard
           isPaused={isPaused}
           playerData={playerData}
@@ -332,6 +342,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           setTileStatuses={setTileStatuses}
           handleClickHome={handleClickHome}
           handleClickPause={handleClickPause}
+          width={width}
+          height={height}          
           scale={scale}
           isTeammate={isTeammate}
         />

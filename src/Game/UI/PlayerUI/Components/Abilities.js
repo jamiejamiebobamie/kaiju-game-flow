@@ -6,7 +6,8 @@ export const TutorialAbilitiesWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: -60px;
-  margin-top: 200px;
+  margin-top: 180px;
+  // margin-top: 200px;
   height: 90px;
   width: 700px;
 `;

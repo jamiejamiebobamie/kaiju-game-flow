@@ -34,7 +34,7 @@ export const ButtonGroup = styled.div`
   width: 500px;
   height: 50px;
   transform: scale(1.2, 1.5);
-  margin 25px 50px;
+  margin: ${props => props.margin ? props.margin : "25px 50px"};
 `;
 export const ButtonsWrapper = styled.div`
   position: relative;

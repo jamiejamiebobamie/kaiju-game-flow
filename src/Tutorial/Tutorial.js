@@ -48,6 +48,7 @@ export const Tutorial = ({ handleClickHome, handleClickGame, triggerTransition }
   const [title, setTitle] = useState([]);
   const [nextButtonContent, setNextButtonContent] = useState("");
   const [backButtonContent, setBackButtonContent] = useState("");
+  const [gameBoardMarginTop, setGameBoardMarginTop] = useState(undefined);  
   const [backButtonCallback, setBackButtonCallback] = useState(() => { });
   const [fullScreenPageData, setFullScreenPageData] = useState(undefined);
   const [isHomeButton, setIsHomeButton] = useState(false);
@@ -90,7 +91,8 @@ export const Tutorial = ({ handleClickHome, handleClickGame, triggerTransition }
     setTileStatuses,
     backButtonCallback,
     setIsHomeButton,
-    selectedAvatar
+    selectedAvatar,
+    setGameBoardMarginTop
   });
 
   // user clicks gameboard tile -> update move-to-tile data
@@ -175,13 +177,14 @@ export const Tutorial = ({ handleClickHome, handleClickGame, triggerTransition }
       height={height}
       scale={scale}
       deadKaijuLocations={deadKaijuLocations}
+      marginTop={gameBoardMarginTop}
     />
     {!!title[1] && (
       <TitleWrapper>
         <Title>{title[1]}</Title>
       </TitleWrapper>
     )}
-    <ButtonGroup>
+    <ButtonGroup margin={gameBoardMarginTop ? "-19px 0px 29px" : undefined}>
       <ButtonsWrapper>
         <Button onClick={backButtonCallback}>
           <ButtonOutline zIndex={1} />

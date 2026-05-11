@@ -23,12 +23,12 @@ const GameMapDimmer = styled.img`
   // width: 100%;
   // height: 100%;
 `;
-export const GameMap = ({ isTutorial, borderStyles, mapStyles }) => {
+export const GameMap = ({ isTutorial, borderStyles, mapStyles, width, height }) => {
   return (
     <Border styles={borderStyles}>
       <Wrapper styles={mapStyles}>
-        <BackgroundImage src={"map.gif"} width={500} />
-        {!isTutorial && <GameMapDimmer src={"landDimmer.png"} width={500} />}
+        <BackgroundImage src={"map.gif"} width={width} height={height} />
+        {!isTutorial && <GameMapDimmer src={"landDimmer.png"} width={width} height={height} />}
       </Wrapper>
     </Border>
   );

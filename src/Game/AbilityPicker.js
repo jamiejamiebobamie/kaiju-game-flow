@@ -87,8 +87,8 @@ export const ButtonGroup = styled.div`
   right: 30px;
   bottom: 30px;
   transform: scale(1.2, 1.5);
-  margin-top: 80px;
-  margin-bottom: 20px;
+
+  ${props => props.margin ? `margin: ${props.margin}` : `margin-top: 80px; margin-bottom: 20px;`}
   // /* background-color: orange; */
 `;
 const CheckboxWrapper = styled.div`
@@ -180,7 +180,7 @@ export const AbilityPicker = ({
             </Checkbox>
           </CheckboxText>
         </CheckboxWrapper>
-        <ButtonGroup>
+        <ButtonGroup margin={`60px 0px -10px 0px`}>
           <ButtonsWrapper>
             <Button disabled={isPlayButtonDisabled} onClick={isPlayButtonDisabled ? () => {} : handleClickPlay}>
               <ButtonOutline zIndex={1} />

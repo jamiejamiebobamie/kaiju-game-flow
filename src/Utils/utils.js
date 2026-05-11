@@ -197,7 +197,7 @@ export const initializeTutorialGameBoard = ({
       color: "purple",
       isThere: true,
       lives: 3,
-      moveSpeed: 2, //kaijuMoveSpeed !== undefined ? kaijuMoveSpeed : 2,
+      moveSpeed: 2,
       lastDmg: 0,
       abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
       isKaiju: true,
@@ -1973,7 +1973,8 @@ export const useUpdateTutorialScreenContent = ({
     setTileStatuses,
     backButtonCallback,
     setIsHomeButton,
-    selectedAvatar
+    selectedAvatar,
+    setGameBoardMarginTop
 }) => {
     useEffect(() => {
 
@@ -1981,7 +1982,6 @@ export const useUpdateTutorialScreenContent = ({
     let playerSpawnPositions = [];
     let kaijuSpawnPositions = [];
     let abilities = [];
-    let kaijuMoveSpeed = undefined;
 
     // full-page screen variables
     let text, buttons, image, backgroundImgs, homeButtonOnClick = undefined;
@@ -2068,7 +2068,6 @@ export const useUpdateTutorialScreenContent = ({
       case 3:
         playerSpawnPositions = [];
         kaijuSpawnPositions = [{ i: 11, j: 4 }];
-        kaijuMoveSpeed = 0;
         setBackButtonContent("Back");
         setNextButtonContent("Ok...");
         setTitle(["This is a Kaiju"]);
@@ -2096,6 +2095,7 @@ export const useUpdateTutorialScreenContent = ({
         setNextButtonContent("Ok!");
         setTitle([`This is your teammate.`]);
         setIsHomeButton(true);
+        setGameBoardMarginTop(undefined);
         break;
       case 6:
         playerSpawnPositions = [
@@ -2107,6 +2107,7 @@ export const useUpdateTutorialScreenContent = ({
         setBackButtonContent("Back");
         setNextButtonContent("Next");
         setIsHomeButton(false);
+        setGameBoardMarginTop(20);
         setTitle([
           <div
             style={{
@@ -2115,15 +2116,15 @@ export const useUpdateTutorialScreenContent = ({
               flexDirection: "column",
               justifyContent: "space-around",
               alignSelf: "center",
-              margin: "20px 0px -5px 0px"
+              // margin: "20px 0px -5px 0px"
             }}
           >
-              <div style={{ margin:"10px" }}>
+              <div style={{ margin:"5px" }}>
               Click on ability buttons</div>
-              <div style={{ margin:"10px" }}>
+              <div style={{ margin:"5px" }}>
               or use num keys 1-9
             </div>
-              <div style={{ margin:"10px" }}>
+              <div style={{ margin:"5px" }}>
               to attack and defend.
             </div>
           </div>,
@@ -2133,10 +2134,11 @@ export const useUpdateTutorialScreenContent = ({
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-around",
-              alignSelf: "center"
+              alignSelf: "center",
+              margin: "10px, 0px, 20px, 0px"
             }}
           >
-            <p>Right tile statuses replace left:</p>
+            <p style={{ margin: "10px, 0px, 20px, 0px" }}>Right tile statuses replace left:</p>
             <br />
             <div
               style={{
@@ -2167,7 +2169,8 @@ export const useUpdateTutorialScreenContent = ({
         ]);
         break;
       case 7:
-        text = ["Defeat the Kaiju", "and save your city!"];
+        setGameBoardMarginTop(undefined);
+        text = ["Defeat the Kaiju,", "save the city!"];
         buttons = [
           {text:"Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex())}, 
           {text:"Play", onClick: () => triggerTransition(() => handleClickGame())}
