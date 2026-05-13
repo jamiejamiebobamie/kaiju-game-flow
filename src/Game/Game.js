@@ -29,6 +29,20 @@ const GameWrapper = styled.div`
   overflow: hidden;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
+  const DEFAULT_FULLSCREEN_PAGE_DATA = {
+    text: ["Wild Kaiju have appeared!"],
+    buttons: [
+      {
+        text: "Fight!",
+        onClick: () => {
+          setWinner(null);
+          setIntervalTime(TURN_DELAY);
+          setFullScreenPageData(undefined);
+        }
+      }
+    ],
+    image: { src: './story_images/match_start.png', width: '535px', height: '535px' }
+  }
   const { selectedAvatar, selectedDifficulty } = useContext(GlobalSettingsContext);
 
   const { MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
@@ -66,20 +80,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
   const [deadKaijuLocations, setDeadKaijuLocations] = useState([]);
-  const [fullScreenPageData, setFullScreenPageData] = useState({
-    text: ["Wild Kaiju have appeared!"],
-    buttons: [
-      {
-        text: "Fight!",
-        onClick: () => {
-          setWinner(null);
-          setIntervalTime(TURN_DELAY);
-          setFullScreenPageData(undefined);
-        }
-      }
-    ],
-    image: { src: './story_images/match_start.png', width: '535px', height: '535px' }
-  });
+  const [fullScreenPageData, setFullScreenPageData] = useState(DEFAULT_FULLSCREEN_PAGE_DATA);
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -99,7 +100,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setTileStatuses(null);
     setPath(null);
     setIntervalTime(null);
-    setFullScreenPageData(undefined);
+    setFullScreenPageData(DEFAULT_FULLSCREEN_PAGE_DATA);
     setDeadKaijuLocations([]);
   };
   const shouldUpdate = (accTime, interval) => !(accTime % interval);
@@ -232,7 +233,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       setTeleportData,
       false,
       winner
-  );
+    );
     // move monsters
     moveKaijuPieces({
       data: kaijuData,
@@ -258,93 +259,93 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         : accTime.current + intervalTime;
   }, intervalTime);
 
-  return isPlayingGame ? (
-    <>
-      <GameWrapper width={width}>
-        <GameBoard
-          isPaused={isPaused}
-          playerData={playerData}
-          kaijuData={kaijuData}
-          setPlayerMoveToTiles={setPlayerMoveToTiles}
-          tileStatuses={tileStatuses}
-          setTileStatuses={setTileStatuses}
-          clickedTile={clickedTile}
-          setClickedTile={setClickedTile}
-          tiles={tiles}
-          path={path}
-          width={width}
-          height={height}
-          scale={scale}
-          hoverLookupString={hoverLookupString}
-          setHoverLookupString={setHoverLookupString}
-          deadKaijuLocations={deadKaijuLocations}
-        />
-        <UI
-          playerData={playerData}
-          kaijuKillCount={kaijuKillCount}
-          kaijuKilledToWin={MAX_TO_WIN}
-          kaijuData={kaijuData}
-          setPlayerData={setPlayerData}
-          setTeleportData={setTeleportData}
-          setTileStatuses={setTileStatuses}
-          handleClickHome={handleClickHome}
-          handleClickPause={handleClickPause}
-          width={width}
-          height={height}
-          scale={scale}
-          isTeammate={isTeammate}
-        />
-      </GameWrapper>
-    </>
-  ) : fullScreenPageData ?
-    <FullscreenPage
-      text={fullScreenPageData.text}
-      buttons={fullScreenPageData.buttons}
-      image={fullScreenPageData.image}
-      homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
-    /> : (
-      <AbilityPicker
-        handleClickHome={handleClickHome}
-        pickedAbilities={pickedAbilities}
-        setPickedAbilities={setPickedAbilities}
-        handleClickPlay={() => {
-          setWinner(1);
-          initializeGameBoard({
-            playerData,
-            setPlayerData,
-            pickedAbilities,
-            kaijuData,
-            width,
-            height,
-            scale,
-            setTiles,
-            setClickedTile,
-            setHoverRef: () => { },
-            tileStatuses,
-            setTileStatuses,
-            isTeammate,
-            selectedAvatar
-          });
-          triggerTransition(() => setIsPlayingGame(bool => !bool));
-        }}
-        isPaused={false}
-        powerUpData={[]}
-        playerData={playerData}
-        setPlayerData={setPlayerData}
-        setTeleportData={setTeleportData}
-        kaijuData={kaijuData}
-        setPlayerMoveToTiles={setPlayerMoveToTiles}
-        tileStatuses={tileStatuses}
-        setTileStatuses={setTileStatuses}
-        clickedTile={clickedTile}
-        setClickedTile={setClickedTile}
-        tiles={tiles}
-        path={path}
-        width={width}
-        height={height}
-        scale={scale}
-        numAbilitiesToPick={3}
-        isTeammate={isTeammate}
-        setIsTeammate={setIsTeammate}
-      />);
+  return !isPlayingGame ? <AbilityPicker
+    handleClickHome={handleClickHome}
+    pickedAbilities={pickedAbilities}
+    setPickedAbilities={setPickedAbilities}
+    handleClickPlay={() => {
+      setWinner(1);
+      initializeGameBoard({
+        playerData,
+        setPlayerData,
+        pickedAbilities,
+        kaijuData,
+        width,
+        height,
+        scale,
+        setTiles,
+        setClickedTile,
+        setHoverRef: () => { },
+        tileStatuses,
+        setTileStatuses,
+        isTeammate,
+        selectedAvatar
+      });
+      triggerTransition(() => setIsPlayingGame(bool => !bool));
+    }}
+    isPaused={false}
+    powerUpData={[]}
+    playerData={playerData}
+    setPlayerData={setPlayerData}
+    setTeleportData={setTeleportData}
+    kaijuData={kaijuData}
+    setPlayerMoveToTiles={setPlayerMoveToTiles}
+    tileStatuses={tileStatuses}
+    setTileStatuses={setTileStatuses}
+    clickedTile={clickedTile}
+    setClickedTile={setClickedTile}
+    tiles={tiles}
+    path={path}
+    width={width}
+    height={height}
+    scale={scale}
+    numAbilitiesToPick={3}
+    isTeammate={isTeammate}
+    setIsTeammate={setIsTeammate}
+  />
+    : fullScreenPageData ?
+      <FullscreenPage
+        text={fullScreenPageData.text}
+        buttons={fullScreenPageData.buttons}
+        image={fullScreenPageData.image}
+        homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
+      />
+      : (
+        <>
+          <GameWrapper width={width}>
+            <GameBoard
+              isPaused={isPaused}
+              playerData={playerData}
+              kaijuData={kaijuData}
+              setPlayerMoveToTiles={setPlayerMoveToTiles}
+              tileStatuses={tileStatuses}
+              setTileStatuses={setTileStatuses}
+              clickedTile={clickedTile}
+              setClickedTile={setClickedTile}
+              tiles={tiles}
+              path={path}
+              width={width}
+              height={height}
+              scale={scale}
+              hoverLookupString={hoverLookupString}
+              setHoverLookupString={setHoverLookupString}
+              deadKaijuLocations={deadKaijuLocations}
+            />
+            <UI
+              playerData={playerData}
+              kaijuKillCount={kaijuKillCount}
+              kaijuKilledToWin={MAX_TO_WIN}
+              kaijuData={kaijuData}
+              setPlayerData={setPlayerData}
+              setTeleportData={setTeleportData}
+              setTileStatuses={setTileStatuses}
+              handleClickHome={handleClickHome}
+              handleClickPause={handleClickPause}
+              width={width}
+              height={height}
+              scale={scale}
+              isTeammate={isTeammate}
+            />
+          </GameWrapper>
+        </>);
 };

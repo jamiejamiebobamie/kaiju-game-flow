@@ -1501,13 +1501,13 @@ export const moveKaijuPieces = ({
 
     const newKaiju =
       !isTutorial &&       
-      shouldUpdate(accTime, 10000)
+      shouldUpdate(accTime, 10000) &&
       _data.length < MAX_AT_ONCE &&
       spawnKaiju(_data, enemyData, scale, false, isTutorial, difficulty);
 
     const respawnedKaijuData =
       !newKaiju &&
-       shouldUpdate(accTime, 3000)
+       shouldUpdate(accTime, 3000) &&
       !!remainingNeeded && remainingNeeded > 0 &&
       _data.map(k => {
           if(!k.lives && remainingNeeded > 0){
