@@ -225,7 +225,7 @@ const StyledMsg = styled.div`
     width: 100%;
     max-width: 1250px;
 
-    ${props => `color: ${props.color ? props.color : '#D1001C' };`}
+    ${props => `color: ${props.color ? props.color : '#D1001C'};`}
 
     ${props => props.color && `filter: drop-shadow(0 0 5px ${props.color});`} 
 
@@ -236,6 +236,12 @@ const PopupMsg = styled.span`
     display: flex;
     width: 250px;
     text-align: end;
+    font-size: 16px;
+
+    ${props => props.textAlign && `text-align: ${props.textAlign};`}
+    ${props => props.fontSize && `font-size: ${props.fontSize};`}
+
+    margin-left: -20px;
 `;
 
 const FadeInOutEffect = styled.div`
@@ -281,14 +287,17 @@ const CircuitDiscSpriteSheet = styled.div`
   }  
 `;
 
-const PopupSpan = ({ color, msg }) =>
+const PopupSpan = ({ color, msg, textAlign, fontSize }) =>
   <StyledMsg color={color}>
     <BlinkFadeEffect>
-      <PopupMsg>{!!msg ? msg : 'Click'}
+      <PopupMsg
+        textAlign={textAlign}
+        fontSize={fontSize}
+      >{!!msg ? msg : 'Click'}
         <br />
-        <TopRightBottomLeftAnim>
+          <UpDownAnim>
           <StyledIcon className='fa fa-caret-down' rotate={0} />
-        </TopRightBottomLeftAnim>
+          </UpDownAnim>
       </PopupMsg>
     </BlinkFadeEffect>
   </StyledMsg>
@@ -374,9 +383,24 @@ const Doodads = ({ persistDisc, show, globalTranslation, isRed, opacity, setOpac
   useOpacityEffect({ show, opacity, setOpacity, activeInterval: activeOpacityInterval });
 
   return <DoodadsWrapper translation={globalTranslation}>
+    {!isAvatarChangedOnce &&
+      !persistDisc &&
+      <FadeInOutEffect opacity={1 - opacity}>
+        <PopupSpan
+          msg={'Click to change avatar'}
+          color={'rgb(196 193 106)'}
+          textAlign={'start'}
+          fontSize={'13px'}
+        />
+      </FadeInOutEffect>}
     <FadeInOutEffect opacity={opacity}>
+      <PopupSpan
+        msg={'Click to change avatar'}
+        color={'#80EF80'}
+        textAlign={'start'}
+        fontSize={'13px'}
+      />
       <BlinkFadeEffect high={69} low={40}>
-        {isAvatarChangedOnce && <PopupSpan color={'#5eff4f'} />}
         <DoodadTransform scale={`${STARTING_POSTIONS[0].scaleX}, ${STARTING_POSTIONS[0].scaleY}`} translation={`${translations[0].x}px, ${translations[0].y}px`}>
           <DoodadSpriteSheet
             src={"spritesheet/doo_dad_bars.png"}
@@ -428,15 +452,14 @@ const Sprite = ({ gender, onClick, selectedAvatar, globalTranslation }) => {
 }
 
 export const AvatarSelection = () => {
-  const { selectedAvatar, setSelectedAvatar, isAvatarChangedOnce, setIsAvatarChangedOnce } = useContext(GlobalSettingsContext);
+  const { selectedAvatar, setSelectedAvatar, setIsAvatarChangedOnce } = useContext(GlobalSettingsContext);
 
   return <AvatarSelectionWrapper>
     <SpritesWrapper>
-      {!isAvatarChangedOnce && <PopupSpan msg={'Click to change avatar'}/>}
       <Sprite
         gender={'girl'}
         onClick={() => {
-          setTimeout(() => setIsAvatarChangedOnce(true), 2000);
+          setIsAvatarChangedOnce(true);
           setSelectedAvatar('girl');
         }}
         selectedAvatar={selectedAvatar}

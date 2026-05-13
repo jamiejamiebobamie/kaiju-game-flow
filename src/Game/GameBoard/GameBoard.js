@@ -53,6 +53,7 @@ export const GameBoard = ({
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
+
   const kaiju = kaijuData.map(k => (
     <Kaiju
       key={k.key}

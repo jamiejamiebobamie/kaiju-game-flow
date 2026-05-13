@@ -350,7 +350,7 @@ export const spawnKaiju = (
   const kaijuTileLocation = getTileXAndY({
     i: kaijuTile.i,
     j: kaijuTile.j,
-    scale: 0.3
+    scale
   });
   const distance = getDistance(kaijuTileLocation, location);
   const normVec = distance && {
@@ -1233,7 +1233,28 @@ export const movePlayerPieces = (
             _data[i].isThere = hasArrived;
             if (_data[i].isThere && _data[i].moveToTiles.length) {
               const [nextTile, ...tiles] = _data[i].moveToTiles;
-              const playerDirection = getDirFromTiles(_data[i].tile, nextTile);
+              let playerDirection = getDirFromTiles(_data[i].tile, nextTile);
+
+              // small issue with highlighted tiles not being connected to current player's path.
+              // find playerDirection using: "getMonsterSwimAnimDirFromNormVec" method
+              if (playerDirection == undefined ){
+                  const currTileLocation = getTileXAndY({
+                    i: _data[i].tile.i,
+                    j: _data[i].tile.j,
+                    scale
+                  });
+                const nextTileLocation = getTileXAndY({
+                    i: nextTile.i,
+                    j: nextTile.j,
+                    scale });
+                const distance = getDistance(nextTileLocation, currTileLocation);
+                const normVec = distance && {
+                  x: (nextTileLocation.x - currTileLocation.x) / distance,
+                  y: (nextTileLocation.y - currTileLocation.y) / distance
+                };
+                playerDirection = getMonsterSwimAnimDirFromNormVec(normVec);
+              }
+              
               _data[i].dir = playerDirection;
               if (!tiles.length) {
                 _data[i].moveToLocation =
@@ -1300,15 +1321,17 @@ export const moveKaijuPieces = ({
   enemyData, // playerData
   setEnemyData, // setPlayerData
   dmgArray,
+  kaijuKillCount,
   setKaijuKillCount,
   isTutorial,
   winner,
   setDeadKaijuLocations,
   difficulty
-}) =>
+}) => 
   setData(_data => {
-
-  const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(difficulty);
+    const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(difficulty);
+    let remainingNeeded;
+    let currKillCount = kaijuKillCount.length;
 
     for (let i = 0; i < _data.length; i++) {
       if (_data[i].lives) {
@@ -1472,30 +1495,20 @@ export const moveKaijuPieces = ({
       }
     }
 
-    let currKillCount = 0;
-    setKaijuKillCount(kc => {
-      if (Array.isArray(kc)){
-        currKillCount = kc.length;
-      }
-      return kc;
-  });
 
-  const numAlive = _data.filter(({ lives }) => lives > 0).length;
-  let remainingNeeded = MAX_TO_WIN - (currKillCount + numAlive);
+    const numAlive = _data.filter(({ lives }) => lives > 0).length;
+    remainingNeeded = MAX_TO_WIN - (currKillCount + numAlive);
 
     const newKaiju =
-      !isTutorial &&
-      remainingNeeded > 0 &&
-      (winner === null) & (_data.length < MAX_AT_ONCE) &&
-      accTime &&
-      !(accTime % 10000) &&
+      !isTutorial &&       
+      shouldUpdate(accTime, 10000)
+      _data.length < MAX_AT_ONCE &&
       spawnKaiju(_data, enemyData, scale, false, isTutorial, difficulty);
 
-    const newKaijuData =
+    const respawnedKaijuData =
       !newKaiju &&
-      accTime &&
-      !(accTime % 3) &&
-      winner === null && 
+       shouldUpdate(accTime, 3000)
+      !!remainingNeeded && remainingNeeded > 0 &&
       _data.map(k => {
           if(!k.lives && remainingNeeded > 0){
             remainingNeeded -= 1;
@@ -1506,12 +1519,14 @@ export const moveKaijuPieces = ({
           }
           return k;
       });
-    return newKaiju
-      ? [..._data, newKaiju]
-      : newKaijuData
-      ? newKaijuData
-      : _data;
+
+    return !!newKaiju ?
+        [..._data, newKaiju]
+        : !!respawnedKaijuData ?
+            respawnedKaijuData
+            : _data;
   });
+
 export const moveTo = ({
   currentLocation,
   moveFromLocation,
@@ -1896,6 +1911,7 @@ export const useEventTick = ({
         enemyData: playerData,
         setEnemyData: setPlayerData,
         dmgArray: dmgArray,
+        kaijuKillCount: [],
         setKaijuKillCount: () => {},
         isTutorial: true,
         winner: null,
@@ -2636,7 +2652,7 @@ export const determineKaijuQuantity = difficulty => {
       MAX_AT_ONCE = 5;
       MAX_TO_WIN = 17;
       KAIJU_MAX_HEALTH = 4;
-      KAIJU_MAX_SPEED = 3;                    
+      KAIJU_MAX_SPEED = 2;                    
       break;
     default: // Difficulty.Medium
       MAX_AT_ONCE = 3;

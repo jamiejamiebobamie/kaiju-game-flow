@@ -31,7 +31,7 @@ const GameWrapper = styled.div`
 export const Game = ({ handleClickHome, triggerTransition }) => {
   const { selectedAvatar, selectedDifficulty } = useContext(GlobalSettingsContext);
 
-  const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
+  const { MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
 
   const TURN_DELAY = 100;
 
@@ -44,7 +44,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const scale = SCALE * percentZoom;
   const width = WIDTH * percentZoom;
   const height = HEIGHT * percentZoom;
-
 
   const accTime = useRef(0);
   const [isTeammate, setIsTeammate] = useState(true);
@@ -67,7 +66,20 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
   const [deadKaijuLocations, setDeadKaijuLocations] = useState([]);
-  const [fullScreenPageData, setFullScreenPageData] = useState(undefined);
+  const [fullScreenPageData, setFullScreenPageData] = useState({
+    text: ["Wild Kaiju have appeared!"],
+    buttons: [
+      {
+        text: "Fight!",
+        onClick: () => {
+          setWinner(null);
+          setIntervalTime(TURN_DELAY);
+          setFullScreenPageData(undefined);
+        }
+      }
+    ],
+    image: { src: './story_images/match_start.png', width: '535px', height: '535px' }
+  });
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -105,6 +117,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     },
     ["Escape"]
   );
+
   useEffect(() => {
     if (kaijuKillCount.length >= MAX_TO_WIN) {
       const _winner = 0;
@@ -113,28 +126,15 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     if (playerData.length && playerKillCount >= playerData.length)
       setWinner(-1);
   }, [kaijuKillCount, playerKillCount, MAX_TO_WIN]);
+
   useEffect(() => {
     if (playerMoveToTiles !== null) {
-      const adjTilesToPath = playerMoveToTiles[0] && [
-        playerMoveToTiles[0],
-        ...getAdjacentTiles(playerMoveToTiles[0])
-      ];
       setPlayerData(_playerData =>
         _playerData.map((p, i) => {
           if (i === 0) {
-            const adjTilesToPlayer = p.tile && [
-              p.tile,
-              ...getAdjacentTiles(p.tile)
-            ];
-            const shouldSet =
-              adjTilesToPlayer &&
-              adjTilesToPath &&
-              adjTilesToPlayer.some(t =>
-                adjTilesToPath.some(_t => _t.i === t.i && _t.j === t.j)
-              );
             return {
               ...p,
-              moveToTiles: shouldSet ? playerMoveToTiles : p.moveToTiles
+              moveToTiles: playerMoveToTiles
             };
           } else {
             return p;
@@ -148,42 +148,40 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   useEffect(() => {
     if (winner !== null && !fullScreenPageData) {
       let text, buttons, image = undefined;
-
-      if (!kaijuData.find(kaiju => kaiju.lives > 0) || winner === -1) {
-        switch (winner) {
-          case 1:
-            text = ["Wild Kaiju have appeared!"];
-            buttons = [
-              { text:"Fight!",
-                onClick: () => {
-                    setWinner(null);
-                    setIntervalTime(TURN_DELAY);
-                    setFullScreenPageData(undefined);
-                  }
+      switch (winner) {
+        case 1:
+          text = ["Wild Kaiju have appeared!"];
+          buttons = [
+            {
+              text: "Fight!",
+              onClick: () => {
+                setWinner(null);
+                setIntervalTime(TURN_DELAY);
+                setFullScreenPageData(undefined);
               }
-            ];
-            image = {src: './story_images/match_start.png', width: '535px', height: '535px'};
-            break;
-          case 0:
-            text = ["You saved the city!", "Play again ?"];
-            buttons = [{text:"Yes", onClick: () => triggerTransition(() => resetState())}, {text:"No", onClick: handleClickHome}];
-            image = {src: './story_images/match_won.png', width: '535px', height: '535px'};
-            break;
-          case -1:
-            text = ["You lost...", "Play again ?"];
-            buttons = [{text:"Yes", onClick: () => triggerTransition(() => resetState())}, {text:"No", onClick: handleClickHome}];
-            image = {src: './story_images/match_lost.png', width: '535px', height: '535px'};
-            break;
-        }
-        if(!!buttons){
-          setTimeout(() => setFullScreenPageData({ text, buttons, image }), 2000);
-          setIntervalTime(null);
-        } else { 
-          setFullScreenPageData(undefined);
-        }
+            }
+          ];
+          image = { src: './story_images/match_start.png', width: '535px', height: '535px' };
+          break;
+        case 0:
+          text = ["You saved the city!", "Play again ?"];
+          buttons = [{ text: "Yes", onClick: () => triggerTransition(() => resetState()) }, { text: "No", onClick: handleClickHome }];
+          image = { src: './story_images/match_won.png', width: '535px', height: '535px' };
+          break;
+        case -1:
+          text = ["You lost...", "Play again ?"];
+          buttons = [{ text: "Yes", onClick: () => triggerTransition(() => resetState()) }, { text: "No", onClick: handleClickHome }];
+          image = { src: './story_images/match_lost.png', width: '535px', height: '535px' };
+          break;
+      }
+      if (!!buttons) {
+        setTimeout(() => setFullScreenPageData({ text, buttons, image }), 2000);
+        setIntervalTime(null);
+      } else {
+        setFullScreenPageData(undefined);
       }
     }
-  }, [kaijuData, winner]);
+  }, [kaijuData, winner, isPlayingGame]);
 
   // event tick
   useInterval(() => {
@@ -196,7 +194,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       scale,
       0
     );
-    if (shouldUpdate(accTime.current, 3)){
+    if (shouldUpdate(accTime.current, 3)) {
       updateTileState(
         playerData,
         kaijuData,
@@ -210,7 +208,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     }
     redrawTiles({
       highlightedTiles0,
-      setHoverRef: () => {},
+      setHoverRef: () => { },
       setClickedTile,
       setTiles,
       playerData,
@@ -218,7 +216,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       tileStatuses,
       setTileStatuses,
       scale,
-  });
+    });
     // move players
     movePlayerPieces(
       playerData,
@@ -233,86 +231,35 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       teleportData,
       setTeleportData,
       false,
-      winner,
-      playerKillCount
-    );
+      winner
+  );
     // move monsters
     moveKaijuPieces({
       data: kaijuData,
       setData: setKaijuData,
-      tileStatuses: tileStatuses,
-      setTileStatuses: setTileStatuses,
+      tileStatuses,
+      setTileStatuses,
       scale: scale,
       accTime: accTime.current,
       enemyData: playerData,
       setEnemyData: setPlayerData,
       dmgArray: dmgArray,
-      setKaijuKillCount: setKaijuKillCount,
+      kaijuKillCount,
+      setKaijuKillCount,
       isTutorial: false,
       winner: winner,
-      setDeadKaijuLocations: setDeadKaijuLocations,
+      setDeadKaijuLocations,
       difficulty: selectedDifficulty
-  });
+    });
     // update accumulated time.
     accTime.current =
       accTime.current > Number.MAX_SAFE_INTEGER - 10000
         ? 0
         : accTime.current + intervalTime;
   }, intervalTime);
-  return !isPlayingGame ? (
-    <AbilityPicker
-      handleClickHome={handleClickHome}
-      pickedAbilities={pickedAbilities}
-      setPickedAbilities={setPickedAbilities}
-      handleClickPlay={() => {
-        setWinner(1);
-        initializeGameBoard({
-          playerData,
-          setPlayerData,
-          pickedAbilities,
-          kaijuData,
-          width,
-          height,
-          scale,
-          setTiles,
-          setClickedTile,
-          setHoverRef: () => {},
-          tileStatuses,
-          setTileStatuses,
-          isTeammate,
-          selectedAvatar
-      });
-        triggerTransition(() => setIsPlayingGame(bool => !bool));
-      }}
-      isPaused={false}
-      powerUpData={[]}
-      playerData={playerData}
-      setPlayerData={setPlayerData}
-      setTeleportData={setTeleportData}
-      kaijuData={kaijuData}
-      setPlayerMoveToTiles={setPlayerMoveToTiles}
-      tileStatuses={tileStatuses}
-      setTileStatuses={setTileStatuses}
-      clickedTile={clickedTile}
-      setClickedTile={setClickedTile}
-      tiles={tiles}
-      path={path}
-      width={width}
-      height={height}
-      scale={scale}
-      numAbilitiesToPick={3}
-      isTeammate={isTeammate}
-      setIsTeammate={setIsTeammate}
-    />
-  ) : (
+
+  return isPlayingGame ? (
     <>
-      {fullScreenPageData &&
-        <FullscreenPage
-          text={fullScreenPageData.text}
-          buttons={fullScreenPageData.buttons}
-          image={fullScreenPageData.image}
-          homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
-          />}
       <GameWrapper width={width}>
         <GameBoard
           isPaused={isPaused}
@@ -343,11 +290,61 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           handleClickHome={handleClickHome}
           handleClickPause={handleClickPause}
           width={width}
-          height={height}          
+          height={height}
           scale={scale}
           isTeammate={isTeammate}
         />
-    </GameWrapper>
+      </GameWrapper>
     </>
-  );
+  ) : fullScreenPageData ?
+    <FullscreenPage
+      text={fullScreenPageData.text}
+      buttons={fullScreenPageData.buttons}
+      image={fullScreenPageData.image}
+      homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
+    /> : (
+      <AbilityPicker
+        handleClickHome={handleClickHome}
+        pickedAbilities={pickedAbilities}
+        setPickedAbilities={setPickedAbilities}
+        handleClickPlay={() => {
+          setWinner(1);
+          initializeGameBoard({
+            playerData,
+            setPlayerData,
+            pickedAbilities,
+            kaijuData,
+            width,
+            height,
+            scale,
+            setTiles,
+            setClickedTile,
+            setHoverRef: () => { },
+            tileStatuses,
+            setTileStatuses,
+            isTeammate,
+            selectedAvatar
+          });
+          triggerTransition(() => setIsPlayingGame(bool => !bool));
+        }}
+        isPaused={false}
+        powerUpData={[]}
+        playerData={playerData}
+        setPlayerData={setPlayerData}
+        setTeleportData={setTeleportData}
+        kaijuData={kaijuData}
+        setPlayerMoveToTiles={setPlayerMoveToTiles}
+        tileStatuses={tileStatuses}
+        setTileStatuses={setTileStatuses}
+        clickedTile={clickedTile}
+        setClickedTile={setClickedTile}
+        tiles={tiles}
+        path={path}
+        width={width}
+        height={height}
+        scale={scale}
+        numAbilitiesToPick={3}
+        isTeammate={isTeammate}
+        setIsTeammate={setIsTeammate}
+      />);
 };

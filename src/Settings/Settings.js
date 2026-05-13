@@ -271,7 +271,7 @@ export const NavButton = styled.div`
   }
 
   font-size: 27px;
-  line-height: 45px;
+  line-height: 42px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
   background-color: #376e5b;
@@ -418,8 +418,6 @@ export const Settings = ({ handleClickHome, handleClickGame, triggerTransition }
   //     </ButtonsWrapper>
   //   </ButtonGroup>
   // </HomeButtonWrapper>
-
-  console.log({ isMediumChecked: selectedDifficulty == Difficulty.Medium, Difficulty, selectedDifficulty, Medium: Difficulty.Medium })
 
   return (<Wrapper>
     <DifficultyWrapper>
