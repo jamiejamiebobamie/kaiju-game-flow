@@ -63,6 +63,7 @@ export const TutorialGameBoard = ({
       scale={scale}
       lives={k.lives}
       zIndex={getFlattenedArrayIndex(k.tile)}
+      isGoingToSpewFire={k.isGoingToSpewFire}
     />
   ));
   const players = playerData.map(p => (

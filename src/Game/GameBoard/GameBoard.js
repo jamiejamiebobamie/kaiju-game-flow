@@ -64,6 +64,7 @@ export const GameBoard = ({
       lives={k.lives}
       zIndex={getFlattenedArrayIndex(k.tile)}
       dropShadowSize={k.dropShadowSize}
+      isGoingToSpewFire={k.isGoingToSpewFire}
     />
   ));
   const players = playerData.map(p => (

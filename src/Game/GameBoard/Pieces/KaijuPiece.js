@@ -9,193 +9,92 @@ const Monster = styled.div`
     margin-left: -15px;
     margin-top: -25px;
     display: ${props =>
-      props.charLocation.x < 0 ||
+    props.charLocation.x < 0 ||
       props.charLocation.x > 500 ||
       props.charLocation.y < 0 ||
       props.charLocation.y > 800
-        ? "none"
-        : "flex"};
+      ? "none"
+      : "flex"};
     width: 40px;
     height: 40px;
     ${props =>
-      props.zIndex ? `z-index: ${props.zIndex + 20002}` : "z-index:20002"};
+    props.zIndex ? `z-index: ${props.zIndex + 20002}` : "z-index:20002"};
     left: ${props => `${props.charLocation.x}px`};
     top: ${props => `${props.charLocation.y}px`};
     pointer-events: none;
 }`;
-const MonsterImg = styled.img`
-  display: ${props => (props.lives > 0 ? "flex" : "none")};
-  width: 40px;
-  height: 40px;
-  animation-iteration-count: 1s;
-  ${props => props.isDamaged && "animation: shake 0.5s;"};
-  @keyframes shake {
-    0% {
-      transform: translate(1px, 1px) rotate(0deg);
-    }
-    10% {
-      transform: translate(-1px, -2px) rotate(-1deg);
-    }
-    20% {
-      transform: translate(-3px, 0px) rotate(1deg);
-    }
-    30% {
-      transform: translate(3px, 2px) rotate(0deg);
-    }
-    40% {
-      transform: translate(1px, -1px) rotate(1deg);
-    }
-    50% {
-      transform: translate(-1px, 2px) rotate(-1deg);
-    }
-    60% {
-      transform: translate(-3px, 1px) rotate(0deg);
-    }
-    70% {
-      transform: translate(3px, 1px) rotate(-1deg);
-    }
-    80% {
-      transform: translate(-1px, -1px) rotate(1deg);
-    }
-    90% {
-      transform: translate(1px, 2px) rotate(0deg);
-    }
-    100% {
-      transform: translate(1px, -2px) rotate(-1deg);
-    }
-  }
-`;
 const SpriteSheet = styled.div`
   pointer-events: none;
   display: ${props => (props.lives > 0 ? "flex" : "none")};
-  background: url("spritesheet/kaiju_sprite.png");
-  transform: scale(0.4) translate(-130px, -165px);
-  height: 230.2px;
-  width: 153px;
+  background: url(${props => `spritesheet/${props.backgroundImgSrc}.png`});
+  // background: url("spritesheet/kaiju_sprite2.png");
+  // background: url("spritesheet/kaiju_sprite_FIRE1.png");
+  transform: scale(0.4) translate(-169px, -169px);
+  height: 230.33px;
+  width: 180px;
   ${props => `filter: drop-shadow(0 0 ${props.dropShadowSize}px #bf40bf)`};
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
-  ${props => `animation: ${props.anim} 1s steps(10) infinite;`};
-  @keyframes upRight {
-    from {
-      background-position-x: -152px;
-      background-position-y: 0px;
-    }
-    to {
-      background-position-x: -1682px;
-      background-position-y: 0px;
-    }
-  }
-  @keyframes up {
-    from {
-      background-position-x: -152px;
-      background-position-y: 220px;
-    }
-    to {
-      background-position-x: -1682px;
-      background-position-y: 220px;
-    }
-  }
-  @keyframes upLeft {
-    from {
-      background-position-x: -152px;
-      background-position-y: 440px;
-    }
-    to {
-      background-position-x: -1682px;
-      background-position-y: 440px;
-    }
-  }
-  @keyframes downLeft {
-    from {
-      background-position-x: -152px;
-      background-position-y: 660px;
-    }
-    to {
-      background-position-x: -1682px;
-      background-position-y: 660px;
-    }
-  }
-  @keyframes down {
-    from {
-      background-position-x: -152px;
-      background-position-y: 880px;
-    }
-    to {
-      background-position-x: -1682px;
-      background-position-y: 880px;
-    }
-  }
-  @keyframes downRight {
-    from {
-      background-position-x: -152px;
-      background-position-y: 1100px;
-    }
-    to {
-      background-position-x: -1682px;
-      background-position-y: 1100px;
-    }
-  }
-
-  @keyframes idleupRight {
+  ${props => `animation: ${props.anim} 1.25s steps(10) infinite;`};
+  @keyframes upRightKaiju {
     from {
       background-position-x: 0px;
       background-position-y: 0px;
     }
     to {
-      background-position-x: 0px;
+      background-position-x: -1800px;
       background-position-y: 0px;
     }
   }
-  @keyframes idleup {
+  @keyframes upKaiju  {
     from {
       background-position-x: 0px;
-      background-position-y: 220px;
+      background-position-y: 230.33px;
     }
     to {
-      background-position-x: 0px;
-      background-position-y: 220px;
+      background-position-x: -1800px;
+      background-position-y: 230.33px;
     }
   }
-  @keyframes idleupLeft {
+  @keyframes upLeftKaiju {
     from {
       background-position-x: 0px;
-      background-position-y: 440px;
+      background-position-y: 460.66px;
     }
     to {
-      background-position-x: 0px;
-      background-position-y: 440px;
+      background-position-x: -1800px;
+      background-position-y: 460.66px;
     }
   }
-  @keyframes idledownLeft {
+  @keyframes downLeftKaiju {
     from {
       background-position-x: 0px;
-      background-position-y: 660px;
+      background-position-y: 691px;
     }
     to {
-      background-position-x: 0px;
-      background-position-y: 660px;
+      background-position-x: -1800px;
+      background-position-y: 691px;
     }
   }
-  @keyframes idledown {
+  @keyframes downKaiju {
     from {
       background-position-x: 0px;
-      background-position-y: 880px;
+      background-position-y: 921.33px;
     }
     to {
-      background-position-x: 0px;
-      background-position-y: 880px;
+      background-position-x: -1800px;
+      background-position-y: 921.33px;
     }
   }
-  @keyframes idledownRight {
+  @keyframes downRightKaiju {
     from {
       background-position-x: 0px;
-      background-position-y: 1100px;
+      background-position-y: 1151.66px;
     }
     to {
-      background-position-x: 0px;
-      background-position-y: 1100px;
+      background-position-x: -1800px;
+      background-position-y: 1151.66px;
     }
   }
 `;
@@ -301,14 +200,14 @@ const Character = styled.div`
   }
 }
 `;
-export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize }) => {
+export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize, isGoingToSpewFire }) => {
   const [healthModifierText, setHealthModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [anim, setAnim] = useState("down");
 
   useEffect(() => {
-    dir && setAnim(dir === "idle" ? `${dir}${anim}` : dir);
+    dir && setAnim(dir === "idle" ? `downKaiju` : `${dir}Kaiju`);
   }, [dir]);
   useEffect(() => {
     if (isFirstLoad) {
@@ -331,7 +230,7 @@ export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize 
       {healthModifierText}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <Character isDamaged={isDamaged}>
-        <SpriteSheet lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
+        <SpriteSheet backgroundImgSrc={isGoingToSpewFire ? 'kaiju_sprite_FIRE1' : 'kaiju_sprite2'} lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
       </Character>
     </Monster>
   );

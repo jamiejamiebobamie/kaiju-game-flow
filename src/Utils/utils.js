@@ -206,7 +206,8 @@ export const initializeTutorialGameBoard = ({
       numTilesModifier: 0,
       tileCountModifier: 0,
       isHealed: false,
-      isTeleported: false
+      isTeleported: false,
+      isGoingToSpewFire: false
     };
     kaijuDataArr.push(data);
   }
@@ -372,7 +373,8 @@ export const spawnKaiju = (
         lives: KAIJU_MAX_HEALTH,
         isOnTiles: false,
         dir,
-        moveSpeed: KAIJU_MAX_SPEED
+        moveSpeed: KAIJU_MAX_SPEED,
+        isGoingToSpewFire: false
       }
     : {
         key,
@@ -394,6 +396,7 @@ export const spawnKaiju = (
         tileCountModifier: 0,
         isHealed: false,
         isTeleported: false,
+        isGoingToSpewFire: true,
         dir
       };
 };
@@ -1372,6 +1375,11 @@ export const moveKaijuPieces = ({
                 const LOW = 0;
                 const dropShadowSize = (HIGH - LOW) * diff / a.cooldownTimeAI + LOW;
                 _data[i].dropShadowSize = dropShadowSize;
+                // update the Kaiju sprite sheet if close to spewing fire  
+                const showFireTime = a.accTime // last game time the fire was spewed
+                                      + a.cooldownTimeAI // fire spew cooldown (12 seconds)
+                                        * 0.75; // show the fire after 3/4 of the cooldown time (9 seconds) 
+                _data[i].isGoingToSpewFire = accTime > showFireTime;
             }
             _data[i].gameTimeMilliseconds = accTime;
           });
