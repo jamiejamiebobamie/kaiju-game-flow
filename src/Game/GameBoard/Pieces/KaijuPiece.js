@@ -24,10 +24,11 @@ const Monster = styled.div`
     pointer-events: none;
 }`;
 const SpriteSheet = styled.div`
+  position: relative;
   pointer-events: none;
   display: ${props => (props.lives > 0 ? "flex" : "none")};
-  background: url(${props => `spritesheet/${props.backgroundImgSrc}.png`});
-  // background: url("spritesheet/kaiju_sprite2.png");
+  // background: url(${props => `spritesheet/${props.backgroundImgSrc}.png`});
+  background: url("spritesheet/kaiju_sprite2.png");
   // background: url("spritesheet/kaiju_sprite_FIRE1.png");
   transform: scale(0.4) translate(-169px, -169px);
   height: 230.33px;
@@ -37,6 +38,23 @@ const SpriteSheet = styled.div`
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
   ${props => `animation: ${props.anim} 1.25s steps(10) infinite;`};
+
+  &::before {
+    content: "";
+    position: absolute;
+    height: 230.33px;
+    width: 180px;
+    pointer-events: none;
+
+    background: url("spritesheet/kaiju_sprite_FIRE1.png");
+    background-position: center;
+
+    ${props => `animation: ${props.anim} 1.25s steps(10) infinite;`};
+
+    opacity: ${props => (props.isGoingToSpewFire ? 1 : 0)};
+    transition: opacity 0.5s ease-out;
+  }
+
   @keyframes upRightKaiju {
     from {
       background-position-x: 0px;
@@ -230,7 +248,7 @@ export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize,
       {healthModifierText}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <Character isDamaged={isDamaged}>
-        <SpriteSheet backgroundImgSrc={isGoingToSpewFire ? 'kaiju_sprite_FIRE1' : 'kaiju_sprite2'} lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
+        <SpriteSheet isGoingToSpewFire={isGoingToSpewFire} lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
       </Character>
     </Monster>
   );
