@@ -119,8 +119,8 @@ export const initializeTutorialGameBoard = ({
       isInManaPool: false,
       isHealed: false,
       isTeleported: false,
-      color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1  ? "salmon" : "#55AAff",
-      gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy", 
+      color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "salmon" : "#55AAff",
+      gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy",
       charLocation: location,
       moveFromLocation: location,
       moveToLocation: location,
@@ -160,7 +160,7 @@ export const initializeTutorialGameBoard = ({
     setTileStatuses,
     scale,
     isTutorial,
-});
+  });
   const status = [];
   const rowLength = 24;
   const colLength = 10;
@@ -252,8 +252,8 @@ export const initializeGameBoard = ({
       isInManaPool: false,
       isHealed: false,
       isTeleported: false,
-      color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1  ? "salmon" : "#55AAff",
-      gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy", 
+      color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "salmon" : "#55AAff",
+      gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy",
       charLocation: location,
       moveFromLocation: location,
       moveToLocation: location,
@@ -287,7 +287,7 @@ export const initializeGameBoard = ({
   // TILES      - - - - - - - - - -
   redrawTiles({
     highlightedTiles0: [],
-    setHoverRef: () => {},
+    setHoverRef: () => { },
     setClickedTile,
     setTiles,
     playerData,
@@ -295,7 +295,7 @@ export const initializeGameBoard = ({
     tileStatuses,
     setTileStatuses,
     scale,
-});
+  });
   const status = [];
   const rowLength = Math.ceil(width / (70 * scale));
   const colLength = Math.ceil(height / (75 * scale));
@@ -339,15 +339,15 @@ export const spawnKaiju = (
   const location = isTutorial
     ? getCharXAndY({ ...TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES[randomCornerTile], scale })//getCharXAndY({ ...kaijuData[0].tile, scale })
     : randBool1
-    // ? { x: randIntX, y: randBool2 ? minY : maxY }
-    ? { x: randIntX, y: minY }
-    : { x: randBool2 ? minX : maxX, y: randIntY };
+      // ? { x: randIntX, y: randBool2 ? minY : maxY }
+      ? { x: randIntX, y: minY }
+      : { x: randBool2 ? minX : maxX, y: randIntY };
   const kaijuTile = isTutorial
     ? TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES[randomCornerTile]//kaijuData[0].tile
     : getClosestPerimeterTileFromLocation({
-        ...location,
-        scale
-      });
+      ...location,
+      scale
+    });
   const kaijuTileLocation = getTileXAndY({
     i: kaijuTile.i,
     j: kaijuTile.j,
@@ -363,42 +363,42 @@ export const spawnKaiju = (
   const { KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED } = determineKaijuQuantity(difficulty);
   return isRespawn
     ? {
-        key,
-        charLocation: location,
-        moveFromLocation: location,
-        moveToLocation: location,
-        moveToTiles: [kaijuTile],
-        tile: kaijuTile,
-        isThere: false,
-        lives: KAIJU_MAX_HEALTH,
-        isOnTiles: false,
-        dir,
-        moveSpeed: KAIJU_MAX_SPEED,
-        isGoingToSpewFire: false
-      }
+      key,
+      charLocation: location,
+      moveFromLocation: location,
+      moveToLocation: location,
+      moveToTiles: [kaijuTile],
+      tile: kaijuTile,
+      isThere: false,
+      lives: KAIJU_MAX_HEALTH,
+      isOnTiles: false,
+      dir,
+      moveSpeed: KAIJU_MAX_SPEED,
+      isGoingToSpewFire: false
+    }
     : {
-        key,
-        charLocation: location,
-        moveFromLocation: location,
-        moveToLocation: location,
-        moveToTiles: [kaijuTile],
-        tile: kaijuTile,
-        color: "purple",
-        isThere: false,
-        lives: KAIJU_MAX_HEALTH,
-        moveSpeed: KAIJU_MAX_SPEED,
-        lastDmg: 0,
-        abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
-        isKaiju: true,
-        isOnTiles: false,
-        i: kaijuData.length,
-        numTilesModifier: 0,
-        tileCountModifier: 0,
-        isHealed: false,
-        isTeleported: false,
-        isGoingToSpewFire: true,
-        dir
-      };
+      key,
+      charLocation: location,
+      moveFromLocation: location,
+      moveToLocation: location,
+      moveToTiles: [kaijuTile],
+      tile: kaijuTile,
+      color: "purple",
+      isThere: false,
+      lives: KAIJU_MAX_HEALTH,
+      moveSpeed: KAIJU_MAX_SPEED,
+      lastDmg: 0,
+      abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
+      isKaiju: true,
+      isOnTiles: false,
+      i: kaijuData.length,
+      numTilesModifier: 0,
+      tileCountModifier: 0,
+      isHealed: false,
+      isTeleported: false,
+      isGoingToSpewFire: true,
+      dir
+    };
 };
 export const updateHighlightedTiles = (
   setHighlightedTiles,
@@ -617,9 +617,9 @@ export const updateTileState = (
                       ) {
                         const targetTile = isKaiju
                           ? playerData[targetIndex] &&
-                            playerData[targetIndex].tile
+                          playerData[targetIndex].tile
                           : kaijuData[targetIndex] &&
-                            kaijuData[targetIndex].tile;
+                          kaijuData[targetIndex].tile;
                         const [_, targetDirection] = getAdjacentTilesFromTile(
                           nextTile,
                           targetTile || { i: 0, j: 0 },
@@ -636,16 +636,16 @@ export const updateTileState = (
                         });
                       const nextTileCount =
                         _statuses[nextTile.i][nextTile.j][k] &&
-                        _statuses[nextTile.i][nextTile.j][k].count
+                          _statuses[nextTile.i][nextTile.j][k].count
                           ? _statuses[nextTile.i][nextTile.j][k].count
                           : 0;
                       _statuses[nextTile.i][nextTile.j][k] = {
                         dirs: direction,
                         count:
                           k === "isWooded" &&
-                          dirs.length > 1 &&
-                          l > 0 &&
-                          nextTileCount < _count - 1
+                            dirs.length > 1 &&
+                            l > 0 &&
+                            nextTileCount < _count - 1
                             ? _count - 1
                             : count - 1,
                         targetIndex,
@@ -697,7 +697,7 @@ export const updateTileState = (
                         };
                         const nextTilesStatus = solveForStatus(
                           _statuses[nextTileForLightning.i][
-                            nextTileForLightning.j
+                          nextTileForLightning.j
                           ]
                         );
                         _statuses[nextTileForLightning.i][
@@ -716,15 +716,15 @@ export const updateTileState = (
                     ];
                     _statuses[i][j][k] =
                       !doNotErase.includes(k) ||
-                      (k === "isWooded" && count === startCount) ||
-                      (k === "isOnFire" && count === startCount) ||
-                      (k === "isOnKaijuFire" && count === startCount) ||
-                      entityOnTileStatus
+                        (k === "isWooded" && count === startCount) ||
+                        (k === "isOnFire" && count === startCount) ||
+                        (k === "isOnKaijuFire" && count === startCount) ||
+                        entityOnTileStatus
                         ? undefined
                         : {
-                            ...tileStatus[k],
-                            count: 0
-                          };
+                          ...tileStatus[k],
+                          count: 0
+                        };
                     _statuses[i][j].updateKey = updateKey;
                     if (_statuses[i][j][k] === undefined)
                       delete _statuses[i][j][k];
@@ -738,9 +738,9 @@ export const updateTileState = (
                       !doNotErase.includes(k) || entityOnTileStatus
                         ? undefined
                         : {
-                            ...tileStatus[k],
-                            count: 0
-                          };
+                          ...tileStatus[k],
+                          count: 0
+                        };
                   });
               }
               if (DEATH_TILE_STATUSES.includes(k) || healthTiles.includes(k)) {
@@ -787,7 +787,7 @@ const getMonsterSwimAnimDirFromNormVec = normVec => {
 const isTileOnGameBoardTutorial = tile => {
   return !!(0 <= tile.i && tile.i < 24 && 0 <= tile.j && tile.j < 10);
 };
-const isTileOnGameBoard = tile => {
+export const isTileOnGameBoard = tile => {
   return PENINSULA_TILE_LOOKUP
     ? !!PENINSULA_TILE_LOOKUP[`${tile.i} ${tile.j}`]
     : false;
@@ -836,14 +836,14 @@ export const shootPower = ({
             : numTiles
         );
         setTileStatuses(_tiles => {
-          if(!!tile && !!_tiles && !!_tiles[tile.i] && !!_tiles[tile.i][tile.j]){
+          if (!!tile && !!_tiles && !!_tiles[tile.i] && !!_tiles[tile.i][tile.j]) {
             _tiles[tile.i][tile.j] = {
               ..._tiles[tile.i][tile.j],
               [statusKey]: {
                 dirs,
                 count:
                   data[dataIndex].tileCountModifier &&
-                  tileStatusesCountModifier.includes(statusKey)
+                    tileStatusesCountModifier.includes(statusKey)
                     ? count + data[dataIndex].tileCountModifier
                     : count,
                 targetIndex,
@@ -885,11 +885,11 @@ const solveForStatus = tile => {
   else if (tile.isOnFire && tile.isOnKaijuFire)
     return getRandBool()
       ? {
-          isOnFire: tile.isOnFire
-        }
+        isOnFire: tile.isOnFire
+      }
       : {
-          isOnKaijuFire: tile.isOnKaijuFire
-        };
+        isOnKaijuFire: tile.isOnKaijuFire
+      };
   else if (tile.isOnFire)
     return {
       isOnFire: tile.isOnFire
@@ -922,7 +922,7 @@ const getNormVecFromTiles = (currTile, destTile, scale) => {
     }
   );
 };
-const getTileOffsetFromDir = (dir, currTile) => {
+export const getTileOffsetFromDir = (dir, currTile) => {
   switch (dir) {
     case "up":
       return { i: 0, j: -1 }; // up
@@ -1089,12 +1089,12 @@ export const movePlayerPieces = (
             _data[i].tile,
             scale
           );
-          if (targetTile.i !== 0) {
+          const isEnemy = targetTile.i !== 0;
             const attackPowersCount = _data[i].abilities.filter(
               ({ type }) => type === "offensive"
             ).length;
             // teammate should do his own thing and attack kaiju
-            if (attackPowersCount) {
+            if (isEnemy && attackPowersCount) {
               const attackPowersRangeAcc = _data[i].abilities
                 .filter(({ type }) => type === "offensive")
                 .map(({ range }) => range)
@@ -1111,18 +1111,17 @@ export const movePlayerPieces = (
               const safeTile = getSafeTile(enemyData, tileStatuses, scale);
 
               const moveToSafetyTiles = findPath(
-                  _data[1].tile,
-                  safeTile,
-                  scale,
-                  isTutorial
-                );
+                _data[1].tile,
+                safeTile,
+                scale,
+                isTutorial
+              );
               const isEnemyTooClose = moveToEnemyTiles.length < powerRangeAvg - 1;
               const isEnemyTooFar = moveToEnemyTiles.length > powerRangeAvg + 10;
               const moveCloserTiles = isEnemyTooFar ? moveToEnemyTiles.slice(0, moveToEnemyTiles.length - powerRangeAvg) : [];
               const moveToTiles = _data[1].moveToTiles
 
               _data[1].moveToTiles = isEnemyTooClose ? moveToSafetyTiles : isEnemyTooFar ? moveCloserTiles : moveToTiles;
-            }
           } else {
             // teammate should stay by player to protect him.
             // get path
@@ -1135,6 +1134,7 @@ export const movePlayerPieces = (
                 ? moveToTiles.slice(0, moveToTiles.length - 3)
                 : [];
           }
+
           // use powers
           let hasUsedOnePower = false;
           _data[i].abilities.forEach((a, j) => {
@@ -1240,16 +1240,17 @@ export const movePlayerPieces = (
 
               // small issue with highlighted tiles not being connected to current player's path.
               // find playerDirection using: "getMonsterSwimAnimDirFromNormVec" method
-              if (playerDirection == undefined ){
-                  const currTileLocation = getTileXAndY({
-                    i: _data[i].tile.i,
-                    j: _data[i].tile.j,
-                    scale
-                  });
+              if (playerDirection == undefined) {
+                const currTileLocation = getTileXAndY({
+                  i: _data[i].tile.i,
+                  j: _data[i].tile.j,
+                  scale
+                });
                 const nextTileLocation = getTileXAndY({
-                    i: nextTile.i,
-                    j: nextTile.j,
-                    scale });
+                  i: nextTile.i,
+                  j: nextTile.j,
+                  scale
+                });
                 const distance = getDistance(nextTileLocation, currTileLocation);
                 const normVec = distance && {
                   x: (nextTileLocation.x - currTileLocation.x) / distance,
@@ -1257,7 +1258,7 @@ export const movePlayerPieces = (
                 };
                 playerDirection = getMonsterSwimAnimDirFromNormVec(normVec);
               }
-              
+
               _data[i].dir = playerDirection;
               if (!tiles.length) {
                 _data[i].moveToLocation =
@@ -1300,7 +1301,7 @@ export const movePlayerPieces = (
                 _data[i].lastDmg = accTime;
                 _data[i].lives =
                   dmg.lifeDecrement > 0 ||
-                  _data[i].lives - dmg.lifeDecrement < 5
+                    _data[i].lives - dmg.lifeDecrement < 5
                     ? _data[i].lives - dmg.lifeDecrement
                     : _data[i].lives;
                 if (dmg.lifeDecrement < 0)
@@ -1330,7 +1331,7 @@ export const moveKaijuPieces = ({
   winner,
   setDeadKaijuLocations,
   difficulty
-}) => 
+}) =>
   setData(_data => {
     const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(difficulty);
     let remainingNeeded;
@@ -1362,24 +1363,24 @@ export const moveKaijuPieces = ({
                 a.activateActive(
                   i,
                   data,
-                  () => {},
+                  () => { },
                   enemyData,
                   setTileStatuses,
                   scale
                 );
               }
             } else {
-                // update dropShadowSize to show how close a Kaiju is to shooting fire.
-                const diff = accTime - a.accTime;
-                const HIGH = 20;
-                const LOW = 0;
-                const dropShadowSize = (HIGH - LOW) * diff / a.cooldownTimeAI + LOW;
-                _data[i].dropShadowSize = dropShadowSize;
-                // update the Kaiju sprite sheet if close to spewing fire  
-                const showFireTime = a.accTime // last game time the fire was spewed
-                                      + a.cooldownTimeAI // fire spew cooldown (12 seconds)
-                                        * 0.75; // show the fire after 3/4 of the cooldown time (9 seconds) 
-                _data[i].isGoingToSpewFire = accTime > showFireTime;
+              // update dropShadowSize to show how close a Kaiju is to shooting fire.
+              const diff = accTime - a.accTime;
+              const HIGH = 20;
+              const LOW = 0;
+              const dropShadowSize = (HIGH - LOW) * diff / a.cooldownTimeAI + LOW;
+              _data[i].dropShadowSize = dropShadowSize;
+              // update the Kaiju sprite sheet if close to spewing fire  
+              const showFireTime = a.accTime // last game time the fire was spewed
+                + a.cooldownTimeAI // fire spew cooldown (12 seconds)
+                * 0.75; // show the fire after 3/4 of the cooldown time (9 seconds) 
+              _data[i].isGoingToSpewFire = accTime > showFireTime;
             }
             _data[i].gameTimeMilliseconds = accTime;
           });
@@ -1488,7 +1489,7 @@ export const moveKaijuPieces = ({
                 _data[i].lastDmg = accTime;
                 _data[i].lives =
                   dmg.lifeDecrement > 0 ||
-                  _data[i].lives - dmg.lifeDecrement < 5
+                    _data[i].lives - dmg.lifeDecrement < 5
                     ? _data[i].lives - dmg.lifeDecrement
                     : _data[i].lives;
                 if (dmg.lifeDecrement < 0)
@@ -1508,31 +1509,31 @@ export const moveKaijuPieces = ({
     remainingNeeded = MAX_TO_WIN - (currKillCount + numAlive);
 
     const newKaiju =
-      !isTutorial &&       
+      !isTutorial &&
       shouldUpdate(accTime, 10000) &&
       _data.length < MAX_AT_ONCE &&
       spawnKaiju(_data, enemyData, scale, false, isTutorial, difficulty);
 
     const respawnedKaijuData =
       !newKaiju &&
-       shouldUpdate(accTime, 3000) &&
+      shouldUpdate(accTime, 3000) &&
       !!remainingNeeded && remainingNeeded > 0 &&
       _data.map(k => {
-          if(!k.lives && remainingNeeded > 0){
-            remainingNeeded -= 1;
-            return {
-              ...k,
-              ...spawnKaiju(_data, enemyData, scale, true, isTutorial, difficulty)
-            };
-          }
-          return k;
+        if (!k.lives && remainingNeeded > 0) {
+          remainingNeeded -= 1;
+          return {
+            ...k,
+            ...spawnKaiju(_data, enemyData, scale, true, isTutorial, difficulty)
+          };
+        }
+        return k;
       });
 
     return !!newKaiju ?
-        [..._data, newKaiju]
-        : !!respawnedKaijuData ?
-            respawnedKaijuData
-            : _data;
+      [..._data, newKaiju]
+      : !!respawnedKaijuData ?
+        respawnedKaijuData
+        : _data;
   });
 
 export const moveTo = ({
@@ -1600,21 +1601,22 @@ export const useHover = () => {
   }, [ref.current]);
   return [saveRef, value];
 };
-export const useKeyPress = (callback, keyCodes, isPlayerDead) => {
-  const handler = ({ code }) => {
-    if (Array.isArray(keyCodes) && keyCodes.includes(code)) {
-      callback(code);
-    } else if (keyCodes === code) {
-      callback(code);
-    }
-  };
+export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isPlayerDead }) => {
   useEffect(() => {
-    if (!isPlayerDead){
-      window.addEventListener("keydown", handler);
-      return () => {
-        window.removeEventListener("keydown", handler);
-      };
-    }
+    const handler = ({ code }, callback) => {
+      // console.log({ code })
+      if (Array.isArray(keyCodes) && keyCodes.includes(code)) {
+        callback(code);
+      } else if (keyCodes === code) {
+        callback(code);
+      }
+    };
+    keyDownCallback && window.addEventListener("keydown", isPlayerDead ? () => { } : e => handler(e, keyDownCallback));
+    keyUpCallback && window.addEventListener("keyup", isPlayerDead ? () => { } : e => handler(e, keyUpCallback));
+    return () => {
+      keyDownCallback && window.removeEventListener("keydown", isPlayerDead ? () => { } : e => handler(e, keyDownCallback));
+      keyUpCallback && window.removeEventListener("keyup", isPlayerDead ? () => { } : e => handler(e, keyUpCallback));
+    };
   }, [isPlayerDead]);
 };
 const getRandomTileOnBoard = (scale, isTutorial) => {
@@ -1706,15 +1708,15 @@ export const getAdjacentTilesTutorial = tile => {
     })
     .filter(t => isTileOnGameBoardTutorial(t));
 };
-const findPath = (start, goal, scale, isTutorial) => {
+export const findPath = (start, goal, scale, isTutorial) => {
   let count = 0;
   return recur(start, [], count).reduce((acc, tile) => {
-          if(!!tile && !acc.lookup[`${tile.i} ${tile.j}`]){
-              acc.lookup[`${tile.i} ${tile.j}`] = true;
-              acc.result.push(tile);
-          }
-          return acc;
-      }, { lookup: {}, result: [] }
+    if (!!tile && !acc.lookup[`${tile.i} ${tile.j}`]) {
+      acc.lookup[`${tile.i} ${tile.j}`] = true;
+      acc.result.push(tile);
+    }
+    return acc;
+  }, { lookup: {}, result: [] }
   ).result;
   function recur(currTile, arr, count) {
     if ((currTile.i === goal.i && currTile.j === goal.j) || count > 400)
@@ -1762,182 +1764,183 @@ const findPath = (start, goal, scale, isTutorial) => {
 
 // not working
 const findPath2 = ({
-                     numTiles,
-                     currTile,
-                     pathLookup,
-                     goalTile,
-                     goalLocation,
-                     scale,
-                     isTutorial,
-                     enemyData
-                   }) => {
+  numTiles,
+  currTile,
+  pathLookup,
+  goalTile,
+  goalLocation,
+  scale,
+  isTutorial,
+  enemyData
+}) => {
 
-     // update values
-     numTiles += 1
-     const path = { ...pathLookup.path };
-     path[numTiles] = currTile;
+  // update values
+  numTiles += 1
+  const path = { ...pathLookup.path };
+  path[numTiles] = currTile;
 
-     const { i, j } = currTile;
+  const { i, j } = currTile;
 
-     // if currTile is goalTile, return pathLookup object
-     if (goalTile.i === i && goalTile.j === j){
-            return pathLookup
-     }
+  // if currTile is goalTile, return pathLookup object
+  if (goalTile.i === i && goalTile.j === j) {
+    return pathLookup
+  }
 
-      /*
-        compute path weight:
-        new accumulated weight = distance of current tile from goalTile
-            + enemy on currTile + 75 + accumulated weight
-      */
-      const enemyTileKeys = enemyData.filter(({ lives }) => !!lives).map(
-          ({ i, j }) => `${i} ${j}`);
-      // if enemy is on tile add 50 to the weight (tile size = ~27)
-      const enemyOnTileCost = enemyTileKeys.some(
-          key => key === `${i} ${j}`) ? 50 : 0;
-      const currTileLocation = getCharXAndY({ ...currTile, scale });
-      const distance = getDistance(currTileLocation, goalLocation);
-      const weight = Math.trunc(distance) + enemyOnTileCost + pathLookup.weight
+  /*
+    compute path weight:
+    new accumulated weight = distance of current tile from goalTile
+        + enemy on currTile + 75 + accumulated weight
+  */
+  const enemyTileKeys = enemyData.filter(({ lives }) => !!lives).map(
+    ({ i, j }) => `${i} ${j}`);
+  // if enemy is on tile add 50 to the weight (tile size = ~27)
+  const enemyOnTileCost = enemyTileKeys.some(
+    key => key === `${i} ${j}`) ? 50 : 0;
+  const currTileLocation = getCharXAndY({ ...currTile, scale });
+  const distance = getDistance(currTileLocation, goalLocation);
+  const weight = Math.trunc(distance) + enemyOnTileCost + pathLookup.weight
 
-      // getAdjacentTiles, do not duplicate tiles in path
-      const currTileKeysInPathLookup = Object.values(pathLookup.path).reduce(
-          (acc, tile) => { acc[`${tile.i} ${tile.j}`] = true; return acc; } , [])
-      const getAdjTiles = isTutorial ?
-        getAdjacentTilesTutorial : getAdjacentTiles;
-      const adjacentTiles = getAdjTiles(currTile).filter(
-          tile => !currTileKeysInPathLookup[`${tile.i} ${tile.j}`]);
+  // getAdjacentTiles, do not duplicate tiles in path
+  const currTileKeysInPathLookup = Object.values(pathLookup.path).reduce(
+    (acc, tile) => { acc[`${tile.i} ${tile.j}`] = true; return acc; }, [])
+  const getAdjTiles = isTutorial ?
+    getAdjacentTilesTutorial : getAdjacentTiles;
+  const adjacentTiles = getAdjTiles(currTile).filter(
+    tile => !currTileKeysInPathLookup[`${tile.i} ${tile.j}`]);
 
-      // return path with lowest accumulated weight
-      return !!adjacentTiles.length ?
-                adjacentTiles.map(tile => {
-                    return findPath2({
-                      numTiles,
-                      currTile: tile,
-                      pathLookup: { weight, path },
-                      goalTile,
-                      goalLocation,
-                      scale,
-                      isTutorial,
-                      enemyData });
-                  }).reduce((acc, item) =>
-                    item.weight < acc.weight ? item : acc,
-                        { weight: Number.MAX_SAFE_INTEGER, path: {} })
-      : { weight: Number.MAX_SAFE_INTEGER, path: {} }
+  // return path with lowest accumulated weight
+  return !!adjacentTiles.length ?
+    adjacentTiles.map(tile => {
+      return findPath2({
+        numTiles,
+        currTile: tile,
+        pathLookup: { weight, path },
+        goalTile,
+        goalLocation,
+        scale,
+        isTutorial,
+        enemyData
+      });
+    }).reduce((acc, item) =>
+      item.weight < acc.weight ? item : acc,
+      { weight: Number.MAX_SAFE_INTEGER, path: {} })
+    : { weight: Number.MAX_SAFE_INTEGER, path: {} }
 };
 
 export const shouldUpdate = (accTime, interval) => !(accTime % interval);
 
 export const useEventTick = ({
+  playerData,
+  setPlayerData,
+  hoverLookupString,
+  path,
+  setPath,
+  scale,
+  kaijuData,
+  setKaijuData,
+  dmgArray,
+  setDmgArray,
+  tileStatuses,
+  setTileStatuses,
+  width,
+  height,
+  accTime,
+  setHoverRef,
+  setClickedTile,
+  setTiles,
+  teleportData,
+  setTeleportData,
+  setDeadKaijuLocations,
+  TURN_DELAY,
+  highlightedTiles0,
+  setHighlightedTiles0,
+  shouldKaijuMove,
+  intervalTime
+}) => useInterval(() => {
+  const isTutorial = true;
+  updateHighlightedTiles(
+    setHighlightedTiles0,
+    playerData,
+    hoverLookupString,
+    path,
+    setPath,
+    scale,
+    isTutorial
+  );
+  if (shouldUpdate(accTime.current, TURN_DELAY)) {
+    updateTileState(
       playerData,
-      setPlayerData,
-      hoverLookupString,
-      path,
-      setPath,
-      scale,
       kaijuData,
-      setKaijuData,
-      dmgArray,
       setDmgArray,
-      tileStatuses,
       setTileStatuses,
       width,
       height,
-      accTime,
-      setHoverRef,
-      setClickedTile,
-      setTiles,
-      teleportData,
-      setTeleportData,
-      setDeadKaijuLocations,
-      TURN_DELAY,
-      highlightedTiles0,
-      setHighlightedTiles0,
-      shouldKaijuMove,
-      intervalTime
-  }) => useInterval(() => {
-    const isTutorial = true;
-    updateHighlightedTiles(
-      setHighlightedTiles0,
-      playerData,
-      hoverLookupString,
-      path,
-      setPath,
       scale,
+      accTime.current,
       isTutorial
     );
-    if (shouldUpdate(accTime.current, TURN_DELAY)){
-      updateTileState(
-        playerData,
-        kaijuData,
-        setDmgArray,
-        setTileStatuses,
-        width,
-        height,
-        scale,
-        accTime.current,
-        isTutorial
-      );
-    }
-    redrawTiles({
-      highlightedTiles0,
-      setHoverRef,
-      setClickedTile,
-      setTiles,
+  }
+  redrawTiles({
+    highlightedTiles0,
+    setHoverRef,
+    setClickedTile,
+    setTiles,
+    playerData,
+    kaijuData,
+    tileStatuses,
+    setTileStatuses,
+    scale,
+    isTutorial
+  });
+  // move players
+  playerData.length &&
+    movePlayerPieces(
       playerData,
-      kaijuData,
+      setPlayerData,
       tileStatuses,
       setTileStatuses,
       scale,
-      isTutorial
-  });
-    // move players
-    playerData.length &&
-      movePlayerPieces(
-        playerData,
-        setPlayerData,
-        tileStatuses,
-        setTileStatuses,
-        scale,
-        accTime.current,
-        kaijuData,
-        dmgArray,
-        () => {},
-        teleportData,
-        setTeleportData,
-        true,
-        null
-      );
-    // move monsters
-    kaijuData.length &&
-      shouldKaijuMove &&
-      moveKaijuPieces({
-        data: kaijuData,
-        setData: setKaijuData,
-        tileStatuses: tileStatuses,
-        setTileStatuses: setTileStatuses,
-        scale: scale,
-        accTime: accTime.current,
-        enemyData: playerData,
-        setEnemyData: setPlayerData,
-        dmgArray: dmgArray,
-        kaijuKillCount: [],
-        setKaijuKillCount: () => {},
-        isTutorial: true,
-        winner: null,
-        setDeadKaijuLocations: setDeadKaijuLocations
-  });
-    // update accumulated time.
-    accTime.current =
-      accTime.current > Number.MAX_SAFE_INTEGER - 10000
-        ? 0
-        : accTime.current + intervalTime;
-  }, intervalTime);
+      accTime.current,
+      kaijuData,
+      dmgArray,
+      () => { },
+      teleportData,
+      setTeleportData,
+      true,
+      null
+    );
+  // move monsters
+  kaijuData.length &&
+    shouldKaijuMove &&
+    moveKaijuPieces({
+      data: kaijuData,
+      setData: setKaijuData,
+      tileStatuses: tileStatuses,
+      setTileStatuses: setTileStatuses,
+      scale: scale,
+      accTime: accTime.current,
+      enemyData: playerData,
+      setEnemyData: setPlayerData,
+      dmgArray: dmgArray,
+      kaijuKillCount: [],
+      setKaijuKillCount: () => { },
+      isTutorial: true,
+      winner: null,
+      setDeadKaijuLocations: setDeadKaijuLocations
+    });
+  // update accumulated time.
+  accTime.current =
+    accTime.current > Number.MAX_SAFE_INTEGER - 10000
+      ? 0
+      : accTime.current + intervalTime;
+}, intervalTime);
 
-  export const useUpdateClickedMovetoTile = ({
-    playerMoveToTiles,
-    setPlayerData,
-    setPlayerMoveToTiles
-  }) => {
-    useEffect(() => {
+export const useUpdateClickedMovetoTile = ({
+  playerMoveToTiles,
+  setPlayerData,
+  setPlayerMoveToTiles
+}) => {
+  useEffect(() => {
     if (playerMoveToTiles !== null) {
       const adjTilesToPath = playerMoveToTiles[0] && [
         playerMoveToTiles[0],
@@ -1968,39 +1971,39 @@ export const useEventTick = ({
     }
     setPlayerMoveToTiles(null);
   }, [playerMoveToTiles]);
-  }
+}
 
 export const useUpdateTutorialScreenContent = ({
-    tutorialViewIndex,
-    setBackButtonContent,
-    setNextButtonContent,
-    setTitle,
-    setBackButtonCallback,
-    setShouldKaijuMove,
-    triggerTransition,
-    handleClickHome,
-    handleClickGame,
-    incrementTutorialViewIndex,
-    decrementTutorialViewIndex,
-    setFullScreenPageData,
-    playerData,
-    setPlayerData,
-    kaijuData,
-    setKaijuData,
-    width,
-    height,
-    scale,
-    setTiles,
-    setClickedTile,
-    setHoverRef,
-    tileStatuses,
-    setTileStatuses,
-    backButtonCallback,
-    setIsHomeButton,
-    selectedAvatar,
-    setGameBoardMarginTop
+  tutorialViewIndex,
+  setBackButtonContent,
+  setNextButtonContent,
+  setTitle,
+  setBackButtonCallback,
+  setShouldKaijuMove,
+  triggerTransition,
+  handleClickHome,
+  handleClickGame,
+  incrementTutorialViewIndex,
+  decrementTutorialViewIndex,
+  setFullScreenPageData,
+  playerData,
+  setPlayerData,
+  kaijuData,
+  setKaijuData,
+  width,
+  height,
+  scale,
+  setTiles,
+  setClickedTile,
+  setHoverRef,
+  tileStatuses,
+  setTileStatuses,
+  backButtonCallback,
+  setIsHomeButton,
+  selectedAvatar,
+  setGameBoardMarginTop
 }) => {
-    useEffect(() => {
+  useEffect(() => {
 
     // gameboard variables  
     let playerSpawnPositions = [];
@@ -2025,10 +2028,10 @@ export const useUpdateTutorialScreenContent = ({
       case 1:
         text = ["You are a Kaiju Warrior,", "the best of the best."];
         buttons = [
-          {text:"Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex())}, 
-          {text:"Ok", onClick: incrementTutorialViewIndex}
+          { text: "Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex()) },
+          { text: "Ok", onClick: incrementTutorialViewIndex }
         ];
-        image = {src: './story_images/tutorial_kaiju_warrior.png', width: '896px', height: '1200px'};
+        image = { src: './story_images/tutorial_kaiju_warrior.png', width: '896px', height: '1200px' };
         backgroundImgs = [
           {
             src: './Background_Wires.png',
@@ -2040,11 +2043,11 @@ export const useUpdateTutorialScreenContent = ({
         homeButtonOnClick = () => triggerTransition(() => handleClickHome());
         setBackButtonCallback(() => () => triggerTransition(() => decrementTutorialViewIndex()));
         setIsHomeButton(true);
-        break;        
+        break;
       case 2:
         text = ["This is your home, Kaiju City."];
-        buttons = [{text:"Back", onClick: backButtonCallback}, {text:"Ok", onClick: incrementTutorialViewIndex}];
-        image = {src: './Map.gif', width: '500px', height: '800px'};
+        buttons = [{ text: "Back", onClick: backButtonCallback }, { text: "Ok", onClick: incrementTutorialViewIndex }];
+        image = { src: './Map.gif', width: '500px', height: '800px' };
         backgroundImgs = [
           // TO-DO: Add anim: "bobbing" - - - - - -
           // NIGHT CLOUD (bottom-left):
@@ -2054,7 +2057,7 @@ export const useUpdateTutorialScreenContent = ({
             height: 367,
             styles: `position: absolute; z-index: 0; bottom: -70px; left: -300px; transform: scale(-.7, .7);`
           },
-            // NIGHT CLOUD (top-right):
+          // NIGHT CLOUD (top-right):
           {
             src: './Night_Cloud.png',
             width: 647,
@@ -2071,14 +2074,14 @@ export const useUpdateTutorialScreenContent = ({
             height: 367,
             styles: `position: absolute; z-index: 1; transition: transform 1.5s; transform: scale(.7) translate(700px, 300px); filter: drop-shadow(0px 500px 20px black);`
           },
-            // NIGHT CLOUD (moving, medium cloud, middle):
+          // NIGHT CLOUD (moving, medium cloud, middle):
           {
             src: './Night_Cloud.png',
             width: 647,
             height: 367,
             styles: `    position: absolute; z-index: -1; transition: transform 1.5s; transform: scale(.4) translate(600px, 340px); filter: drop-shadow(0px 500px 20px black);`
           },
-            // NIGHT CLOUD (moving, little cloud, back):
+          // NIGHT CLOUD (moving, little cloud, back):
           {
             src: './Night_Cloud.png',
             width: 647,
@@ -2143,12 +2146,12 @@ export const useUpdateTutorialScreenContent = ({
               // margin: "20px 0px -5px 0px"
             }}
           >
-              <div style={{ margin:"5px" }}>
+            <div style={{ margin: "5px" }}>
               Click on ability buttons</div>
-              <div style={{ margin:"5px" }}>
+            <div style={{ margin: "5px" }}>
               or use num keys 1-9
             </div>
-              <div style={{ margin:"5px" }}>
+            <div style={{ margin: "5px" }}>
               to attack and defend.
             </div>
           </div>,
@@ -2196,10 +2199,10 @@ export const useUpdateTutorialScreenContent = ({
         setGameBoardMarginTop(undefined);
         text = ["Defeat the Kaiju,", "save the city!"];
         buttons = [
-          {text:"Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex())}, 
-          {text:"Play", onClick: () => triggerTransition(() => handleClickGame())}
+          { text: "Back", onClick: () => triggerTransition(() => decrementTutorialViewIndex()) },
+          { text: "Play", onClick: () => triggerTransition(() => handleClickGame()) }
         ];
-        image = {src: './story_images/tutorial_exit.png', width: '895px', height: '1200px'};
+        image = { src: './story_images/tutorial_exit.png', width: '895px', height: '1200px' };
         backgroundImgs = [
           // TO-DO: Add anim: "move to position (position = bottom/top/left/right) from off-screen left, then bobbing infinite once in position" - - - - - -
           // DAY CLOUD (top-left, smallest):
@@ -2222,19 +2225,19 @@ export const useUpdateTutorialScreenContent = ({
             width: 660,
             height: 417,
             styles: `position: absolute; z-index: 1; transition: transform 1.5s; bottom: -115px; right: 260px; transform: scale(-.6, .4) translate(0px, 0px);`
-          }                    
+          }
         ]
         homeButtonOnClick = () => triggerTransition(() => handleClickHome());
-        break; 
+        break;
     }
-    
-    !!buttons ? setFullScreenPageData({ 
+
+    !!buttons ? setFullScreenPageData({
       text,
       buttons,
       image,
       backgroundImgs,
       homeButtonOnClick
-     }) : setFullScreenPageData(undefined);
+    }) : setFullScreenPageData(undefined);
 
     initializeTutorialGameBoard({
       playerData,
@@ -2258,42 +2261,42 @@ export const useUpdateTutorialScreenContent = ({
 }
 
 export const useUpdateSettingsScreen = ({
-    currAbility,
-    setTitle,
-    setShouldKaijuMove,
-    playerData,
-    setPlayerData,
-    kaijuData,
-    setKaijuData,
-    width,
-    height,
-    scale,
-    setTiles,
-    setClickedTile,
-    setHoverRef,
-    tileStatuses,
-    setTileStatuses,
-    selectedAvatar
+  currAbility,
+  setTitle,
+  setShouldKaijuMove,
+  playerData,
+  setPlayerData,
+  kaijuData,
+  setKaijuData,
+  width,
+  height,
+  scale,
+  setTiles,
+  setClickedTile,
+  setHoverRef,
+  tileStatuses,
+  setTileStatuses,
+  selectedAvatar
 }) => {
-    useEffect(() => {
-       const playerSpawnPositions = [
-          { i: 3, j: 3 }
-        ];
-        const kaijuSpawnPositions = [{ i: 19, j: 3 }];
-        const abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
-        setShouldKaijuMove(false);
-        setTitle([
-          <>
-            <StyledIcon className="fa fa-leaf" color="Chartreuse" />
-            <StyledIcon className="fa fa-free-code-camp" color="tomato" />
-            <StyledIcon className="fa fa-shield" color="AntiqueWhite" />
-            <StyledIcon className="fa fa-snowflake-o" color="PaleTurquoise" />
-            <StyledIcon className="fa fa-bolt" color="cyan" />
-            <StyledIcon className="fa fa-snapchat-ghost" color="GhostWhite" />
-            <StyledIcon className="fa fa-question-circle-o" color="Thistle" />
-            <StyledIcon className="fa fa-heart" color="pink" />
-          </>
-        ]);
+  useEffect(() => {
+    const playerSpawnPositions = [
+      { i: 3, j: 3 }
+    ];
+    const kaijuSpawnPositions = [{ i: 19, j: 3 }];
+    const abilities = Object.values(PLAYER_ABILITIES).slice(0, 9);
+    setShouldKaijuMove(false);
+    setTitle([
+      <>
+        <StyledIcon className="fa fa-leaf" color="Chartreuse" />
+        <StyledIcon className="fa fa-free-code-camp" color="tomato" />
+        <StyledIcon className="fa fa-shield" color="AntiqueWhite" />
+        <StyledIcon className="fa fa-snowflake-o" color="PaleTurquoise" />
+        <StyledIcon className="fa fa-bolt" color="cyan" />
+        <StyledIcon className="fa fa-snapchat-ghost" color="GhostWhite" />
+        <StyledIcon className="fa fa-question-circle-o" color="Thistle" />
+        <StyledIcon className="fa fa-heart" color="pink" />
+      </>
+    ]);
 
     initializeTutorialGameBoard({
       playerData,
@@ -2321,81 +2324,81 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
     case "modifiers":
       return playerData && playerData[playerIndex]
         ? {
-            title: playerIndex === 1 ? "Your teammate" : "You",
-            description: [
-              <div>
-                Move Speed:{" "}
-                <span
-                  style={{
-                    color:
-                      playerData[playerIndex].moveSpeed > 6
-                        ? "green"
-                        : playerData[playerIndex].moveSpeed < 6
+          title: playerIndex === 1 ? "Your teammate" : "You",
+          description: [
+            <div>
+              Move Speed:{" "}
+              <span
+                style={{
+                  color:
+                    playerData[playerIndex].moveSpeed > 6
+                      ? "green"
+                      : playerData[playerIndex].moveSpeed < 6
                         ? "red"
                         : "black"
-                  }}
-                >
-                  {playerData[playerIndex].moveSpeed}
-                </span>
-              </div>,
-              <br />,
-              <div>
-                Lives:{" "}
-                <span
-                  style={{
-                    color:
-                      playerData[playerIndex].lives > 4
-                        ? "green"
-                        : playerData[playerIndex].lives < 4
+                }}
+              >
+                {playerData[playerIndex].moveSpeed}
+              </span>
+            </div>,
+            <br />,
+            <div>
+              Lives:{" "}
+              <span
+                style={{
+                  color:
+                    playerData[playerIndex].lives > 4
+                      ? "green"
+                      : playerData[playerIndex].lives < 4
                         ? "red"
                         : "black"
-                  }}
-                >
-                  {playerData[playerIndex].lives}
-                </span>
-              </div>,
-              <br />,
-              <div>
-                Num Tiles Modifier:{" "}
-                <span
-                  style={{
-                    color:
-                      playerData[playerIndex].numTilesModifier > 0
-                        ? "green"
-                        : "black"
-                  }}
-                >
-                  {playerData[playerIndex].numTilesModifier}
-                </span>
-              </div>,
-              <br />,
-              <div>
-                Tiles Count Modifier:{" "}
-                <span
-                  style={{
-                    color:
-                      playerData[playerIndex].tileCountModifier > 0
-                        ? "green"
-                        : "black"
-                  }}
-                >
-                  {playerData[playerIndex].tileCountModifier}
-                </span>
-              </div>
-            ],
-            effect1: "",
-            effect2: "",
-            img: "",
-            formatData: {}
-          }
+                }}
+              >
+                {playerData[playerIndex].lives}
+              </span>
+            </div>,
+            <br />,
+            <div>
+              Num Tiles Modifier:{" "}
+              <span
+                style={{
+                  color:
+                    playerData[playerIndex].numTilesModifier > 0
+                      ? "green"
+                      : "black"
+                }}
+              >
+                {playerData[playerIndex].numTilesModifier}
+              </span>
+            </div>,
+            <br />,
+            <div>
+              Tiles Count Modifier:{" "}
+              <span
+                style={{
+                  color:
+                    playerData[playerIndex].tileCountModifier > 0
+                      ? "green"
+                      : "black"
+                }}
+              >
+                {playerData[playerIndex].tileCountModifier}
+              </span>
+            </div>
+          ],
+          effect1: "",
+          effect2: "",
+          img: "",
+          formatData: {}
+        }
         : {
-            title: "",
-            description: "",
-            effect1: "",
-            effect2: "",
-            img: "",
-            formatData: {}
-          };
+          title: "",
+          description: "",
+          effect1: "",
+          effect2: "",
+          img: "",
+          formatData: {}
+        };
     case "class":
       return {
         title:
@@ -2643,7 +2646,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
 
 export const determineKaijuQuantity = difficulty => {
   let MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED = undefined;
-  switch (difficulty){
+  switch (difficulty) {
     case Difficulty.Easy:
       MAX_AT_ONCE = 1;
       MAX_TO_WIN = 5;
@@ -2654,19 +2657,19 @@ export const determineKaijuQuantity = difficulty => {
       MAX_AT_ONCE = 4;
       MAX_TO_WIN = 12;
       KAIJU_MAX_HEALTH = 3;
-      KAIJU_MAX_SPEED = 2;    
+      KAIJU_MAX_SPEED = 2;
       break;
     case Difficulty.Xtreme:
       MAX_AT_ONCE = 5;
       MAX_TO_WIN = 17;
       KAIJU_MAX_HEALTH = 4;
-      KAIJU_MAX_SPEED = 2;                    
+      KAIJU_MAX_SPEED = 2;
       break;
     default: // Difficulty.Medium
       MAX_AT_ONCE = 3;
       MAX_TO_WIN = 9;
       KAIJU_MAX_HEALTH = 3;
-      KAIJU_MAX_SPEED = 2;                     
+      KAIJU_MAX_SPEED = 2;
   }
   return { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED };
 }

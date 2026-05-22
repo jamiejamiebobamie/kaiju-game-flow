@@ -165,21 +165,20 @@ export const Ability = ({
     accTime,
     color
   } = abilityData;
-  const [isActive, setIsActive] = useState(false);
+  const [isOnCoolDown, setIsOnCoolDown] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
 
   // disable ability buttons if game is paused or character is dead
   const isPlayerAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && playerData[playerIndex] && !!playerData[playerIndex].lives;
-
-  useKeyPress(
-    () =>
-    handleClick(),
-    `Digit${keyNum}`,
-    isPaused || !isPlayerAlive // isPlayerDead
-  );
+  const handleClick = () => !isOnCoolDown && isPlayerAlive && !isPaused && setIsOnCoolDown(true);
+  useKeyPress({
+    keyCodes: `Digit${keyNum}`,
+    keyDownCallback: handleClick,
+    isPlayerDead: isPaused || !isPlayerAlive
+  });
   useEffect(() => {
-    if (isActive && isPlayerAlive && !isPaused) {
+    if (isOnCoolDown && isPlayerAlive && !isPaused) {
       activateActive(
         playerIndex,
         playerData,
@@ -191,16 +190,15 @@ export const Ability = ({
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
       setTimeout(() => {
-        setIsActive(false);
+        setIsOnCoolDown(false);
         setIconLookupString("active");
       }, cooldownTime);
     }
-  }, [isActive]);
-  useEffect(() => playerIndex === 1 && setIsActive(true), [accTime]);
+  }, [isOnCoolDown]);
+  useEffect(() => playerIndex === 1 && setIsOnCoolDown(true), [accTime]);
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
-  const handleClick = () => !isActive && isPlayerAlive && !isPaused && setIsActive(true);
   return (
     <Wrapper
       onClick={() => isPlayerAlive && !isPaused && handleClick()}
@@ -211,7 +209,7 @@ export const Ability = ({
       <AbilityIcon
         disabled={true}
         className={`fa ${ICON_LOOKUP[element][iconLookupString]}`}
-        isCoolDown={isActive}
+        isCoolDown={isOnCoolDown}
         cooldownTime={cooldownTime}
         color={color}
       />

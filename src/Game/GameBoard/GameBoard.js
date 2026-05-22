@@ -136,7 +136,7 @@ export const GameBoard = ({
                             }
                       )
           test.key && test.key !== hoverLookupString && setHoverLookupString(test.key);
-        } else if (isPlayerDead && hoverLookupString != '') {
+        } else if (hoverLookupString != '') {
           setHoverLookupString('');
         } 
       }}

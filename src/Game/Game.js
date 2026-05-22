@@ -14,7 +14,10 @@ import {
   updateHighlightedTiles,
   initializeGameBoard,
   getAdjacentTiles,
-  determineKaijuQuantity
+  determineKaijuQuantity,
+  getTileOffsetFromDir,
+  isTileOnGameBoard,
+  findPath
 } from "Utils/utils";
 import { FullscreenPage } from "Components/FullscreenPage.js";
 const GameWrapper = styled.div`
@@ -27,6 +30,9 @@ const GameWrapper = styled.div`
   ${props => props.height ? `height: ${props.height};` : "height:800px;"}
   overflow: hidden;
 `;
+
+const shouldUpdate = (accTime, interval) => !(accTime % interval);
+
 export const Game = ({ handleClickHome, triggerTransition }) => {
   const DEFAULT_FULLSCREEN_PAGE_DATA = {
     text: ["Wild Kaiju have appeared!"],
@@ -80,6 +86,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [intervalTime, setIntervalTime] = useState(null);
   const [deadKaijuLocations, setDeadKaijuLocations] = useState([]);
   const [fullScreenPageData, setFullScreenPageData] = useState(DEFAULT_FULLSCREEN_PAGE_DATA);
+  const [isPlayerDead, setIsPlayerDead] = useState(false);
+  const [keysPressed, setKeysPressed] = useState([]);
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -102,29 +110,120 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setFullScreenPageData(DEFAULT_FULLSCREEN_PAGE_DATA);
     setDeadKaijuLocations([]);
   };
-  const shouldUpdate = (accTime, interval) => !(accTime % interval);
   const handleClickPause = () => {
     setIsPaused(_isPaused => !_isPaused);
     setIntervalTime(_intervalTime => (_intervalTime === null ? TURN_DELAY : null));
   };
-  useKeyPress(
-    code => {
-      switch (code) {
-        case "Escape":
-          handleClickPause();
-          break;
+
+  const moveWASD = keys => {
+    const sortLookup = { 
+         "KeyW": 0,      "KeyS": 1,      "KeyA": 2,       "KeyD": 3,
+      "ArrowUp": 0, "ArrowDown": 1, "ArrowLeft": 2, "ArrowRight": 3
+     };
+
+    const dirLookup = { 
+         "KeyW": "up",      "KeyA": "left",      "KeyS": "down",       "KeyD": "right", 
+      "ArrowUp": "up", "ArrowLeft": "left", "ArrowDown": "down", "ArrowRight": "right" 
+    };
+
+    const dirs = keys
+                  // sort based on priority
+                  .sort((a, b) => sortLookup[a] - sortLookup[b])
+                  // map keys to directions
+                  .map(k => dirLookup[k])
+                  // remove duplicates in case of Arrow Keys and WASD are pressed at same time
+                  .reduce((acc,item) => !acc.includes(item) ? [...acc, item] : acc, []); 
+
+    let dir = dirs[0];
+    if (dirs.length > 1) {
+      const isConflictingDirs = (dirs.includes("up") && dirs.includes("down")) || (dirs.includes("left") && dirs.includes("right"));
+      if (isConflictingDirs) {
+        dir = dirs[0];
+      } else {
+        dir = `${dirs[0]} ${dirs[1]}`;
       }
-    },
-    ["Escape"]
-  );
+    }
+
+    console.log({ keys, dirs, dir });
+    let tile;
+    setPlayerData(data => {
+      console.log({ playerData: data })
+      if (Array.isArray(data) && !!data.length) {
+        tile = data[0].tile;
+        console.log({ tile });
+        if (!!tile) {
+           if (dir == "right" || dir == "left") {
+              /*
+                handle left-right movement on hexagonal grid.
+                prefix "up " or "down " depending on
+                  column index of current player tile.
+              */ 
+              const { j } = tile;
+              if(j % 2){
+                dir = `up ${dir}`;
+              } else {
+                dir = `down ${dir}`;
+              }
+            }
+          const desiredOffset = getTileOffsetFromDir(dir, tile);
+          const nextTile = { i: tile.i + desiredOffset.i, j: tile.j + desiredOffset.j };
+          const isValid = isTileOnGameBoard(nextTile);
+
+          console.log({ desiredOffset, nextTile, isValid });
+          if (isValid) {
+            const path = findPath(
+              tile,
+              nextTile,
+              scale
+            );
+            setPlayerMoveToTiles(path);
+            setHoverLookupString(`${nextTile.i} ${nextTile.j}`);
+          }
+        }
+      }
+      return data
+    });
+  }
+
+  useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isPlayerDead: false });
+
+  const keyDown = code => {
+    setKeysPressed(keys => {
+      const newKeys = !keys.includes(code) ? [...keys, code] : keys; // add key
+      // console.log("keyDown", { newKeys });
+      moveWASD(newKeys);
+      return newKeys;
+    });
+  }
+
+  const keyUp = code => {
+    setKeysPressed(keys => {
+      const newKeys = keys.includes(code) ? keys.filter(k => k != code) : keys; // remove key
+      // console.log("keyUp", { newKeys });
+      !!newKeys.length && moveWASD(newKeys);
+      return newKeys;
+    });
+  }
+
+  useKeyPress({
+    keyCodes: ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"],
+    keyDownCallback: keyDown,
+    keyUpCallback: keyUp,
+    isPlayerDead
+  });
 
   useEffect(() => {
     if (kaijuKillCount.length >= MAX_TO_WIN) {
       const _winner = 0;
       setWinner(_winner);
     }
-    if (playerData.length && playerKillCount >= playerData.length)
+    if (!!playerData.length && playerKillCount >= playerData.length) {
       setWinner(-1);
+      if (!!playerData.length && !!playerData[0] && !playerData[0].lives) {
+        setIsPlayerDead(true);
+        setKeysPressed([]);
+      }
+    }
   }, [kaijuKillCount, playerKillCount, MAX_TO_WIN]);
 
   useEffect(() => {

@@ -68,7 +68,7 @@ const PlayerPicture = styled.div`
     width: 592px;
     height: 359px;
     animation: 1s steps(9) 0s infinite normal none running playSpriteSheet;
-    transform: scale(.4, .6) translate(-598px, -178px);
+    transform: scale(.4, .6) translate(-560px, -178px);
  }     
 `;
 export const PlayerUI = ({
