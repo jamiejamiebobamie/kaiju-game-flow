@@ -23,8 +23,7 @@ const Wrapper = styled.div`
   border-color: #db974f;
   color: #db974f;
   background-color: #152642;
-  ${props =>
-    props.isTeammate && "align-content: flex-end; transform:scale(.75); left: 50px;"}
+  ${props => props.isTeammate && "align-content: flex-end; transform: scale(.75); left: 50px;"}
   pointer-events: auto;
 `;
 const PlayerBorder = styled.div`
@@ -37,11 +36,16 @@ const PlayerBorder = styled.div`
   border-radius: 100%;
   overflow: hidden;
 `;
-const PlayerPicture = styled.img`
-  margin-top: -1px;
-  margin-left: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
+const PlayerPicture = styled.div`
+
+  position: relative;
+
+  background: url(${props => props.src});
+
+  background-position: 12px;
+  width: 97%;
+  height: 97%;
+
   border-style: solid;
   border-thickness: 10px;
   border-radius: 100%;
@@ -51,6 +55,21 @@ const PlayerPicture = styled.img`
     props.isBlue
       ? "filter: drop-shadow(20px -15px 25px blue);"
       : "filter: drop-shadow(20px -15px 25px salmon);"}  
+
+ &::after{
+    filter: opacity(.2) hue-rotate(
+        ${props => props.isBlue ? "148deg" : "301deg"}
+      );
+    z-index: -1;
+    position: absolute;
+    content: "";
+    pointer-events: none;
+    background: url(spritesheet/horizontal_circuit_disc_sprite.png) center center;
+    width: 592px;
+    height: 359px;
+    animation: 1s steps(9) 0s infinite normal none running playSpriteSheet;
+    transform: scale(.4, .6) translate(-598px, -178px);
+ }     
 `;
 export const PlayerUI = ({
   playerData = [
@@ -81,13 +100,15 @@ export const PlayerUI = ({
   playerIndex,
   _,
   isTeammate,
-  scale
+  scale,
+  percentZoom,
+  isPaused
 }) => {
   const { gender } = playerData[playerIndex];
   const isReversed = isTeammate;
 
   const _playerUI = (
-    <Wrapper isTeammate={isTeammate}>
+    <Wrapper percentZoom={percentZoom} isTeammate={isTeammate}>
       {isReversed ? (
         <>
           <Abilities
@@ -103,6 +124,7 @@ export const PlayerUI = ({
             playerIndex={playerIndex}
             setPlayerData={setPlayerData}
             setTeleportData={setTeleportData}
+            isPaused={isPaused}
           />
           <HealthBar
             health={(playerData.length && playerData[playerIndex].lives) || 0}
@@ -129,13 +151,13 @@ export const PlayerUI = ({
             playerIndex={playerIndex}
             setPlayerData={setPlayerData}
             setTeleportData={setTeleportData}
+            isPaused={isPaused}
           />
         </>
       )}
       <PlayerBorder isReversed={isReversed}>
         <PlayerPicture
           src={gender == "guy" ? "player_avatar.png" : "teammate_avatar.png"}
-          height="150px"
           className="fa fa-user-circle"
           isBlue={gender == "guy" ? true : false}
         />

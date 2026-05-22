@@ -9,6 +9,8 @@ import { GameMap } from "../../Components/GameMap.js";
 import { getFlattenedArrayIndex, getDistance } from "../../Utils/utils";
 const Board = styled.div`
   position: relative;
+  display: flex;
+
   ${props => props.width ? `width: ${props.width}px;` : 'width: 500px;'}
   // crop bottom of image. use 98% of required height.
   ${props => props.height ? `height: ${props.height * .98}px;` : 'height: 790px;'}

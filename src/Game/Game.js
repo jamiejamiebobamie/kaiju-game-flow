@@ -24,8 +24,7 @@ const GameWrapper = styled.div`
   justify-content: space-between;
   // width: 800px;
   ${props => props.width ? `width: ${props.width};` : "width:800px;"}
-  height: 100%;
-  // margin-top: 40px;
+  ${props => props.height ? `height: ${props.height};` : "height:800px;"}
   overflow: hidden;
 `;
 export const Game = ({ handleClickHome, triggerTransition }) => {
@@ -312,7 +311,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       />
       : (
         <>
-          <GameWrapper width={width}>
+          <GameWrapper width={width} height={height}>
             <GameBoard
               isPaused={isPaused}
               playerData={playerData}
@@ -344,7 +343,9 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               width={width}
               height={height}
               scale={scale}
+              percentZoom={percentZoom}
               isTeammate={isTeammate}
+              isPaused={isPaused}
             />
           </GameWrapper>
         </>);

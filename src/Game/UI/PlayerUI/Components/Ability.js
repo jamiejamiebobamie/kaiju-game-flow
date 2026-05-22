@@ -154,7 +154,8 @@ export const Ability = ({
   setTeleportData,
   setTileStatuses,
   scale,
-  keyNum
+  keyNum,
+  isPaused
 }) => {
   const {
     activeName,
@@ -168,16 +169,17 @@ export const Ability = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
 
+  // disable ability buttons if game is paused or character is dead
   const isPlayerAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && playerData[playerIndex] && !!playerData[playerIndex].lives;
 
   useKeyPress(
     () =>
     handleClick(),
     `Digit${keyNum}`,
-    !isPlayerAlive // isPlayerDead
+    isPaused || !isPlayerAlive // isPlayerDead
   );
   useEffect(() => {
-    if (isActive && isPlayerAlive) {
+    if (isActive && isPlayerAlive && !isPaused) {
       activateActive(
         playerIndex,
         playerData,
@@ -198,10 +200,10 @@ export const Ability = ({
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
-  const handleClick = () => !isActive && isPlayerAlive && setIsActive(true);
+  const handleClick = () => !isActive && isPlayerAlive && !isPaused && setIsActive(true);
   return (
     <Wrapper
-      onClick={() => isPlayerAlive && handleClick()}
+      onClick={() => isPlayerAlive && !isPaused && handleClick()}
       isAnimating={isAnimating}
       title={activeName}
       color={color}

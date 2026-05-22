@@ -138,7 +138,7 @@ const TopRightBottomLeftAnim = styled.div`
     }
 `;
 
-const BlinkFadeEffect = styled.div`
+export const BlinkFadeEffect = styled.div`
   animation: blink-fade-${props => `${props.time ? props.time : 5}-${props.low ? props.low : 3}-${props.high ? props.high : 59}`} ${props => props.time ? props.time / 100 : .05}s linear infinite;
 
   @keyframes blink-fade-${props => `${props.time ? props.time : 5}-${props.low ? props.low : 3}-${props.high ? props.high : 59}`} {
@@ -254,7 +254,7 @@ const DoodadTransform = styled.div`
   ${props => `transform: scale(${props.scale}) translate(${props.translation});`}
 `;
 
-const CircuitDiscSpriteSheet = styled.div`
+export const CircuitDiscSpriteSheet = styled.div`
   position: absolute;
 
   ${props => props.zIndex && `z-index: ${props.zIndex};`}

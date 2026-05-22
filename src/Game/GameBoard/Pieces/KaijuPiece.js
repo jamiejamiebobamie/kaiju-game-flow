@@ -27,9 +27,7 @@ const SpriteSheet = styled.div`
   position: relative;
   pointer-events: none;
   display: ${props => (props.lives > 0 ? "flex" : "none")};
-  // background: url(${props => `spritesheet/${props.backgroundImgSrc}.png`});
   background: url("spritesheet/kaiju_sprite2.png");
-  // background: url("spritesheet/kaiju_sprite_FIRE1.png");
   transform: scale(0.4) translate(-169px, -169px);
   height: 230.33px;
   width: 180px;
@@ -52,7 +50,7 @@ const SpriteSheet = styled.div`
     ${props => `animation: ${props.anim} 1.25s steps(10) infinite;`};
 
     opacity: ${props => (props.isGoingToSpewFire ? 1 : 0)};
-    transition: opacity 0.5s ease-out;
+    transition: opacity 0.5s ease-in-out;
   }
 
   @keyframes upRightKaiju {

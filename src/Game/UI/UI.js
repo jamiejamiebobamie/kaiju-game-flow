@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { PlayerUI } from "./PlayerUI/PlayerUI";
+import { BlinkFadeEffect } from 'Components/AvatarSelection';
 
 const Wrapper = styled.div`
+${props => props.percentZoom ? `transform: scale(${props.percentZoom}) translate(${(1 - props.percentZoom) * 200 - 2.4}px, 0px);` : ''} // -2.4 for border radius
+
+  position: relative;
   display: flex;
-  justify-content: space-between;
   flex-direction: column;
+
   border-radius: 10px;
   align-self: center;
-  margin-left: -130px;
-  margin-right: 0px;
-  height: 450px;
+  width: 320px;
   z-index: 9999999;
   pointer-events: none;
 `;
@@ -18,15 +20,11 @@ const ButtonGroup = styled.div`
   z-index: 1;
   display: flex;
   justify-content: space-around;
-  align-items: center;
-
-  width: 442px;
-  ${props => (props.isTeammate ? "height: 50px;" : "height: 100px;")}
-  transform: scale(1, 1.3);
-  margin-top: 50px;
-  display: flex;
-  flex-direction: column;
-  margin-left: 30px;
+  align-self: flex-end;
+  width: 400px;
+  transform: scale(.9, 1.1) translate(30px, 20px);
+  right: 0px;
+  bottom: -60px;
   pointer-events: auto;
 `;
 const ButtonsWrapper = styled.div`
@@ -88,18 +86,21 @@ const ProgressCounter = styled.div`
   z-index: 1111111110;
 
   display: flex;
+  align-self: flex-end;
   justify-content: space-between;
 
-  margin-left: 130px;
   margin-top: -60px;
 
   border-color: rgb(219, 151, 79);
   color: rgb(219, 151, 79);
-  font-size: 25px;
   -webkit-text-stroke: 0.5px rgb(219, 151, 79);
   -webkit-box-pack: end;
 
   pointer-events: none;
+`;
+
+const ProgressContent = styled.div`
+  font-size: 1.5em;
 `;
 export const UI = ({
   playerData,
@@ -112,73 +113,56 @@ export const UI = ({
   handleClickHome,
   handleClickPause,
   scale,
-  isTeammate
+  percentZoom,
+  isTeammate,
+  isPaused
 }) => {
   const [displayString, setDisplayString] = useState(null);
-  const playerUI = (
-    <PlayerUI
-      playerData={playerData}
-      kaijuData={kaijuData}
-      kaijuKillCount={kaijuKillCount}
-      setPlayerData={setPlayerData}
-      setTeleportData={setTeleportData}
-      setTileStatuses={setTileStatuses}
-      scale={scale}
-      setDisplayString={setDisplayString}
-      playerIndex={0}
-    />
-  );
-  const teammateUI = playerData.length > 1 && (
-    <PlayerUI
-      playerData={playerData}
-      kaijuData={kaijuData}
-      kaijuKillCount={kaijuKillCount}
-      setPlayerData={setPlayerData}
-      setTeleportData={setTeleportData}
-      setTileStatuses={setTileStatuses}
-      scale={scale}
-      setDisplayString={setDisplayString}
-      playerIndex={1}
-      isTeammate={true}
-    />
-  );
+  const progressCounter = <ProgressCounter>
+    <ProgressContent>
+      <BlinkFadeEffect>
+        Kaiju:
+      </BlinkFadeEffect>
+    </ProgressContent>
+    <ProgressContent>
+      <BlinkFadeEffect>
+        {`${Array.isArray(kaijuKillCount) ? kaijuKillCount.length : 0} / ${kaijuKilledToWin}`}
+      </BlinkFadeEffect>
+    </ProgressContent>
+  </ProgressCounter>
+  const playerUIs = Array.isArray(playerData) && playerData.map((_, i) => <PlayerUI
+    playerData={playerData}
+    kaijuData={kaijuData}
+    kaijuKillCount={kaijuKillCount}
+    setPlayerData={setPlayerData}
+    setTeleportData={setTeleportData}
+    setTileStatuses={setTileStatuses}
+    scale={scale}
+    setDisplayString={setDisplayString}
+    playerIndex={i}
+    isTeammate={i > 0}
+    isPaused={isPaused}
+  />);
+  const buttons = <ButtonGroup
+    isTeammate={isTeammate}>
+    <ButtonsWrapper>
+      <Button onClick={handleClickPause}>
+        <ButtonOutline zIndex={1} />
+        Pause
+      </Button>
+    </ButtonsWrapper>
+    <ButtonsWrapper>
+      <Button onClick={handleClickHome}>
+        <ButtonOutline zIndex={1} />
+        Home
+      </Button>
+    </ButtonsWrapper>
+  </ButtonGroup>
   return (
-    <Wrapper>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "400px",
-          alignSelf: "flex-end"
-        }}
-      >
-        <ProgressCounter>
-          <div>Kaiju:</div>
-          <div>
-            {`${Array.isArray(kaijuKillCount) ? kaijuKillCount.length : 0} / ${kaijuKilledToWin}`}
-          </div>
-        </ProgressCounter>
-        {playerUI}
-        {teammateUI}
-        <ButtonGroup isTeammate={isTeammate}>
-          <div>
-            <ButtonsWrapper>
-              <Button onClick={handleClickPause}>
-                <ButtonOutline zIndex={1} />
-                Pause
-              </Button>
-            </ButtonsWrapper>
-          </div>
-          <div>
-            <ButtonsWrapper>
-              <Button onClick={handleClickHome}>
-                <ButtonOutline zIndex={1} />
-                Home
-              </Button>
-            </ButtonsWrapper>
-          </div>
-        </ButtonGroup>
-      </div>
+    <Wrapper percentZoom={percentZoom}>
+      {progressCounter}
+      {playerUIs}
+      {buttons}
     </Wrapper>
   );
 };

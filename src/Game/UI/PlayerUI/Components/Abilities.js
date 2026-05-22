@@ -37,6 +37,7 @@ export const Abilities = ({
   scale,
   setDisplayString,
   isReversed,
+  isPaused,
   abilities = [
     {
       displayLookup: "abilityGlass",
@@ -95,6 +96,7 @@ export const Abilities = ({
       abilityData={abilityData}
       keyNum={isReversed ? i + 4 : i + 1}
       playerIndex={playerIndex}
+      isPaused={isPaused}
     />
   ));
   return (
