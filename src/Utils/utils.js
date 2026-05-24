@@ -1079,52 +1079,119 @@ export const movePlayerPieces = (
   winner
 ) =>
   setData(_data => {
+    const enemiesOnTiles = enemyData.filter(({ isOnTiles }) => !!isOnTiles);
     for (let i = 0; i < _data.length; i++) {
       if (_data[i].lives) {
         // set logic for teammate
         if (i === 1) {
-          // find the closest kaiju
-          const [targetTile, _] = getClosestEntityFromTile(
-            enemyData,
-            _data[i].tile,
-            scale
-          );
-          const isEnemy = targetTile.i !== 0;
-            const attackPowersCount = _data[i].abilities.filter(
-              ({ type }) => type === "offensive"
-            ).length;
-            // teammate should do his own thing and attack kaiju
-            if (isEnemy && attackPowersCount) {
-              const attackPowersRangeAcc = _data[i].abilities
-                .filter(({ type }) => type === "offensive")
-                .map(({ range }) => range)
-                .reduce((acc, item) => acc + item, 0);
-              const powerRangeAvg = Math.trunc(
-                attackPowersRangeAcc / attackPowersCount
-              );
-              // get path
-              const moveToEnemyTiles =
-                _data[1].tile &&
-                targetTile &&
-                findPath(_data[1].tile, targetTile, scale, isTutorial);
 
-              const safeTile = getSafeTile(enemyData, tileStatuses, scale);
+          let isEnemy = false;
+          let powersCount = 3;
+          let targetTile = { i: 0, j: 0 };
 
-              const moveToSafetyTiles = findPath(
+          const isEnemiesOnTiles = !!enemiesOnTiles.length;
+          if (isEnemiesOnTiles) {
+            // find the closest kaiju
+            const [_targetTile, _] = getClosestEntityFromTile(
+              enemiesOnTiles,
+              _data[i].tile,
+              scale
+            );
+            targetTile = _targetTile;
+            isEnemy = targetTile.i !== 0;
+            powersCount = _data[i].abilities.length;
+          }
+          // teammate should do his own thing and attack kaiju
+          if (isEnemy) {
+            const powersRangeAcc = _data[i].abilities
+              .map(({ range }) => range)
+              .reduce((acc, item) => acc + item, 0);
+            const powerRangeAvg = Math.trunc(
+              powersRangeAcc / powersCount
+            );
+            // avoid enemy tiles if possible
+            const enemyTiles = enemiesOnTiles.map(({ tile }) => tile);
+            const moveToEnemyTilePath =
+              _data[1].tile &&
+              targetTile &&
+              findPath(_data[1].tile, targetTile, scale, isTutorial);
+            const isEnemyTooFar = moveToEnemyTilePath.length > powerRangeAvg + 5;
+            const isEnemyTooClose = moveToEnemyTilePath.length <= powerRangeAvg - 2;
+            if (isEnemyTooFar) {
+              const idealTileDistanceFromEnemyWithGivenTeammatePowers = moveToEnemyTilePath.length - powerRangeAvg;
+              const moveToEnemy = idealTileDistanceFromEnemyWithGivenTeammatePowers > 0 ? moveToEnemyTilePath.slice(0, idealTileDistanceFromEnemyWithGivenTeammatePowers) : moveToEnemyTilePath;
+              _data[1].moveToTiles = moveToEnemy;
+            } else if (isEnemyTooClose){// && isTimeToRecalculateSafePath) {
+              _data[1].lastAccTimeForFindPath = accTime;
+              const safeTile = getSafeTile(enemiesOnTiles, tileStatuses, scale);
+              const toSafeTilePath = findPath(
                 _data[1].tile,
                 safeTile,
                 scale,
-                isTutorial
+                isTutorial,
+                enemyTiles
               );
-              const isEnemyTooClose = moveToEnemyTiles.length < powerRangeAvg - 1;
-              const isEnemyTooFar = moveToEnemyTiles.length > powerRangeAvg + 10;
-              const moveCloserTiles = isEnemyTooFar ? moveToEnemyTiles.slice(0, moveToEnemyTiles.length - powerRangeAvg) : [];
-              const moveToTiles = _data[1].moveToTiles
+              const idealTileDistanceFromEnemyWithGivenTeammatePowers = toSafeTilePath.length - powerRangeAvg;
+              const moveAwayFromEnemy = idealTileDistanceFromEnemyWithGivenTeammatePowers > 0 ? toSafeTilePath.slice(0, idealTileDistanceFromEnemyWithGivenTeammatePowers) : toSafeTilePath;
+              _data[1].moveToTiles = moveAwayFromEnemy;
+            }
 
-              _data[1].moveToTiles = isEnemyTooClose ? moveToSafetyTiles : isEnemyTooFar ? moveCloserTiles : moveToTiles;
+            // use powers
+            let hasUsedOnePower = _data[i].abilities.every(a => (accTime - a.accTime) < 500);
+            !hasUsedOnePower && _data[i].abilities.forEach((a, j) => {
+              const diff = accTime - a.accTime;
+              const isCooldownOver = !a.accTime || (diff > a.cooldownTimeAI);
+              if (isCooldownOver && !hasUsedOnePower) {
+                const numTilesFromTarget = moveToEnemyTilePath.length;
+                const adj_tiles = isTutorial
+                  ? getAdjacentTilesTutorial(_data[i].tile)
+                  : getAdjacentTiles(_data[i].tile);
+                const surroundingTiles = [_data[i].tile, ...adj_tiles.map(at => isTutorial
+                  ? getAdjacentTilesTutorial(at).flat()
+                  : getAdjacentTiles(at).flat())];
+                const isInDanger =
+                  !!tileStatuses &&
+                  !!surroundingTiles &&
+                  surroundingTiles.some(
+                    t =>
+                      !!t &&
+                      !!tileStatuses[t.i] &&
+                      !!tileStatuses[t.i][t.j] &&
+                      !!tileStatuses[t.i][t.j]["isOnKaijuFire"]
+                  );
+                const isOffensivePowerAndTargetInRange =
+                  a.type.includes("offensive") &&
+                  numTilesFromTarget &&
+                  a.range >= numTilesFromTarget;
+                const isDefensivePowerAndIsInDanger =
+                  a.type.includes("defensive") && isInDanger;
+                const isEscapePowerAndIsInDanger =
+                  a.type.includes("escape") && numTilesFromTarget <= 2;
+                const isHealPowerAndIsTeammateHealthLow =
+                  a.type.includes("heal") &&
+                  ((!!data[0].lives && data[0].lives < 4) ||
+                    (!!data[1].lives && data[1].lives < 4));
+                if (
+                  isOffensivePowerAndTargetInRange ||
+                  isDefensivePowerAndIsInDanger ||
+                  isEscapePowerAndIsInDanger ||
+                  isHealPowerAndIsTeammateHealthLow
+                ) {
+                  hasUsedOnePower = true;
+                  _data[i].abilities[j].accTime = accTime;
+                  a.activateActive(
+                    i,
+                    data,
+                    setTeleportData,
+                    enemiesOnTiles,
+                    setTileStatuses,
+                    scale
+                  );
+                }
+              }
+            });
           } else {
-            // teammate should stay by player to protect him.
-            // get path
+            // no enemy ...have teammate stay by player.
             const moveToTiles =
               _data[1].tile &&
               _data[0].tile &&
@@ -1134,69 +1201,6 @@ export const movePlayerPieces = (
                 ? moveToTiles.slice(0, moveToTiles.length - 3)
                 : [];
           }
-
-          // use powers
-          let hasUsedOnePower = false;
-          _data[i].abilities.forEach((a, j) => {
-            const diff = accTime - a.accTime;
-            const isCooldownOver = !a.accTime || (diff > a.cooldownTimeAI);
-            if (isCooldownOver && !hasUsedOnePower) {
-              const [targetTile, _] = getClosestEntityFromTile(
-                enemyData,
-                _data[i].tile,
-                scale
-              );
-              const numTilesFromTarget =
-                _data[i].tile &&
-                targetTile &&
-                findPath(_data[i].tile, targetTile, scale, isTutorial).length;
-              const adj_tiles = isTutorial
-                ? getAdjacentTilesTutorial(_data[i].tile)
-                : getAdjacentTiles(_data[i].tile);
-              const surroundingTiles = [_data[i].tile, ...adj_tiles];
-              const isInDanger =
-                tileStatuses &&
-                surroundingTiles &&
-                surroundingTiles.some(
-                  t =>
-                    t &&
-                    tileStatuses[t.i] &&
-                    tileStatuses[t.i][t.j] &&
-                    Object.keys(tileStatuses[t.i][t.j]).includes(
-                      "isOnKaijuFire"
-                    )
-                );
-              const isOffensivePowerAndTargetInRange =
-                a.type === "offensive" &&
-                numTilesFromTarget &&
-                a.range >= numTilesFromTarget;
-              const isDefensivePowerAndIsInDanger =
-                a.type === "defensive" && isInDanger;
-              const isEscapePowerAndIsInDanger =
-                a.type === "escape" && numTilesFromTarget <= 2;
-              const isHealPowerAndIsTeammateHealthLow =
-                a.type === "heal" &&
-                ((!!data[0].lives && data[0].lives < 4) ||
-                  (!!data[1].lives && data[1].lives < 4));
-              if (
-                isOffensivePowerAndTargetInRange ||
-                isDefensivePowerAndIsInDanger ||
-                isEscapePowerAndIsInDanger ||
-                isHealPowerAndIsTeammateHealthLow
-              ) {
-                hasUsedOnePower = true;
-                _data[i].abilities[j].accTime = accTime;
-                a.activateActive(
-                  i,
-                  data,
-                  setTeleportData,
-                  enemyData,
-                  setTileStatuses,
-                  scale
-                );
-              }
-            }
-          });
         }
         if (
           _data[i].charLocation &&
@@ -1209,22 +1213,16 @@ export const movePlayerPieces = (
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
             _data[i].isTeleported = !_data[i].isTeleported;
-            const _path = findPath(
-              _data[i].tile,
-              getSafeTile(enemyData, tileStatuses, scale),
-              scale,
-              isTutorial
-            );
-            const tile = _path[_path.length - 1];
-            const location = getCharXAndY({ ...tile, scale });
-            _data[i].tile = tile || _data[i].tile;
-            _data[i].charLocation = tile ? location : _data[i].charLocation;
-            _data[i].moveToLocation = tile ? location : _data[i].moveToLocation;
-            _data[i].moveFromLocation = tile
-              ? location
-              : _data[i].moveFromLocation;
-            _data[i].moveToTiles = [];
-            _data[i].isThere = false;
+            const teleportTile = getSafeTile(enemyData, tileStatuses, scale);//_path[_path.length - 1];
+            if (teleportTile) {
+              const teleportLocation = getCharXAndY({ ...teleportTile, scale });
+              _data[i].tile = teleportTile
+              _data[i].charLocation = teleportLocation;
+              _data[i].moveToLocation = teleportLocation;
+              _data[i].moveFromLocation = teleportLocation;
+              _data[i].moveToTiles = [];
+              _data[i].isThere = false;
+            }
           } else {
             const { newLocation, hasArrived } = moveTo({
               currentLocation: _data[i].charLocation,
@@ -1355,7 +1353,7 @@ export const moveKaijuPieces = ({
                 targetTile &&
                 findPath(_data[i].tile, targetTile, scale, isTutorial).length;
               const isOffensivePowerAndTargetInRange =
-                a.type === "offensive" &&
+                a.type.includes("offensive") &&
                 numTilesFromTarget &&
                 a.range >= numTilesFromTarget;
               if (isOffensivePowerAndTargetInRange) {
@@ -1661,7 +1659,7 @@ const getSafeTile = (kaijuData, tileStatuses, scale) => {
           index: getRandomTileOnBoard(scale)
         }
       );
-      if (safeTileObj.distance < testSafeTileObj.distance)
+      if (testSafeTileObj.distance > safeTileObj.distance)
         safeTileObj = testSafeTileObj;
     });
   return safeTileObj.index;
@@ -1708,7 +1706,7 @@ export const getAdjacentTilesTutorial = tile => {
     })
     .filter(t => isTileOnGameBoardTutorial(t));
 };
-export const findPath = (start, goal, scale, isTutorial) => {
+export const findPath = (start, goal, scale, isTutorial, enemyTiles = undefined) => { // enemyTiles <- only used for the teammate pathing
   let count = 0;
   return recur(start, [], count).reduce((acc, tile) => {
     if (!!tile && !acc.lookup[`${tile.i} ${tile.j}`]) {
@@ -1721,10 +1719,28 @@ export const findPath = (start, goal, scale, isTutorial) => {
   function recur(currTile, arr, count) {
     if ((currTile.i === goal.i && currTile.j === goal.j) || count > 400)
       return arr;
+
     // produce all possible adjacent tile indices to currTile
-    const adjacentTiles = isTutorial
+    let adjacentTiles = isTutorial
       ? getAdjacentTilesTutorial(currTile)
       : getAdjacentTiles(currTile);
+
+    if (!!enemyTiles) {
+      const tilesWithEnemyTilesRemoved = adjacentTiles.filter(t => {
+        // filter-out adjacent tiles that have Kaiju on them
+        if(enemyTiles.some(e => e.i === t.i && e.j === t.j)) return false;
+
+        // filter-out adjacent tiles that have adjacent tiles with Kaiju on them
+        const adjAdjTiles = isTutorial ? getAdjacentTilesTutorial(t).flat() : getAdjacentTiles(t).flat();
+        return adjAdjTiles.every(at => !enemyTiles.some(e => e.i === at.i && e.j === at.j));
+      });
+
+      // do not allow teammate to run through enemies (if possible...)
+      if (!!tilesWithEnemyTilesRemoved.length) {
+        adjacentTiles = tilesWithEnemyTilesRemoved;
+      }
+    }
+
     // get all charXAndY for each confirmed adjacent tile
     const goalXY = getCharXAndY({ ...goal, scale });
     const test = getCharXAndY({ ...adjacentTiles[0], scale });

@@ -1513,7 +1513,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "Frozen Joints",
     activeName: "Ice Slice",
     range: 3,
-    type: "offensive",
+    type: ["offensive", "defensive"],
     activatePassive: baseStats => {
       return { ...baseStats, moveSpeed: baseStats.moveSpeed - 1 };
     },
@@ -1549,7 +1549,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "Fuel to Burn",
     activeName: "Wildfire",
     range: 10,
-    type: "offensive",
+    type: ["offensive"],
     activatePassive: baseStats => {
       return {
         ...baseStats,
@@ -1582,13 +1582,13 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1000,
-    cooldownTimeAI: 2000,
+    cooldownTimeAI: 2500,
     color: "tomato"
   },
   wood: {
     passiveName: "Crunchy Granola",
     activeName: "Overgrowth",
-    type: "offensive",
+    type: ["offensive"],
     activatePassive: baseStats => {
       return {
         ...baseStats,
@@ -1621,14 +1621,14 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    cooldownTimeAI: 4000,
+    cooldownTimeAI: 3000,
 
     color: "Chartreuse"
   },
   lightning: {
     passiveName: "Charged Step",
     activeName: "Discharge",
-    type: "offensive",
+    type: ["offensive"],
     activatePassive: baseStats => {
       return {
         ...baseStats,
@@ -1661,7 +1661,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1500,
-    cooldownTimeAI: 3000,
+    cooldownTimeAI: 4000,
 
     color: "cyan"
   },
@@ -1669,7 +1669,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "One Foot in the Grave",
     activeName: "Haunt",
     range: 10,
-    type: "offensive",
+    type: ["offensive"],
     activatePassive: baseStats => {
       return {
         ...baseStats,
@@ -1701,14 +1701,14 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 8000,
-    cooldownTimeAI: 9000,
+    cooldownTimeAI: 7000,
 
     color: "GhostWhite"
   },
   bubble: {
     passiveName: "So Many Bubbles",
     activeName: "Dispel",
-    type: "defensive",
+    type: ["defensive"],
     activatePassive: baseStats => {
       return {
         ...baseStats,
@@ -1742,14 +1742,13 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1000,
-    cooldownTimeAI: 2000,
-
+    cooldownTimeAI: 1500,
     color: "Thistle"
   },
   metal: {
     passiveName: "Builder",
     activeName: "Aegis",
-    type: "defensive",
+    type: ["defensive"],
     activatePassive: baseStats => {
       return {
         ...baseStats,
@@ -1785,15 +1784,15 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    cooldownTimeAI: 4500,
+    cooldownTimeAI: 4000,
 
     color: "AntiqueWhite"
   },
   glass: {
     passiveName: "Teleport Sickness",
     activeName: "Escape",
-    range: 30,
-    type: "escape",
+    range: 2,
+    type: ["escape"],
     activatePassive: baseStats => {
       return {
         ...baseStats,
@@ -1826,7 +1825,7 @@ export const PLAYER_ABILITIES = {
   heart: {
     passiveName: "Good Vibes",
     activeName: "Heal",
-    type: "heal",
+    type: ["heal"],
     activatePassive: baseStats => baseStats,
     activateActive: (
       k,
@@ -1853,15 +1852,15 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 10000,
-    cooldownTime: 10000,
+    cooldownTimeAI: 20000,
+    cooldownTime: 20000,
     color: "pink"
   },
   kaijuFire: {
     passiveName: "",
     activeName: "",
     range: 30,
-    type: "offensive",
+    type: ["offensive"],
     activateActive: (
       k,
       data,
