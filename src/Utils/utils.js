@@ -116,7 +116,6 @@ export const initializeTutorialGameBoard = ({
     const location = getCharXAndY({ ...playerSpawnPositions[k], scale });
     const _player = {
       key: Math.random(),
-      isInManaPool: false,
       isHealed: false,
       isTeleported: false,
       color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "salmon" : "#55AAff",
@@ -249,7 +248,6 @@ export const initializeGameBoard = ({
     const location = getCharXAndY({ i, j, scale });
     const baseStats = {
       key: Math.random(),
-      isInManaPool: false,
       isHealed: false,
       isTeleported: false,
       color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "salmon" : "#55AAff",
@@ -468,6 +466,14 @@ export const redrawTiles = ({
         const key = `${i} ${j}`;
         if (PENINSULA_TILE_LOOKUP[key] || isTutorial) {
           const tileLocation = getTileXAndY({ i, j, scale });
+          const playerOnTile = playerData.find(
+            ({ tile, lives }) =>
+              !!lives && !!tile && tile.i === i && tile.j === j
+          )
+          const playerGender = !!playerOnTile ? playerOnTile.gender : undefined;
+          const isKaiju = kaijuData
+            .filter(k => k.isOnTiles && k.lives)
+            .find(({ tile }) => tile && tile.i === i && tile.j === j);
           _tiles.push(
             <HexagonTile
               key={key}
@@ -484,17 +490,8 @@ export const redrawTiles = ({
               )}
               status={{
                 ...tileStatuses[i][j],
-                playerGender:
-                  playerData.find(
-                    ({ tile, lives }) =>
-                      tile && lives && tile.i === i && tile.j === j
-                  ) &&
-                  playerData.find(
-                    ({ tile }) => tile && tile.i === i && tile.j === j
-                  ).gender,
-                isKaiju: kaijuData
-                  .filter(k => k.isOnTiles && k.lives)
-                  .find(({ tile }) => tile && tile.i === i && tile.j === j)
+                playerGender,
+                isKaiju
               }}
             />
           );
@@ -528,26 +525,16 @@ export const updateTileState = (
             let tileStatus = solveForStatus(_statuses[i][j]);
             const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
             if (entry) {
-              const entityOnTileStatus =
-                playerData.find(
-                  ({ tile }) => tile && tile.i === i && tile.j === j
-                ) ||
-                kaijuData.find(
+              const playerOnTile = playerData.find(
+                ({ tile }) => tile && tile.i === i && tile.j === j
+              );
+              const kaijuOnTile = kaijuData
+                .filter(({ isOnTiles, lives }) => isOnTiles && lives)
+                .find(
                   ({ tile }) => tile && tile.i === i && tile.j === j
                 );
-              const playerKaijuConflictKey =
-                playerData.find(
-                  ({ tile }) => tile && tile.i === i && tile.j === j
-                ) &&
-                kaijuData
-                  .filter(k => k.isOnTiles)
-                  .find(
-                    ({ tile, lives }) =>
-                      tile && tile.i === i && tile.j === j && lives
-                  ) &&
-                playerData.find(
-                  ({ tile }) => tile && tile.i === i && tile.j === j
-                ).key;
+              const entityOnTileStatus = playerOnTile || kaijuOnTile;
+              const playerKaijuConflictKey = playerOnTile && kaijuOnTile ? playerOnTile.key : undefined;
               const [k, data] = entry;
               const {
                 dirs,
@@ -555,7 +542,6 @@ export const updateTileState = (
                 targetIndex,
                 isKaiju,
                 startCount,
-                isInManaPool,
                 playerIndex
               } = data;
               const healthTiles = ["isHealing"];
@@ -590,23 +576,23 @@ export const updateTileState = (
                         const newDir =
                           tileDirMapping[count % tileDirMapping.length];
                         direction = [newDir];
-                      } else if (
-                        k === "isElectrified" &&
-                        isInManaPool &&
-                        count === startCount - 3
-                      ) {
-                        const [_, newDirs] = getAdjacentTilesFromTile(
-                          { i, j },
-                          nextTile,
-                          scale,
-                          3
-                        );
-                        direction = newDirs;
-                      } else if (
+                      }
+                      // else if (
+                      //   k === "isElectrified" &&
+                      //   count === startCount - 3
+                      // ) {
+                      //   const [_, newDirs] = getAdjacentTilesFromTile(
+                      //     { i, j },
+                      //     nextTile,
+                      //     scale,
+                      //     3
+                      //   );
+                      //   direction = newDirs;
+                      // } 
+                      else if (
                         k === "isOnKaijuFire" ||
                         k === "isOnFire" ||
                         (k === "isBubble" && count === startCount) ||
-                        (k === "isBubble" && isInManaPool) ||
                         k === "isShielded"
                       ) {
                         direction = dirs;
@@ -650,7 +636,6 @@ export const updateTileState = (
                             : count - 1,
                         targetIndex,
                         startCount,
-                        isInManaPool,
                         isKaiju,
                         playerIndex
                       };
@@ -691,7 +676,6 @@ export const updateTileState = (
                           count: count > 8 ? 8 : count - 1,
                           targetIndex,
                           startCount,
-                          isInManaPool,
                           isKaiju,
                           playerIndex
                         };
@@ -815,7 +799,7 @@ export const shootPower = ({
       const originTile = d.tile;
       const [targetTile, targetIndex] =
         statusKey === "isHealing"
-          ? data.length < 2 || !data[1].lives || data[0].lives < data[1].lives
+          ? data.length < 2 || !data[1].lives || data[0].lives <= data[1].lives
             ? [data[0].tile, 0]
             : [data[1].tile, 1]
           : getClosestEntityFromTile(targetData, originTile, scale);
@@ -849,7 +833,6 @@ export const shootPower = ({
                 targetIndex,
                 isKaiju: d.isKaiju || statusKey === "isHealing",
                 startCount: count,
-                isInManaPool: d.isInManaPool,
                 playerIndex: d.isKaiju ? undefined : dataIndex
               }
             };
@@ -1076,7 +1059,8 @@ export const movePlayerPieces = (
   teleportData,
   setTeleportData,
   isTutorial,
-  winner
+  winner,
+  teammatePowersRaceConditionFix
 ) =>
   setData(_data => {
     const enemiesOnTiles = enemyData.filter(({ isOnTiles }) => !!isOnTiles);
@@ -1116,12 +1100,12 @@ export const movePlayerPieces = (
               targetTile &&
               findPath(_data[1].tile, targetTile, scale, isTutorial);
             const isEnemyTooFar = moveToEnemyTilePath.length > powerRangeAvg + 5;
-            const isEnemyTooClose = moveToEnemyTilePath.length <= powerRangeAvg - 2;
+            const isEnemyTooClose = moveToEnemyTilePath.length <= powerRangeAvg;
             if (isEnemyTooFar) {
               const idealTileDistanceFromEnemyWithGivenTeammatePowers = moveToEnemyTilePath.length - powerRangeAvg;
               const moveToEnemy = idealTileDistanceFromEnemyWithGivenTeammatePowers > 0 ? moveToEnemyTilePath.slice(0, idealTileDistanceFromEnemyWithGivenTeammatePowers) : moveToEnemyTilePath;
               _data[1].moveToTiles = moveToEnemy;
-            } else if (isEnemyTooClose){// && isTimeToRecalculateSafePath) {
+            } else if (isEnemyTooClose) {
               _data[1].lastAccTimeForFindPath = accTime;
               const safeTile = getSafeTile(enemiesOnTiles, tileStatuses, scale);
               const toSafeTilePath = findPath(
@@ -1137,18 +1121,27 @@ export const movePlayerPieces = (
             }
 
             // use powers
-            let hasUsedOnePower = _data[i].abilities.every(a => (accTime - a.accTime) < 500);
+            let hasUsedOnePower = Object.values(teammatePowersRaceConditionFix.current).some(v => (accTime - v.accTime) < 500);
+            console.log({ hasUsedOnePower, accTime, teammatePowersRaceConditionFix })
             !hasUsedOnePower && _data[i].abilities.forEach((a, j) => {
+
+              /*
+                BUG: sometimes negative diff now...
+                     consider resetting ability accTime
+                     if larger than accTime as hacky fix (for the moment).
+              */ 
               const diff = accTime - a.accTime;
-              const isCooldownOver = !a.accTime || (diff > a.cooldownTimeAI);
+              const isCooldownOver = diff > a.cooldownTimeAI;
+
+              console.log({ accTime, a, diff, isCooldownOver, hasUsedOnePower });
+
               if (isCooldownOver && !hasUsedOnePower) {
+
                 const numTilesFromTarget = moveToEnemyTilePath.length;
-                const adj_tiles = isTutorial
-                  ? getAdjacentTilesTutorial(_data[i].tile)
-                  : getAdjacentTiles(_data[i].tile);
-                const surroundingTiles = [_data[i].tile, ...adj_tiles.map(at => isTutorial
-                  ? getAdjacentTilesTutorial(at).flat()
-                  : getAdjacentTiles(at).flat())];
+                const surroundingTiles = isTutorial
+                  ? getAdjacentAdjacentTilesTutorial(_data[i].tile)
+                  : getAdjacentAdjacentTiles(_data[i].tile);
+
                 const isInDanger =
                   !!tileStatuses &&
                   !!surroundingTiles &&
@@ -1159,6 +1152,7 @@ export const movePlayerPieces = (
                       !!tileStatuses[t.i][t.j] &&
                       !!tileStatuses[t.i][t.j]["isOnKaijuFire"]
                   );
+
                 const isOffensivePowerAndTargetInRange =
                   a.type.includes("offensive") &&
                   numTilesFromTarget &&
@@ -1166,17 +1160,35 @@ export const movePlayerPieces = (
                 const isDefensivePowerAndIsInDanger =
                   a.type.includes("defensive") && isInDanger;
                 const isEscapePowerAndIsInDanger =
-                  a.type.includes("escape") && numTilesFromTarget <= 2;
+                  a.type.includes("escape") &&
+                  a.range > numTilesFromTarget;
                 const isHealPowerAndIsTeammateHealthLow =
                   a.type.includes("heal") &&
                   ((!!data[0].lives && data[0].lives < 4) ||
                     (!!data[1].lives && data[1].lives < 4));
+
+                // BUG: powers not triggering due to large a.accTime causing negative diff...
+                console.log({
+                  accTime,
+                  a,
+                  bool: isOffensivePowerAndTargetInRange ||
+                    isDefensivePowerAndIsInDanger ||
+                    isEscapePowerAndIsInDanger ||
+                    isHealPowerAndIsTeammateHealthLow,
+                  isOffensivePowerAndTargetInRange,
+                  isDefensivePowerAndIsInDanger,
+                  isEscapePowerAndIsInDanger,
+                  isHealPowerAndIsTeammateHealthLow
+                });
+
                 if (
                   isOffensivePowerAndTargetInRange ||
                   isDefensivePowerAndIsInDanger ||
                   isEscapePowerAndIsInDanger ||
                   isHealPowerAndIsTeammateHealthLow
                 ) {
+                  console.log({ accTime, a });
+                  teammatePowersRaceConditionFix.current[a.element] = { shotPower: false, accTime };
                   hasUsedOnePower = true;
                   _data[i].abilities[j].accTime = accTime;
                   a.activateActive(
@@ -1185,7 +1197,8 @@ export const movePlayerPieces = (
                     setTeleportData,
                     enemiesOnTiles,
                     setTileStatuses,
-                    scale
+                    scale,
+                    teammatePowersRaceConditionFix
                   );
                 }
               }
@@ -1202,6 +1215,7 @@ export const movePlayerPieces = (
                 : [];
           }
         }
+
         if (
           _data[i].charLocation &&
           _data[i].moveFromLocation &&
@@ -1678,6 +1692,35 @@ export const getAdjacentTiles = tile => {
     })
     .filter(t => PENINSULA_TILE_LOOKUP[`${t.i} ${t.j}`]);
 };
+export const getAdjacentAdjacentTiles = tile => {
+  return [
+    // ADJACENT TILES
+    { i: 0, j: -1 },
+    { i: 1, j: tile.i % 2 ? 0 : -1 },
+    { i: 1, j: tile.i % 2 ? 1 : 0 },
+    { i: 0, j: 1 },
+    { i: -1, j: tile.i % 2 ? 1 : 0 },
+    { i: -1, j: tile.i % 2 ? 0 : -1 },
+
+    // TILES THAT ARE TWO ADJACENT
+    { i: 0, j: 2 }, // up two
+    { i: 0, j: -2 }, // down two
+    { i: -2, j: -1 }, // up left two
+    { i: 2, j: -1 }, // up right two
+    { i: -2, j: 1 }, // down left two
+    { i: 2, j: 1 }, // down right two
+    { i: -1, j: tile.i % 2 ? -1 : -2 }, // top left two
+    { i: 1, j: tile.i % 2 ? -1 : -2 }, // top right two
+    { i: -2, j: 0 }, // left two
+    { i: 2, j: 0 }, // right two
+    { i: -1, j: tile.i % 2 ? 2 : 1 }, // bottom left two
+    { i: 1, j: tile.i % 2 ? 2 : 1 }, // bottom right two
+  ]
+    .map(t => {
+      return { i: t.i + tile.i, j: t.j + tile.j };
+    })
+    .filter(t => PENINSULA_TILE_LOOKUP[`${t.i} ${t.j}`]);
+};
 export const areTilesAdjacent = (tile1, tile2) => {
   return [
     { i: 0, j: -1 },
@@ -1706,6 +1749,36 @@ export const getAdjacentTilesTutorial = tile => {
     })
     .filter(t => isTileOnGameBoardTutorial(t));
 };
+export const getAdjacentAdjacentTilesTutorial = tile => {
+  return [
+    // ADJACENT TILES
+    { i: 0, j: -1 },
+    { i: 1, j: tile.i % 2 ? 0 : -1 },
+    { i: 1, j: tile.i % 2 ? 1 : 0 },
+    { i: 0, j: 1 },
+    { i: -1, j: tile.i % 2 ? 1 : 0 },
+    { i: -1, j: tile.i % 2 ? 0 : -1 },
+
+    // TILES THAT ARE TWO ADJACENT
+    { i: 0, j: 2 }, // up two
+    { i: 0, j: -2 }, // down two
+    { i: -2, j: -1 }, // up left two
+    { i: 2, j: -1 }, // up right two
+    { i: -2, j: 1 }, // down left two
+    { i: 2, j: 1 }, // down right two
+    { i: -1, j: tile.i % 2 ? -1 : -2 }, // top left two
+    { i: 1, j: tile.i % 2 ? -1 : -2 }, // top right two
+    { i: -2, j: 0 }, // left two
+    { i: 2, j: 0 }, // right two
+    { i: -1, j: tile.i % 2 ? 2 : 1 }, // bottom left two
+    { i: 1, j: tile.i % 2 ? 2 : 1 }, // bottom right two
+  ]
+    .map(t => {
+      return { i: t.i + tile.i, j: t.j + tile.j };
+    })
+    .filter(t => isTileOnGameBoardTutorial(t));
+};
+
 export const findPath = (start, goal, scale, isTutorial, enemyTiles = undefined) => { // enemyTiles <- only used for the teammate pathing
   let count = 0;
   return recur(start, [], count).reduce((acc, tile) => {
@@ -1728,9 +1801,9 @@ export const findPath = (start, goal, scale, isTutorial, enemyTiles = undefined)
     if (!!enemyTiles) {
       const tilesWithEnemyTilesRemoved = adjacentTiles.filter(t => {
         // filter-out adjacent tiles that have Kaiju on them
-        if(enemyTiles.some(e => e.i === t.i && e.j === t.j)) return false;
+        if (enemyTiles.some(e => e.i === t.i && e.j === t.j)) return false;
 
-        // filter-out adjacent tiles that have adjacent tiles with Kaiju on them
+        // // filter-out adjacent tiles that have adjacent tiles with Kaiju on them
         const adjAdjTiles = isTutorial ? getAdjacentTilesTutorial(t).flat() : getAdjacentTiles(t).flat();
         return adjAdjTiles.every(at => !enemyTiles.some(e => e.i === at.i && e.j === at.j));
       });

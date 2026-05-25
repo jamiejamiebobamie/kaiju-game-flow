@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useHover, useKeyPress } from "../../../../Utils/utils";
+import { useKeyPress } from "../../../../Utils/utils";
 
 const ICON_LOOKUP = {
   heart: {
@@ -185,7 +185,8 @@ export const Ability = ({
         setTeleportData,
         kaijuData,
         setTileStatuses,
-        scale
+        scale,
+        { current: { [element]: { shotPower: false } } }
       );
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);

@@ -65,6 +65,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const height = HEIGHT * percentZoom;
 
   const accTime = useRef(0);
+  const teammatePowersRaceConditionFix = useRef({}); // teammate is shooting powers twice due to React update logic (updating with "setTileStatuses" in shootPower)
   const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
@@ -222,6 +223,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       if (!!playerData.length && !!playerData[0] && !playerData[0].lives) {
         setIsPlayerDead(true);
         setKeysPressed([]);
+        setHighlightedTiles0([]);
       }
     }
   }, [kaijuKillCount, playerKillCount, MAX_TO_WIN]);
@@ -330,7 +332,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       teleportData,
       setTeleportData,
       false,
-      winner
+      winner,
+      teammatePowersRaceConditionFix
     );
     // move monsters
     moveKaijuPieces({

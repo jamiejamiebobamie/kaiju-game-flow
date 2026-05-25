@@ -1523,9 +1523,14 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-    ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["ice"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["ice"].shotPower = true;
+
+      return !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1534,7 +1539,8 @@ export const PLAYER_ABILITIES = {
         statusKey: "isCold",
         numTiles: 6,
         setTileStatuses
-      }),
+      })
+    },
     displayLookup: "abilityIce",
     elementUppercase: "Ice",
     element: "ice",
@@ -1563,9 +1569,14 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-  ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["fire"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["fire"].shotPower = true;
+
+      !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1574,7 +1585,8 @@ export const PLAYER_ABILITIES = {
         statusKey: "isOnFire",
         numTiles: 3,
         setTileStatuses
-      }),
+      })
+    },
     displayLookup: "abilityFire",
     elementUppercase: "Fire",
     element: "fire",
@@ -1601,9 +1613,13 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-    ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["wood"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["wood"].shotPower = true;
+      !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1612,7 +1628,8 @@ export const PLAYER_ABILITIES = {
         statusKey: "isWooded",
         numTiles: 3,
         setTileStatuses
-      }),
+      })
+    },
     range: 10,
     displayLookup: "abilityWood",
     elementUppercase: "Wood",
@@ -1641,9 +1658,13 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-    ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["lightning"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["lightning"].shotPower = true;
+      !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1652,7 +1673,8 @@ export const PLAYER_ABILITIES = {
         statusKey: "isElectrified",
         numTiles: 3,
         setTileStatuses
-      }),
+      })
+    },
     range: 10,
     displayLookup: "abilityLightning",
     elementUppercase: "Lightning",
@@ -1682,9 +1704,13 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-    ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["death"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["death"].shotPower = true;
+      !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1693,7 +1719,8 @@ export const PLAYER_ABILITIES = {
         statusKey: "isGhosted",
         numTiles: 1,
         setTileStatuses
-      }),
+      })
+    },
     displayLookup: "abilityDeath",
     elementUppercase: "Death",
     element: "death",
@@ -1722,9 +1749,13 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-    ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["bubble"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["bubble"].shotPower = true;
+      !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1733,7 +1764,8 @@ export const PLAYER_ABILITIES = {
         statusKey: "isBubble",
         numTiles: 6,
         setTileStatuses
-      }),
+      })
+    },
     range: 4,
     displayLookup: "abilityBubble",
     elementUppercase: "Bubble",
@@ -1764,9 +1796,13 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-    ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["metal"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["metal"].shotPower = true;
+      !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1775,8 +1811,9 @@ export const PLAYER_ABILITIES = {
         statusKey: "isShielded",
         numTiles: 6,
         setTileStatuses
-      }),
-    range: 2,
+      })
+    },
+    range: 4,
     displayLookup: "abilityMetal",
     elementUppercase: "Metal",
     element: "metal",
@@ -1791,7 +1828,7 @@ export const PLAYER_ABILITIES = {
   glass: {
     passiveName: "Teleport Sickness",
     activeName: "Escape",
-    range: 2,
+    range: 5,
     type: ["escape"],
     activatePassive: baseStats => {
       return {
@@ -1819,7 +1856,6 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     cooldownTime: 12000,
     cooldownTimeAI: 8000,
-
     color: "BlueViolet"
   },
   heart: {
@@ -1833,9 +1869,13 @@ export const PLAYER_ABILITIES = {
       setTeleportData,
       targetData,
       setTileStatuses,
-      scale
-    ) =>
-      shootPower({
+      scale,
+      teammatePowersRaceConditionFix
+    ) => {
+      // this works and is required for the teammate. TO-DO: add for all powers.
+      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["heart"].shotPower : true;
+      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["heart"].shotPower = true;
+      !isShotPower && shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1844,7 +1884,8 @@ export const PLAYER_ABILITIES = {
         statusKey: "isHealing",
         numTiles: 1,
         setTileStatuses
-      }),
+      })
+    },
     range: 10,
     displayLookup: "abilityHeart",
     elementUppercase: "Heart",
@@ -1868,7 +1909,7 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-    ) => {
+    ) => {  // are the Kaiju shooting fire twice?
       shootPower({
         data,
         dataIndex: k,
@@ -2330,8 +2371,8 @@ export const PLAYER_CLASSES = [
 ];
 
 export const TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES = [
- // bottom-left:
- {
+  // bottom-left:
+  {
     "i": 0,
     "j": 9
   },
@@ -2349,5 +2390,5 @@ export const TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES = [
   {
     "i": 23,
     "j": 9
-  }  
+  }
 ]
