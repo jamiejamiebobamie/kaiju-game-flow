@@ -64,6 +64,7 @@ export const PlayerUI = ({
   playerData = [
     {
       lives: 0,
+      livesModifier: 0,
       playerClass: "",
       moveSpeed: "",
       modifiers: "",
@@ -73,6 +74,7 @@ export const PlayerUI = ({
     },
     {
       lives: 0,
+      livesModifier: 0,
       playerClass: "",
       moveSpeed: "",
       modifiers: "",
@@ -81,9 +83,9 @@ export const PlayerUI = ({
       gender: "girl"
     }
   ],
+  setPlayerData,
   kaijuData = [],
   setDisplayString,
-  setPlayerData,
   setTeleportData,
   setTileStatuses,
   playerIndex,
@@ -91,17 +93,20 @@ export const PlayerUI = ({
   isTeammate,
   scale,
   percentZoom,
-  isPaused
+  isPaused,
+  accTime
 }) => {
   const { gender } = playerData[playerIndex];
   const isReversed = isTeammate;
 
   const _playerUI = (
     <Wrapper percentZoom={percentZoom} isTeammate={isTeammate}>
+      {playerData && playerData[0] && playerData[0].moveSpeedModifier}
       {isReversed ? (
         <>
           <Abilities
             playerData={playerData}
+            setPlayerData={setPlayerData}
             kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
@@ -111,12 +116,13 @@ export const PlayerUI = ({
             setDisplayString={setDisplayString}
             isReversed={isReversed}
             playerIndex={playerIndex}
-            setPlayerData={setPlayerData}
             setTeleportData={setTeleportData}
             isPaused={isPaused}
+            accTime={accTime}
           />
           <HealthBar
-            health={(playerData.length && playerData[playerIndex].lives) || 0}
+            health={playerData.length && (playerData[playerIndex].lives || 0)}
+            healthModifier={playerData.length && playerData[playerIndex].livesModifier || 0}
             setDisplayString={setDisplayString}
             isTeammate={isTeammate}
           />
@@ -124,12 +130,14 @@ export const PlayerUI = ({
       ) : (
         <>
           <HealthBar
-            health={(playerData.length && playerData[playerIndex].lives) || 0}
+            health={playerData.length && (playerData[playerIndex].lives || 0)}
+            healthModifier={playerData.length && playerData[playerIndex].livesModifier || 0}
             setDisplayString={setDisplayString}
           />
           <Abilities
             isLarge={true}
             playerData={playerData}
+            setPlayerData={setPlayerData}
             kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
@@ -138,9 +146,9 @@ export const PlayerUI = ({
             }
             setDisplayString={setDisplayString}
             playerIndex={playerIndex}
-            setPlayerData={setPlayerData}
             setTeleportData={setTeleportData}
             isPaused={isPaused}
+            accTime={accTime}
           />
         </>
       )}
@@ -153,8 +161,10 @@ export const PlayerUI = ({
         <PlayerPictureBackground isBlue={gender == "guy" ? true : false} />
       </PlayerBorder>
       <PassiveAbilities
+        accTime={accTime}
         setDisplayString={setDisplayString}
         isReversed={true}
+        isTeammate={isTeammate}
         abilities={
           (playerData &&
             playerData.length &&

@@ -40,12 +40,19 @@ const PassiveAbility = styled.div`
     ${props => (props.isReversed ? props.i * 18 - 90 : props.i * 18 - 30)}deg
   );
   pointer-events: auto;
+  ${props => props.isOnCooldown ? "filter: brightness(1);" : "filter: brightness(.2);"}
+
+  -webkit-transition-duration: 0.2s;
+  transition-duration: .2s;
+  transition-property: brightness;
 `;
 const PassiveIcon = styled.i`
   display: flex;
   align-self: center;
 `;
 export const PassiveAbilities = ({
+  accTime,
+  isTeammate,
   setDisplayString,
   isReversed,
   abilities = []
@@ -63,19 +70,37 @@ export const PassiveAbilities = ({
     metal: "fa fa-wrench",
     ice: "fa-thermometer-quarter"
   };
-  const abilityButtons = abilities.map((data, i) => (
-    <PassiveAbilityWrapper i={i}>
-      <PassiveAbility
-        // ref={setHoverRef(`${data.displayLookup}Passive`)}
-        key={i}
-        isReversed={isReversed}
-        i={i}
-        title={data.passiveName}
-        color={data.color}
-      >
-        <PassiveIcon className={`fa ${ICON_LOOKUP[data.element]}`} />
-      </PassiveAbility>
-    </PassiveAbilityWrapper>
-  ));
+
+  // let isOnCooldown = !isTeammate && abilities.some(a => a.accTime + a.cooldownTime > accTime);
+  // useEffect(() => {
+  //   if (!isTeammate) { // player-only
+  //     console.log({ abilities, isOnCooldown });
+  //   }
+  // }, [isOnCooldown]);
+
+    // accTime: 0,
+    // cooldownTimeAI: 20000,
+    // cooldownTime: 20000,
+
+
+  const abilityButtons = abilities.map((a, i) => {
+    const isOnCooldown = isTeammate ? (a.accTime + a.cooldownTimeAI) > accTime : (a.accTime + a.cooldownTime) > accTime;
+    return (
+      <PassiveAbilityWrapper i={i}>
+        <PassiveAbility
+          // ref={setHoverRef(`${data.displayLookup}Passive`)}
+          key={i}
+          isReversed={isReversed}
+          i={i}
+          title={a.passiveName}
+          color={a.color}
+          isOnCooldown={!!a.accTime && isOnCooldown} // ensure power has been cast once (a.accTime != 0) to highlight passive 
+          isTeammate={isTeammate}
+        >
+          <PassiveIcon className={`fa ${ICON_LOOKUP[a.element]}`} />
+        </PassiveAbility>
+      </PassiveAbilityWrapper>
+    )
+  });
   return <Wrapper isReversed={isReversed}>{abilityButtons}</Wrapper>;
 };

@@ -1,4 +1,4 @@
-import { shootPower } from "./utils";
+import { shootPower, modifyStats, updateTeammatePowersRaceConditionFixRef } from "./utils";
 export const PENINSULA_TILE_LOOKUP = {
   "14 26": { i: 14, j: 26 },
   "3 31": { i: 3, j: 31 },
@@ -1514,9 +1514,7 @@ export const PLAYER_ABILITIES = {
     activeName: "Ice Slice",
     range: 3,
     type: ["offensive", "defensive"],
-    activatePassive: baseStats => {
-      return { ...baseStats, moveSpeed: baseStats.moveSpeed - 1 };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -1),
     activateActive: (
       k,
       data,
@@ -1526,10 +1524,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["ice"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["ice"].shotPower = true;
-
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "ice");
       return !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -1548,7 +1543,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTimeAI: 3000,
-    cooldownTime: 2000,
+    cooldownTime: 4000,
     color: "PaleTurquoise"
   },
   fire: {
@@ -1556,13 +1551,7 @@ export const PLAYER_ABILITIES = {
     activeName: "Wildfire",
     range: 10,
     type: ["offensive"],
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        tileCountModifier:
-          baseStats.tileCountModifier > 1 ? baseStats.tileCountModifier : 1
-      };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 1),
     activateActive: (
       k,
       data,
@@ -1572,10 +1561,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["fire"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["fire"].shotPower = true;
-
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "fire");
       !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -1593,20 +1579,15 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 1000,
-    cooldownTimeAI: 2500,
+    cooldownTime: 2000,
+    cooldownTimeAI: 3500,
     color: "tomato"
   },
   wood: {
-    passiveName: "Crunchy Granola",
+    passiveName: "Healthy",
     activeName: "Overgrowth",
     type: ["offensive"],
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        lives: baseStats.lives + 1
-      };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', 1, 1),
     activateActive: (
       k,
       data,
@@ -1616,9 +1597,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["wood"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["wood"].shotPower = true;
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "wood");
       !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -1638,7 +1617,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    cooldownTimeAI: 3000,
+    cooldownTimeAI: 5000,
 
     color: "Chartreuse"
   },
@@ -1646,12 +1625,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "Charged Step",
     activeName: "Discharge",
     type: ["offensive"],
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        moveSpeed: baseStats.moveSpeed + 1
-      };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', 2),
     activateActive: (
       k,
       data,
@@ -1661,9 +1635,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["lightning"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["lightning"].shotPower = true;
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "lightning");
       !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -1682,8 +1654,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 1500,
-    cooldownTimeAI: 4000,
+    cooldownTime: 2500,
+    cooldownTimeAI: 5000,
 
     color: "cyan"
   },
@@ -1692,12 +1664,7 @@ export const PLAYER_ABILITIES = {
     activeName: "Haunt",
     range: 10,
     type: ["offensive"],
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        lives: baseStats.lives - 1
-      };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', -1, -1),
     activateActive: (
       k,
       data,
@@ -1707,9 +1674,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["death"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["death"].shotPower = true;
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "death");
       !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -1736,13 +1701,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "So Many Bubbles",
     activeName: "Dispel",
     type: ["defensive"],
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        numTilesModifier:
-          baseStats.numTilesModifier > 1 ? baseStats.numTilesModifier : 1
-      };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'numTilesModifier', 1),
     activateActive: (
       k,
       data,
@@ -1752,9 +1711,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["bubble"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["bubble"].shotPower = true;
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "bubble");
       !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -1773,23 +1730,15 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 1000,
-    cooldownTimeAI: 1500,
+    cooldownTime: 2000,
+    cooldownTimeAI: 2500,
     color: "Thistle"
   },
   metal: {
     passiveName: "Builder",
     activeName: "Aegis",
     type: ["defensive"],
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        numTilesModifier:
-          baseStats.numTilesModifier > 1 ? baseStats.numTilesModifier : 1,
-        tileCountModifier:
-          baseStats.tileCountModifier > 1 ? baseStats.tileCountModifier : 1
-      };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'numTilesModifier', 1),
     activateActive: (
       k,
       data,
@@ -1799,9 +1748,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["metal"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["metal"].shotPower = true;
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "metal");
       !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -1830,15 +1777,7 @@ export const PLAYER_ABILITIES = {
     activeName: "Escape",
     range: 5,
     type: ["escape"],
-    activatePassive: baseStats => {
-      return {
-        ...baseStats,
-        moveSpeed:
-          baseStats.moveSpeed - 2 <= 4
-            ? baseStats.moveSpeed
-            : baseStats.moveSpeed - 2
-      };
-    },
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -2),
     activateActive: (
       k,
       data,
@@ -1846,7 +1785,14 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-    ) => setTeleportData(_teleportData => [..._teleportData, k]),
+    ) => {
+      /*
+        NOT REQUIRED: 
+          const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "glass");
+        ("activateActive" does not call "setTileStatuses")
+      */
+      setTeleportData(_teleportData => [..._teleportData, k]);
+    },
     getPlayerIndex: k => k,
     displayLookup: "abilityGlass",
     elementUppercase: "Glass",
@@ -1854,15 +1800,15 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 12000,
-    cooldownTimeAI: 8000,
+    cooldownTime: 10000,
+    cooldownTimeAI: 11000,
     color: "BlueViolet"
   },
   heart: {
     passiveName: "Good Vibes",
     activeName: "Heal",
     type: ["heal"],
-    activatePassive: baseStats => baseStats,
+    togglePassive: playerStats => playerStats,
     activateActive: (
       k,
       data,
@@ -1872,9 +1818,7 @@ export const PLAYER_ABILITIES = {
       scale,
       teammatePowersRaceConditionFix
     ) => {
-      // this works and is required for the teammate. TO-DO: add for all powers.
-      const isShotPower = teammatePowersRaceConditionFix ? teammatePowersRaceConditionFix.current["heart"].shotPower : true;
-      if (teammatePowersRaceConditionFix) teammatePowersRaceConditionFix.current["heart"].shotPower = true;
+      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "heart");
       !isShotPower && shootPower({
         data,
         dataIndex: k,
@@ -2392,3 +2336,23 @@ export const TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES = [
     "j": 9
   }
 ]
+export const BASE_PLAYER_STATS = {
+  isHealed: false,
+  isTeleported: false,
+  color: "#55AAff",
+  gender: "guy",
+  dir: "idle",
+  isThere: true,
+  lives: 4,
+  moveSpeed: 6,
+  isOnTiles: true,
+  isKaiju: false,
+  lastDmg: 0,
+  livesModifier: 0,
+  numTilesModifier: 0,
+  tileCountModifier: 0,
+  moveSpeedModifier: 0,
+  playerClass: "",
+  playerClassDescription: "",
+  elements: ""
+};

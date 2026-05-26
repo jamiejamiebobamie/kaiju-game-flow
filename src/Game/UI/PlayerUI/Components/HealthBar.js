@@ -23,7 +23,7 @@ const Wrapper = styled.div`
 `;
 const Bar = styled.div`
   ${props =>
-    props.numHealth < 5
+    (props.health + props.healthModifier) < 5
       ? "min-width: 20%; width: 20%;"
       : "min-width: 15%; width: 15%;"};
   height: 15px;
@@ -35,14 +35,22 @@ const Bar = styled.div`
   margin: 5px;
 
   ${props =>
-    !!props.isTeammate && !!props.numHealth && "margin: 10px 5px 5px 5px;"}
+    !!props.isTeammate && !!props.health && "margin: 10px 5px 5px 5px;"}
 
+  ${props => props.healthModifier > 0 
+              && ((props.index + 1) > props.health) ?
+                'background: linear-gradient(45deg, #2bd24aff, #065d1cff);' 
+                : props.healthModifier < 0
+                    && ((props.health + props.healthModifier) < 0 || (props.index + 1) > props.health + props.healthModifier) ?
+                  `background: linear-gradient(45deg, #dfdfdfff, #c8c8c8ff);;  border-radius: 10px; border-style: solid; border-thickness: thin; border-color: #000;`
+              : ''}  
 `;
 export const HealthBar = ({
-  health = 1,
-  isTeammate = false
+  health = 0,
+  isTeammate = false,
+  healthModifier
 }) => {
-  const bars = Array(health).fill(0).map((_, i) => <Bar key={i} numHealth={health} isTeammate={isTeammate} />)
+  const bars = Array(healthModifier > 0 ? health + healthModifier : health).fill(0).map((_, i) => <Bar key={i} index={i} health={health} healthModifier={healthModifier} isTeammate={isTeammate} />)
   return (
     <BlinkFadeEffect>
       <Wrapper

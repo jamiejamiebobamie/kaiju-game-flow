@@ -38,6 +38,7 @@ export const Abilities = ({
   setDisplayString,
   isReversed,
   isPaused,
+  accTime,
   abilities = [
     {
       displayLookup: "abilityGlass",
@@ -86,6 +87,7 @@ export const Abilities = ({
   const abilityButtons = abilities.map((abilityData, i) => (
     <Ability
       key={i}
+      abilityIndex={i}
       playerData={playerData}
       setPlayerData={setPlayerData}
       setTeleportData={setTeleportData}
@@ -97,6 +99,7 @@ export const Abilities = ({
       keyNum={isReversed ? i + 4 : i + 1}
       playerIndex={playerIndex}
       isPaused={isPaused}
+      accTime={accTime}
     />
   ));
   return (

@@ -236,13 +236,13 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       }
     }
 
-    console.log({ keys, dirs, dir });
+    // console.log({ keys, dirs, dir });
     let tile;
     setPlayerData(data => {
-      console.log({ playerData: data })
+      // console.log({ playerData: data })
       if (Array.isArray(data) && !!data.length) {
         tile = data[0].tile;
-        console.log({ tile });
+        // console.log({ tile });
         if (!!tile) {
           if (dir == "right" || dir == "left") {
             /*
@@ -261,7 +261,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           const nextTile = { i: tile.i + desiredOffset.i, j: tile.j + desiredOffset.j };
           const isValid = isTileOnGameBoard(nextTile);
 
-          console.log({ desiredOffset, nextTile, isValid });
+          // console.log({ desiredOffset, nextTile, isValid });
           if (isValid) {
             const path = findPath(
               tile,
@@ -552,10 +552,10 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
             />
             <UI
               playerData={playerData}
+              setPlayerData={setPlayerData}
               kaijuKillCount={kaijuKillCount}
               kaijuKilledToWin={MAX_TO_WIN}
               kaijuData={kaijuData}
-              setPlayerData={setPlayerData}
               setTeleportData={setTeleportData}
               setTileStatuses={setTileStatuses}
               handleClickHome={handleClickHome}
@@ -566,6 +566,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               percentZoom={percentZoom}
               isTeammate={isTeammate}
               isPaused={isPaused}
+              accTime={accTime.current}
             />
           </GameWrapper>
         </Wrapper>);

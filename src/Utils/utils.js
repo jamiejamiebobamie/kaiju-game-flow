@@ -7,7 +7,8 @@ import {
   PERIMETER_TILES_VALS,
   DEATH_TILE_STATUSES,
   PLAYER_CLASSES,
-  TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES
+  TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES,
+  BASE_PLAYER_STATS
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 import { StyledIcon } from "Tutorial/Components/StyledComponents";
@@ -46,7 +47,7 @@ const getRandomAbilities = () => {
   return chosen.sort((a1, a2) => a1.localeCompare(a2));
 };
 
-export const setPassives = (pickedAbilities, setPlayerData) => {
+export const setAbilities = (pickedAbilities, setPlayerData) => {
   const classLookup =
     pickedAbilities.length === 3 &&
     pickedAbilities
@@ -64,12 +65,13 @@ export const setPassives = (pickedAbilities, setPlayerData) => {
   if (setPlayerData) {
     setPlayerData(_players => {
       return _players.map((p, i) => {
-        const newPlayer = {
-          ...p,
-          ...abilities.reduce((acc, ability) => ability.activatePassive(acc), p)
-        };
+        // const newPlayer = {
+        //   ...p,
+        //   ...abilities.reduce((acc, ability) => ability.activatePassive(acc), p)
+        // };
         return {
-          ...newPlayer,
+          ...p,
+          // ...newPlayer,
           abilities: i === 0 ? abilities : []
         };
       });
@@ -115,9 +117,8 @@ export const initializeTutorialGameBoard = ({
   for (let k = 0; k < playerSpawnPositions.length; k++) {
     const location = getCharXAndY({ ...playerSpawnPositions[k], scale });
     const _player = {
+      ...BASE_PLAYER_STATS,
       key: Math.random(),
-      isHealed: false,
-      isTeleported: false,
       color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "salmon" : "#55AAff",
       gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy",
       charLocation: location,
@@ -125,22 +126,9 @@ export const initializeTutorialGameBoard = ({
       moveToLocation: location,
       moveToTiles: [playerSpawnPositions[k]],
       tile: playerSpawnPositions[k],
-      dir: "idle",
       i: k,
-      isThere: true,
-      moveSpeed: 6,
-      lives: Number.MAX_SAFE_INTEGER,
-      isOnTiles: true,
-      isKaiju: false,
-      lastDmg: 0,
-      isInManaPoolAccTime: 0,
       abilities: abilities ? abilities : [],
-      abilityCooldowns: [],
-      numTilesModifier: 0,
-      tileCountModifier: 0,
-      playerClass: "",
-      playerClassDescription: "",
-      elements: ""
+      lives: Number.MAX_SAFE_INTEGER,
     };
     _players.push(_player);
   }
@@ -197,6 +185,7 @@ export const initializeTutorialGameBoard = ({
       isThere: true,
       lives: 3,
       moveSpeed: 2,
+      moveSpeedModifier: 0,
       lastDmg: 0,
       abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }],
       isKaiju: true,
@@ -235,7 +224,7 @@ export const initializeGameBoard = ({
   const teammateAbilities = getRandomAbilities();
   const numPlayers = isTeammate ? 2 : 1;
   for (let k = 0; k < numPlayers; k++) {
-    const classDetails = setPassives(
+    const classDetails = setAbilities(
       k === 0 ? pickedAbilities : teammateAbilities
     );
     const randomInt = getRandomIntInRange({
@@ -246,10 +235,9 @@ export const initializeGameBoard = ({
     tileIndices[tileIndices.length - k] = tileIndices[randomInt];
     tileIndices[randomInt] = storeItem;
     const location = getCharXAndY({ i, j, scale });
-    const baseStats = {
+    const player = {
+      ...BASE_PLAYER_STATS,
       key: Math.random(),
-      isHealed: false,
-      isTeleported: false,
       color: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "salmon" : "#55AAff",
       gender: selectedAvatar == 'girl' && k == 0 || selectedAvatar == 'guy' && k == 1 ? "girl" : "guy",
       charLocation: location,
@@ -257,28 +245,10 @@ export const initializeGameBoard = ({
       moveToLocation: location,
       moveToTiles: [],
       tile: { i, j },
-      dir: "idle",
       i: k,
-      isThere: true,
-      moveSpeed: 6,
-      lives: 4,
-      isOnTiles: true,
-      isKaiju: false,
-      lastDmg: 0,
-      isInManaPoolAccTime: 0,
-      abilityCooldowns: [],
-      numTilesModifier: 0,
-      tileCountModifier: 0,
       ...classDetails[k]
     };
-    const newPlayer = {
-      ...baseStats,
-      ...baseStats.abilities.reduce(
-        (acc, ability) => ability.activatePassive(acc),
-        baseStats
-      )
-    };
-    _players.push(newPlayer);
+    _players.push(player);
   }
   setPlayerData(_players);
   // PLAYERS    - - - - - - - - - -
@@ -372,6 +342,7 @@ export const spawnKaiju = (
       isOnTiles: false,
       dir,
       moveSpeed: KAIJU_MAX_SPEED,
+      moveSpeedModifier: 0,
       isGoingToSpewFire: false
     }
     : {
@@ -390,6 +361,7 @@ export const spawnKaiju = (
       isKaiju: true,
       isOnTiles: false,
       i: kaijuData.length,
+      moveSpeedModifier: 0,
       numTilesModifier: 0,
       tileCountModifier: 0,
       isHealed: false,
@@ -1065,7 +1037,7 @@ export const movePlayerPieces = (
   setData(_data => {
     const enemiesOnTiles = enemyData.filter(({ isOnTiles }) => !!isOnTiles);
     for (let i = 0; i < _data.length; i++) {
-      if (_data[i].lives) {
+      if (!!_data[i].lives) {
         // set logic for teammate
         if (i === 1) {
 
@@ -1122,18 +1094,18 @@ export const movePlayerPieces = (
 
             // use powers
             let hasUsedOnePower = Object.values(teammatePowersRaceConditionFix.current).some(v => (accTime - v.accTime) < 500);
-            console.log({ hasUsedOnePower, accTime, teammatePowersRaceConditionFix })
+            // console.log({ hasUsedOnePower, accTime, teammatePowersRaceConditionFix })
             !hasUsedOnePower && _data[i].abilities.forEach((a, j) => {
 
               /*
                 BUG: sometimes negative diff now...
                      consider resetting ability accTime
                      if larger than accTime as hacky fix (for the moment).
-              */ 
+              */
               const diff = accTime - a.accTime;
               const isCooldownOver = diff > a.cooldownTimeAI;
 
-              console.log({ accTime, a, diff, isCooldownOver, hasUsedOnePower });
+              // console.log({ accTime, a, diff, isCooldownOver, hasUsedOnePower });
 
               if (isCooldownOver && !hasUsedOnePower) {
 
@@ -1168,18 +1140,18 @@ export const movePlayerPieces = (
                     (!!data[1].lives && data[1].lives < 4));
 
                 // BUG: powers not triggering due to large a.accTime causing negative diff...
-                console.log({
-                  accTime,
-                  a,
-                  bool: isOffensivePowerAndTargetInRange ||
-                    isDefensivePowerAndIsInDanger ||
-                    isEscapePowerAndIsInDanger ||
-                    isHealPowerAndIsTeammateHealthLow,
-                  isOffensivePowerAndTargetInRange,
-                  isDefensivePowerAndIsInDanger,
-                  isEscapePowerAndIsInDanger,
-                  isHealPowerAndIsTeammateHealthLow
-                });
+                // console.log({
+                //   accTime,
+                //   a,
+                //   bool: isOffensivePowerAndTargetInRange ||
+                //     isDefensivePowerAndIsInDanger ||
+                //     isEscapePowerAndIsInDanger ||
+                //     isHealPowerAndIsTeammateHealthLow,
+                //   isOffensivePowerAndTargetInRange,
+                //   isDefensivePowerAndIsInDanger,
+                //   isEscapePowerAndIsInDanger,
+                //   isHealPowerAndIsTeammateHealthLow
+                // });
 
                 if (
                   isOffensivePowerAndTargetInRange ||
@@ -1187,10 +1159,13 @@ export const movePlayerPieces = (
                   isEscapePowerAndIsInDanger ||
                   isHealPowerAndIsTeammateHealthLow
                 ) {
-                  console.log({ accTime, a });
+                  // console.log({ accTime, a });
+
                   teammatePowersRaceConditionFix.current[a.element] = { shotPower: false, accTime };
                   hasUsedOnePower = true;
                   _data[i].abilities[j].accTime = accTime;
+
+                  // activate teammate active ability
                   a.activateActive(
                     i,
                     data,
@@ -1200,6 +1175,20 @@ export const movePlayerPieces = (
                     scale,
                     teammatePowersRaceConditionFix
                   );
+
+                  // toggle-on teammate passive ability
+                  if (!!_data[i]) {
+                    _data[i] = a.togglePassive(_data[i]);
+                  }
+
+                  // toggle-off teammate passive ability
+                  setTimeout(() => setData(d => {
+                    if (!!d[i]) {
+                      const toggleOff = true;
+                      d[i] = a.togglePassive(d[i], toggleOff);
+                    }
+                    return d;
+                  }), a.cooldownTimeAI);
                 }
               }
             });
@@ -1242,7 +1231,7 @@ export const movePlayerPieces = (
               currentLocation: _data[i].charLocation,
               moveFromLocation: _data[i].moveFromLocation,
               moveToLocation: _data[i].moveToLocation,
-              moveSpeed: _data[i].moveSpeed
+              moveSpeed: _data[i].moveSpeed + _data[i].moveSpeedModifier
             });
             _data[i].charLocation = newLocation;
             _data[i].isThere = hasArrived;
@@ -1300,17 +1289,35 @@ export const movePlayerPieces = (
         ) {
           _data[i].dir = "idle";
         }
+
+        let livesModifier = _data[i].livesModifier;
+        let killed = _data[i].lives < 1;
         dmgArray
           .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju) // what does this do...
           .forEach(dmg => {
-            if (_data[i].key === dmg.key && _data[i].lives) {
+            if (_data[i].key === dmg.key && !killed) {
               if (
                 accTime - _data[i].lastDmg > 1000 ||
                 accTime - _data[i].lastDmg < 0
               ) {
+
                 // can only get damaged once every 1 second.
                 // also accTime might reset to zero, so check for that.
                 _data[i].lastDmg = accTime;
+
+                if (livesModifier > 0 && dmg.lifeDecrement > 0) {
+                  // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
+                  const remainingDmg = dmg.lifeDecrement - livesModifier;
+                  dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
+                  livesModifier = remainingDmg < 0 ? 1 : 0; //remainingDmg * -1 : 0;
+                } 
+                // else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
+                //   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
+                //   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
+                //   dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
+                //   _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
+                // }
+
                 _data[i].lives =
                   dmg.lifeDecrement > 0 ||
                     _data[i].lives - dmg.lifeDecrement < 5
@@ -1319,7 +1326,10 @@ export const movePlayerPieces = (
                 if (dmg.lifeDecrement < 0)
                   _data[i].isHealed = !_data[i].isHealed;
               }
-              if (!_data[i].lives) setPlayerKillCount(count => count + 1);
+              if ((_data[i].lives + livesModifier) < 1) {
+                setPlayerKillCount(count => count + 1);
+                killed = true;
+              }
             }
           });
       }
@@ -1350,7 +1360,7 @@ export const moveKaijuPieces = ({
     let currKillCount = kaijuKillCount.length;
 
     for (let i = 0; i < _data.length; i++) {
-      if (_data[i].lives) {
+      if (!!_data[i].lives) {
         // use powers
         if (_data[i].isOnTiles && _data[i].abilities.length) {
           _data[i].abilities.forEach((a, j) => {
@@ -1443,7 +1453,7 @@ export const moveKaijuPieces = ({
             currentLocation: _data[i].charLocation,
             moveFromLocation: _data[i].moveFromLocation,
             moveToLocation: _data[i].moveToLocation,
-            moveSpeed: _data[i].moveSpeed
+            moveSpeed: _data[i].moveSpeed + _data[i].moveSpeedModifier
           });
           _data[i].charLocation = newLocation;
           _data[i].isThere = hasArrived;
@@ -1489,7 +1499,7 @@ export const moveKaijuPieces = ({
           .forEach(dmg => {
             if (
               _data[i].key === dmg.key &&
-              _data[i].lives &&
+              !!_data[i].lives &&
               _data[i].isOnTiles
             ) {
               if (
@@ -1499,9 +1509,24 @@ export const moveKaijuPieces = ({
                 // can only get damaged once every 1 second.
                 // also accTime might reset to zero, so check for that.
                 _data[i].lastDmg = accTime;
+
+
+                if (_data[i].livesModifier > 0 && dmg.lifeDecrement > 0) {
+                  // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
+                  const remainingDmg = dmg.lifeDecrement - _data[i].livesModifier;
+                  dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
+                  _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
+                } 
+                // else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
+                //   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
+                //   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
+                //   dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
+                //   _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
+                // }
+
                 _data[i].lives =
                   dmg.lifeDecrement > 0 ||
-                    _data[i].lives - dmg.lifeDecrement < 5
+                    (_data[i].lives - dmg.lifeDecrement) < 5 // cap max health at 4... negative "lifeDecrement" is a heal
                     ? _data[i].lives - dmg.lifeDecrement
                     : _data[i].lives;
                 if (dmg.lifeDecrement < 0)
@@ -2534,9 +2559,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
     case "abilityMetalPassive":
       return {
         title: "Builder",
-        description: "Your powers are larger, go farther, and lasts longer",
+        description: "Your powers are prolific",
         effect1: "+1 number of tiles modifier",
-        effect2: "+1 tile count modifier",
+        // effect2: "+1 tile count modifier",
         img: "",
         formatData: {},
         icon: "fa-wrench",
@@ -2601,7 +2626,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
     case "abilityFirePassive":
       return {
         title: "Fuel to Burn",
-        description: "All of your powers go farther and lasts longer",
+        description: "All of your powers go farther and last longer",
         effect1: "+1 tile count modifier",
         effect2: "",
         img: "",
@@ -2622,9 +2647,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityWoodPassive":
       return {
-        title: "Crunchy Granola",
+        title: "Healthy",
         description: "You're extra healthy",
-        effect1: "+1 to starting lives",
+        effect1: "+1 lives",
         effect2: "",
         img: "",
         formatData: {},
@@ -2670,7 +2695,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "One Foot in the Grave",
         description: "Communing with death has brought you closer to it...",
-        effect1: "-1 to starting health",
+        effect1: "-1 lives",
         effect2: "",
         img: "",
         formatData: {},
@@ -2762,3 +2787,24 @@ export const determineKaijuQuantity = difficulty => {
   }
   return { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED };
 }
+export const modifyStats = (playerStats, toggleOff, attr, modifier, max) => {
+  const mod = (toggleOff ? -1 : 1) * modifier;
+  const modification = !!max && Math.abs(playerStats[attr] + mod) > Math.abs(max) ? max : playerStats[attr] + mod;
+  const update = ({
+    ...playerStats,
+    [attr]: (toggleOff && !playerStats[attr]) ? 0 : modification
+  })
+  console.log({ modification, update, playerStats, toggleOff, attr, modifier, max });
+  return update;
+};
+
+export const updateTeammatePowersRaceConditionFixRef = (teammatePowersRaceConditionFix, element) => {
+  let isShotPower = true;
+  // this is required for the teammate to avoid React-setInterval, DOM-update bug calling "activateActive" twice 
+  if (!!teammatePowersRaceConditionFix && !!teammatePowersRaceConditionFix.current) {
+    isShotPower = teammatePowersRaceConditionFix.current[element].shotPower;
+    teammatePowersRaceConditionFix.current[element].shotPower = true;
+  }
+  return isShotPower;
+}
+

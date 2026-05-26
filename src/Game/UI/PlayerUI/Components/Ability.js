@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useKeyPress } from "../../../../Utils/utils";
 
+const COOLDOWN_VALS = Object.freeze({
+  false: false,
+  true: true,
+  click: 1
+});
+
 const ICON_LOOKUP = {
   heart: {
     passive: "fa-gratipay",
@@ -147,31 +153,36 @@ const AbilityNum = styled.div`
   font-size: 12px;
 `;
 export const Ability = ({
+  abilityIndex,
   playerIndex,
   abilityData,
   playerData,
+  setPlayerData,
   kaijuData,
   setTeleportData,
   setTileStatuses,
   scale,
   keyNum,
-  isPaused
+  isPaused,
+  accTime
 }) => {
   const {
     activeName,
     activateActive,
+    togglePassive,
     cooldownTime,
+    cooldownTimeAI,
     element,
-    accTime,
     color
   } = abilityData;
+  const abilityAccTime = abilityData.accTime;
   const [isOnCoolDown, setIsOnCoolDown] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [iconLookupString, setIconLookupString] = useState("active");
 
   // disable ability buttons if game is paused or character is dead
   const isPlayerAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && playerData[playerIndex] && !!playerData[playerIndex].lives;
-  const handleClick = () => !isOnCoolDown && isPlayerAlive && !isPaused && setIsOnCoolDown(true);
+  const handleClick = () => !isOnCoolDown && isPlayerAlive && !isPaused && setIsOnCoolDown(COOLDOWN_VALS.click); // true, false, 1=player click
   useKeyPress({
     keyCodes: `Digit${keyNum}`,
     keyDownCallback: handleClick,
@@ -179,24 +190,93 @@ export const Ability = ({
   });
   useEffect(() => {
     if (isOnCoolDown && isPlayerAlive && !isPaused) {
-      activateActive(
-        playerIndex,
-        playerData,
-        setTeleportData,
-        kaijuData,
-        setTileStatuses,
-        scale,
-        { current: { [element]: { shotPower: false } } }
-      );
+
+      if (COOLDOWN_VALS.click == isOnCoolDown) {
+        // activate player active ability
+        activateActive(
+          playerIndex,
+          playerData,
+          setTeleportData,
+          kaijuData,
+          setTileStatuses,
+          scale,
+          { current: { [element]: { shotPower: false } } }
+        );
+
+
+
+        // toggle-on player passive ability
+        if (togglePassive != undefined && setPlayerData != undefined) {
+          setPlayerData(p => {
+            if (!!p[playerIndex]) {
+              const update = togglePassive(p[playerIndex]);
+              console.log("before toggle-on passive", { player: p[playerIndex], update, element });
+              p[playerIndex] = update;
+              p[playerIndex].abilities[abilityIndex].accTime = accTime;
+              console.log("after toggle-on passive", { player: p[playerIndex], update, element });
+            }
+            return p;
+          })
+        }
+      }
+
+      /*
+                        // activate teammate active ability
+                  a.activateActive(
+                    i,
+                    data,
+                    setTeleportData,
+                    enemiesOnTiles,
+                    setTileStatuses,
+                    scale,
+                    teammatePowersRaceConditionFix
+                  );
+
+                  // toggle-on teammate passive ability
+                  if (!!_data[i]) {
+                    _data[i] = a.togglePassive(_data[i]);
+                  }
+
+                  // toggle-off teammate passive ability
+                  setTimeout(() => setData(d => {
+                    if (!!d[i]) {
+                      const toggleOff = true;
+                      d[i] = a.togglePassive(d[i], toggleOff);
+                    }
+                    return d;
+                  }), a.cooldownTimeAI);
+      
+      */
+
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
+
+      console.log("before timeout", cooldownTime, element);
       setTimeout(() => {
-        setIsOnCoolDown(false);
+        setIsOnCoolDown(COOLDOWN_VALS.false);
         setIconLookupString("active");
-      }, cooldownTime);
+        console.log("timeout triggered", cooldownTime, element);
+
+        if (COOLDOWN_VALS.click == isOnCoolDown && togglePassive != undefined && setPlayerData != undefined) {
+          // toggle-off player passive ability
+          setPlayerData(p => {
+            if (!!p[playerIndex]) {
+              const toggleOff = true;
+              const update = togglePassive(p[playerIndex], toggleOff);
+              console.log("before toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
+              p[playerIndex] = update;
+              console.log("after toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
+            }
+            return p;
+          });
+        }
+      }, playerIndex > 0 ? cooldownTimeAI : cooldownTime);
     }
   }, [isOnCoolDown]);
-  useEffect(() => playerIndex === 1 && setIsOnCoolDown(true), [accTime]);
+
+  // handle teammate ability button aesthetics:
+  useEffect(() => playerIndex === 1 && setIsOnCoolDown(COOLDOWN_VALS.true), [abilityAccTime]);
+
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
@@ -211,7 +291,7 @@ export const Ability = ({
         disabled={true}
         className={`fa ${ICON_LOOKUP[element][iconLookupString]}`}
         isCoolDown={isOnCoolDown}
-        cooldownTime={cooldownTime}
+        cooldownTime={playerIndex > 0 ? cooldownTimeAI : cooldownTime}
         color={color}
       />
       <AbilityNum color={color}>

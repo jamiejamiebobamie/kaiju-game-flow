@@ -109,10 +109,10 @@ const FillerDiv = styled.div`
 `;
 export const UI = ({
   playerData,
+  setPlayerData,
   kaijuData,
   kaijuKillCount,
   kaijuKilledToWin,
-  setPlayerData,
   setTeleportData,
   setTileStatuses,
   handleClickHome,
@@ -120,7 +120,8 @@ export const UI = ({
   scale,
   percentZoom,
   isTeammate,
-  isPaused
+  isPaused,
+  accTime
 }) => {
   const [displayString, setDisplayString] = useState(null);
   const progressCounter = <ProgressCounter>
@@ -141,9 +142,9 @@ export const UI = ({
   </ProgressCounter>
   const playerUIs = Array.isArray(playerData) && playerData.map((_, i) => <PlayerUI
     playerData={playerData}
+    setPlayerData={setPlayerData}
     kaijuData={kaijuData}
     kaijuKillCount={kaijuKillCount}
-    setPlayerData={setPlayerData}
     setTeleportData={setTeleportData}
     setTileStatuses={setTileStatuses}
     scale={scale}
@@ -151,6 +152,7 @@ export const UI = ({
     playerIndex={i}
     isTeammate={i > 0}
     isPaused={isPaused}
+    accTime={accTime}
   />);
   const buttons = <ButtonGroup>
     <ButtonsWrapper>
