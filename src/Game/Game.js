@@ -20,15 +20,57 @@ import {
   findPath
 } from "Utils/utils";
 import { FullscreenPage } from "Components/FullscreenPage.js";
-const GameWrapper = styled.div`
+
+const Wrapper = styled.div`
   position: relative;
   display: flex;
   align-self: center;
+`;
+
+const GameWrapper = styled.div`
+  position: relative;
+  display: flex;
   justify-content: space-between;
-  // width: 800px;
   ${props => props.width ? `width: ${props.width};` : "width:800px;"}
   ${props => props.height ? `height: ${props.height};` : "height:800px;"}
   overflow: hidden;
+`;
+
+const GameBoardOverlay = styled.div`
+  position: absolute;
+  z-index: ${props => props.isBackground ? 214 : 2147483645};
+
+  pointer-events: none;
+  background: url(${props => props.isBackground ? "GameUI_Pieces/GameArea_Background.png" : "GameUI_Pieces/GameArea_Overlay.png"});
+  transform: ${props => props.isBackground ? "scale(0.78, 0.83) translate(537px, 626px)" : "scale(.78, .83) translate(-193px, -117px)"};
+  
+  width: ${props => props.isBackground ? "387px" : "1117px"};
+  height: ${props => props.isBackground ? "46px" : "919px"};
+`;
+
+const ProgressCounterOverlay = styled.div`
+  position: absolute;
+  z-index: ${props => props.isBackground ? 214 : 2147483648};
+
+  pointer-events: none;
+  background: url(GameUI_Pieces/ScoreArea_Overlay.png);
+    background: url(${props => props.isBackground ? "GameUI_Pieces/ScoreArea_Background.png" : "GameUI_Pieces/ScoreArea_Overlay.png"});
+  transform: scale(1.3, 1) translate(398px, 32px);
+  width: 255px;
+  height: 109px;
+`;
+
+const UI_Overlay = styled.div`
+  position: absolute;
+  z-index: ${props => props.isBackground ? 2147483646 : 2147483647};
+
+  pointer-events: none;
+  background: url(${props => props.isTeammate ?
+    props.isBackground ? 'GameUI_Pieces/TeammateArea_Background.png' : 'GameUI_Pieces/TeammateArea_Overlay.png'
+    : props.isBackground ? 'GameUI_Pieces/PlayerArea_Background.png' : 'GameUI_Pieces/PlayerArea_Overlay.png'});
+  transform: ${props => props.isTeammate ? 'scale(0.8, .785) translate(573px, 419px)' : 'scale(0.79, .78) translate(442px, 190.5px)'};
+  width: ${props => props.isTeammate ? '355px' : '483px'};
+  height: ${props => props.isTeammate ? '162px' : '215px'};
 `;
 
 const shouldUpdate = (accTime, interval) => !(accTime % interval);
@@ -117,23 +159,23 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   };
 
   const moveWASD = keys => {
-    const sortLookup = { 
-         "KeyW": 0,      "KeyS": 1,      "KeyA": 2,       "KeyD": 3,
+    const sortLookup = {
+      "KeyW": 0, "KeyS": 1, "KeyA": 2, "KeyD": 3,
       "ArrowUp": 0, "ArrowDown": 1, "ArrowLeft": 2, "ArrowRight": 3
-     };
+    };
 
-    const dirLookup = { 
-         "KeyW": "up",      "KeyA": "left",      "KeyS": "down",       "KeyD": "right", 
-      "ArrowUp": "up", "ArrowLeft": "left", "ArrowDown": "down", "ArrowRight": "right" 
+    const dirLookup = {
+      "KeyW": "up", "KeyA": "left", "KeyS": "down", "KeyD": "right",
+      "ArrowUp": "up", "ArrowLeft": "left", "ArrowDown": "down", "ArrowRight": "right"
     };
 
     const dirs = keys
-                  // sort based on priority
-                  .sort((a, b) => sortLookup[a] - sortLookup[b])
-                  // map keys to directions
-                  .map(k => dirLookup[k])
-                  // remove duplicates in case of Arrow Keys and WASD are pressed at same time
-                  .reduce((acc,item) => !acc.includes(item) ? [...acc, item] : acc, []); 
+      // sort based on priority
+      .sort((a, b) => sortLookup[a] - sortLookup[b])
+      // map keys to directions
+      .map(k => dirLookup[k])
+      // remove duplicates in case of Arrow Keys and WASD are pressed at same time
+      .reduce((acc, item) => !acc.includes(item) ? [...acc, item] : acc, []);
 
     let dir = dirs[0];
     if (dirs.length > 1) {
@@ -153,19 +195,19 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         tile = data[0].tile;
         console.log({ tile });
         if (!!tile) {
-           if (dir == "right" || dir == "left") {
-              /*
-                handle left-right movement on hexagonal grid.
-                prefix "up " or "down " depending on
-                  column index of current player tile.
-              */ 
-              const { j } = tile;
-              if(j % 2){
-                dir = `up ${dir}`;
-              } else {
-                dir = `down ${dir}`;
-              }
+          if (dir == "right" || dir == "left") {
+            /*
+              handle left-right movement on hexagonal grid.
+              prefix "up " or "down " depending on
+                column index of current player tile.
+            */
+            const { j } = tile;
+            if (j % 2) {
+              dir = `up ${dir}`;
+            } else {
+              dir = `down ${dir}`;
             }
+          }
           const desiredOffset = getTileOffsetFromDir(dir, tile);
           const nextTile = { i: tile.i + desiredOffset.i, j: tile.j + desiredOffset.j };
           const isValid = isTileOnGameBoard(nextTile);
@@ -412,7 +454,15 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         homeButtonOnClick={fullScreenPageData.homeButtonOnClick}
       />
       : (
-        <>
+        <Wrapper>
+          <GameBoardOverlay />
+          <ProgressCounterOverlay />
+          <UI_Overlay isTeammate={true} />
+          <UI_Overlay isTeammate={false} />
+          <GameBoardOverlay isBackground={true} />
+          <ProgressCounterOverlay isBackground={true} />
+          <UI_Overlay isTeammate={true} isBackground={true} />
+          <UI_Overlay isTeammate={false} isBackground={true} />
           <GameWrapper width={width} height={height}>
             <GameBoard
               isPaused={isPaused}
@@ -450,5 +500,5 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               isPaused={isPaused}
             />
           </GameWrapper>
-        </>);
+        </Wrapper>);
 };

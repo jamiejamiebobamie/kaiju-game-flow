@@ -10,11 +10,11 @@ const Wrapper = styled.div`
   width: 100%;
   text-align: center;
   align-self: center;
-  color: #db974f;
+  color: #5eff5e;
   font-size: 30px;
   font-alignment: center;
-  text-stroke: 0.5px #db974f;
-  -webkit-text-stroke: 0.5px #db974f;
+  text-stroke: 0.5px #5eff5e;
+  -webkit-text-stroke: 0.5px #5eff5e;
 `;
 export const PauseModal = () => {
   return <Wrapper>

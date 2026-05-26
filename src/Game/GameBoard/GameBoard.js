@@ -28,6 +28,7 @@ const ShiftContentOver = styled.div`
   margin-left: -5px;
   position: absolute;
 `;
+
 export const GameBoard = ({
   isPaused,
   playerData,

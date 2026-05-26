@@ -32,7 +32,7 @@ export const MainMenu = ({ handleClickGame, handleClickTutorial, handleClickSett
         Settings
       </Button>
     </ButtonsWrapper>
-    <ButtonsWrapper>
+    {/* <ButtonsWrapper>
       <Button>
         <ButtonOutline zIndex={1} color={"black"} />
         <StyledLink></StyledLink>
@@ -45,7 +45,7 @@ export const MainMenu = ({ handleClickGame, handleClickTutorial, handleClickSett
           <StyledIcon className="fa fa-github-alt" />
         </StyledLink>
       </Button>
-    </ButtonsWrapper>
+    </ButtonsWrapper> */}
   </ButtonGroup>);
 
   return <Wrapper>

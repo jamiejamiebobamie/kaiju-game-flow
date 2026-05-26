@@ -11,21 +11,11 @@ const Wrapper = styled.div`
   justify-content: space-around;
   width: 400px;
   height: 170px;
-  border-style: solid;
-  border-thickness: thin;
-  border-radius: 10px;
-  background-color: #152642;
-  border-color: #db974f;
-  box-shadow: 3px 7px 10px black;
   align-self: flex-end;
-  border-style: solid;
-  border-thickness: thin;
-  border-color: #db974f;
-  color: #db974f;
-  background-color: #152642;
   ${props => props.isTeammate && "align-content: flex-end; transform: scale(.75); left: 50px;"}
   pointer-events: auto;
 `;
+
 const PlayerBorder = styled.div`
   position: absolute;
   right: 10px;
@@ -36,21 +26,17 @@ const PlayerBorder = styled.div`
   border-radius: 100%;
   overflow: hidden;
 `;
+
 const PlayerPicture = styled.div`
 
   position: relative;
 
   background: url(${props => props.src});
 
-  background-position: 12px;
+  background-position: 17px 17px;
   width: 97%;
   height: 97%;
 
-  border-style: solid;
-  border-thickness: 10px;
-  border-radius: 100%;
-  border-color: #db974f;
-  background-color: rgba(0, 0, 0, 0.5);
   ${props =>
     props.isBlue
       ? "filter: drop-shadow(20px -15px 25px blue);"
