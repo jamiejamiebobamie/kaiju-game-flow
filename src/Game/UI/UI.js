@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { PlayerUI } from "./PlayerUI/PlayerUI";
 import { BlinkFadeEffect } from 'Components/AvatarSelection';
+import { FloatingEffect } from 'Game/Game';
 
 const Wrapper = styled.div`
 ${props => props.percentZoom ? `transform: scale(${props.percentZoom}) translate(${(1 - props.percentZoom) * 200 - 2.4}px, 0px);` : ''} // -2.4 for border radius
@@ -13,7 +14,7 @@ ${props => props.percentZoom ? `transform: scale(${props.percentZoom}) translate
   border-radius: 10px;
   align-self: center;
   width: 320px;
-  z-index: 2147483646;
+  z-index: 2147483648;
   pointer-events: none;
 `;
 const ButtonGroup = styled.div`
@@ -101,6 +102,11 @@ const ProgressCounter = styled.div`
 const ProgressContent = styled.div`
   font-size: 1.5em;
 `;
+
+const FillerDiv = styled.div`
+  width: 400px;
+  height: 170px;
+`;
 export const UI = ({
   playerData,
   kaijuData,
@@ -119,14 +125,18 @@ export const UI = ({
   const [displayString, setDisplayString] = useState(null);
   const progressCounter = <ProgressCounter>
     <ProgressContent>
-      <BlinkFadeEffect>
-        Kaiju:
-      </BlinkFadeEffect>
+      <FloatingEffect>
+        <BlinkFadeEffect>
+          Kaiju:
+        </BlinkFadeEffect>
+      </FloatingEffect>
     </ProgressContent>
     <ProgressContent>
-      <BlinkFadeEffect>
-        {`${Array.isArray(kaijuKillCount) ? kaijuKillCount.length : 0} / ${kaijuKilledToWin}`}
-      </BlinkFadeEffect>
+      <FloatingEffect>
+        <BlinkFadeEffect>
+          {`${Array.isArray(kaijuKillCount) ? kaijuKillCount.length : 0} / ${kaijuKilledToWin}`}
+        </BlinkFadeEffect>
+      </FloatingEffect>
     </ProgressContent>
   </ProgressCounter>
   const playerUIs = Array.isArray(playerData) && playerData.map((_, i) => <PlayerUI
@@ -142,8 +152,7 @@ export const UI = ({
     isTeammate={i > 0}
     isPaused={isPaused}
   />);
-  const buttons = <ButtonGroup
-    isTeammate={isTeammate}>
+  const buttons = <ButtonGroup>
     <ButtonsWrapper>
       <Button onClick={handleClickPause}>
         <ButtonOutline zIndex={1} />
@@ -161,6 +170,7 @@ export const UI = ({
     <Wrapper percentZoom={percentZoom}>
       {progressCounter}
       {playerUIs}
+      {!isTeammate && <FillerDiv />}
       {buttons}
     </Wrapper>
   );

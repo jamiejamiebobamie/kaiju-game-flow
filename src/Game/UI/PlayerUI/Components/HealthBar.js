@@ -7,9 +7,16 @@ const Wrapper = styled.div`
   ${props =>
     !!props.health
       ? "margin-left: 5px;"
-      : "flex-direction: column; margin-left: -10px; text-align: center; font-size: 15px;"}
+      : "flex-direction: column; margin-left: -10px; text-align: center; font-size: 15px; color: rgb(113, 255, 113); -webkit-text-stroke: 0.5px rgb(113, 255, 113);"}
   ${props =>
     !!props.isTeammate && !props.health && "font-size: 19px;"}
+  ${props =>
+    !props.isTeammate && !props.health && "line-height: 35px;"}
+
+      ${props =>
+    !!props.isTeammate && !!props.health && "margin-bottom: 5px;"}
+
+    
   width: 220px;
   height: 30px;
   justify-content: flex-start;
@@ -26,12 +33,16 @@ const Bar = styled.div`
   border-radius: 30px;
   background: linear-gradient(45deg, #d22b2b, #880808);
   margin: 5px;
+
+  ${props =>
+    !!props.isTeammate && !!props.numHealth && "margin: 10px 5px 5px 5px;"}
+
 `;
 export const HealthBar = ({
   health = 1,
   isTeammate = false
 }) => {
-  const bars = Array(health).fill(0).map((_, i) => <Bar key={i} numHealth={health} />)
+  const bars = Array(health).fill(0).map((_, i) => <Bar key={i} numHealth={health} isTeammate={isTeammate} />)
   return (
     <BlinkFadeEffect>
       <Wrapper

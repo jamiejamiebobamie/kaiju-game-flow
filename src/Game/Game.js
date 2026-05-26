@@ -20,6 +20,7 @@ import {
   findPath
 } from "Utils/utils";
 import { FullscreenPage } from "Components/FullscreenPage.js";
+import { BlinkFadeEffect } from 'Components/AvatarSelection';
 
 const Wrapper = styled.div`
   position: relative;
@@ -36,16 +37,52 @@ const GameWrapper = styled.div`
   overflow: hidden;
 `;
 
+
+export const FloatingEffect = styled.div`
+
+  ${props => !!props.styles && props.styles}
+
+  animation: float-animation ${props => !!props.duration ? props.duration : "4"}s ease-in-out infinite;
+
+@keyframes float-animation {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  12.5% {
+    transform: translateY(-2px);
+  }
+  25% {
+    transform: translateY(-5px);
+  }
+  37.5% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  62.5% {
+    transform: translateY(-4px);
+  }
+  75% {
+    transform: translateY(-5px);
+  }
+  87.5% {
+    transform: translateY(-2px);
+  }
+}`;
+
 const GameBoardOverlay = styled.div`
   position: absolute;
-  z-index: ${props => props.isBackground ? 214 : 2147483645};
+  z-index: ${props => props.isBackground ? 214 : 2147483644};
 
   pointer-events: none;
   background: url(${props => props.isBackground ? "GameUI_Pieces/GameArea_Background.png" : "GameUI_Pieces/GameArea_Overlay.png"});
-  transform: ${props => props.isBackground ? "scale(0.78, 0.83) translate(537px, 626px)" : "scale(.78, .83) translate(-193px, -117px)"};
+  transform: ${props => props.isBackground ? "scale(0.78, 0.84) translate(537px, 620px)" : "scale(.78, .83) translate(-193px, -117px)"};
   
   width: ${props => props.isBackground ? "387px" : "1117px"};
   height: ${props => props.isBackground ? "46px" : "919px"};
+
+  ${props => props.isBackground && "filter: brightness(0.2);"}
 `;
 
 const ProgressCounterOverlay = styled.div`
@@ -60,17 +97,29 @@ const ProgressCounterOverlay = styled.div`
   height: 109px;
 `;
 
-const UI_Overlay = styled.div`
+const Avatar_Overlay = styled.div`
   position: absolute;
-  z-index: ${props => props.isBackground ? 2147483646 : 2147483647};
+  z-index: ${props => props.isBackground ? 2147483645 : 2147483647};
 
   pointer-events: none;
   background: url(${props => props.isTeammate ?
     props.isBackground ? 'GameUI_Pieces/TeammateArea_Background.png' : 'GameUI_Pieces/TeammateArea_Overlay.png'
     : props.isBackground ? 'GameUI_Pieces/PlayerArea_Background.png' : 'GameUI_Pieces/PlayerArea_Overlay.png'});
-  transform: ${props => props.isTeammate ? 'scale(0.8, .785) translate(573px, 419px)' : 'scale(0.79, .78) translate(442px, 190.5px)'};
+  transform: ${props => props.isTeammate ? 'scale(0.8, 0.785) translate(572.5px, 419px)' : 'scale(0.79, 0.78) translate(439px, 190.5px)'};
   width: ${props => props.isTeammate ? '355px' : '483px'};
   height: ${props => props.isTeammate ? '162px' : '215px'};
+`;
+
+const HolographGridBackground = styled.div`
+  position: absolute;
+  z-index: 213;
+
+  pointer-events: none;
+  background: url(${props => props.src});
+  transform: scale(0.78, 0.84) translate(534px, -87px);
+  
+  width: 478px;
+  height: 876px;
 `;
 
 const shouldUpdate = (accTime, interval) => !(accTime % interval);
@@ -456,13 +505,32 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       : (
         <Wrapper>
           <GameBoardOverlay />
-          <ProgressCounterOverlay />
-          <UI_Overlay isTeammate={true} />
-          <UI_Overlay isTeammate={false} />
           <GameBoardOverlay isBackground={true} />
-          <ProgressCounterOverlay isBackground={true} />
-          <UI_Overlay isTeammate={true} isBackground={true} />
-          <UI_Overlay isTeammate={false} isBackground={true} />
+          <BlinkFadeEffect high={90} low={45} time={2000}>
+            <HolographGridBackground src="GameUI_Pieces/HolographGrid1.png" />
+          </BlinkFadeEffect>
+          <BlinkFadeEffect high={70} low={55} time={1000}>
+            <HolographGridBackground src="GameUI_Pieces/HolographGrid2.png" />
+          </BlinkFadeEffect>
+          <BlinkFadeEffect high={100} low={15} time={3000}>
+            <HolographGridBackground src="GameUI_Pieces/HolographGrid3.png" />
+          </BlinkFadeEffect>
+          <BlinkFadeEffect high={80} low={70} time={1500}>
+            <HolographGridBackground src="GameUI_Pieces/HolographGrid4.png" />
+          </BlinkFadeEffect>
+          <FloatingEffect>
+            <ProgressCounterOverlay />
+            <ProgressCounterOverlay isBackground={true} />
+          </FloatingEffect>
+          {isTeammate ?
+            <FloatingEffect
+              styles={" display: flex; flex-direction: column; animation-delay: 3s;"}
+              duration={"5"}>
+              <Avatar_Overlay isTeammate={true} />
+              <Avatar_Overlay isTeammate={true} isBackground={true} />
+            </FloatingEffect> : null}
+          <Avatar_Overlay isTeammate={false} />
+          <Avatar_Overlay isTeammate={false} isBackground={true} />
           <GameWrapper width={width} height={height}>
             <GameBoard
               isPaused={isPaused}
