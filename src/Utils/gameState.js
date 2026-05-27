@@ -1698,10 +1698,10 @@ export const PLAYER_ABILITIES = {
     color: "GhostWhite"
   },
   bubble: {
-    passiveName: "So Many Bubbles",
+    passiveName: "Pretty Bubbles",
     activeName: "Dispel",
     type: ["defensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'numTilesModifier', 1),
+    togglePassive: playerStats => playerStats,
     activateActive: (
       k,
       data,
@@ -1738,7 +1738,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "Builder",
     activeName: "Aegis",
     type: ["defensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'numTilesModifier', 1),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'numTilesModifier', 2),
     activateActive: (
       k,
       data,
@@ -1808,7 +1808,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "Good Vibes",
     activeName: "Heal",
     type: ["heal"],
-    togglePassive: playerStats => playerStats,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 1),
     activateActive: (
       k,
       data,
@@ -1824,7 +1824,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 20,
+        count: 7,
         statusKey: "isHealing",
         numTiles: 1,
         setTileStatuses
@@ -1837,8 +1837,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 20000,
-    cooldownTime: 20000,
+    cooldownTimeAI: 10000,
+    cooldownTime: 10000,
     color: "pink"
   },
   kaijuFire: {
@@ -2347,6 +2347,7 @@ export const BASE_PLAYER_STATS = {
   moveSpeed: 6,
   isOnTiles: true,
   isKaiju: false,
+  isDead: false,
   lastDmg: 0,
   livesModifier: 0,
   numTilesModifier: 0,

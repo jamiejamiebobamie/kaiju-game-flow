@@ -37,7 +37,6 @@ const GameWrapper = styled.div`
   overflow: hidden;
 `;
 
-
 export const FloatingEffect = styled.div`
 
   ${props => !!props.styles && props.styles}
@@ -82,7 +81,7 @@ const GameBoardOverlay = styled.div`
   width: ${props => props.isBackground ? "387px" : "1117px"};
   height: ${props => props.isBackground ? "46px" : "919px"};
 
-  ${props => props.isBackground && "filter: brightness(0.2);"}
+  ${props => props.isBackground ? "filter: brightness(0.2);" : "filter: drop-shadow(0px 5px 5px black);"}
 `;
 
 const ProgressCounterOverlay = styled.div`
@@ -92,9 +91,10 @@ const ProgressCounterOverlay = styled.div`
   pointer-events: none;
   background: url(GameUI_Pieces/ScoreArea_Overlay.png);
     background: url(${props => props.isBackground ? "GameUI_Pieces/ScoreArea_Background.png" : "GameUI_Pieces/ScoreArea_Overlay.png"});
-  transform: scale(1.3, 1) translate(398px, 32px);
+  transform: scale(1.3, 1) translate(397px, 32px);
   width: 255px;
   height: 109px;
+  ${props => props.isBackground && "filter: brightness(0.5) drop-shadow(0px 20px 15px black) hue-rotate(275deg);"}
 `;
 
 const Avatar_Overlay = styled.div`
@@ -105,9 +105,11 @@ const Avatar_Overlay = styled.div`
   background: url(${props => props.isTeammate ?
     props.isBackground ? 'GameUI_Pieces/TeammateArea_Background.png' : 'GameUI_Pieces/TeammateArea_Overlay.png'
     : props.isBackground ? 'GameUI_Pieces/PlayerArea_Background.png' : 'GameUI_Pieces/PlayerArea_Overlay.png'});
-  transform: ${props => props.isTeammate ? 'scale(0.8, 0.785) translate(572.5px, 419px)' : 'scale(0.79, 0.78) translate(439px, 190.5px)'};
+  transform: ${props => props.isTeammate ? 'scale(0.8, 0.785) translate(572.5px, 434px)' : 'scale(0.79, 0.78) translate(442px, 190.5px)'};
   width: ${props => props.isTeammate ? '355px' : '483px'};
   height: ${props => props.isTeammate ? '162px' : '215px'};
+
+  ${props => props.isBackground && (props.isTeammate ? "filter: brightness(0.5) drop-shadow(-2px 2px 10px black) hue-rotate(275deg);" : "filter: brightness(0.5) drop-shadow(-4px 10px 10px black) hue-rotate(275deg);")}
 `;
 
 const HolographGridBackground = styled.div`
@@ -116,10 +118,14 @@ const HolographGridBackground = styled.div`
 
   pointer-events: none;
   background: url(${props => props.src});
-  transform: scale(0.78, 0.84) translate(534px, -87px);
+  transform: scale(0.78, 0.84) translate(518px, -87px);
   
   width: 478px;
   height: 876px;
+
+  filter: drop-shadow(0px 0px 1px rgb(94, 255, 94))  blur(2px);
+  border: solid rgb(94, 255, 94) .25px;
+
 `;
 
 const shouldUpdate = (accTime, interval) => !(accTime % interval);
@@ -506,18 +512,21 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         <Wrapper>
           <GameBoardOverlay />
           <GameBoardOverlay isBackground={true} />
-          <BlinkFadeEffect high={90} low={45} time={2000}>
-            <HolographGridBackground src="GameUI_Pieces/HolographGrid1.png" />
+          <BlinkFadeEffect high={49} low={10} time={700}>
+            <BlinkFadeEffect high={100} low={30} time={400}>
+              <HolographGridBackground src="GameUI_Pieces/HolographGrid1.png" />
+            </BlinkFadeEffect>
+            <BlinkFadeEffect high={100} low={30} time={500}>
+              <HolographGridBackground src="GameUI_Pieces/HolographGrid2.png" />
+            </BlinkFadeEffect>
+            <BlinkFadeEffect high={100} low={30} time={700}>
+              <HolographGridBackground src="GameUI_Pieces/HolographGrid3.png" />
+            </BlinkFadeEffect>
+            <BlinkFadeEffect high={100} low={30} time={600}>
+              <HolographGridBackground src="GameUI_Pieces/HolographGrid4.png" />
+            </BlinkFadeEffect>
           </BlinkFadeEffect>
-          <BlinkFadeEffect high={70} low={55} time={1000}>
-            <HolographGridBackground src="GameUI_Pieces/HolographGrid2.png" />
-          </BlinkFadeEffect>
-          <BlinkFadeEffect high={100} low={15} time={3000}>
-            <HolographGridBackground src="GameUI_Pieces/HolographGrid3.png" />
-          </BlinkFadeEffect>
-          <BlinkFadeEffect high={80} low={70} time={1500}>
-            <HolographGridBackground src="GameUI_Pieces/HolographGrid4.png" />
-          </BlinkFadeEffect>
+
           <FloatingEffect>
             <ProgressCounterOverlay />
             <ProgressCounterOverlay isBackground={true} />

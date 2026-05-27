@@ -5,16 +5,16 @@ import { BlinkFadeEffect } from 'Components/AvatarSelection';
 const Wrapper = styled.div`
   display: flex;
   ${props =>
-    !!props.health
+    !props.isDead
       ? "margin-left: 5px;"
       : "flex-direction: column; margin-left: -10px; text-align: center; font-size: 15px; color: rgb(113, 255, 113); -webkit-text-stroke: 0.5px rgb(113, 255, 113);"}
   ${props =>
-    !!props.isTeammate && !props.health && "font-size: 19px;"}
+    !!props.isTeammate && props.isDead && "font-size: 19px;"}
   ${props =>
-    !props.isTeammate && !props.health && "line-height: 35px;"}
+    !props.isTeammate && props.isDead && "line-height: 35px;"}
 
       ${props =>
-    !!props.isTeammate && !!props.health && "margin-bottom: 5px;"}
+    !!props.isTeammate && !props.isDead && "margin-bottom: 5px;"}
 
     
   width: 220px;
@@ -47,6 +47,7 @@ const Bar = styled.div`
 `;
 export const HealthBar = ({
   health = 0,
+  isDead=false,
   isTeammate = false,
   healthModifier
 }) => {
@@ -54,10 +55,10 @@ export const HealthBar = ({
   return (
     <BlinkFadeEffect>
       <Wrapper
-        health={health}
+        isDead={isDead}
         isTeammate={isTeammate}
       >
-        {health ? bars : "Deceased!"}
+        {!isDead ? bars : "Deceased!"}
       </Wrapper>
     </BlinkFadeEffect>
 

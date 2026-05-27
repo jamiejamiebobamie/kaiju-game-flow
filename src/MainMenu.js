@@ -21,15 +21,15 @@ export const MainMenu = ({ handleClickGame, handleClickTutorial, handleClickSett
       </Button>
     </ButtonsWrapper>
     <ButtonsWrapper>
-      <Button onClick={handleClickTutorial}>
-        <ButtonOutline zIndex={1} />
-        Tutorial
-      </Button>
-    </ButtonsWrapper>
-    <ButtonsWrapper>
       <Button onClick={handleClickSettings}>
         <ButtonOutline zIndex={1} />
         Settings
+      </Button>
+    </ButtonsWrapper>
+    <ButtonsWrapper>
+      <Button onClick={handleClickTutorial}>
+        <ButtonOutline zIndex={1} />
+        Tutorial
       </Button>
     </ButtonsWrapper>
     {/* <ButtonsWrapper>

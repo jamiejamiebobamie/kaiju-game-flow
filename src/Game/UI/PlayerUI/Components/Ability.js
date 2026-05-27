@@ -181,7 +181,7 @@ export const Ability = ({
   const [iconLookupString, setIconLookupString] = useState("active");
 
   // disable ability buttons if game is paused or character is dead
-  const isPlayerAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && playerData[playerIndex] && !!playerData[playerIndex].lives;
+  const isPlayerAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && !!playerData[playerIndex] && !playerData[playerIndex].isDead;
   const handleClick = () => !isOnCoolDown && isPlayerAlive && !isPaused && setIsOnCoolDown(COOLDOWN_VALS.click); // true, false, 1=player click
   useKeyPress({
     keyCodes: `Digit${keyNum}`,
@@ -191,7 +191,7 @@ export const Ability = ({
   useEffect(() => {
     if (isOnCoolDown && isPlayerAlive && !isPaused) {
 
-      if (COOLDOWN_VALS.click == isOnCoolDown) {
+      if (COOLDOWN_VALS.click === isOnCoolDown) {
         // activate player active ability
         activateActive(
           playerIndex,
@@ -203,69 +203,40 @@ export const Ability = ({
           { current: { [element]: { shotPower: false } } }
         );
 
-
-
         // toggle-on player passive ability
         if (togglePassive != undefined && setPlayerData != undefined) {
           setPlayerData(p => {
             if (!!p[playerIndex]) {
               const update = togglePassive(p[playerIndex]);
-              console.log("before toggle-on passive", { player: p[playerIndex], update, element });
+              // console.log("before toggle-on passive", { player: p[playerIndex], update, element });
               p[playerIndex] = update;
               p[playerIndex].abilities[abilityIndex].accTime = accTime;
-              console.log("after toggle-on passive", { player: p[playerIndex], update, element });
+              // console.log("after toggle-on passive", { player: p[playerIndex], update, element });
             }
             return p;
           })
         }
       }
 
-      /*
-                        // activate teammate active ability
-                  a.activateActive(
-                    i,
-                    data,
-                    setTeleportData,
-                    enemiesOnTiles,
-                    setTileStatuses,
-                    scale,
-                    teammatePowersRaceConditionFix
-                  );
-
-                  // toggle-on teammate passive ability
-                  if (!!_data[i]) {
-                    _data[i] = a.togglePassive(_data[i]);
-                  }
-
-                  // toggle-off teammate passive ability
-                  setTimeout(() => setData(d => {
-                    if (!!d[i]) {
-                      const toggleOff = true;
-                      d[i] = a.togglePassive(d[i], toggleOff);
-                    }
-                    return d;
-                  }), a.cooldownTimeAI);
-      
-      */
 
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
 
-      console.log("before timeout", cooldownTime, element);
+      // console.log("before timeout", cooldownTime, element);
       setTimeout(() => {
         setIsOnCoolDown(COOLDOWN_VALS.false);
         setIconLookupString("active");
-        console.log("timeout triggered", cooldownTime, element);
+        // console.log("timeout triggered", cooldownTime, element);
 
-        if (COOLDOWN_VALS.click == isOnCoolDown && togglePassive != undefined && setPlayerData != undefined) {
+        if (COOLDOWN_VALS.click === isOnCoolDown && togglePassive != undefined && setPlayerData != undefined) {
           // toggle-off player passive ability
           setPlayerData(p => {
             if (!!p[playerIndex]) {
               const toggleOff = true;
               const update = togglePassive(p[playerIndex], toggleOff);
-              console.log("before toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
+              // console.log("before toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
               p[playerIndex] = update;
-              console.log("after toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
+              // console.log("after toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
             }
             return p;
           });

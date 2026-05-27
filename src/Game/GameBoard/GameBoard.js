@@ -47,7 +47,7 @@ export const GameBoard = ({
 }) => {
   const playerIndex = 0;
 
-  const isPlayerDead = !!playerData[playerIndex] && typeof(playerData[playerIndex].lives) === "number" && playerData[playerIndex].lives < 1;
+  const isPlayerDead = !!playerData[playerIndex] && playerData[playerIndex].isDead;
 
   useEffect(() => {
     const { i, _ } = clickedTile;
@@ -77,6 +77,7 @@ export const GameBoard = ({
       color={p.color}
       scale={scale}
       lives={p.lives}
+      isDead={p.isDead}
       isHealed={p.isHealed}
       isTeleported={p.isTeleported}
       dir={p.dir}
@@ -84,7 +85,7 @@ export const GameBoard = ({
       gender={p.gender}
     />
   ));
-  const deadPlayers = playerData.filter(({ lives }) => lives < 1).map(p => (
+  const deadPlayers = playerData.filter(({ isDead }) => isDead).map(p => (
     <DeadPlayer
       key={p.i}
       i={p.i}

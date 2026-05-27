@@ -17,7 +17,7 @@ const TransitionStrip = styled.div`
   border-radius: 150px;
     // box-shadow: 3px 7px 10px black;
   ${props =>
-    props.duration !== undefined && `z-index: ${99999999999 + props.duration};`}
+    props.duration !== undefined && `z-index: ${99999999999999 + props.duration};`}
   @keyframes moveRight {
     0% {
       right: -100dvw;

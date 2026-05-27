@@ -18,13 +18,13 @@ ${props => props.percentZoom ? `transform: scale(${props.percentZoom}) translate
   pointer-events: none;
 `;
 const ButtonGroup = styled.div`
-  z-index: 1;
-  display: flex;
-  justify-content: space-around;
-  align-self: flex-end;
-  width: 410px;
-  transform: scale(0.87, 1.4) translate(27px, 39px);
-  pointer-events: auto;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-self: flex-start;
+    width: 355px;
+    transform: translate(-38.9px, 39px);
+    pointer-events: auto;
 `;
 const ButtonsWrapper = styled.div`
   position: relative;
@@ -32,7 +32,8 @@ const ButtonsWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
-  margin-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   height: 40px;
   pointer-events: auto;
 `;
@@ -40,9 +41,8 @@ const Button = styled.div`
   display: flex;
   align-self: center;
   justify-content: center;
-  width: 175px;
-  min-width: 175px;
-  height: 20px;
+  width: 150px;
+  height: 50px;
   font-alignment: center;
   cursor: pointer;
   border-radius: 5px;
@@ -56,18 +56,18 @@ const Button = styled.div`
     transform: translate(0px, 3px);
     filter: drop-shadow(0px 0px 0px black);
   }
-  font-size: 16px;
   text-stroke: 0.5px black;
   -webkit-text-stroke: 0.5px black;
   background-color: #376e5b;
   pointer-events: auto;
+  font-size: 20px;
+  line-height: 34px;
 `;
 const ButtonOutline = styled.div`
   position: absolute;
   z-index: ${props => props.zIndex};
-  width: 175px;
-  min-width: 175px;
-  height: 19.5px;
+  width: 149.5px;
+  height: 33.5px;
   margin-top: -0.5px;
   pointer-events: none;
   border-radius: 3px;
@@ -88,8 +88,8 @@ const ProgressCounter = styled.div`
   align-self: flex-end;
   justify-content: space-between;
 
-  margin-top: -112px;
-  margin-right: 6px;
+    margin-top: -114px;
+    margin-right: 9px;
 
 
   color: #71ff71;

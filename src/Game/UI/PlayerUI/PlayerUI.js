@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   width: 400px;
   height: 170px;
   align-self: flex-end;
-  ${props => props.isTeammate && "align-content: flex-end; transform: scale(.75); left: 50px;"}
+  ${props => props.isTeammate && "align-content: flex-end; transform: scale(.75) translate(0px, 15px); left: 50px;"}
   pointer-events: auto;
 `;
 
@@ -64,6 +64,7 @@ export const PlayerUI = ({
   playerData = [
     {
       lives: 0,
+      isDead: false,
       livesModifier: 0,
       playerClass: "",
       moveSpeed: "",
@@ -74,6 +75,7 @@ export const PlayerUI = ({
     },
     {
       lives: 0,
+      isDead: false,
       livesModifier: 0,
       playerClass: "",
       moveSpeed: "",
@@ -101,7 +103,7 @@ export const PlayerUI = ({
 
   const _playerUI = (
     <Wrapper percentZoom={percentZoom} isTeammate={isTeammate}>
-      {playerData && playerData[0] && playerData[0].moveSpeedModifier}
+      {/* <div style={{ position: "absolute", color: "#fff" }}>{ playerData[playerIndex].numTilesModifier}</div> */}
       {isReversed ? (
         <>
           <Abilities
@@ -122,6 +124,7 @@ export const PlayerUI = ({
           />
           <HealthBar
             health={playerData.length && (playerData[playerIndex].lives || 0)}
+            isDead={playerData.length && (playerData[playerIndex].isDead || false)}
             healthModifier={playerData.length && playerData[playerIndex].livesModifier || 0}
             setDisplayString={setDisplayString}
             isTeammate={isTeammate}
@@ -131,6 +134,7 @@ export const PlayerUI = ({
         <>
           <HealthBar
             health={playerData.length && (playerData[playerIndex].lives || 0)}
+            isDead={playerData.length && (playerData[playerIndex].isDead || false)}
             healthModifier={playerData.length && playerData[playerIndex].livesModifier || 0}
             setDisplayString={setDisplayString}
           />

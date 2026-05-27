@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.i`
-  display: ${props => (props.lives > 0 ? "flex" : "none")};
+  display: ${props => (!props.isDead ? "flex" : "none")};
   position: absolute;
   ${props =>
     props.zIndex ? `z-index: ${props.zIndex + 20001}` : "z-index:20001"};
@@ -239,6 +239,7 @@ export const Player = ({
   dir,
   lives,
   charLocation,
+  isDead,
   isHealed,
   isTeleported,
   color,
@@ -305,7 +306,7 @@ export const Player = ({
     }
   }, [isTeleported]);
   return (
-    <Wrapper zIndex={zIndex} lives={lives} charLocation={charLocation}>
+    <Wrapper zIndex={zIndex} isDead={isDead} charLocation={charLocation}>
       {modifierText}
       <Character isDamaged={isDamaged}>
         <SpriteSheet gender={gender} anim={anim} color={color} />

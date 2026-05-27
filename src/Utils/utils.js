@@ -439,8 +439,8 @@ export const redrawTiles = ({
         if (PENINSULA_TILE_LOOKUP[key] || isTutorial) {
           const tileLocation = getTileXAndY({ i, j, scale });
           const playerOnTile = playerData.find(
-            ({ tile, lives }) =>
-              !!lives && !!tile && tile.i === i && tile.j === j
+            ({ tile, isDead }) =>
+              !isDead && !!tile && tile.i === i && tile.j === j
           )
           const playerGender = !!playerOnTile ? playerOnTile.gender : undefined;
           const isKaiju = kaijuData
@@ -771,37 +771,42 @@ export const shootPower = ({
       const originTile = d.tile;
       const [targetTile, targetIndex] =
         statusKey === "isHealing"
-          ? data.length < 2 || !data[1].lives || data[0].lives <= data[1].lives
+          ? data.length < 2 || !!data[1].isDead || data[0].lives <= data[1].lives
             ? [data[0].tile, 0]
             : [data[1].tile, 1]
           : getClosestEntityFromTile(targetData, originTile, scale);
       if (originTile && targetTile) {
-        const tileStatusesCountModifier = ["isWooded", "isOnFire", "isHealing"];
-        const tileStatusesNumTilesModifier = [
-          "isWooded",
-          "isGhosted",
-          "isHealing"
+        // const excludeStatusesForTileStatusesNumTilesModifier = ["isBubble"];//, "isWooded", "isOnFire", "isHealing"];
+        const excludeStatusesForTileStatusesCountModifier = [
+          "isBubble"
+          // "isWooded",
+          // "isGhosted",
+          // "isHealing"
         ];
+        const countReductionForNumTilesModifierStatus = statusKey == "isOnFire" && !!data[dataIndex].numTilesModifier ? 3 : 0;
         const [tile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
-          data[dataIndex].numTilesModifier &&
-            tileStatusesNumTilesModifier.includes(statusKey)
+          data[dataIndex].numTilesModifier 
+          // && !excludeStatusesForTileStatusesNumTilesModifier.includes(statusKey)
             ? numTiles + data[dataIndex].numTilesModifier
             : numTiles
         );
+        const tileCount = data[dataIndex].tileCountModifier 
+                  && !excludeStatusesForTileStatusesCountModifier.includes(statusKey)
+                    ? count + data[dataIndex].tileCountModifier
+                    : count
+
+        console.log({ count: tileCount - countReductionForNumTilesModifierStatus, countReductionForNumTilesModifierStatus, tileCount, statusKey, numTilesModifier: data[dataIndex].numTilesModifier })
+
         setTileStatuses(_tiles => {
           if (!!tile && !!_tiles && !!_tiles[tile.i] && !!_tiles[tile.i][tile.j]) {
             _tiles[tile.i][tile.j] = {
               ..._tiles[tile.i][tile.j],
               [statusKey]: {
                 dirs,
-                count:
-                  data[dataIndex].tileCountModifier &&
-                    tileStatusesCountModifier.includes(statusKey)
-                    ? count + data[dataIndex].tileCountModifier
-                    : count,
+                count: tileCount - countReductionForNumTilesModifierStatus,
                 targetIndex,
                 isKaiju: d.isKaiju || statusKey === "isHealing",
                 startCount: count,
@@ -1037,7 +1042,7 @@ export const movePlayerPieces = (
   setData(_data => {
     const enemiesOnTiles = enemyData.filter(({ isOnTiles }) => !!isOnTiles);
     for (let i = 0; i < _data.length; i++) {
-      if (!!_data[i].lives) {
+      if (!_data[i].isDead) {
         // set logic for teammate
         if (i === 1) {
 
@@ -1291,11 +1296,10 @@ export const movePlayerPieces = (
         }
 
         let livesModifier = _data[i].livesModifier;
-        let killed = _data[i].lives < 1;
         dmgArray
           .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju) // what does this do...
           .forEach(dmg => {
-            if (_data[i].key === dmg.key && !killed) {
+            if (_data[i].key === dmg.key && !_data[i].isDead) {
               if (
                 accTime - _data[i].lastDmg > 1000 ||
                 accTime - _data[i].lastDmg < 0
@@ -1309,14 +1313,13 @@ export const movePlayerPieces = (
                   // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
                   const remainingDmg = dmg.lifeDecrement - livesModifier;
                   dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
-                  livesModifier = remainingDmg < 0 ? 1 : 0; //remainingDmg * -1 : 0;
-                } 
-                // else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
-                //   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
-                //   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
-                //   dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
-                //   _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
-                // }
+                  _data[i].livesModifier = remainingDmg < 0 ? 1 : 0; //remainingDmg * -1 : 0;
+                } else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
+                  // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
+                  const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
+                  dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
+                  _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
+                }
 
                 _data[i].lives =
                   dmg.lifeDecrement > 0 ||
@@ -1328,7 +1331,7 @@ export const movePlayerPieces = (
               }
               if ((_data[i].lives + livesModifier) < 1) {
                 setPlayerKillCount(count => count + 1);
-                killed = true;
+                _data[i].isDead = true;
               }
             }
           });
@@ -2549,7 +2552,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Good Vibes",
         description: "You send out good vibes",
-        effect1: "",
+        effect1: "+1 tile count modifier",
         effect2: "",
         img: "",
         formatData: {},
@@ -2561,6 +2564,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         title: "Builder",
         description: "Your powers are prolific",
         effect1: "+1 number of tiles modifier",
+        effect2: "",
         // effect2: "+1 tile count modifier",
         img: "",
         formatData: {},
@@ -2715,9 +2719,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityBubblePassive":
       return {
-        title: "So Many Bubbles",
-        description: "Your powers are more effective",
-        effect1: "+1 number of tiles modifier",
+        title: "Pretty Bubbles",
+        description: "So pretty!",
+        effect1: "",//+1 number of tiles modifier",
         effect2: "",
         img: "",
         formatData: {},
@@ -2762,26 +2766,26 @@ export const determineKaijuQuantity = difficulty => {
   let MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED = undefined;
   switch (difficulty) {
     case Difficulty.Easy:
-      MAX_AT_ONCE = 1;
+      MAX_AT_ONCE = 2;
       MAX_TO_WIN = 5;
       KAIJU_MAX_HEALTH = 2;
       KAIJU_MAX_SPEED = 2;
       break;
     case Difficulty.Hard:
       MAX_AT_ONCE = 4;
-      MAX_TO_WIN = 12;
+      MAX_TO_WIN = 20;
       KAIJU_MAX_HEALTH = 3;
       KAIJU_MAX_SPEED = 2;
       break;
     case Difficulty.Xtreme:
       MAX_AT_ONCE = 5;
-      MAX_TO_WIN = 17;
-      KAIJU_MAX_HEALTH = 4;
+      MAX_TO_WIN = 50;
+      KAIJU_MAX_HEALTH = 3;
       KAIJU_MAX_SPEED = 2;
       break;
     default: // Difficulty.Medium
       MAX_AT_ONCE = 3;
-      MAX_TO_WIN = 9;
+      MAX_TO_WIN = 10;
       KAIJU_MAX_HEALTH = 3;
       KAIJU_MAX_SPEED = 2;
   }
@@ -2792,7 +2796,7 @@ export const modifyStats = (playerStats, toggleOff, attr, modifier, max) => {
   const modification = !!max && Math.abs(playerStats[attr] + mod) > Math.abs(max) ? max : playerStats[attr] + mod;
   const update = ({
     ...playerStats,
-    [attr]: (toggleOff && !playerStats[attr]) ? 0 : modification
+    [attr]: modification//(toggleOff && !playerStats[attr]) ? 0 : modification
   })
   console.log({ modification, update, playerStats, toggleOff, attr, modifier, max });
   return update;
