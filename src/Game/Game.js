@@ -34,7 +34,7 @@ const GameWrapper = styled.div`
   justify-content: space-between;
   ${props => props.width ? `width: ${props.width};` : "width:800px;"}
   ${props => props.height ? `height: ${props.height};` : "height:800px;"}
-  overflow: hidden;
+  overflow: visible;
 `;
 
 export const FloatingEffect = styled.div`
@@ -72,7 +72,7 @@ export const FloatingEffect = styled.div`
 
 const GameBoardOverlay = styled.div`
   position: absolute;
-  z-index: ${props => props.isBackground ? 214 : 2147483644};
+  z-index: ${props => props.isBackground ? 214 : 2147483643};
 
   pointer-events: none;
   background: url(${props => props.isBackground ? "GameUI_Pieces/GameArea_Background.png" : "GameUI_Pieces/GameArea_Overlay.png"});
@@ -86,7 +86,7 @@ const GameBoardOverlay = styled.div`
 
 const ProgressCounterOverlay = styled.div`
   position: absolute;
-  z-index: ${props => props.isBackground ? 214 : 2147483648};
+  z-index: ${props => props.isBackground ? 214 : 2147483645};
 
   pointer-events: none;
   background: url(GameUI_Pieces/ScoreArea_Overlay.png);
@@ -99,7 +99,7 @@ const ProgressCounterOverlay = styled.div`
 
 const Avatar_Overlay = styled.div`
   position: absolute;
-  z-index: ${props => props.isBackground ? 2147483645 : 2147483647};
+  z-index: ${props => props.isBackground ? 2147483644 : 2147483645};
 
   pointer-events: none;
   background: url(${props => props.isTeammate ?
@@ -114,7 +114,7 @@ const Avatar_Overlay = styled.div`
 
 const HolographGridBackground = styled.div`
   position: absolute;
-  z-index: 213;
+  z-index: -85;
 
   pointer-events: none;
   background: url(${props => props.src});
@@ -127,6 +127,80 @@ const HolographGridBackground = styled.div`
   border: solid rgb(94, 255, 94) .25px;
 
 `;
+
+const RiseUpEffect = styled.div`
+  position: absolute;
+  z-index: 2147483645; 
+  transform: scale(0.7) translate(328px, 107px);
+  filter: drop-shadow(-2px 2px 10px black);
+
+  animation: rise-up-animation ${props => props.duration}s linear forwards 1;
+  animation-delay: ${props => props.delay}s;
+  @keyframes rise-up-animation{
+    0% {
+      transform: scale(0.7) translate(328px, 107px);
+      filter: drop-shadow(-2px 2px 10px black);
+    }
+
+  60% {
+      transform: scale(0.8) translate(214px, 85px);
+      filter: drop-shadow(black -4px 10px 6px);
+    }
+
+  100% {
+      transform: scale(1) translate(0px, 0px);
+      filter: drop-shadow(black -4px 7px 30px);
+    }
+  }
+
+  ${props => !!props.styles && props.styles}
+`;
+
+const RotateInPlaceEffect = styled.div`
+  position: absolute;
+  z-index: 2147483645; 
+  // transform: scale(0.7) translate(328px, 107px);
+  // filter: drop-shadow(-2px 2px 10px black);
+
+  animation: rotate-in-place-animation ${props => props.duration}s linear forwards 1;
+  animation-delay: ${props => props.delay ? props.delay : 0}s;
+  @keyframes rotate-in-place-animation{
+    0% {
+        transform: scale(-1, 1);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+  }
+
+  ${props => !!props.styles && props.styles}
+`;
+
+
+
+
+const SwoopOutEffect = styled.div`
+  position: absolute;
+  ${props => !!props.styles && props.styles}
+  animation: swoop-out-animation  ${props => props.duration}s ease-out forwards 1;
+
+@keyframes swoop-out-animation{
+0% {
+    z-index: -84;
+    transform: translate(-400px, 0px);
+}
+
+99% {
+    z-index: -84;
+    transform: translate(0px, 0px);
+}
+100% {
+    z-index: 2147483646;
+    transform: translate(0px, 0px);
+}
+}`;
+
 
 const shouldUpdate = (accTime, interval) => !(accTime % interval);
 
@@ -242,13 +316,10 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       }
     }
 
-    // console.log({ keys, dirs, dir });
     let tile;
     setPlayerData(data => {
-      // console.log({ playerData: data })
       if (Array.isArray(data) && !!data.length) {
         tile = data[0].tile;
-        // console.log({ tile });
         if (!!tile) {
           if (dir == "right" || dir == "left") {
             /*
@@ -267,7 +338,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           const nextTile = { i: tile.i + desiredOffset.i, j: tile.j + desiredOffset.j };
           const isValid = isTileOnGameBoard(nextTile);
 
-          // console.log({ desiredOffset, nextTile, isValid });
           if (isValid) {
             const path = findPath(
               tile,
@@ -288,7 +358,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const keyDown = code => {
     setKeysPressed(keys => {
       const newKeys = !keys.includes(code) ? [...keys, code] : keys; // add key
-      // console.log("keyDown", { newKeys });
       moveWASD(newKeys);
       return newKeys;
     });
@@ -297,7 +366,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const keyUp = code => {
     setKeysPressed(keys => {
       const newKeys = keys.includes(code) ? keys.filter(k => k != code) : keys; // remove key
-      // console.log("keyUp", { newKeys });
       !!newKeys.length && moveWASD(newKeys);
       return newKeys;
     });
@@ -315,13 +383,15 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       const _winner = 0;
       setWinner(_winner);
     }
+
     if (!!playerData.length && playerKillCount >= playerData.length) {
       setWinner(-1);
-      if (!!playerData.length && !!playerData[0] && !playerData[0].lives) {
-        setIsPlayerDead(true);
-        setKeysPressed([]);
-        setHighlightedTiles0([]);
-      }
+    }
+
+    if (!!playerData.length && !!playerData[0] && playerData[0].isDead) {
+      setIsPlayerDead(true);
+      setKeysPressed([]);
+      setHighlightedTiles0([]);
     }
   }, [kaijuKillCount, playerKillCount, MAX_TO_WIN]);
 
@@ -457,6 +527,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         : accTime.current + intervalTime;
   }, intervalTime);
 
+  const swoopOutDuration = 3; //testing
+
   return !isPlayingGame ? <AbilityPicker
     handleClickHome={handleClickHome}
     pickedAbilities={pickedAbilities}
@@ -526,20 +598,35 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               <HolographGridBackground src="GameUI_Pieces/HolographGrid4.png" />
             </BlinkFadeEffect>
           </BlinkFadeEffect>
-
-          <FloatingEffect>
-            <ProgressCounterOverlay />
-            <ProgressCounterOverlay isBackground={true} />
-          </FloatingEffect>
+            <SwoopOutEffect duration={swoopOutDuration}>
+            <FloatingEffect>
+              {/* <RotateInPlaceEffect duration={swoopOutDuration}> */}
+                <ProgressCounterOverlay />
+                <ProgressCounterOverlay isBackground={true} />
+              {/* </RotateInPlaceEffect> */}
+            </FloatingEffect>
+          </SwoopOutEffect>
           {isTeammate ?
-            <FloatingEffect
-              styles={" display: flex; flex-direction: column; animation-delay: 3s;"}
-              duration={"5"}>
-              <Avatar_Overlay isTeammate={true} />
-              <Avatar_Overlay isTeammate={true} isBackground={true} />
-            </FloatingEffect> : null}
-          <Avatar_Overlay isTeammate={false} />
-          <Avatar_Overlay isTeammate={false} isBackground={true} />
+            <SwoopOutEffect duration={swoopOutDuration}>
+              <FloatingEffect
+                styles={`display: flex; flex-direction: column; animation-delay: 3s;`}
+                duration={"5"}>
+                <Avatar_Overlay isTeammate={isTeammate} />
+                <Avatar_Overlay isTeammate={isTeammate} isBackground={true} />
+              </FloatingEffect>
+            </SwoopOutEffect>
+            : null}
+          <SwoopOutEffect duration={swoopOutDuration}>
+            <RiseUpEffect duration={1} delay={swoopOutDuration}>
+              <FloatingEffect
+                styles={`display: flex; flex-direction: column; animation-delay: 2s;`}
+                duration={"5.5"}>
+                <Avatar_Overlay isTeammate={false} />
+                <Avatar_Overlay isTeammate={false} isBackground={true} />
+              </FloatingEffect>
+            </RiseUpEffect>
+          </SwoopOutEffect>
+
           <GameWrapper width={width} height={height}>
             <GameBoard
               isPaused={isPaused}

@@ -4,6 +4,7 @@ import { Abilities } from "./Components/Abilities";
 import { HealthBar } from "./Components/HealthBar";
 import { PassiveAbilities } from "./Components/PassiveAbilities";
 import { FloatingEffect } from 'Game/Game';
+import { BlinkFadeEffect } from 'Components/AvatarSelection';
 
 const Wrapper = styled.div`
   position: relative;
@@ -60,6 +61,34 @@ const PlayerPictureBackground = styled.div`
     animation: 4s steps(9) 0s infinite normal none running playSpriteSheet;
     transform: ${props => props.isBlue ? "scale(0.3, 0.45) translate(-776px, -274px)" : "scale(0.3, 0.45) translate(-785px, -274px);"};   
 `;
+
+const ModifierList = styled.ul`
+    position: absolute;
+    transform: translate(${props => props.translation ? props.translation : `347px, -65px`});
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+`;
+
+const ModifierListitem = styled.li`
+    padding: 10px;
+  ${props => props.translateX && `transform: translate(${props.translateX});`}
+`;
+
+const ModifierValue = styled.span`
+  border-bottom: solid 5px;
+  border-color: ${props => props.color};
+  color: ${props => props.color};
+  font-size: 35px;
+  padding: 7px 7px 7px ${props => props.notZero ? "7px" : "17px"};
+  margin-right: ${props => props.notZero ? "17px" : "7px"};;
+`;
+
+const ModifierLabel = styled.span`
+  color: ${props => props.color};
+  fonst-size: 20px;
+`;
+
 export const PlayerUI = ({
   playerData = [
     {
@@ -98,12 +127,30 @@ export const PlayerUI = ({
   isPaused,
   accTime
 }) => {
-  const { gender } = playerData[playerIndex];
+  const {
+    gender,
+    moveSpeedModifier,
+    numTilesModifier,
+    tileCountModifier
+  } = playerData[playerIndex];
   const isReversed = isTeammate;
+
+  const modifierListItem = (color, label, value, translateX) => <ModifierListitem translateX={translateX}>
+    <ModifierValue notZero={value != 0} color={color}>{value > 0 ? `+${value}` : value}</ModifierValue>
+    <ModifierLabel color={color}>{label}</ModifierLabel>
+  </ModifierListitem>;
+
+  const modifierDisplay = <BlinkFadeEffect>
+      <ModifierList translation={isTeammate ? '341px, -65px' : undefined}>
+        {modifierListItem('#86d8deff', 'Speed', moveSpeedModifier)}
+        {modifierListItem('#d4d07bff', 'Area', numTilesModifier, "17px")}
+        {modifierListItem('#d4aa7bff', 'Range', tileCountModifier)}
+      </ModifierList>
+  </BlinkFadeEffect>;
 
   const _playerUI = (
     <Wrapper percentZoom={percentZoom} isTeammate={isTeammate}>
-      {/* <div style={{ position: "absolute", color: "#fff" }}>{ playerData[playerIndex].numTilesModifier}</div> */}
+      {modifierDisplay}
       {isReversed ? (
         <>
           <Abilities
@@ -179,11 +226,9 @@ export const PlayerUI = ({
       />
     </Wrapper>
   );
-  return isTeammate ?
-    <FloatingEffect 
-      styles={" display: flex; flex-direction: column; animation-delay: 3s;"}
-      duration={"5"}>
-      {_playerUI}
-    </FloatingEffect>
-    : _playerUI;
+  return <FloatingEffect
+        styles={`display: flex; flex-direction: column; ${isTeammate ? "animation-delay: 3s;" : "animation-delay: 2s;"}`}
+        duration={isTeammate ? "5" : "5.5"}>
+        {_playerUI}
+      </FloatingEffect>;
 };

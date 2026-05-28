@@ -8,7 +8,7 @@ const TransitionWrapper = styled.div`
   position: absolute;
   width: 100dvw;
   height: 100dvh;
-  z-index: 99999999999;
+  z-index: 2147483647;
   pointer-events: none;
 `;
 const TransitionStrip = styled.div`
@@ -17,7 +17,7 @@ const TransitionStrip = styled.div`
   border-radius: 150px;
     // box-shadow: 3px 7px 10px black;
   ${props =>
-    props.duration !== undefined && `z-index: ${99999999999999 + props.duration};`}
+    props.duration !== undefined && `z-index: ${2147483647 + props.duration};`}
   @keyframes moveRight {
     0% {
       right: -100dvw;

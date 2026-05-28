@@ -498,12 +498,12 @@ export const updateTileState = (
             const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
             if (entry) {
               const playerOnTile = playerData.find(
-                ({ tile }) => tile && tile.i === i && tile.j === j
+                ({ tile, isDead }) => !isDead && (tile && tile.i === i && tile.j === j)
               );
               const kaijuOnTile = kaijuData
                 .filter(({ isOnTiles, lives }) => isOnTiles && lives)
                 .find(
-                  ({ tile }) => tile && tile.i === i && tile.j === j
+                  ({ tile, isDead }) => !isDead && (tile && tile.i === i && tile.j === j)
                 );
               const entityOnTileStatus = playerOnTile || kaijuOnTile;
               const playerKaijuConflictKey = playerOnTile && kaijuOnTile ? playerOnTile.key : undefined;
@@ -771,7 +771,7 @@ export const shootPower = ({
       const originTile = d.tile;
       const [targetTile, targetIndex] =
         statusKey === "isHealing"
-          ? data.length < 2 || !!data[1].isDead || data[0].lives <= data[1].lives
+          ? data.length < 2 || !!data[1].isDead || ((data[0].lives <= data[1].lives) && !data[0].isDead)
             ? [data[0].tile, 0]
             : [data[1].tile, 1]
           : getClosestEntityFromTile(targetData, originTile, scale);
@@ -783,22 +783,21 @@ export const shootPower = ({
           // "isGhosted",
           // "isHealing"
         ];
-        const countReductionForNumTilesModifierStatus = statusKey == "isOnFire" && !!data[dataIndex].numTilesModifier ? 3 : 0;
+        const countReductionForNumTilesModifierStatus = statusKey == "isOnFire" && !!data[dataIndex].numTilesModifier ? 2 : 0;
         const [tile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
-          data[dataIndex].numTilesModifier 
-          // && !excludeStatusesForTileStatusesNumTilesModifier.includes(statusKey)
+          data[dataIndex].numTilesModifier
+            // && !excludeStatusesForTileStatusesNumTilesModifier.includes(statusKey)
             ? numTiles + data[dataIndex].numTilesModifier
             : numTiles
         );
-        const tileCount = data[dataIndex].tileCountModifier 
-                  && !excludeStatusesForTileStatusesCountModifier.includes(statusKey)
-                    ? count + data[dataIndex].tileCountModifier
-                    : count
-
-        console.log({ count: tileCount - countReductionForNumTilesModifierStatus, countReductionForNumTilesModifierStatus, tileCount, statusKey, numTilesModifier: data[dataIndex].numTilesModifier })
+        const tileCount = data[dataIndex].tileCountModifier
+          && !excludeStatusesForTileStatusesCountModifier.includes(statusKey)
+          ?
+          count + data[dataIndex].tileCountModifier
+          : count
 
         setTileStatuses(_tiles => {
           if (!!tile && !!_tiles && !!_tiles[tile.i] && !!_tiles[tile.i][tile.j]) {
@@ -1099,7 +1098,6 @@ export const movePlayerPieces = (
 
             // use powers
             let hasUsedOnePower = Object.values(teammatePowersRaceConditionFix.current).some(v => (accTime - v.accTime) < 500);
-            // console.log({ hasUsedOnePower, accTime, teammatePowersRaceConditionFix })
             !hasUsedOnePower && _data[i].abilities.forEach((a, j) => {
 
               /*
@@ -1107,10 +1105,9 @@ export const movePlayerPieces = (
                      consider resetting ability accTime
                      if larger than accTime as hacky fix (for the moment).
               */
+              const AI_accTimeDelay = 750;
               const diff = accTime - a.accTime;
-              const isCooldownOver = diff > a.cooldownTimeAI;
-
-              // console.log({ accTime, a, diff, isCooldownOver, hasUsedOnePower });
+              const isCooldownOver = (diff > (a.cooldownTimeAI + AI_accTimeDelay)) || accTime < a.accTime;
 
               if (isCooldownOver && !hasUsedOnePower) {
 
@@ -1138,25 +1135,11 @@ export const movePlayerPieces = (
                   a.type.includes("defensive") && isInDanger;
                 const isEscapePowerAndIsInDanger =
                   a.type.includes("escape") &&
-                  a.range > numTilesFromTarget;
+                  a.range > numTilesFromTarget || isInDanger;
                 const isHealPowerAndIsTeammateHealthLow =
                   a.type.includes("heal") &&
                   ((!!data[0].lives && data[0].lives < 4) ||
                     (!!data[1].lives && data[1].lives < 4));
-
-                // BUG: powers not triggering due to large a.accTime causing negative diff...
-                // console.log({
-                //   accTime,
-                //   a,
-                //   bool: isOffensivePowerAndTargetInRange ||
-                //     isDefensivePowerAndIsInDanger ||
-                //     isEscapePowerAndIsInDanger ||
-                //     isHealPowerAndIsTeammateHealthLow,
-                //   isOffensivePowerAndTargetInRange,
-                //   isDefensivePowerAndIsInDanger,
-                //   isEscapePowerAndIsInDanger,
-                //   isHealPowerAndIsTeammateHealthLow
-                // });
 
                 if (
                   isOffensivePowerAndTargetInRange ||
@@ -1164,7 +1147,6 @@ export const movePlayerPieces = (
                   isEscapePowerAndIsInDanger ||
                   isHealPowerAndIsTeammateHealthLow
                 ) {
-                  // console.log({ accTime, a });
 
                   teammatePowersRaceConditionFix.current[a.element] = { shotPower: false, accTime };
                   hasUsedOnePower = true;
@@ -1186,14 +1168,17 @@ export const movePlayerPieces = (
                     _data[i] = a.togglePassive(_data[i]);
                   }
 
+                  const delay = a.passiveDurationTime ? a.passiveDurationTime : a.cooldownTimeAI;
+
                   // toggle-off teammate passive ability
-                  setTimeout(() => setData(d => {
+                  const timeoutRef = setTimeout(() => setData(d => {
                     if (!!d[i]) {
                       const toggleOff = true;
                       d[i] = a.togglePassive(d[i], toggleOff);
+                      d[i].abilities[j].toggleOffPassiveTimeoutRef = timeoutRef;
                     }
                     return d;
-                  }), a.cooldownTimeAI);
+                  }), delay);
                 }
               }
             });
@@ -1313,12 +1298,27 @@ export const movePlayerPieces = (
                   // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
                   const remainingDmg = dmg.lifeDecrement - livesModifier;
                   dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
-                  _data[i].livesModifier = remainingDmg < 0 ? 1 : 0; //remainingDmg * -1 : 0;
+                  _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
+
+                  // only wood ability gives: positive "livesModifier." clearTimeout as passive has been toggled-off by decrementing extra lives
+                  const woodAbility = _data[i].abilities.find(({ element, toggleOffPassiveTimeoutRef }) => element == 'wood' && !!toggleOffPassiveTimeoutRef);
+                  if (woodAbility) {
+                    clearTimeout(woodAbility.toggleOffPassiveTimeoutRef);
+                    woodAbility.toggleOffPassiveTimeoutRef = undefined;
+                  }
                 } else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
                   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
                   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
                   dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
                   _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
+
+                  // only death ability gives: negative "livesModifier." clearTimeout as passive has been "toggled-off"
+                  const deathAbility = _data[i].abilities.find(({ element, toggleOffPassiveTimeoutRef }) => element == 'death' && !!toggleOffPassiveTimeoutRef);
+
+
+                  if (deathAbility) {
+                    clearTimeout(deathAbility.toggleOffPassiveTimeoutRef);
+                  }
                 }
 
                 _data[i].lives =
@@ -1367,11 +1367,12 @@ export const moveKaijuPieces = ({
         // use powers
         if (_data[i].isOnTiles && _data[i].abilities.length) {
           _data[i].abilities.forEach((a, j) => {
+            // AI triggers power immediately so delay next activation to let UI state catch-up
             const isCooldownOver =
               accTime - a.accTime >= a.cooldownTimeAI || accTime < a.accTime;
             if (isCooldownOver) {
               const [targetTile, _] = getClosestEntityFromTile(
-                enemyData,
+                enemyData.filter(({ isDead }) => !isDead),
                 _data[i].tile,
                 scale
               );
@@ -1417,14 +1418,19 @@ export const moveKaijuPieces = ({
           !_data[i].isOnTiles &&
           _data[i].isThere &&
           !_data[i].moveToTiles.length
-        )
+        ) {
           _data[i].isOnTiles = true;
+
+          // also, reset the kaiju ability accTimes
+          _data[i].abilities.forEach(a => { a.accTime = accTime; })
+        }
+
         // - - - - - - - - - - -
         // if Kaiju and on tiles, move toward the closest player.
         if (_data[i].isKaiju && _data[i].isOnTiles) {
           if (enemyData.length) {
             const [targetTile, _] = getClosestEntityFromTile(
-              enemyData,
+              enemyData.filter(({ isDead }) => !isDead),
               _data[i].tile,
               scale
             );
@@ -1514,12 +1520,12 @@ export const moveKaijuPieces = ({
                 _data[i].lastDmg = accTime;
 
 
-                if (_data[i].livesModifier > 0 && dmg.lifeDecrement > 0) {
-                  // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
-                  const remainingDmg = dmg.lifeDecrement - _data[i].livesModifier;
-                  dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
-                  _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
-                } 
+                // if (_data[i].livesModifier > 0 && dmg.lifeDecrement > 0) {
+                //   // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
+                //   const remainingDmg = dmg.lifeDecrement - _data[i].livesModifier;
+                //   dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
+                //   _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
+                // }
                 // else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
                 //   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
                 //   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
@@ -1644,7 +1650,6 @@ export const useHover = () => {
 export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isPlayerDead }) => {
   useEffect(() => {
     const handler = ({ code }, callback) => {
-      // console.log({ code })
       if (Array.isArray(keyCodes) && keyCodes.includes(code)) {
         callback(code);
       } else if (keyCodes === code) {
@@ -2542,7 +2547,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         title: "Heal",
         description: "Heal your teammate",
         effect1: "",
-        effect2: "",
+        effect2: "RoE: 7 AoE: 1",
+        RoE: "7",
+        AoE: "1",
         img: "",
         formatData: {},
         icon: "fa-heart",
@@ -2552,7 +2559,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Good Vibes",
         description: "You send out good vibes",
-        effect1: "+1 tile count modifier",
+        effect1: "+1 range of effect",
         effect2: "",
         img: "",
         formatData: {},
@@ -2561,9 +2568,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityMetalPassive":
       return {
-        title: "Builder",
-        description: "Your powers are prolific",
-        effect1: "+1 number of tiles modifier",
+        title: "Seasoned Builder",
+        description: "You are prolific",
+        effect1: "+2 area of effect",
         effect2: "",
         // effect2: "+1 tile count modifier",
         img: "",
@@ -2577,7 +2584,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         description:
           "Create an area of protection around you. Blocking many ranged attacks",
         effect1: "Status remains on the tile until walked on",
-        effect2: "",
+        effect2: "RoE: 2 AoE: 6",
+        RoE: "2",
+        AoE: "6",
         img: "",
         formatData: {},
         icon: "fa-shield",
@@ -2587,7 +2596,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Teleport Sickness",
         description: "Zipping through space-time makes you nauseous",
-        effect1: "-2 to move speed",
+        effect1: "-2 move speed",
         effect2: "",
         img: "",
         formatData: {},
@@ -2609,7 +2618,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Inclement Weather",
         description: "The forecast calls for snow",
-        effect1: "-1 to move speed",
+        effect1: "-1 move speed",
         effect2: "",
         img: "",
         formatData: {},
@@ -2621,7 +2630,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         title: "Ice Slice",
         description: "Conjure a stationary vortex of ice",
         effect1: "",
-        effect2: "",
+        effect2: "RoE: 10 AoE: 6",
+        RoE: "10",
+        AoE: "6",
         img: "",
         formatData: {},
         icon: "fa-snowflake-o",
@@ -2629,9 +2640,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityFirePassive":
       return {
-        title: "Fuel to Burn",
-        description: "All of your powers go farther and last longer",
-        effect1: "+1 tile count modifier",
+        title: "Uncontrolled Burn",
+        description: "All effects last longer and go farther",
+        effect1: "+2 range of effect",
         effect2: "",
         img: "",
         formatData: {},
@@ -2643,7 +2654,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         title: "Wildfire",
         description: "Create a single, lateral line of fire",
         effect1: "Fire travels in the direction of your closest enemy",
-        effect2: "",
+        effect2: "RoE: 10 AoE: 3",
+        RoE: "10",
+        AoE: "3",
         img: "",
         formatData: {},
         icon: "fa-free-code-camp",
@@ -2653,7 +2666,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Healthy",
         description: "You're extra healthy",
-        effect1: "+1 lives",
+        effect1: "+1 health",
         effect2: "",
         img: "",
         formatData: {},
@@ -2664,9 +2677,11 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Overgrowth",
         description:
-          "Poison ivy travels in the direction of your closest enemy",
+          "Poison ivy travels to your closest enemy",
         effect1: "Status remains on the tile until walked on",
-        effect2: "",
+        effect2: "RoE: 10 AoE: 3",
+        RoE: "10",
+        AoE: "3",
         img: "",
         formatData: {},
         icon: "fa-leaf",
@@ -2676,7 +2691,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Charged Step",
         description: "Electrical energy courses through your body",
-        effect1: "+1 to move speed",
+        effect1: "+2 move speed",
         effect2: "",
         img: "",
         formatData: {},
@@ -2689,7 +2704,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         description:
           "Cast 3 bolts of lightning in the direction of your closest enemy",
         effect1: "Bolts ricochet off the walls of the map",
-        effect2: "",
+        effect2: "RoE: 20 AoE: 3",
+        RoE: "20",
+        AoE: "3",
         img: "",
         formatData: {},
         icon: "fa-bolt",
@@ -2697,9 +2714,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityDeathPassive":
       return {
-        title: "One Foot in the Grave",
-        description: "Communing with death has brought you closer to it...",
-        effect1: "-1 lives",
+        title: "Blood Ritual",
+        description: "Nothing calls Death quicker than a fresh wound",
+        effect1: "-1 health",
         effect2: "",
         img: "",
         formatData: {},
@@ -2711,7 +2728,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         title: "Haunt",
         description: "Shoot a ghost at your closest enemy",
         effect1: "",
-        effect2: "",
+        effect2: "RoE: 30 AoE: 1",
+        RoE: "30",
+        AoE: "1",
         img: "",
         formatData: {},
         icon: "fa-snapchat-ghost",
@@ -2719,9 +2738,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityBubblePassive":
       return {
-        title: "Pretty Bubbles",
-        description: "So pretty!",
-        effect1: "",//+1 number of tiles modifier",
+        title: "Floating",
+        description: "Just drifting",
+        effect1: "-2 range of effect",//+1 number of tiles modifier",
         effect2: "",
         img: "",
         formatData: {},
@@ -2733,7 +2752,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         title: "Dispel",
         description: "Dispel all tile effects around you",
         effect1: "Clears both positive and negative statuses",
-        effect2: "",
+        effect2: "RoE: 7 AoE: 6",
+        RoE: "7",
+        AoE: "6",
         img: "",
         formatData: {},
         icon: "fa-question-circle-o",
@@ -2793,12 +2814,11 @@ export const determineKaijuQuantity = difficulty => {
 }
 export const modifyStats = (playerStats, toggleOff, attr, modifier, max) => {
   const mod = (toggleOff ? -1 : 1) * modifier;
-  const modification = !!max && Math.abs(playerStats[attr] + mod) > Math.abs(max) ? max : playerStats[attr] + mod;
+  const modification = playerStats[attr] + mod;
   const update = ({
     ...playerStats,
-    [attr]: modification//(toggleOff && !playerStats[attr]) ? 0 : modification
+    [attr]: modification
   })
-  console.log({ modification, update, playerStats, toggleOff, attr, modifier, max });
   return update;
 };
 

@@ -172,6 +172,7 @@ export const Ability = ({
     togglePassive,
     cooldownTime,
     cooldownTimeAI,
+    passiveDurationTime,
     element,
     color
   } = abilityData;
@@ -191,8 +192,10 @@ export const Ability = ({
   useEffect(() => {
     if (isOnCoolDown && isPlayerAlive && !isPaused) {
 
+      // player triggered their abilities or teammate's abiltiies 
       if (COOLDOWN_VALS.click === isOnCoolDown) {
-        // activate player active ability
+
+        // activate active ability
         activateActive(
           playerIndex,
           playerData,
@@ -203,45 +206,46 @@ export const Ability = ({
           { current: { [element]: { shotPower: false } } }
         );
 
-        // toggle-on player passive ability
         if (togglePassive != undefined && setPlayerData != undefined) {
+
+          const delay = passiveDurationTime ? 
+                          passiveDurationTime : // required when the passive effect's duration needs to be shorter than the cooldown time
+                          (playerIndex > 0 ? 
+                            cooldownTimeAI : cooldownTime);
+
+          // set timer to toggle-off player passive ability once cooldown ends
+          const timeoutRef = setTimeout(() => {
+            setPlayerData(p => {
+              if (!!p[playerIndex]) {
+                const toggleOff = true;
+                const update = togglePassive(p[playerIndex], toggleOff);
+                p[playerIndex] = update;
+              }
+              return p;
+            });
+          }, delay);
+
+          // activate passive ability
           setPlayerData(p => {
             if (!!p[playerIndex]) {
               const update = togglePassive(p[playerIndex]);
-              // console.log("before toggle-on passive", { player: p[playerIndex], update, element });
               p[playerIndex] = update;
               p[playerIndex].abilities[abilityIndex].accTime = accTime;
-              // console.log("after toggle-on passive", { player: p[playerIndex], update, element });
-            }
-            return p;
-          })
-        }
-      }
-
-
-      setIsAnimating(true);
-      setTimeout(() => setIconLookupString("loader"), 250);
-
-      // console.log("before timeout", cooldownTime, element);
-      setTimeout(() => {
-        setIsOnCoolDown(COOLDOWN_VALS.false);
-        setIconLookupString("active");
-        // console.log("timeout triggered", cooldownTime, element);
-
-        if (COOLDOWN_VALS.click === isOnCoolDown && togglePassive != undefined && setPlayerData != undefined) {
-          // toggle-off player passive ability
-          setPlayerData(p => {
-            if (!!p[playerIndex]) {
-              const toggleOff = true;
-              const update = togglePassive(p[playerIndex], toggleOff);
-              // console.log("before toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
-              p[playerIndex] = update;
-              // console.log("after toggle-off passive", { player: p[playerIndex], update, element, cooldownTime });
+              p[playerIndex].abilities[abilityIndex].toggleOffPassiveTimeoutRef = timeoutRef;
             }
             return p;
           });
         }
-      }, playerIndex > 0 ? cooldownTimeAI : cooldownTime);
+
+      }
+
+      // ability icon cooldown aesthetics
+      setIsAnimating(true);
+      setTimeout(() => setIconLookupString("loader"), 250);
+      setTimeout(() => {
+        setIsOnCoolDown(COOLDOWN_VALS.false);
+        setIconLookupString("active");
+      }, cooldownTime);
     }
   }, [isOnCoolDown]);
 
@@ -262,7 +266,7 @@ export const Ability = ({
         disabled={true}
         className={`fa ${ICON_LOOKUP[element][iconLookupString]}`}
         isCoolDown={isOnCoolDown}
-        cooldownTime={playerIndex > 0 ? cooldownTimeAI : cooldownTime}
+        cooldownTime={cooldownTime}
         color={color}
       />
       <AbilityNum color={color}>

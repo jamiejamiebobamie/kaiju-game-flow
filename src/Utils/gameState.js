@@ -1510,7 +1510,7 @@ export const PERIMETER_TILES = {
 };
 export const PLAYER_ABILITIES = {
   ice: {
-    passiveName: "Frozen Joints",
+    passiveName: "Inclement Weather",
     activeName: "Ice Slice",
     range: 3,
     type: ["offensive", "defensive"],
@@ -1542,16 +1542,16 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 3000,
-    cooldownTime: 4000,
+    cooldownTimeAI: 4000,
+    cooldownTime: 3000,
     color: "PaleTurquoise"
   },
   fire: {
-    passiveName: "Fuel to Burn",
+    passiveName: "Uncontrolled Burn",
     activeName: "Wildfire",
     range: 10,
     type: ["offensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 1),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 2),
     activateActive: (
       k,
       data,
@@ -1587,7 +1587,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "Healthy",
     activeName: "Overgrowth",
     type: ["offensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', 1, 1),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', 1),
     activateActive: (
       k,
       data,
@@ -1647,7 +1647,7 @@ export const PLAYER_ABILITIES = {
         setTileStatuses
       })
     },
-    range: 10,
+    range: 15,
     displayLookup: "abilityLightning",
     elementUppercase: "Lightning",
     element: "lightning",
@@ -1656,15 +1656,15 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     cooldownTime: 2500,
     cooldownTimeAI: 5000,
-
+    passiveDurationTime: 3000,
     color: "cyan"
   },
   death: {
-    passiveName: "One Foot in the Grave",
+    passiveName: "Blood Ritual",
     activeName: "Haunt",
     range: 10,
     type: ["offensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', -1, -1),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', -1),
     activateActive: (
       k,
       data,
@@ -1692,16 +1692,17 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 8000,
-    cooldownTimeAI: 7000,
+    cooldownTime: 7000,
+    cooldownTimeAI: 8000,
 
     color: "GhostWhite"
   },
   bubble: {
-    passiveName: "Pretty Bubbles",
+    passiveName: "Floating",
     activeName: "Dispel",
     type: ["defensive"],
-    togglePassive: playerStats => playerStats,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', -2), // modifyStats(playerStats, toggleOff, 'numTilesModifier', -1)
+    // togglePassive: playerStats => playerStats,
     activateActive: (
       k,
       data,
@@ -1731,7 +1732,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 2000,
-    cooldownTimeAI: 2500,
+    cooldownTimeAI: 3000,
     color: "Thistle"
   },
   metal: {
@@ -1768,7 +1769,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    cooldownTimeAI: 4000,
+    cooldownTimeAI: 5000,
 
     color: "AntiqueWhite"
   },
@@ -1777,7 +1778,7 @@ export const PLAYER_ABILITIES = {
     activeName: "Escape",
     range: 5,
     type: ["escape"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -2),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -3),
     activateActive: (
       k,
       data,
@@ -1800,6 +1801,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
+    passiveDurationTime: 4000,
     cooldownTime: 10000,
     cooldownTimeAI: 11000,
     color: "BlueViolet"
@@ -1830,14 +1832,14 @@ export const PLAYER_ABILITIES = {
         setTileStatuses
       })
     },
-    range: 10,
+    range: 5,
     displayLookup: "abilityHeart",
     elementUppercase: "Heart",
     element: "heart",
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 10000,
+    cooldownTimeAI: 11000,
     cooldownTime: 10000,
     color: "pink"
   },
@@ -1943,8 +1945,8 @@ export const PLAYER_CLASSES = [
   },
   {
     elems: "Bubble,Fire,Metal",
-    class_name: "General",
-    player_class_description: "You command fire and metal."
+    class_name: "Bomb-monger",
+    player_class_description: "Free samples!"
   },
   {
     elems: "Bubble,Fire,Wood",

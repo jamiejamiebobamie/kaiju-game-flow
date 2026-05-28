@@ -17,7 +17,7 @@ export const MainMenu = ({ handleClickGame, handleClickTutorial, handleClickSett
     <ButtonsWrapper>
       <Button onClick={handleClickGame}>
         <ButtonOutline zIndex={1} />
-        Game
+        New Game
       </Button>
     </ButtonsWrapper>
     <ButtonsWrapper>

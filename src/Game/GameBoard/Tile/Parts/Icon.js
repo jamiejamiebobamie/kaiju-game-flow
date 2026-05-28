@@ -14,6 +14,16 @@ const StyledIcon = styled.i`
   ${props => props.className === "fa fa-shield" && "margin-left: 5px;"}
   ${props => props.className === "fa fa-bolt" && "margin-left: 10px;"}
 
+    // TEST
+  animation: flip-flop 2s steps(2) linear infinite;
+  @keyframes flip-flop {  
+    to {
+      transform: scale(3, 3) translate(19px, 15px);
+    }
+    from {
+      transform: scale(3, -3) translate(19px, 15px);
+    }
+  }
 `;
 
 export const Icon = ({ color, className, zIndex }) => {

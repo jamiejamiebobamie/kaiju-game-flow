@@ -44,16 +44,16 @@ export const DescriptionDisplay = ({
   isTutorial
 }) => {
 
-  const classObject = Array.isArray(pickedAbilities) && 
+  const classObject = Array.isArray(pickedAbilities) &&
     pickedAbilities.length === 3 &&
     Array.isArray(PLAYER_CLASSES) &&
     !!PLAYER_CLASSES.find(classObject =>
-      typeof(classObject.elems) == 'string'
-        && classObject.elems.split(",").sort((a1, a2) => a1.localeCompare(a2)).join(",") === pickedAbilities.join(",")) ?
-      PLAYER_CLASSES.find(classObject =>
-      typeof(classObject.elems) == 'string'
-        && classObject.elems.split(",").sort((a1, a2) => a1.localeCompare(a2)).join(",") === pickedAbilities.join(","))
-      : null;
+      typeof (classObject.elems) == 'string'
+      && classObject.elems.split(",").sort((a1, a2) => a1.localeCompare(a2)).join(",") === pickedAbilities.join(",")) ?
+    PLAYER_CLASSES.find(classObject =>
+      typeof (classObject.elems) == 'string'
+      && classObject.elems.split(",").sort((a1, a2) => a1.localeCompare(a2)).join(",") === pickedAbilities.join(","))
+    : null;
 
   const [_string, playerIndex] = (displayString &&
     displayString.split(" ")) || ["", 0];
@@ -63,22 +63,24 @@ export const DescriptionDisplay = ({
     description,
     effect1,
     effect2,
+    RoE,
+    AoE,
     img,
     icon,
     color
   } = (displayString &&
-    getAbilityPickerDescription(_string, playerData, Number(playerIndex))) || 
-    (!!classObject && getAbilityPickerDescription("class", [{
-      playerClass: classObject.class_name,
-      playerClassDescription: classObject.player_class_description,
-      elements: classObject.elems
-    }], Number(playerIndex))) ||
-   {
-    title: "",
-    description: "Select 3 abilities to find out your class",
-    img: "",
-    formatData: {}
-  };
+    getAbilityPickerDescription(_string, playerData, Number(playerIndex))) ||
+  (!!classObject && getAbilityPickerDescription("class", [{
+    playerClass: classObject.class_name,
+    playerClassDescription: classObject.player_class_description,
+    elements: classObject.elems
+  }], Number(playerIndex))) ||
+    {
+      title: "",
+      description: "Select 3 abilities to find out your class",
+      img: "",
+      formatData: {}
+    };
 
   return (
     <Wrapper isClassWrapper={isClassWrapper}>
@@ -103,13 +105,27 @@ export const DescriptionDisplay = ({
               alignItems: "flex-end"
             }}
           >
+            {(!!RoE && !!AoE) ? <div
+              style={{
+                display: "flex",
+                alignItems: "flex-end",
+                flexDirection: "column",
+                fontSize: "11px",
+                // height: '20px',
+                marginTop: '-5px',
+                marginRight: '30px'
+              }}
+            >
+              <p>{`Range: ${RoE}`}</p>
+              <p>{`Area: ${AoE}`}</p>
+            </div> : null}
             <AbilityIcon color={color} className={`fa ${icon}`} />
           </div>
         )}
       </h2>
       <p>{description}</p>
       <p>{effect1}</p>
-      <p>{effect2}</p>
+      {/* <p>{effect2}</p> */}
       <img src={img} />
     </Wrapper>
   );

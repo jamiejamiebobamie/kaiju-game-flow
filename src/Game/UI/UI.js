@@ -14,7 +14,7 @@ ${props => props.percentZoom ? `transform: scale(${props.percentZoom}) translate
   border-radius: 10px;
   align-self: center;
   width: 320px;
-  z-index: 2147483648;
+  z-index: 2147483646;
   pointer-events: none;
 `;
 const ButtonGroup = styled.div`
@@ -82,7 +82,7 @@ const ProgressCounter = styled.div`
   height: 40px;
 
   position: absolute;
-  z-index: 1111111110;
+  z-index: 2147483646;
 
   display: flex;
   align-self: flex-end;
@@ -155,16 +155,16 @@ export const UI = ({
     accTime={accTime}
   />);
   const buttons = <ButtonGroup>
-    <ButtonsWrapper>
+    <ButtonsWrapper title={'Pause'}>
       <Button onClick={handleClickPause}>
         <ButtonOutline zIndex={1} />
         Pause
       </Button>
     </ButtonsWrapper>
-    <ButtonsWrapper>
+    <ButtonsWrapper title={'Goodbye!'}>
       <Button onClick={handleClickHome}>
         <ButtonOutline zIndex={1} />
-        Home
+        Leave
       </Button>
     </ButtonsWrapper>
   </ButtonGroup>

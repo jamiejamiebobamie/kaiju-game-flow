@@ -216,7 +216,7 @@ const Character = styled.div`
   }
 }
 `;
-export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize, isGoingToSpewFire }) => {
+export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize, isGoingToSpewFire, isOnTiles }) => {
   const [healthModifierText, setHealthModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
@@ -246,7 +246,7 @@ export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize,
       {healthModifierText}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <Character isDamaged={isDamaged}>
-        <SpriteSheet isGoingToSpewFire={isGoingToSpewFire} lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
+        <SpriteSheet isGoingToSpewFire={isOnTiles && isGoingToSpewFire} lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
       </Character>
     </Monster>
   );
