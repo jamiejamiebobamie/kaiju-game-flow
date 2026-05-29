@@ -140,7 +140,8 @@ export const UI = ({
       </FloatingEffect>
     </ProgressContent>
   </ProgressCounter>
-  const playerUIs = Array.isArray(playerData) && playerData.map((_, i) => <PlayerUI
+  const playerUIs = Array.isArray(playerData) && playerData.map((pd, i) => <PlayerUI
+    pd={pd}
     playerData={playerData}
     setPlayerData={setPlayerData}
     kaijuData={kaijuData}

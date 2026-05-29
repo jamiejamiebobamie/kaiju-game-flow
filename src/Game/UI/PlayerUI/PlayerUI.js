@@ -72,7 +72,11 @@ const ModifierList = styled.ul`
 
 const ModifierListitem = styled.li`
     padding: 10px;
-  ${props => props.translateX && `transform: translate(${props.translateX});`}
+    ${props => props.translateX && `transform: translate(${props.translateX});`}
+    opacity: ${props => props.notZero ? 1 : 0};
+    -webkit-transition-duration: 3s;
+    transition-duration: 3s;
+    transition-property: opacity;
 `;
 
 const ModifierValue = styled.span`
@@ -90,6 +94,7 @@ const ModifierLabel = styled.span`
 `;
 
 export const PlayerUI = ({
+  pd,
   playerData = [
     {
       lives: 0,
@@ -129,60 +134,60 @@ export const PlayerUI = ({
 }) => {
   const {
     gender,
+    livesModifier,
     moveSpeedModifier,
     numTilesModifier,
     tileCountModifier
   } = playerData[playerIndex];
-  const isReversed = isTeammate;
 
-  const modifierListItem = (color, label, value, translateX) => <ModifierListitem translateX={translateX}>
-    <ModifierValue notZero={value != 0} color={color}>{value > 0 ? `+${value}` : value}</ModifierValue>
-    <ModifierLabel color={color}>{label}</ModifierLabel>
-  </ModifierListitem>;
+  const modifierListItem = (color, label, value, translateX) => (
+    <ModifierListitem notZero={true /*value != 0*/} translateX={translateX}>
+      <ModifierLabel color={color}>{label}</ModifierLabel>
+      <ModifierValue notZero={value != 0} color={color}>{value > 0 ? `+${value}` : value}</ModifierValue>
+    </ModifierListitem>);
 
   const modifierDisplay = <BlinkFadeEffect>
-      <ModifierList translation={isTeammate ? '341px, -65px' : undefined}>
-        {modifierListItem('#86d8deff', 'Speed', moveSpeedModifier)}
-        {modifierListItem('#d4d07bff', 'Area', numTilesModifier, "17px")}
-        {modifierListItem('#d4aa7bff', 'Range', tileCountModifier)}
-      </ModifierList>
+    <ModifierList translation={isTeammate ? '341px, -65px' : undefined}>
+      {modifierListItem('#8dde86ff', 'Health', livesModifier)}
+      {modifierListItem('#86d8deff', 'Speed', moveSpeedModifier)}
+      {modifierListItem('#d4d07bff', 'Area', numTilesModifier, "17px")}
+      {modifierListItem('#d4aa7bff', 'Range', tileCountModifier)}
+    </ModifierList>
   </BlinkFadeEffect>;
 
   const _playerUI = (
     <Wrapper percentZoom={percentZoom} isTeammate={isTeammate}>
       {modifierDisplay}
-      {isReversed ? (
-        <>
+      {isTeammate ? (
+        <> {/* teammate's UI */}
           <Abilities
             playerData={playerData}
             setPlayerData={setPlayerData}
             kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
-            abilities={
-              (playerData.length && playerData[playerIndex].abilities) || []
-            }
+            abilities={pd.abilities}
             setDisplayString={setDisplayString}
-            isReversed={isReversed}
+            isReversed={true}
             playerIndex={playerIndex}
             setTeleportData={setTeleportData}
             isPaused={isPaused}
             accTime={accTime}
           />
           <HealthBar
-            health={playerData.length && (playerData[playerIndex].lives || 0)}
-            isDead={playerData.length && (playerData[playerIndex].isDead || false)}
-            healthModifier={playerData.length && playerData[playerIndex].livesModifier || 0}
+            health={pd.lives}
+            isDead={pd.isDead}
+            healthModifier={pd.livesModifier}
             setDisplayString={setDisplayString}
-            isTeammate={isTeammate}
+            isTeammate={true}
           />
         </>
       ) : (
-        <>
+        <> {/* player's UI */}
           <HealthBar
-            health={playerData.length && (playerData[playerIndex].lives || 0)}
-            isDead={playerData.length && (playerData[playerIndex].isDead || false)}
-            healthModifier={playerData.length && playerData[playerIndex].livesModifier || 0}
+            health={pd.lives}
+            isDead={pd.isDead}
+            healthModifier={pd.livesModifier}
             setDisplayString={setDisplayString}
           />
           <Abilities
@@ -192,9 +197,7 @@ export const PlayerUI = ({
             kaijuData={kaijuData}
             setTileStatuses={setTileStatuses}
             scale={scale}
-            abilities={
-              (playerData.length && playerData[playerIndex].abilities) || []
-            }
+            abilities={pd.abilities}
             setDisplayString={setDisplayString}
             playerIndex={playerIndex}
             setTeleportData={setTeleportData}
@@ -203,7 +206,7 @@ export const PlayerUI = ({
           />
         </>
       )}
-      <PlayerBorder isBlue={gender == "guy" ? true : false} isReversed={isReversed}>
+      <PlayerBorder isBlue={gender == "guy" ? true : false} isReversed={isTeammate ? true : false}>
         <PlayerPicture
           src={gender == "guy" ? "player_avatar.png" : "teammate_avatar.png"}
           className="fa fa-user-circle"
@@ -214,21 +217,14 @@ export const PlayerUI = ({
       <PassiveAbilities
         accTime={accTime}
         setDisplayString={setDisplayString}
-        isReversed={true}
         isTeammate={isTeammate}
-        abilities={
-          (playerData &&
-            playerData.length &&
-            playerData[playerIndex] &&
-            playerData[playerIndex].abilities) ||
-          []
-        }
+        abilities={pd.abilities}
       />
     </Wrapper>
   );
   return <FloatingEffect
-        styles={`display: flex; flex-direction: column; ${isTeammate ? "animation-delay: 3s;" : "animation-delay: 2s;"}`}
-        duration={isTeammate ? "5" : "5.5"}>
-        {_playerUI}
-      </FloatingEffect>;
+    styles={`display: flex; flex-direction: column; ${isTeammate ? "animation-delay: 3s;" : "animation-delay: 2s;"}`}
+    duration={isTeammate ? "5" : "5.5"}>
+    {_playerUI}
+  </FloatingEffect>;
 };

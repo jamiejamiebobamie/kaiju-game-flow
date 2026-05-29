@@ -152,6 +152,109 @@ const AbilityNum = styled.div`
   justify-content: center;
   font-size: 12px;
 `;
+
+const useHandlePlayerClickAbilityButtons = ({
+  isOnCoolDown,
+  isCharacterAlive,
+  isPaused,
+  element,
+  togglePassive,
+  abilityIndex,
+  playerIndex,
+  playerData,
+  setPlayerData,
+  kaijuData,
+  setTeleportData,
+  setTileStatuses,
+  scale,
+  accTime,
+  activateActive,
+  cooldownTime,
+  cooldownTimeAI,
+  passiveDurationTime
+}) => {
+  useEffect(() => {
+    if (isOnCoolDown && isCharacterAlive && !isPaused) activateAbilityFromPlayerClick({
+      isOnCoolDown,
+      element,
+      togglePassive,
+      abilityIndex,
+      playerIndex,
+      playerData,
+      setPlayerData,
+      kaijuData,
+      setTeleportData,
+      setTileStatuses,
+      scale,
+      accTime,
+      activateActive,
+      cooldownTime,
+      cooldownTimeAI,
+      passiveDurationTime
+    });
+  }, [isOnCoolDown]);
+};
+
+const activateAbilityFromPlayerClick = ({
+  isOnCoolDown,
+  element,
+  togglePassive,
+  abilityIndex,
+  playerIndex,
+  playerData,
+  setPlayerData,
+  kaijuData,
+  setTeleportData,
+  setTileStatuses,
+  scale,
+  accTime,
+  activateActive,
+  cooldownTime,
+  cooldownTimeAI,
+  passiveDurationTime
+}) => { // player triggered their abilities or teammate's abilities 
+  if (COOLDOWN_VALS.click === isOnCoolDown) {
+
+    // activate active ability
+    activateActive(
+      playerIndex,
+      playerData,
+      setTeleportData,
+      kaijuData,
+      setTileStatuses,
+      scale
+    );
+
+    if (togglePassive != undefined && setPlayerData != undefined) {
+      const delay = passiveDurationTime ?
+        passiveDurationTime : // required when the passive effect's duration needs to be shorter than the cooldown time
+        (playerIndex > 0 ?
+          cooldownTimeAI : cooldownTime);
+      // set timer to toggle-off player passive ability once cooldown ends
+      const timeoutRef = setTimeout(() => {
+        setPlayerData(p => {
+          if (!!p[playerIndex]) {
+            const toggleOff = true;
+            const update = togglePassive(p[playerIndex], toggleOff);
+            p[playerIndex] = update;
+          }
+          return p;
+        });
+      }, delay);
+      // activate passive ability
+      setPlayerData(p => {
+        if (!!p[playerIndex]) {
+          const update = togglePassive(p[playerIndex]);
+          p[playerIndex] = update;
+          p[playerIndex].abilities[abilityIndex].accTime = accTime;
+          p[playerIndex].abilities[abilityIndex].toggleOffPassiveTimeoutRef = timeoutRef;
+        }
+        return p;
+      });
+    }
+  }
+};
+
 export const Ability = ({
   abilityIndex,
   playerIndex,
@@ -182,63 +285,51 @@ export const Ability = ({
   const [iconLookupString, setIconLookupString] = useState("active");
 
   // disable ability buttons if game is paused or character is dead
-  const isPlayerAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && !!playerData[playerIndex] && !playerData[playerIndex].isDead;
-  const handleClick = () => !isOnCoolDown && isPlayerAlive && !isPaused && setIsOnCoolDown(COOLDOWN_VALS.click); // true, false, 1=player click
+  const isCharacterAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && !!playerData[playerIndex] && !playerData[playerIndex].isDead;
+
+  const handleClick = () => setIsOnCoolDown(isOnCoolDown =>
+    isOnCoolDown == true ? // check to see if already on cooldown...
+      isOnCoolDown // if already on cooldown, do not change
+      : COOLDOWN_VALS.click); // COOLDOWN_VALS.click = 1 ("player click")
+
   useKeyPress({
     keyCodes: `Digit${keyNum}`,
-    keyDownCallback: handleClick,
-    isPlayerDead: isPaused || !isPlayerAlive
+    keyDownCallback: handleClick, // closure. just sets state var 'setIsOnCoolDown' to COOLDOWN_VALS.click = 1 ("player click")
+    isCharacterDead: isPaused || !isCharacterAlive
   });
+
+  /*
+    triggered by keyDownCallback closure: "handleClick"
+    player triggered their abilities or teammate's abilities by clicking 
+  */
+  useHandlePlayerClickAbilityButtons({
+    /* fresh data */
+    isOnCoolDown,
+    isCharacterAlive,
+    isPaused,
+    element,
+    togglePassive,
+    abilityIndex,
+    playerIndex,
+    playerData,
+    setPlayerData,
+    kaijuData,
+    setTeleportData,
+    setTileStatuses,
+    scale,
+    accTime,
+    activateActive,
+    cooldownTime,
+    cooldownTimeAI,
+    passiveDurationTime
+  });
+
+  /* teammate triggered ability with AI logic. handle ability button aesthetics. */
+  useEffect(() => playerIndex === 1 && setIsOnCoolDown(COOLDOWN_VALS.true), [abilityAccTime]);
+
+  /* ability button cooldown aesthetics for teammate and player. */
   useEffect(() => {
-    if (isOnCoolDown && isPlayerAlive && !isPaused) {
-
-      // player triggered their abilities or teammate's abiltiies 
-      if (COOLDOWN_VALS.click === isOnCoolDown) {
-
-        // activate active ability
-        activateActive(
-          playerIndex,
-          playerData,
-          setTeleportData,
-          kaijuData,
-          setTileStatuses,
-          scale,
-          { current: { [element]: { shotPower: false } } }
-        );
-
-        if (togglePassive != undefined && setPlayerData != undefined) {
-
-          const delay = passiveDurationTime ? 
-                          passiveDurationTime : // required when the passive effect's duration needs to be shorter than the cooldown time
-                          (playerIndex > 0 ? 
-                            cooldownTimeAI : cooldownTime);
-
-          // set timer to toggle-off player passive ability once cooldown ends
-          const timeoutRef = setTimeout(() => {
-            setPlayerData(p => {
-              if (!!p[playerIndex]) {
-                const toggleOff = true;
-                const update = togglePassive(p[playerIndex], toggleOff);
-                p[playerIndex] = update;
-              }
-              return p;
-            });
-          }, delay);
-
-          // activate passive ability
-          setPlayerData(p => {
-            if (!!p[playerIndex]) {
-              const update = togglePassive(p[playerIndex]);
-              p[playerIndex] = update;
-              p[playerIndex].abilities[abilityIndex].accTime = accTime;
-              p[playerIndex].abilities[abilityIndex].toggleOffPassiveTimeoutRef = timeoutRef;
-            }
-            return p;
-          });
-        }
-
-      }
-
+    if (isOnCoolDown && !isPaused) {
       // ability icon cooldown aesthetics
       setIsAnimating(true);
       setTimeout(() => setIconLookupString("loader"), 250);
@@ -249,15 +340,12 @@ export const Ability = ({
     }
   }, [isOnCoolDown]);
 
-  // handle teammate ability button aesthetics:
-  useEffect(() => playerIndex === 1 && setIsOnCoolDown(COOLDOWN_VALS.true), [abilityAccTime]);
-
   useEffect(() => {
     isAnimating && setTimeout(() => setIsAnimating(false), 500);
   }, [isAnimating]);
   return (
     <Wrapper
-      onClick={() => isPlayerAlive && !isPaused && handleClick()}
+      onClick={() => isCharacterAlive && !isPaused && handleClick()}
       isAnimating={isAnimating}
       title={activeName}
       color={color}

@@ -60,7 +60,7 @@ export const setAbilities = (pickedAbilities, setPlayerData) => {
     pickedAbilities.length === 3 &&
     PLAYER_CLASSES.find(pc => pc.elems === classLookup);
   const abilities = pickedAbilities.map(
-    ability => PLAYER_ABILITIES[ability.toLowerCase()]
+    ability => ({ ...PLAYER_ABILITIES[ability.toLowerCase()] })
   );
   if (setPlayerData) {
     setPlayerData(_players => {
@@ -1034,9 +1034,7 @@ export const movePlayerPieces = (
   setPlayerKillCount,
   teleportData,
   setTeleportData,
-  isTutorial,
-  winner,
-  teammatePowersRaceConditionFix
+  isTutorial
 ) =>
   setData(_data => {
     const enemiesOnTiles = enemyData.filter(({ isOnTiles }) => !!isOnTiles);
@@ -1097,7 +1095,7 @@ export const movePlayerPieces = (
             }
 
             // use powers
-            let hasUsedOnePower = Object.values(teammatePowersRaceConditionFix.current).some(v => (accTime - v.accTime) < 500);
+            let hasUsedOnePower = _data[i].abilities.some(v => (accTime - v.accTime) < 500);
             !hasUsedOnePower && _data[i].abilities.forEach((a, j) => {
 
               /*
@@ -1107,7 +1105,7 @@ export const movePlayerPieces = (
               */
               const AI_accTimeDelay = 750;
               const diff = accTime - a.accTime;
-              const isCooldownOver = (diff > (a.cooldownTimeAI + AI_accTimeDelay)) || accTime < a.accTime;
+              const isCooldownOver = (diff > (a.cooldownTimeAI + AI_accTimeDelay)) || (accTime < a.accTime);
 
               if (isCooldownOver && !hasUsedOnePower) {
 
@@ -1148,7 +1146,6 @@ export const movePlayerPieces = (
                   isHealPowerAndIsTeammateHealthLow
                 ) {
 
-                  teammatePowersRaceConditionFix.current[a.element] = { shotPower: false, accTime };
                   hasUsedOnePower = true;
                   _data[i].abilities[j].accTime = accTime;
 
@@ -1159,8 +1156,7 @@ export const movePlayerPieces = (
                     setTeleportData,
                     enemiesOnTiles,
                     setTileStatuses,
-                    scale,
-                    teammatePowersRaceConditionFix
+                    scale
                   );
 
                   // toggle-on teammate passive ability
@@ -1369,7 +1365,7 @@ export const moveKaijuPieces = ({
           _data[i].abilities.forEach((a, j) => {
             // AI triggers power immediately so delay next activation to let UI state catch-up
             const isCooldownOver =
-              accTime - a.accTime >= a.cooldownTimeAI || accTime < a.accTime;
+              ((accTime - a.accTime) >= a.cooldownTimeAI) || (accTime < a.accTime);
             if (isCooldownOver) {
               const [targetTile, _] = getClosestEntityFromTile(
                 enemyData.filter(({ isDead }) => !isDead),
@@ -1647,7 +1643,7 @@ export const useHover = () => {
   }, [ref.current]);
   return [saveRef, value];
 };
-export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isPlayerDead }) => {
+export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isCharacterDead }) => {
   useEffect(() => {
     const handler = ({ code }, callback) => {
       if (Array.isArray(keyCodes) && keyCodes.includes(code)) {
@@ -1656,13 +1652,13 @@ export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isPlayer
         callback(code);
       }
     };
-    keyDownCallback && window.addEventListener("keydown", isPlayerDead ? () => { } : e => handler(e, keyDownCallback));
-    keyUpCallback && window.addEventListener("keyup", isPlayerDead ? () => { } : e => handler(e, keyUpCallback));
+    keyDownCallback && window.addEventListener("keydown", isCharacterDead ? () => { } : e => handler(e, keyDownCallback));
+    keyUpCallback && window.addEventListener("keyup", isCharacterDead ? () => { } : e => handler(e, keyUpCallback));
     return () => {
-      keyDownCallback && window.removeEventListener("keydown", isPlayerDead ? () => { } : e => handler(e, keyDownCallback));
-      keyUpCallback && window.removeEventListener("keyup", isPlayerDead ? () => { } : e => handler(e, keyUpCallback));
+      keyDownCallback && window.removeEventListener("keydown", isCharacterDead ? () => { } : e => handler(e, keyDownCallback));
+      keyUpCallback && window.removeEventListener("keyup", isCharacterDead ? () => { } : e => handler(e, keyUpCallback));
     };
-  }, [isPlayerDead]);
+  }, [isCharacterDead]);
 };
 const getRandomTileOnBoard = (scale, isTutorial) => {
   if (isTutorial) {
@@ -2028,8 +2024,7 @@ export const useEventTick = ({
       () => { },
       teleportData,
       setTeleportData,
-      true,
-      null
+      isTutorial
     );
   // move monsters
   kaijuData.length &&
@@ -2821,14 +2816,3 @@ export const modifyStats = (playerStats, toggleOff, attr, modifier, max) => {
   })
   return update;
 };
-
-export const updateTeammatePowersRaceConditionFixRef = (teammatePowersRaceConditionFix, element) => {
-  let isShotPower = true;
-  // this is required for the teammate to avoid React-setInterval, DOM-update bug calling "activateActive" twice 
-  if (!!teammatePowersRaceConditionFix && !!teammatePowersRaceConditionFix.current) {
-    isShotPower = teammatePowersRaceConditionFix.current[element].shotPower;
-    teammatePowersRaceConditionFix.current[element].shotPower = true;
-  }
-  return isShotPower;
-}
-

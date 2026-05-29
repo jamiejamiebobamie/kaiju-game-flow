@@ -25,7 +25,9 @@ const Bar = styled.div`
   ${props =>
     (props.health + props.healthModifier) < 5
       ? "min-width: 20%; width: 20%;"
-      : "min-width: 15%; width: 15%;"};
+      : `min-width: ${(80/(props.health + props.healthModifier))}%; 
+             width: ${(80/(props.health + props.healthModifier))}%;`
+  };
   height: 15px;
   min-height: 10px;
   margin-left: 10px;

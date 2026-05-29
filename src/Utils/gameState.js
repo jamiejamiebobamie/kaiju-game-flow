@@ -1,4 +1,4 @@
-import { shootPower, modifyStats, updateTeammatePowersRaceConditionFixRef } from "./utils";
+import { shootPower, modifyStats } from "./utils";
 export const PENINSULA_TILE_LOOKUP = {
   "14 26": { i: 14, j: 26 },
   "3 31": { i: 3, j: 31 },
@@ -1518,14 +1518,12 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "ice");
-      return !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1534,8 +1532,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isCold",
         numTiles: 6,
         setTileStatuses
-      })
-    },
+      }),
     displayLookup: "abilityIce",
     elementUppercase: "Ice",
     element: "ice",
@@ -1555,14 +1552,12 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "fire");
-      !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1571,8 +1566,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isOnFire",
         numTiles: 3,
         setTileStatuses
-      })
-    },
+      }),
     displayLookup: "abilityFire",
     elementUppercase: "Fire",
     element: "fire",
@@ -1591,14 +1585,12 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "wood");
-      !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1607,8 +1599,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isWooded",
         numTiles: 3,
         setTileStatuses
-      })
-    },
+      }),
     range: 10,
     displayLookup: "abilityWood",
     elementUppercase: "Wood",
@@ -1629,14 +1620,12 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "lightning");
-      !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1645,8 +1634,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isElectrified",
         numTiles: 3,
         setTileStatuses
-      })
-    },
+      }),
     range: 15,
     displayLookup: "abilityLightning",
     elementUppercase: "Lightning",
@@ -1668,14 +1656,12 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "death");
-      !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1684,8 +1670,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isGhosted",
         numTiles: 1,
         setTileStatuses
-      })
-    },
+      }),
     displayLookup: "abilityDeath",
     elementUppercase: "Death",
     element: "death",
@@ -1701,19 +1686,16 @@ export const PLAYER_ABILITIES = {
     passiveName: "Floating",
     activeName: "Dispel",
     type: ["defensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', -2), // modifyStats(playerStats, toggleOff, 'numTilesModifier', -1)
-    // togglePassive: playerStats => playerStats,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', -2),
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "bubble");
-      !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1722,8 +1704,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isBubble",
         numTiles: 6,
         setTileStatuses
-      })
-    },
+      }),
     range: 4,
     displayLookup: "abilityBubble",
     elementUppercase: "Bubble",
@@ -1743,14 +1724,12 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "metal");
-      !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1759,8 +1738,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isShielded",
         numTiles: 6,
         setTileStatuses
-      })
-    },
+      }),
     range: 4,
     displayLookup: "abilityMetal",
     elementUppercase: "Metal",
@@ -1786,14 +1764,9 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-    ) => {
-      /*
-        NOT REQUIRED: 
-          const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "glass");
-        ("activateActive" does not call "setTileStatuses")
-      */
-      setTeleportData(_teleportData => [..._teleportData, k]);
-    },
+    ) => 
+      setTeleportData(_teleportData => [..._teleportData, k])
+    ,
     getPlayerIndex: k => k,
     displayLookup: "abilityGlass",
     elementUppercase: "Glass",
@@ -1814,14 +1787,12 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
-      scale,
-      teammatePowersRaceConditionFix
-    ) => {
-      const isShotPower = updateTeammatePowersRaceConditionFixRef(teammatePowersRaceConditionFix, "heart");
-      !isShotPower && shootPower({
+      scale
+    ) =>
+      shootPower({
         data,
         dataIndex: k,
         targetData,
@@ -1830,8 +1801,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isHealing",
         numTiles: 1,
         setTileStatuses
-      })
-    },
+      }),
     range: 5,
     displayLookup: "abilityHeart",
     elementUppercase: "Heart",
@@ -1851,11 +1821,11 @@ export const PLAYER_ABILITIES = {
     activateActive: (
       k,
       data,
-      setTeleportData,
+      _,
       targetData,
       setTileStatuses,
       scale
-    ) => {  // are the Kaiju shooting fire twice?
+    ) =>
       shootPower({
         data,
         dataIndex: k,
@@ -1865,8 +1835,7 @@ export const PLAYER_ABILITIES = {
         statusKey: "isOnKaijuFire",
         numTiles: 3,
         setTileStatuses
-      });
-    },
+      }),
     displayLookup: "",
     elementUppercase: "",
     element: "kaijuFire",
@@ -2358,4 +2327,16 @@ export const BASE_PLAYER_STATS = {
   playerClass: "",
   playerClassDescription: "",
   elements: ""
+};
+
+export const ICON_LOOKUP = {
+  heart: "fa-gratipay",
+  glass: "fa-tencent-weibo",
+  fire: "fa-fire",
+  wood: "fa-tree",
+  lightning: "fa-hourglass-half",
+  death: "fa-heartbeat",
+  bubble: "fa-universal-access",
+  metal: "fa fa-wrench",
+  ice: "fa-thermometer-quarter"
 };

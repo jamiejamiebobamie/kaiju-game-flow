@@ -13,7 +13,6 @@ import {
   redrawTiles,
   updateHighlightedTiles,
   initializeGameBoard,
-  getAdjacentTiles,
   determineKaijuQuantity,
   getTileOffsetFromDir,
   isTileOnGameBoard,
@@ -236,7 +235,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const height = HEIGHT * percentZoom;
 
   const accTime = useRef(0);
-  const teammatePowersRaceConditionFix = useRef({}); // teammate is shooting powers twice due to React update logic (updating with "setTileStatuses" in shootPower)
   const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
@@ -353,7 +351,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     });
   }
 
-  useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isPlayerDead: false });
+  useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isCharacterDead: false });
 
   const keyDown = code => {
     setKeysPressed(keys => {
@@ -375,7 +373,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     keyCodes: ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"],
     keyDownCallback: keyDown,
     keyUpCallback: keyUp,
-    isPlayerDead
+    isCharacterDead: isPlayerDead
   });
 
   useEffect(() => {
@@ -498,9 +496,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       setPlayerKillCount,
       teleportData,
       setTeleportData,
-      false,
-      winner,
-      teammatePowersRaceConditionFix
+      false
     );
     // move monsters
     moveKaijuPieces({
