@@ -2807,7 +2807,7 @@ export const determineKaijuQuantity = difficulty => {
   }
   return { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED };
 }
-export const modifyStats = (playerStats, toggleOff, attr, modifier, max) => {
+export const modifyStats = (playerStats, toggleOff, attr, modifier) => {
   const mod = (toggleOff ? -1 : 1) * modifier;
   const modification = playerStats[attr] + mod;
   const update = ({
