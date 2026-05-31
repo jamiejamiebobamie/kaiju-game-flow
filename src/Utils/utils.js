@@ -517,10 +517,14 @@ export const updateTileState = (
                 playerIndex
               } = data;
               const healthTiles = ["isHealing"];
-              if (count) {
+
+              if (!count) {
+                // 2. erase winning tile status if out of counts, unless status is "persistent"
+                solveForStatusWithNoCounts({ i, j, k, _statuses, entityOnTileStatus, tileStatus });
+              } else {
                 Array.isArray(dirs) &&
                   dirs.forEach((d, l) => {
-                    // 2. move the status based on the direction
+                    // 3. move the status based on the directions
                     const offset = getTileOffsetFromDir(d, { i, j });
                     const nextTile = { i: i + offset.i, j: j + offset.j };
                     const tileDirMapping = [
@@ -544,161 +548,132 @@ export const updateTileState = (
                           j: nextTile.j
                         }))
                     ) {
-                      if (count < startCount && k === "isCold") {
-                        const newDir =
-                          tileDirMapping[count % tileDirMapping.length];
-                        direction = [newDir];
+
+                      // solve for statuses with rotating directions
+                      if (
+                        k === "isCold" && // tick 1 and 2 = spread in single direction
+                        // (count < (startCount * 3 / 5) ||
+                        // (((count % 3) && count >= (startCount - 10))  || //&& k == "isCold") || // tick 10+
+                         (count < (startCount - 0) && count > (startCount - 8))// ) // tick 1-7
+                        //  count >= (startCount - 1))
+                        // ||
+                        // (k === "isOnFire" && count >= startCount)
+                      ) {
+                        direction = solveForRotatingDirectionStatus({ tileDirMapping, count })
                       }
-                      // else if (
-                      //   k === "isElectrified" &&
-                      //   count === startCount - 3
-                      // ) {
-                      //   const [_, newDirs] = getAdjacentTilesFromTile(
-                      //     { i, j },
-                      //     nextTile,
-                      //     scale,
-                      //     3
-                      //   );
-                      //   direction = newDirs;
-                      // } 
+
+                      // handle multiply with delay
+                      else if (
+                        k === "isElectrified" &&
+                        count == (startCount - 3)
+                      ) {
+                        const [_, newDirs] = getAdjacentTilesFromTile(
+                          { i, j },
+                          nextTile,
+                          scale,
+                          3
+                        );
+                        direction = newDirs;
+                      } 
+
+                      // solve for statuses with "spreading" directions
                       else if (
                         k === "isOnKaijuFire" ||
                         k === "isOnFire" ||
-                        (k === "isBubble" && count === startCount) ||
-                        k === "isShielded"
+                        (k === "isBubble" && count >= startCount) ||
+                        k === "isShielded" || //||
+                        // (k == "isCold" && count == (startCount - 8)) ||// ) // tick 8
+
+                      // (count < (startCount - 3) && count > (startCount - 5) && k == "isCold") || // tick 4
+                      // (count % 2 && count >= (startCount - 10)  && k == "isCold") || // tick 10+
+                      //  (count >= (startCount - 3) && k === "isCold") ||
+                      //  (count == startCount && k === "isWooded")
+                         (k === "isWooded" && count == startCount)// || count > (startCount - 1))// ) // ticks 0-1, spread in place
                       ) {
                         direction = dirs;
-                      } else if (
-                        k === "isGhosted" ||
-                        k === "isWooded" ||
-                        k === "isHealing"
-                      ) {
-                        const targetTile = isKaiju
-                          ? playerData[targetIndex] &&
-                          playerData[targetIndex].tile
-                          : kaijuData[targetIndex] &&
-                          kaijuData[targetIndex].tile;
-                        const [_, targetDirection] = getAdjacentTilesFromTile(
-                          nextTile,
-                          targetTile || { i: 0, j: 0 },
-                          scale,
-                          1
-                        );
-                        direction = targetDirection;
                       }
-                      const _count =
-                        count -
-                        getRandomIntInRange({
-                          min: count - 2,
-                          max: count - 1
+
+                      // solve for statuses with tracking directions
+                      else if (
+                        k === "isGhosted" ||
+                        // k === "isWooded" ||
+                        k === "isHealing" ||
+
+                        (k == "isCold" && count < (startCount - 7)) || // ) // tick 8+
+                        // (count >= (startCount - 5) && k == "isCold") || // tick 5+
+                        // (count % 2 && count >= (startCount - 10) && k == "isCold") || // tick 10+
+                      //  (count >= (startCount * 3 / 5) && k === "isCold") ||
+                      //  (count < startCount && k === "isWooded")
+                         ( k === "isWooded" && count <= (startCount - 2)) // ticks 3+, track
+                      ) {
+                        direction = solveForTrackingStatusDirection({
+                          isKaiju,
+                          playerData,
+                          kaijuData,
+                          targetIndex,
+                          nextTile,
+                          scale,
                         });
-                      const nextTileCount =
-                        _statuses[nextTile.i][nextTile.j][k] &&
-                          _statuses[nextTile.i][nextTile.j][k].count
-                          ? _statuses[nextTile.i][nextTile.j][k].count
-                          : 0;
-                      _statuses[nextTile.i][nextTile.j][k] = {
-                        dirs: direction,
-                        count:
-                          k === "isWooded" &&
-                            dirs.length > 1 &&
-                            l > 0 &&
-                            nextTileCount < _count - 1
-                            ? _count - 1
-                            : count - 1,
+                      }
+
+                      setNextTileStatus({
+                        k,
+                        l,
+                        count,
+                        _statuses,
+                        nextTile,
+                        direction,
+                        dirs,
                         targetIndex,
                         startCount,
                         isKaiju,
-                        playerIndex
-                      };
-                      const nextTilesStatus = solveForStatus(
-                        _statuses[nextTile.i][nextTile.j]
-                      );
-                      _statuses[nextTile.i][nextTile.j] = nextTilesStatus;
-                      _statuses[nextTile.i][nextTile.j].updateKey = updateKey;
-                    } else if (k === "isElectrified") {
-                      const dirMapIndex = tileDirMapping.indexOf(d);
-                      const newDirMapIndex =
-                        dirMapIndex > 2 ? dirMapIndex - 2 : dirMapIndex + 2;
-                      const newDir = tileDirMapping[newDirMapIndex];
-                      const nextTileOffsetFromCurrTile = getTileOffsetFromDir(
-                        newDir,
-                        { i, j }
-                      );
-                      const nextTileForLightning = {
-                        i: i + nextTileOffsetFromCurrTile.i,
-                        j: j + nextTileOffsetFromCurrTile.j
-                      };
-                      if (
-                        (isTutorial &&
-                          isTileOnGameBoardTutorial({
-                            i: nextTileForLightning.i,
-                            j: nextTileForLightning.j
-                          })) ||
-                        (!isTutorial &&
-                          isTileOnGameBoard({
-                            i: nextTileForLightning.i,
-                            j: nextTileForLightning.j
-                          }))
-                      ) {
-                        _statuses[nextTileForLightning.i][
-                          nextTileForLightning.j
-                        ][k] = {
-                          dirs: [newDir],
-                          count: count > 8 ? 8 : count - 1,
-                          targetIndex,
-                          startCount,
-                          isKaiju,
-                          playerIndex
-                        };
-                        const nextTilesStatus = solveForStatus(
-                          _statuses[nextTileForLightning.i][
-                          nextTileForLightning.j
-                          ]
-                        );
-                        _statuses[nextTileForLightning.i][
-                          nextTileForLightning.j
-                        ] = nextTilesStatus;
-                        _statuses[nextTileForLightning.i][
-                          nextTileForLightning.j
-                        ].updateKey = updateKey;
-                      }
+                        playerIndex,
+                        updateKey
+                      });
+
+                      // solve for "bouncy" tile statuses
+                    } else if (k === "isElectrified" || k === "isWooded" || k == 'isHealing' || k == 'isGhosted' || k === "isCold" || k === "isOnFire" || k === "isOnKaijuFire") {
+                      solveForWallReflectionStatus({
+                        k, d, i, j,
+                        tileDirMapping,
+                        isTutorial,
+                        _statuses,
+                        count,
+                        targetIndex,
+                        startCount,
+                        isKaiju,
+                        playerIndex,
+                        updateKey
+                      });
                     }
+
+                    // UNSURE... - - - - - - - -
                     // 3. erase current tile's state
                     const doNotErase = [
                       "isElectrified",
                       "isShielded",
-                      "isWooded"
+                      "isWooded",
+                      "isCold" // ADDED... test
                     ];
                     _statuses[i][j][k] =
                       !doNotErase.includes(k) ||
-                        (k === "isWooded" && count === startCount) ||
-                        (k === "isOnFire" && count === startCount) ||
-                        (k === "isOnKaijuFire" && count === startCount) ||
+                        (["isOnFire", "isOnKaijuFire"].includes(k) && count >= startCount) ||
                         entityOnTileStatus
-                        ? undefined
+                        ? undefined // ERASE
                         : {
-                          ...tileStatus[k],
+                          ...tileStatus[k], // add <"isElectrified", "isShielded", "isWooded", "isOnFire", "isOnKaijuFire"> statuses to tile
                           count: 0
                         };
                     _statuses[i][j].updateKey = updateKey;
+                    // - - - - - - - - - - - - - -- - - -
+                    // May be a "fallback"
+
+
                     if (_statuses[i][j][k] === undefined)
                       delete _statuses[i][j][k];
                   });
-              } else {
-                Array.isArray(dirs) &&
-                  dirs.forEach(d => {
-                    // 3. erase current tile's state.
-                    const doNotErase = ["isShielded", "isWooded"];
-                    _statuses[i][j][k] =
-                      !doNotErase.includes(k) || entityOnTileStatus
-                        ? undefined
-                        : {
-                          ...tileStatus[k],
-                          count: 0
-                        };
-                  });
               }
+
               if (DEATH_TILE_STATUSES.includes(k) || healthTiles.includes(k)) {
                 const entityOnTile = isKaiju
                   ? playerData.find(({ tile }) => tile.i === i && tile.j === j)
@@ -724,8 +699,8 @@ export const updateTileState = (
                 newDmg.push(dmgObj);
               }
             }
-            _statuses[i][j].updateKey = updateKey;
           }
+          _statuses[i][j].updateKey = updateKey;
         }
       }
       setDmgArray(newDmg);
@@ -735,6 +710,147 @@ export const updateTileState = (
     }
   });
 };
+const solveForRotatingDirectionStatus = ({ tileDirMapping, count }) => {
+  const newDir =
+    tileDirMapping[count % tileDirMapping.length];
+  return [newDir];
+}
+const solveForTrackingStatusDirection = ({
+  isKaiju,
+  playerData,
+  kaijuData,
+  targetIndex,
+  nextTile,
+  scale
+}) => {
+  const targetTile = isKaiju
+    ? playerData[targetIndex] &&
+    playerData[targetIndex].tile
+    : kaijuData[targetIndex] &&
+    kaijuData[targetIndex].tile;
+  const [_, targetDirection] = getAdjacentTilesFromTile(
+    nextTile,
+    targetTile || { i: 0, j: 0 },
+    scale,
+    1
+  );
+  return targetDirection;
+}
+const setNextTileStatus = ({
+  k,
+  l,
+  count,
+  _statuses,
+  nextTile,
+  direction,
+  dirs,
+  targetIndex,
+  startCount,
+  isKaiju,
+  playerIndex,
+  updateKey
+}) => {
+  const _count =
+    count -
+    getRandomIntInRange({
+      min: count - 2,
+      max: count - 1
+    });
+  const nextTileCount =
+    _statuses[nextTile.i][nextTile.j][k] &&
+      _statuses[nextTile.i][nextTile.j][k].count
+      ? _statuses[nextTile.i][nextTile.j][k].count
+      : 0;
+  _statuses[nextTile.i][nextTile.j][k] = {
+    dirs: direction,
+    count:
+      k === "isWooded" &&
+        dirs.length > 1 &&
+        l > 0 &&
+        nextTileCount < _count - 1
+        ? _count - 1
+        : count - 1,
+    targetIndex,
+    startCount,
+    isKaiju,
+    playerIndex
+  };
+  const nextTilesStatus = solveForStatus(
+    _statuses[nextTile.i][nextTile.j]
+  );
+  _statuses[nextTile.i][nextTile.j] = nextTilesStatus;
+  _statuses[nextTile.i][nextTile.j].updateKey = updateKey;
+}
+const solveForWallReflectionStatus = ({
+  k, d, i, j,
+  tileDirMapping,
+  isTutorial,
+  _statuses,
+  count,
+  targetIndex,
+  startCount,
+  isKaiju,
+  playerIndex,
+  updateKey
+}) => {
+  const dirMapIndex = tileDirMapping.indexOf(d);
+  const newDirMapIndex =
+    dirMapIndex > 2 ? dirMapIndex - 2 : dirMapIndex + 2;
+  const newDir = tileDirMapping[newDirMapIndex];
+  const nextTileOffsetFromCurrTile = getTileOffsetFromDir(
+    newDir,
+    { i, j }
+  );
+  const nextTileForLightning = {
+    i: i + nextTileOffsetFromCurrTile.i,
+    j: j + nextTileOffsetFromCurrTile.j
+  };
+
+  if (
+    (isTutorial &&
+      isTileOnGameBoardTutorial({
+        i: nextTileForLightning.i,
+        j: nextTileForLightning.j
+      })) ||
+    (!isTutorial &&
+      isTileOnGameBoard({
+        i: nextTileForLightning.i,
+        j: nextTileForLightning.j
+      }))
+  ) {
+    _statuses[nextTileForLightning.i][
+      nextTileForLightning.j
+    ][k] = {
+      dirs: [newDir],
+      count: count > 8 ? 8 : count - 1,
+      targetIndex,
+      startCount,
+      isKaiju,
+      playerIndex
+    };
+    const nextTilesStatus = solveForStatus(
+      _statuses[nextTileForLightning.i][
+      nextTileForLightning.j
+      ]
+    );
+    _statuses[nextTileForLightning.i][
+      nextTileForLightning.j
+    ] = nextTilesStatus;
+    _statuses[nextTileForLightning.i][
+      nextTileForLightning.j
+    ].updateKey = updateKey;
+  }
+};
+const solveForStatusWithNoCounts = ({ i, j, k, _statuses, entityOnTileStatus, tileStatus }) => {
+  const persistent = ["isShielded", "isWooded"];
+  _statuses[i][j][k] =
+    !persistent.includes(k) || entityOnTileStatus
+      ? undefined
+      : {
+        ...tileStatus[k],
+        count: 0
+      };
+}
 const getMonsterSwimAnimDirFromNormVec = normVec => {
   const xDir = normVec.x > 0 ? "Right" : "Left"; // go right
   const yDir = normVec.y > 0 ? "down" : "up"; // go up
@@ -783,18 +899,18 @@ export const shootPower = ({
           // "isGhosted",
           // "isHealing"
         ];
-        const countReductionForNumTilesModifierStatus = statusKey == "isOnFire" && !!data[dataIndex].numTilesModifier ? 2 : 0;
+        // const countReductionForNumTilesModifierStatus = statusKey == "isOnFire" && !!data[dataIndex].numTilesModifier ? 2 : 0;
         const [tile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
           data[dataIndex].numTilesModifier
             // && !excludeStatusesForTileStatusesNumTilesModifier.includes(statusKey)
-            ? numTiles + data[dataIndex].numTilesModifier
+            ? Math.max(numTiles + data[dataIndex].numTilesModifier, 1)
             : numTiles
         );
         const tileCount = data[dataIndex].tileCountModifier
-          && !excludeStatusesForTileStatusesCountModifier.includes(statusKey)
+          && !excludeStatusesForTileStatusesCountModifier.includes(statusKey) // don't apply tileCountModifier to bubble
           ?
           count + data[dataIndex].tileCountModifier
           : count
@@ -805,10 +921,10 @@ export const shootPower = ({
               ..._tiles[tile.i][tile.j],
               [statusKey]: {
                 dirs,
-                count: tileCount - countReductionForNumTilesModifierStatus,
+                count: tileCount, //Math.max(tileCount - countReductionForNumTilesModifierStatus, 0),
                 targetIndex,
                 isKaiju: d.isKaiju || statusKey === "isHealing",
-                startCount: count,
+                startCount: count, //Math.max(countReductionForNumTilesModifierStatus ? tileCount - countReductionForNumTilesModifierStatus : count, 0),
                 playerIndex: d.isKaiju ? undefined : dataIndex
               }
             };
@@ -1147,34 +1263,20 @@ export const movePlayerPieces = (
                 ) {
 
                   hasUsedOnePower = true;
-                  _data[i].abilities[j].accTime = accTime;
-
-                  // activate teammate active ability
-                  a.activateActive(
-                    i,
+                  useAbility({
+                    a,
                     data,
+                    setData,
+                    _data,
+                    i,
+                    j,
+                    accTime,
                     setTeleportData,
                     enemiesOnTiles,
                     setTileStatuses,
                     scale
-                  );
+                  });
 
-                  // toggle-on teammate passive ability
-                  if (!!_data[i]) {
-                    _data[i] = a.togglePassive(_data[i]);
-                  }
-
-                  const delay = a.passiveDurationTime ? a.passiveDurationTime : a.cooldownTimeAI;
-
-                  // toggle-off teammate passive ability
-                  const timeoutRef = setTimeout(() => setData(d => {
-                    if (!!d[i]) {
-                      const toggleOff = true;
-                      d[i] = a.togglePassive(d[i], toggleOff);
-                      d[i].abilities[j].toggleOffPassiveTimeoutRef = timeoutRef;
-                    }
-                    return d;
-                  }), delay);
                 }
               }
             });
@@ -1336,6 +1438,49 @@ export const movePlayerPieces = (
     teleportData && teleportData.length && setTeleportData([]);
     return _data;
   });
+const useAbility = ({
+  a,
+  data,
+  _data,
+  setData,
+  i,
+  j,
+  accTime,
+  setTeleportData,
+  enemiesOnTiles,
+  setTileStatuses,
+  scale
+}) => {
+  // update accTime
+  _data[i].abilities[j].accTime = accTime;
+
+  // activate teammate active ability
+  a.activateActive(
+    i,
+    data,
+    setTeleportData,
+    enemiesOnTiles,
+    setTileStatuses,
+    scale
+  );
+
+  // toggle-on teammate passive ability
+  if (!!_data[i]) {
+    _data[i] = a.togglePassive(_data[i]);
+  }
+
+  const delay = a.passiveDurationTime ? a.passiveDurationTime : a.cooldownTimeAI;
+
+  // toggle-off teammate passive ability
+  const timeoutRef = setTimeout(() => setData(d => {
+    if (!!d[i]) {
+      const toggleOff = true;
+      d[i] = a.togglePassive(d[i], toggleOff);
+      d[i].abilities[j].toggleOffPassiveTimeoutRef = timeoutRef;
+    }
+    return d;
+  }), delay);
+}
 export const moveKaijuPieces = ({
   data,
   setData,

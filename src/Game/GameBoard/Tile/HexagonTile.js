@@ -34,7 +34,7 @@ export const HexagonTile = ({
   const zIndex = rowLength * i + j + 1;
   const ICON_LOOKUP = {
     isOnKaijuFire: { className: "fa-free-code-camp", color: "#df73ff" },
-    isOnFire: { className: "fa-free-code-camp", color: "tomato" },
+    isOnFire: { className: "fa-droplet", color: "blue"},//""fa-free-code-camp", color: "tomato" },
     isWooded: { className: "fa-leaf", color: "Chartreuse" },
     isElectrified: { className: "fa-bolt", color: "cyan" },
     isGhosted: { className: "fa-snapchat-ghost", color: "GhostWhite" },

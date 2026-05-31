@@ -287,7 +287,7 @@ export const Ability = ({
   // disable ability buttons if game is paused or character is dead
   const isCharacterAlive = typeof playerIndex == 'number' && Array.isArray(playerData) && playerData.length > playerIndex && !!playerData[playerIndex] && !playerData[playerIndex].isDead;
 
-  const handleClick = () => setIsOnCoolDown(isOnCoolDown =>
+  const handleClick = () => !isPaused && isCharacterAlive && setIsOnCoolDown(isOnCoolDown =>
     isOnCoolDown == true ? // check to see if already on cooldown...
       isOnCoolDown // if already on cooldown, do not change
       : COOLDOWN_VALS.click); // COOLDOWN_VALS.click = 1 ("player click")

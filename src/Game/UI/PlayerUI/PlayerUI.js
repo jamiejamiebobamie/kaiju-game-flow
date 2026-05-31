@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Abilities } from "./Components/Abilities";
 import { HealthBar } from "./Components/HealthBar";
@@ -64,7 +64,7 @@ const PlayerPictureBackground = styled.div`
 
 const ModifierList = styled.ul`
     position: absolute;
-    transform: translate(${props => props.translation ? props.translation : `347px, -65px`});
+    transform: scale(.75) translate(${props => props.translation ? props.translation : `475px, -46px`});
     display: flex;
     flex-direction: column;
     list-style-type: none;
@@ -72,11 +72,37 @@ const ModifierList = styled.ul`
 
 const ModifierListitem = styled.li`
     padding: 10px;
-    ${props => props.translateX && `transform: translate(${props.translateX});`}
-    opacity: ${props => props.notZero ? 1 : 0};
-    -webkit-transition-duration: 3s;
-    transition-duration: 3s;
+    ${props => props.translateX&& `transform: translate(${props.translateX});`}
+    opacity: ${props => props.modIsApplied ? 0 : 1};
+    -webkit-transition-duration: 1s;
+    transition-duration: 1s;
     transition-property: opacity;
+    position: absolute;
+    background: url(${props => props.noModSrc});
+    pointer-events: none;
+    background-position: center;
+    width: 372px;
+    height: 229px;
+
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 372px;
+    height: 229px;
+    pointer-events: none;
+
+    background: url(${props => props.modSrc});
+
+    background-position: center;
+    opacity: ${props => (props.modIsApplied ? 1 : 0)};
+    -webkit-transition-duration: 1s;
+    transition-duration: 1s;
+    transition-property: opacity;
+  }
+
+  opacity: ${props => props.notInLoadOut ? 0 : 1};
+
 `;
 
 const ModifierValue = styled.span`
@@ -84,13 +110,17 @@ const ModifierValue = styled.span`
   border-color: ${props => props.color};
   color: ${props => props.color};
   font-size: 35px;
-  padding: 7px 7px 7px ${props => props.notZero ? "7px" : "17px"};
-  margin-right: ${props => props.notZero ? "17px" : "7px"};;
+  padding: 7px 7px 7px ${props => props.modIsApplied ? "7px" : "17px"};
+  margin-right: ${props => props.modIsApplied ? "17px" : "7px"};
+    position: absolute;
+
 `;
 
 const ModifierLabel = styled.span`
   color: ${props => props.color};
   fonst-size: 20px;
+    position: absolute;
+
 `;
 
 export const PlayerUI = ({
@@ -140,18 +170,64 @@ export const PlayerUI = ({
     tileCountModifier
   } = playerData[playerIndex];
 
-  const modifierListItem = (color, label, value, translateX) => (
-    <ModifierListitem notZero={true /*value != 0*/} translateX={translateX}>
-      <ModifierLabel color={color}>{label}</ModifierLabel>
-      <ModifierValue notZero={value != 0} color={color}>{value > 0 ? `+${value}` : value}</ModifierValue>
-    </ModifierListitem>);
+  // modifiers
+  const [inLoadOut, setInLoadOut] = useState({});
+  useEffect(() => {
+    const dict = {
+      livesModifier,
+      moveSpeedModifier,
+      numTilesModifier,
+      tileCountModifier
+    };
+    const loadout = Object.keys(dict)
+                          .reduce(
+                            (acc, k) => pd.abilities.reduce(
+                                      (_acc, a) => ({ ..._acc, [k]: !!_acc[k] || !!a[k] })
+                                      , acc)
+                            , { ...dict });
+    setInLoadOut(loadout);
+  }, []);
 
-  const modifierDisplay = <BlinkFadeEffect>
-    <ModifierList translation={isTeammate ? '341px, -65px' : undefined}>
-      {modifierListItem('#8dde86ff', 'Health', livesModifier)}
-      {modifierListItem('#86d8deff', 'Speed', moveSpeedModifier)}
-      {modifierListItem('#d4d07bff', 'Area', numTilesModifier, "17px")}
-      {modifierListItem('#d4aa7bff', 'Range', tileCountModifier)}
+  const modifierListItemSrcImgPaths = [
+    {
+      modSrc: 'GameUI_Pieces/modifiers_ui/1-mod.png',
+      noModSrc: 'GameUI_Pieces/modifiers_ui/1-noMod.png',
+    },
+    {
+      modSrc: 'GameUI_Pieces/modifiers_ui/2-mod.png',
+      noModSrc: 'GameUI_Pieces/modifiers_ui/2-noMod.png'
+    },
+    {
+      modSrc: 'GameUI_Pieces/modifiers_ui/3-mod.png',
+      noModSrc: 'GameUI_Pieces/modifiers_ui/3-noMod.png',
+    },
+    {
+
+      modSrc: 'GameUI_Pieces/modifiers_ui/4-mod.png',
+      noModSrc: 'GameUI_Pieces/modifiers_ui/4-noMod.png',
+    }
+  ];
+
+  const modifierListItem = (i, inLoadOut, color, label, value, animDelay, translateX) => (
+    <ModifierListitem
+      modSrc={modifierListItemSrcImgPaths[i].modSrc}
+      noModSrc={modifierListItemSrcImgPaths[i].noModSrc}
+      modIsApplied={value != 0}
+      notInLoadOut={!inLoadOut}
+      translateX={translateX}>
+      <FloatingEffect
+        styles={`position: relative; display: flex; flex-direction: column; ${isTeammate ? `animation-delay: ${animDelay}s;` : `animation-delay: ${animDelay}s;`}`}
+        duration={isTeammate ? "5" : "5.5"}>
+        <ModifierLabel color={color}>{label}</ModifierLabel>
+        <ModifierValue modIsApplied={value != 0} color={color}>{value > 0 ? `+${value}` : value}</ModifierValue>
+      </FloatingEffect>
+    </ModifierListitem>);
+  const modifierDisplay = <BlinkFadeEffect high={90} low={75}>
+    <ModifierList translation={isTeammate ? `475px, -46px` : undefined}>
+      {modifierListItem(0, !!inLoadOut['livesModifier'], '#8dde86ff', 'Health', livesModifier, Math.sin(0))}
+      {modifierListItem(1, !!inLoadOut['moveSpeedModifier'], '#86d8deff', 'Speed', moveSpeedModifier, Math.sin(Math.PI))}
+      {modifierListItem(2, !!inLoadOut['tileCountModifier'], '#d4d07bff', 'Range', tileCountModifier, Math.sin(2*Math.PI), "17px")}
+      {modifierListItem(3, !!inLoadOut['numTilesModifier'], '#d4aa7bff', 'Area', numTilesModifier, Math.sin(3*Math.PI))}
     </ModifierList>
   </BlinkFadeEffect>;
 

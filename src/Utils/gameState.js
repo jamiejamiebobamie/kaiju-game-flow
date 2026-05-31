@@ -1514,6 +1514,7 @@ export const PLAYER_ABILITIES = {
     activeName: "Ice Slice",
     range: 3,
     type: ["offensive", "defensive"],
+    moveSpeedModifier: true,
     togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -1),
     activateActive: (
       k,
@@ -1528,7 +1529,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 10,
+        count: 25,
         statusKey: "isCold",
         numTiles: 6,
         setTileStatuses
@@ -1539,8 +1540,9 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 4000,
-    cooldownTime: 3000,
+    cooldownTimeAI: 8000,
+    cooldownTime: 7000,
+    passiveDurationTime: 5000,
     color: "PaleTurquoise"
   },
   fire: {
@@ -1548,7 +1550,11 @@ export const PLAYER_ABILITIES = {
     activeName: "Wildfire",
     range: 10,
     type: ["offensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 2),
+    // tileCountModifier: true,
+    // numTilesModifier: true,
+    // livesModifier: true,
+    moveSpeedModifier: true,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -1),// 'tileCountModifier', 1),
     activateActive: (
       k,
       data,
@@ -1575,13 +1581,15 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     cooldownTime: 2000,
     cooldownTimeAI: 3500,
+    passiveDurationTime: 3000,
     color: "tomato"
   },
   wood: {
     passiveName: "Healthy",
     activeName: "Overgrowth",
     type: ["offensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', 1),
+    livesModifier: true,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', -1),
     activateActive: (
       k,
       data,
@@ -1595,9 +1603,10 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 10,
+        count: 25,
         statusKey: "isWooded",
-        numTiles: 3,
+        // numTiles: 2,
+        numTiles: 6,
         setTileStatuses
       }),
     range: 10,
@@ -1609,13 +1618,14 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     cooldownTime: 4000,
     cooldownTimeAI: 5000,
-
+    passiveDurationTime: 5000,
     color: "Chartreuse"
   },
   lightning: {
     passiveName: "Charged Step",
     activeName: "Discharge",
     type: ["offensive"],
+    moveSpeedModifier: true,
     togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', 2),
     activateActive: (
       k,
@@ -1630,7 +1640,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 20,
+        count: 13,
         statusKey: "isElectrified",
         numTiles: 3,
         setTileStatuses
@@ -1642,9 +1652,9 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 2500,
+    cooldownTime: 4000,
     cooldownTimeAI: 5000,
-    passiveDurationTime: 3000,
+    passiveDurationTime: 6000,
     color: "cyan"
   },
   death: {
@@ -1652,6 +1662,7 @@ export const PLAYER_ABILITIES = {
     activeName: "Haunt",
     range: 10,
     type: ["offensive"],
+    livesModifier: true,
     togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', -1),
     activateActive: (
       k,
@@ -1677,16 +1688,18 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 7000,
-    cooldownTimeAI: 8000,
-
+    cooldownTime: 2000,
+    cooldownTimeAI: 3000,
+    passiveDurationTime: 8000,
     color: "GhostWhite"
   },
   bubble: {
     passiveName: "Floating",
     activeName: "Dispel",
     type: ["defensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', -2),
+    // numTilesModifier: true,
+    tileCountModifier: true,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 1),// 'numTilesModifier', .5),
     activateActive: (
       k,
       data,
@@ -1714,13 +1727,16 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     cooldownTime: 2000,
     cooldownTimeAI: 3000,
+    passiveDurationTime: 4000,
     color: "Thistle"
   },
   metal: {
     passiveName: "Builder",
     activeName: "Aegis",
     type: ["defensive"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'numTilesModifier', 2),
+    // numTilesModifier: true,
+    tileCountModifier: true,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff,'tileCountModifier', 1),// 'numTilesModifier', .5),
     activateActive: (
       k,
       data,
@@ -1748,7 +1764,7 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     cooldownTime: 4000,
     cooldownTimeAI: 5000,
-
+    passiveDurationTime: 6000,
     color: "AntiqueWhite"
   },
   glass: {
@@ -1756,7 +1772,8 @@ export const PLAYER_ABILITIES = {
     activeName: "Escape",
     range: 5,
     type: ["escape"],
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -3),
+    moveSpeedModifier: true,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -4),
     activateActive: (
       k,
       data,
@@ -1783,6 +1800,7 @@ export const PLAYER_ABILITIES = {
     passiveName: "Good Vibes",
     activeName: "Heal",
     type: ["heal"],
+    tileCountModifier: true,
     togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 1),
     activateActive: (
       k,
@@ -1797,7 +1815,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 7,
+        count: 9,
         statusKey: "isHealing",
         numTiles: 1,
         setTileStatuses
@@ -1811,6 +1829,7 @@ export const PLAYER_ABILITIES = {
     accTime: 0,
     cooldownTimeAI: 11000,
     cooldownTime: 10000,
+    passiveDurationTime: 20000,
     color: "pink"
   },
   kaijuFire: {
