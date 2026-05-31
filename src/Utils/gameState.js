@@ -2359,3 +2359,6 @@ export const ICON_LOOKUP = {
   metal: "fa fa-wrench",
   ice: "fa-thermometer-quarter"
 };
+
+export const MAX_ROWS = 36;
+export const MAX_COLS = 24;

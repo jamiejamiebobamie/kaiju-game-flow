@@ -1,35 +1,27 @@
 import { React } from "react";
 import styled from "styled-components";
 
-const Border = styled.div`
-  ${props => props.styles}
-`;
 const Wrapper = styled.div`
-  ${props => props.styles}
+  width: ${props => props.width}px;
+  height: ${props => props.height}px;
+  opacity: ${props => props.isVisible ? 1 : 0};
+  transition-property: opacity;
+  transition-duration: 2s;
 `;
 const BackgroundImage = styled.img`
   position: absolute;
   z-index: -4;
   pointer-events: none;
   background-color: #06080c;
-  // opacity: 0.5;
 `;
 const GameMapDimmer = styled.img`
   position: absolute;
   z-index: -3;
   pointer-events: none;
-  // background-color: black;
-  opacity: 0.5;
-  // width: 100%;
-  // height: 100%;
 `;
-export const GameMap = ({ isTutorial, borderStyles, mapStyles, width, height }) => {
-  return (
-    <Border styles={borderStyles}>
-      <Wrapper styles={mapStyles}>
-        <BackgroundImage src={"map.gif"} width={width} height={height} />
-        {!isTutorial && <GameMapDimmer src={"landDimmer.png"} width={width} height={height} />}
-      </Wrapper>
-    </Border>
-  );
-};
+export const GameMap = ({ isVisible, width, height }) => (
+  <Wrapper width={width} height={height} isVisible={isVisible}>
+    <GameMapDimmer src={"landDimmer.png"} width={width} height={height} />
+    <BackgroundImage src={"map.gif"} width={width} height={height} />
+  </Wrapper>
+);

@@ -9,17 +9,13 @@ import {
   useKeyPress,
   movePlayerPieces,
   moveKaijuPieces,
-  updateTileState,
-  redrawTiles,
-  updateHighlightedTiles,
-  initializeGameBoard,
   determineKaijuQuantity,
   getTileOffsetFromDir,
   isTileOnGameBoard,
   findPath
 } from "Utils/utils";
 import { FullscreenPage } from "Components/FullscreenPage.js";
-import { BlinkFadeEffect } from 'Components/AvatarSelection';
+import { HolographGridBackground } from "Game/UI/HolographGridBackground";
 
 const Wrapper = styled.div`
   position: relative;
@@ -109,22 +105,6 @@ const Avatar_Overlay = styled.div`
   height: ${props => props.isTeammate ? '162px' : '215px'};
 
   ${props => props.isBackground && (props.isTeammate ? "filter: brightness(0.5) drop-shadow(-2px 2px 10px black) hue-rotate(275deg);" : "filter: brightness(0.5) drop-shadow(-4px 10px 10px black) hue-rotate(275deg);")}
-`;
-
-const HolographGridBackground = styled.div`
-  position: absolute;
-  z-index: -85;
-
-  pointer-events: none;
-  background: url(${props => props.src});
-  transform: scale(0.78, 0.84) translate(518px, -87px);
-  
-  width: 478px;
-  height: 876px;
-
-  filter: drop-shadow(0px 0px 1px rgb(94, 255, 94))  blur(2px);
-  border: solid rgb(94, 255, 94) .25px;
-
 `;
 
 const RiseUpEffect = styled.div`
@@ -234,12 +214,22 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const width = WIDTH * percentZoom;
   const height = HEIGHT * percentZoom;
 
+  const [isPaused, setIsPaused] = useState(false);
+
+  // units = tiles
+  const ROW_OFFSET = isPaused ? 5 : 0;
+  const ROW_LENGTH = (isPaused ? 15 : 36) - ROW_OFFSET;
+
+  const COL_OFFSET = isPaused ? 3 : 0;
+  const COL_LENGTH = (isPaused ? 20 : 24) - COL_OFFSET;
+  // - - - - - - -
+
+
   const accTime = useRef(0);
   const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
   const [winner, setWinner] = useState(null);
-  const [isPaused, setIsPaused] = useState(false);
   const [dmgArray, setDmgArray] = useState([]);
   const [kaijuKillCount, setKaijuKillCount] = useState([]);
   const [playerData, setPlayerData] = useState([]);
@@ -449,41 +439,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     }
   }, [kaijuData, winner, isPlayingGame]);
 
-  // event tick
+  // pieces event tick
   useInterval(() => {
-    updateHighlightedTiles(
-      setHighlightedTiles0,
-      playerData,
-      hoverLookupString,
-      path,
-      setPath,
-      scale,
-      0
-    );
-    if (shouldUpdate(accTime.current, 3)) {
-      updateTileState(
-        playerData,
-        kaijuData,
-        setDmgArray,
-        setTileStatuses,
-        width,
-        height,
-        scale,
-        accTime.current
-      );
-    }
-    redrawTiles({
-      highlightedTiles0,
-      setHoverRef: () => { },
-      setClickedTile,
-      setTiles,
-      playerData,
-      kaijuData,
-      tileStatuses,
-      setTileStatuses,
-      scale,
-    });
-    // move players
     movePlayerPieces(
       playerData,
       setPlayerData,
@@ -498,7 +455,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       setTeleportData,
       false
     );
-    // move monsters
     moveKaijuPieces({
       data: kaijuData,
       setData: setKaijuData,
@@ -531,22 +487,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setPickedAbilities={setPickedAbilities}
     handleClickPlay={() => {
       setWinner(1);
-      initializeGameBoard({
-        playerData,
-        setPlayerData,
-        pickedAbilities,
-        kaijuData,
-        width,
-        height,
-        scale,
-        setTiles,
-        setClickedTile,
-        setHoverRef: () => { },
-        tileStatuses,
-        setTileStatuses,
-        isTeammate,
-        selectedAvatar
-      });
       triggerTransition(() => setIsPlayingGame(bool => !bool));
     }}
     isPaused={false}
@@ -580,25 +520,13 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         <Wrapper>
           <GameBoardOverlay />
           <GameBoardOverlay isBackground={true} />
-          <BlinkFadeEffect high={49} low={10} time={700}>
-            <BlinkFadeEffect high={100} low={30} time={400}>
-              <HolographGridBackground src="GameUI_Pieces/HolographGrid1.png" />
-            </BlinkFadeEffect>
-            <BlinkFadeEffect high={100} low={30} time={500}>
-              <HolographGridBackground src="GameUI_Pieces/HolographGrid2.png" />
-            </BlinkFadeEffect>
-            <BlinkFadeEffect high={100} low={30} time={700}>
-              <HolographGridBackground src="GameUI_Pieces/HolographGrid3.png" />
-            </BlinkFadeEffect>
-            <BlinkFadeEffect high={100} low={30} time={600}>
-              <HolographGridBackground src="GameUI_Pieces/HolographGrid4.png" />
-            </BlinkFadeEffect>
-          </BlinkFadeEffect>
-            <SwoopOutEffect duration={swoopOutDuration}>
+          <HolographGridBackground isVisible={true} />
+          <HolographGridBackground isVisible={isPaused} isLeftSide={true} />
+          <SwoopOutEffect duration={swoopOutDuration}>
             <FloatingEffect>
               {/* <RotateInPlaceEffect duration={swoopOutDuration}> */}
-                <ProgressCounterOverlay />
-                <ProgressCounterOverlay isBackground={true} />
+              <ProgressCounterOverlay />
+              <ProgressCounterOverlay isBackground={true} />
               {/* </RotateInPlaceEffect> */}
             </FloatingEffect>
           </SwoopOutEffect>
@@ -622,7 +550,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               </FloatingEffect>
             </RiseUpEffect>
           </SwoopOutEffect>
-
           <GameWrapper width={width} height={height}>
             <GameBoard
               isPaused={isPaused}
@@ -641,8 +568,39 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               hoverLookupString={hoverLookupString}
               setHoverLookupString={setHoverLookupString}
               deadKaijuLocations={deadKaijuLocations}
+              //
+              highlightedTiles0={highlightedTiles0}
+              setHighlightedTiles0={setHighlightedTiles0}
+              setPath={setPath}
+              setDmgArray={setDmgArray}
+              setTiles={setTiles}
+              accTime={accTime}
+              GAME_PIECES_TURN_DELAY={TURN_DELAY}
+              ROW_LENGTH={ROW_LENGTH}
+              COL_LENGTH={COL_LENGTH}
+              ROW_OFFSET={ROW_OFFSET}
+              COL_OFFSET={COL_OFFSET}
+              initializationProps={{
+                playerData,
+                setPlayerData,
+                pickedAbilities,
+                kaijuData,
+                width,
+                height,
+                scale,
+                setTiles,
+                setClickedTile,
+                tileStatuses,
+                setTileStatuses,
+                isTeammate,
+                selectedAvatar,
+                ROW_LENGTH,
+                COL_LENGTH,
+                ROW_OFFSET,
+                COL_OFFSET
+              }}
             />
-            <UI
+            < UI
               playerData={playerData}
               setPlayerData={setPlayerData}
               kaijuKillCount={kaijuKillCount}

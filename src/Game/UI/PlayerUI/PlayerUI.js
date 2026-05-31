@@ -64,7 +64,8 @@ const PlayerPictureBackground = styled.div`
 
 const ModifierList = styled.ul`
     position: absolute;
-    transform: scale(.75) translate(${props => props.translation ? props.translation : `475px, -46px`});
+    // scale(.75)
+    transform: translate(${props => props.translation ? props.translation : `475px, -46px`});
     display: flex;
     flex-direction: column;
     list-style-type: none;
@@ -79,8 +80,10 @@ const ModifierListitem = styled.li`
     transition-property: opacity;
     position: absolute;
     background: url(${props => props.noModSrc});
-    pointer-events: none;
+    background-repeat: no-repeat;
     background-position: center;
+
+    pointer-events: none;
     width: 372px;
     height: 229px;
 
@@ -93,8 +96,9 @@ const ModifierListitem = styled.li`
     pointer-events: none;
 
     background: url(${props => props.modSrc});
-
+    background-repeat: no-repeat;
     background-position: center;
+    
     opacity: ${props => (props.modIsApplied ? 1 : 0)};
     -webkit-transition-duration: 1s;
     transition-duration: 1s;

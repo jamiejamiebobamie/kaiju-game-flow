@@ -6,7 +6,8 @@ import { ExplodingKaiju } from "./Pieces/ExplodingKaijuPiece";
 import { Kaiju } from "./Pieces/KaijuPiece";
 import { PauseModal } from "./PauseModal";
 import { GameMap } from "../../Components/GameMap.js";
-import { getFlattenedArrayIndex, getDistance } from "../../Utils/utils";
+import { useInterval, initializeGameBoard, getFlattenedArrayIndex, getDistance, updateTileState, redrawTiles, updateHighlightedTiles, getSafeTile } from "../../Utils/utils";
+
 const Board = styled.div`
   position: relative;
   display: flex;
@@ -43,11 +44,32 @@ export const GameBoard = ({
   scale,
   hoverLookupString,
   setHoverLookupString,
-  deadKaijuLocations
+  deadKaijuLocations,
+  //
+  highlightedTiles0,
+  setHighlightedTiles0,
+  setPath,
+  setDmgArray,
+  setTiles,
+  tileStatuses,
+  setTileStatuses,
+  accTime,
+  GAME_PIECES_TURN_DELAY,
+  ROW_LENGTH,
+  COL_LENGTH,
+  ROW_OFFSET,
+  COL_OFFSET,
+  initializationProps
 }) => {
   const playerIndex = 0;
 
   const isPlayerDead = !!playerData[playerIndex] && playerData[playerIndex].isDead;
+
+  const TILE_STATUS_TURN_DELAY = GAME_PIECES_TURN_DELAY * 1.5;
+
+  const isRenderCityMap = !isPaused;
+
+  useEffect(() => initializeGameBoard({ ...initializationProps, isMap: isRenderCityMap }), []);
 
   useEffect(() => {
     const { i, _ } = clickedTile;
@@ -56,6 +78,48 @@ export const GameBoard = ({
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
+
+  // gameboard tiles event tick
+  useInterval(() => {
+    updateHighlightedTiles(
+      setHighlightedTiles0,
+      playerData,
+      hoverLookupString,
+      path,
+      setPath,
+      scale,
+      0
+    );
+
+    const safeTile = getSafeTile({ enemyData: kaijuData, tileStatuses, isMap: isRenderCityMap, scale });
+    updateTileState(
+      playerData,
+      kaijuData,
+      setDmgArray,
+      setTileStatuses,
+      width,
+      height,
+      scale,
+      accTime.current,
+      safeTile
+    );
+    redrawTiles({
+      highlightedTiles0,
+      setHoverRef: () => { },
+      setClickedTile,
+      setTiles,
+      playerData,
+      kaijuData,
+      tileStatuses,
+      setTileStatuses,
+      scale,
+      rowLength: ROW_LENGTH,
+      colLength: COL_LENGTH,
+      rowOffset: ROW_OFFSET,
+      colOffset: COL_OFFSET,
+      isMap: isRenderCityMap
+    });
+  }, TILE_STATUS_TURN_DELAY);
 
   const kaiju = kaijuData.map(k => (
     <Kaiju
@@ -103,45 +167,44 @@ export const GameBoard = ({
       zIndex={getFlattenedArrayIndex(k.tile)}
     />
   ));
+
   return (
     <Board
       onClick={e => {
-        if(!isPlayerDead){
+        if (!isPlayerDead) {
           var rect = e.target.getBoundingClientRect();
           var x = e.clientX - rect.left - 23; // x position within the gameboard w/ offset: -23
           var y = e.clientY - rect.top;  // y position within the gameboard.
-          const test = tiles && tiles.reduce((acc, {props : { i, j, tileLocation }}) =>
-                        {
-                            const distance = getDistance({ x, y }, tileLocation);
-                            return acc.distance > distance ? ({key: `${i} ${j}`, distance }) : acc;
+          const test = tiles && tiles.reduce((acc, { props: { i, j, tileLocation } }) => {
+            const distance = getDistance({ x, y }, tileLocation);
+            return acc.distance > distance ? ({ key: `${i} ${j}`, distance }) : acc;
 
-                        }  , {
-                            distance: Number.MAX_SAFE_INTEGER,
-                            key: undefined
-                          }
-                     )
-        test.key && setClickedTile(test.key);
+          }, {
+            distance: Number.MAX_SAFE_INTEGER,
+            key: undefined
+          }
+          )
+          test.key && setClickedTile(test.key);
         }
       }}
       onMouseMove={e => {
-        if(!isPlayerDead){
-            var rect = e.target.getBoundingClientRect();
-            var x = e.clientX - rect.left - 23; // x position within the gameboard w/ offset: -23
-            var y = e.clientY - rect.top + 8;  // y position within the gameboard.
-            const test = tiles && tiles.reduce((acc, {props : { i, j, tileLocation }}) =>
-                          {
-                              const distance = getDistance({ x, y }, tileLocation);
-                              return acc.distance > distance ? ({key: `${i} ${j}`, distance }) : acc;
+        if (!isPlayerDead) {
+          var rect = e.target.getBoundingClientRect();
+          var x = e.clientX - rect.left - 23; // x position within the gameboard w/ offset: -23
+          var y = e.clientY - rect.top + 8;  // y position within the gameboard.
+          const test = tiles && tiles.reduce((acc, { props: { i, j, tileLocation } }) => {
+            const distance = getDistance({ x, y }, tileLocation);
+            return acc.distance > distance ? ({ key: `${i} ${j}`, distance }) : acc;
 
-                          }  , {
-                              distance: Number.MAX_SAFE_INTEGER,
-                              key: undefined
-                            }
-                      )
+          }, {
+            distance: Number.MAX_SAFE_INTEGER,
+            key: undefined
+          }
+          )
           test.key && test.key !== hoverLookupString && setHoverLookupString(test.key);
         } else if (hoverLookupString != '') {
           setHoverLookupString('');
-        } 
+        }
       }}
       width={width}
       height={height}>
@@ -153,7 +216,7 @@ export const GameBoard = ({
         {deadPlayers}
         {kaijuRemains}
       </ShiftContentOver>
-      <GameMap width={width} height={height} />
+      <GameMap isVisible={isRenderCityMap} width={width} height={height} />
     </Board>
   );
 };

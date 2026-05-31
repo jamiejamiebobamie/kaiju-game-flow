@@ -8,7 +8,9 @@ import {
   DEATH_TILE_STATUSES,
   PLAYER_CLASSES,
   TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES,
-  BASE_PLAYER_STATS
+  BASE_PLAYER_STATS,
+  MAX_ROWS,
+  MAX_COLS
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 import { StyledIcon } from "Tutorial/Components/StyledComponents";
@@ -207,16 +209,18 @@ export const initializeGameBoard = ({
   setPlayerData,
   pickedAbilities,
   kaijuData,
-  width,
-  height,
   scale,
   setTiles,
   setClickedTile,
-  setHoverRef,
   tileStatuses,
   setTileStatuses,
   isTeammate,
-  selectedAvatar
+  selectedAvatar,
+  isMap,
+  ROW_LENGTH,
+  COL_LENGTH,
+  ROW_OFFSET,
+  COL_OFFSET
 }) => {
   const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   // PLAYERS - - - - - - - - - - - -
@@ -253,6 +257,24 @@ export const initializeGameBoard = ({
   setPlayerData(_players);
   // PLAYERS    - - - - - - - - - -
   // TILES      - - - - - - - - - -
+  const _tileStatuses = [];
+  for (let i = 0; i < COL_LENGTH; i++) {
+    const status = [];
+    for (let j = 0; j < ROW_LENGTH; j++) {
+      status.push({
+        updateKey: Math.random(),
+        playerGender:
+          playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
+          playerData.find(({ tile }) => tile.i === i && tile.j === j).gender,
+        isKaiju: kaijuData
+          .filter(k => k.isOnTiles)
+          .find(key => key === `${i} ${j}`)
+      });
+    }
+    _tileStatuses.push(status);
+  }
+  setTileStatuses(_tileStatuses);
+
   redrawTiles({
     highlightedTiles0: [],
     setHoverRef: () => { },
@@ -263,26 +285,13 @@ export const initializeGameBoard = ({
     tileStatuses,
     setTileStatuses,
     scale,
+    isTutorial: false,
+    rowLength: ROW_LENGTH,
+    colLength: COL_LENGTH,
+    rowOffset: ROW_OFFSET,
+    colOffset: COL_OFFSET,
+    isMap
   });
-  const status = [];
-  const rowLength = Math.ceil(width / (70 * scale));
-  const colLength = Math.ceil(height / (75 * scale));
-  for (let i = 0; i < rowLength; i++) {
-    const _status = [];
-    for (let j = 0; j < colLength; j++) {
-      _status.push({
-        updateKey: Math.random(),
-        playerGender:
-          playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
-          playerData.find(({ tile }) => tile.i === i && tile.j === j).gender,
-        isKaiju: kaijuData
-          .filter(k => k.isOnTiles)
-          .find(key => key === `${i} ${j}`)
-      });
-    }
-    status.push(_status);
-  }
-  setTileStatuses(status);
   // TILES      - - - - - - - - - -
 };
 export const spawnKaiju = (
@@ -418,56 +427,62 @@ export const updateHighlightedTiles = (
   }
   setHighlightedTiles(_highlightedTiles);
 };
+
+const isTileVisible = ({ i, j, key, rowOffset, rowLength, colOffset, colLength, isMap }) => {
+  const isVisible = j > rowOffset && j < rowLength && i > colOffset && i < colLength && (!isMap || PENINSULA_TILE_LOOKUP[key]);
+  return isVisible;
+}
+
 export const redrawTiles = ({
   highlightedTiles0,
-  setHoverRef,
   setClickedTile,
   setTiles,
   playerData,
   kaijuData,
   tileStatuses,
   scale,
-  isTutorial,
+  isMap,
+  rowLength = MAX_ROWS,
+  colLength = MAX_COLS,
+  rowOffset = 0,
+  colOffset = 0,
 }) => {
   if (tileStatuses) {
-    const rowLength = 24;
-    const colLength = isTutorial ? 10 : 36;
     const _tiles = [];
-    for (let i = 0; i < rowLength; i++) {
-      for (let j = 0; j < colLength; j++) {
+    for (let i = 0; i < MAX_COLS; i++) {
+      for (let j = 0; j < MAX_ROWS; j++) {
         const key = `${i} ${j}`;
-        if (PENINSULA_TILE_LOOKUP[key] || isTutorial) {
-          const tileLocation = getTileXAndY({ i, j, scale });
-          const playerOnTile = playerData.find(
-            ({ tile, isDead }) =>
-              !isDead && !!tile && tile.i === i && tile.j === j
-          )
-          const playerGender = !!playerOnTile ? playerOnTile.gender : undefined;
-          const isKaiju = kaijuData
-            .filter(k => k.isOnTiles && k.lives)
-            .find(({ tile }) => tile && tile.i === i && tile.j === j);
-          _tiles.push(
-            <HexagonTile
-              key={key}
-              setHoverRef={setHoverRef}
-              rowLength={rowLength}
-              i={i}
-              j={j}
-              scale={scale}
-              isTutorial={isTutorial}
-              setClickedIndex={setClickedTile}
-              tileLocation={tileLocation}
-              isHighlighted0={highlightedTiles0.some(
-                ({ h_i, h_j }) => h_i === i && h_j === j
-              )}
-              status={{
-                ...tileStatuses[i][j],
-                playerGender,
-                isKaiju
-              }}
-            />
-          );
+        const tileLocation = getTileXAndY({ i, j, scale });
+        const playerOnTile = playerData.find(
+          ({ tile, isDead }) =>
+            !isDead && !!tile && tile.i === i && tile.j === j
+        )
+        const playerGender = !!playerOnTile ? playerOnTile.gender : undefined;
+        const isKaiju = kaijuData
+          .filter(k => k.isOnTiles && k.lives)
+          .find(({ tile }) => tile && tile.i === i && tile.j === j);
+        const isVisible = isTileVisible({ i, j, key, rowOffset, rowLength, colOffset, colLength, isMap });
+        const tileStatus = {
+          ...tileStatuses[i][j],
+          playerGender,
+          isKaiju
         }
+        _tiles.push(
+          <HexagonTile
+            key={key}
+            isVisible={isVisible}
+            tileLocation={tileLocation}
+            rowLength={rowLength}
+            scale={scale}
+            i={i}
+            j={j}
+            setClickedIndex={isVisible ? setClickedTile : () => { }}
+            isHighlighted0={isVisible && highlightedTiles0.some(
+              ({ h_i, h_j }) => h_i === i && h_j === j
+            )}
+            status={isVisible ? tileStatus : {}}
+          />
+        );
       }
     }
     setTiles(_tiles);
@@ -482,18 +497,31 @@ export const updateTileState = (
   height,
   scale,
   accTime,
-  isTutorial
+  safeTile,
+  rowLength = MAX_ROWS,
+  colLength = MAX_COLS,
+  rowOffset = 0,
+  colOffset = 0,
+  isMap = true
 ) => {
   setTileStatuses(_statuses => {
     if (_statuses) {
-      const rowLength = isTutorial ? 24 : Math.ceil(width / (70 * scale));
-      const colLength = isTutorial ? 10 : Math.ceil(height / (75 * scale));
       const updateKey = Math.random();
       const newDmg = [];
-      for (let i = 0; i < rowLength; i++) {
-        for (let j = 0; j < colLength; j++) {
+      for (let i = 0; i < MAX_COLS; i++) {
+        for (let j = 0; j < MAX_ROWS; j++) {
+
+          const key = `${i} ${j}`;
+          const isVisible = isTileVisible({ i, j, key, rowOffset, rowLength, colOffset, colLength, isMap });
+          if (!isVisible) {
+            _statuses[i][j] = {};
+          }
+
           // 1. solve what should be on the tile
-          if (_statuses[i][j].updateKey !== updateKey) {
+          else if (safeTile.i == i && safeTile.j == j) {
+            // "isHomeBase" = sanctuary
+            _statuses[i][j] = { isHomeBase: true, updateKey: _statuses[i][j].updateKey };
+          } else if (_statuses[i][j].updateKey !== updateKey) {
             let tileStatus = solveForStatus(_statuses[i][j]);
             const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
             if (entry) {
@@ -536,25 +564,15 @@ export const updateTileState = (
                       "up left"
                     ];
                     let direction = [d];
-                    if (
-                      (isTutorial &&
-                        isTileOnGameBoardTutorial({
-                          i: nextTile.i,
-                          j: nextTile.j
-                        })) ||
-                      (!isTutorial &&
-                        isTileOnGameBoard({
-                          i: nextTile.i,
-                          j: nextTile.j
-                        }))
-                    ) {
 
+                    const isNextTileVisible = isTileVisible({ i: nextTile.i, j: nextTile.j, key: `${nextTile.i} ${nextTile.j}`, rowOffset, rowLength, colOffset, colLength, isMap });
+                    if (isNextTileVisible) {
                       // solve for statuses with rotating directions
                       if (
                         k === "isCold" && // tick 1 and 2 = spread in single direction
                         // (count < (startCount * 3 / 5) ||
                         // (((count % 3) && count >= (startCount - 10))  || //&& k == "isCold") || // tick 10+
-                         (count < (startCount - 0) && count > (startCount - 8))// ) // tick 1-7
+                        (count < (startCount - 0) && count > (startCount - 8))// ) // tick 1-7
                         //  count >= (startCount - 1))
                         // ||
                         // (k === "isOnFire" && count >= startCount)
@@ -574,7 +592,7 @@ export const updateTileState = (
                           3
                         );
                         direction = newDirs;
-                      } 
+                      }
 
                       // solve for statuses with "spreading" directions
                       else if (
@@ -584,11 +602,11 @@ export const updateTileState = (
                         k === "isShielded" || //||
                         // (k == "isCold" && count == (startCount - 8)) ||// ) // tick 8
 
-                      // (count < (startCount - 3) && count > (startCount - 5) && k == "isCold") || // tick 4
-                      // (count % 2 && count >= (startCount - 10)  && k == "isCold") || // tick 10+
-                      //  (count >= (startCount - 3) && k === "isCold") ||
-                      //  (count == startCount && k === "isWooded")
-                         (k === "isWooded" && count == startCount)// || count > (startCount - 1))// ) // ticks 0-1, spread in place
+                        // (count < (startCount - 3) && count > (startCount - 5) && k == "isCold") || // tick 4
+                        // (count % 2 && count >= (startCount - 10)  && k == "isCold") || // tick 10+
+                        //  (count >= (startCount - 3) && k === "isCold") ||
+                        //  (count == startCount && k === "isWooded")
+                        (k === "isWooded" && count == startCount)// || count > (startCount - 1))// ) // ticks 0-1, spread in place
                       ) {
                         direction = dirs;
                       }
@@ -602,9 +620,9 @@ export const updateTileState = (
                         (k == "isCold" && count < (startCount - 7)) || // ) // tick 8+
                         // (count >= (startCount - 5) && k == "isCold") || // tick 5+
                         // (count % 2 && count >= (startCount - 10) && k == "isCold") || // tick 10+
-                      //  (count >= (startCount * 3 / 5) && k === "isCold") ||
-                      //  (count < startCount && k === "isWooded")
-                         ( k === "isWooded" && count <= (startCount - 2)) // ticks 3+, track
+                        //  (count >= (startCount * 3 / 5) && k === "isCold") ||
+                        //  (count < startCount && k === "isWooded")
+                        (k === "isWooded" && count <= (startCount - 2)) // ticks 3+, track
                       ) {
                         direction = solveForTrackingStatusDirection({
                           isKaiju,
@@ -636,14 +654,14 @@ export const updateTileState = (
                       solveForWallReflectionStatus({
                         k, d, i, j,
                         tileDirMapping,
-                        isTutorial,
                         _statuses,
                         count,
                         targetIndex,
                         startCount,
                         isKaiju,
                         playerIndex,
-                        updateKey
+                        updateKey,
+                        rowOffset, rowLength, colOffset, colLength, isMap
                       });
                     }
 
@@ -784,42 +802,38 @@ const setNextTileStatus = ({
 const solveForWallReflectionStatus = ({
   k, d, i, j,
   tileDirMapping,
-  isTutorial,
   _statuses,
   count,
   targetIndex,
   startCount,
   isKaiju,
   playerIndex,
-  updateKey
+  updateKey,
+  rowOffset, rowLength, colOffset, colLength, isMap
 }) => {
+
   const dirMapIndex = tileDirMapping.indexOf(d);
+
   const newDirMapIndex =
     dirMapIndex > 2 ? dirMapIndex - 2 : dirMapIndex + 2;
+
   const newDir = tileDirMapping[newDirMapIndex];
+
   const nextTileOffsetFromCurrTile = getTileOffsetFromDir(
     newDir,
     { i, j }
   );
-  const nextTileForLightning = {
+
+  const nextTile = {
     i: i + nextTileOffsetFromCurrTile.i,
     j: j + nextTileOffsetFromCurrTile.j
   };
 
-  if (
-    (isTutorial &&
-      isTileOnGameBoardTutorial({
-        i: nextTileForLightning.i,
-        j: nextTileForLightning.j
-      })) ||
-    (!isTutorial &&
-      isTileOnGameBoard({
-        i: nextTileForLightning.i,
-        j: nextTileForLightning.j
-      }))
-  ) {
-    _statuses[nextTileForLightning.i][
-      nextTileForLightning.j
+  const isNextTileVisible = isTileVisible({ i: nextTile.i, j: nextTile.j, key: `${nextTile.i} ${nextTile.j}`, rowOffset, rowLength, colOffset, colLength, isMap });
+  if (isNextTileVisible) {
+
+    _statuses[nextTile.i][
+      nextTile.j
     ][k] = {
       dirs: [newDir],
       count: count > 8 ? 8 : count - 1,
@@ -828,17 +842,9 @@ const solveForWallReflectionStatus = ({
       isKaiju,
       playerIndex
     };
-    const nextTilesStatus = solveForStatus(
-      _statuses[nextTileForLightning.i][
-      nextTileForLightning.j
-      ]
-    );
-    _statuses[nextTileForLightning.i][
-      nextTileForLightning.j
-    ] = nextTilesStatus;
-    _statuses[nextTileForLightning.i][
-      nextTileForLightning.j
-    ].updateKey = updateKey;
+
+    const nextTilesStatus = solveForStatus(_statuses[nextTile.i][nextTile.j]);
+    _statuses[nextTile.i][nextTile.j] = { ...nextTilesStatus, updateKey };
   }
 };
 const solveForStatusWithNoCounts = ({ i, j, k, _statuses, entityOnTileStatus, tileStatus }) => {
@@ -936,49 +942,56 @@ export const shootPower = ({
   });
 };
 const solveForStatus = tile => {
-  if (tile.isHealing) return { isHealing: tile.isHealing };
-  else if (tile.isBubble)
-    return {
-      isBubble: tile.isBubble
-    };
-  else if (tile.isGhosted)
-    return {
-      isGhosted: tile.isGhosted
-    };
-  else if (tile.isElectrified)
-    return {
-      isElectrified: tile.isElectrified
-    };
-  else if (tile.isCold)
-    return {
-      isCold: tile.isCold
-    };
-  else if (tile.isShielded)
-    return {
-      isShielded: tile.isShielded
-    };
-  else if (tile.isOnFire && tile.isOnKaijuFire)
-    return getRandBool()
-      ? {
+  switch (true) {
+    case !!tile.isHomeBase:
+      return { isHomeBase: tile.isHomeBase }
+    case !!tile.isHealing:
+      return { isHealing: tile.isHealing }
+    case !!tile.isBubble:
+      return {
+        isBubble: tile.isBubble
+      };
+    case !!tile.isGhosted:
+      return {
+        isGhosted: tile.isGhosted
+      };
+    case !!tile.isElectrified:
+      return {
+        isElectrified: tile.isElectrified
+      };
+    case !!tile.isCold:
+      return {
+        isCold: tile.isCold
+      };
+    case !!tile.isShielded:
+      return {
+        isShielded: tile.isShielded
+      };
+    case (!!tile.isOnFire && !!tile.isOnKaijuFire):
+      return getRandBool()
+        ? {
+          isOnFire: tile.isOnFire
+        }
+        : {
+          isOnKaijuFire: tile.isOnKaijuFire
+        };
+      return;
+    case !!tile.isOnFire:
+      return {
         isOnFire: tile.isOnFire
-      }
-      : {
+      };
+    case !!tile.isOnKaijuFire:
+      return {
         isOnKaijuFire: tile.isOnKaijuFire
       };
-  else if (tile.isOnFire)
-    return {
-      isOnFire: tile.isOnFire
-    };
-  else if (tile.isOnKaijuFire)
-    return {
-      isOnKaijuFire: tile.isOnKaijuFire
-    };
-  else if (tile.isWooded)
-    return {
-      isWooded: tile.isWooded
-    };
-  else return tile;
-};
+    case !!tile.isWooded:
+      return {
+        isWooded: tile.isWooded
+      };
+    default:
+      return tile;
+  }
+}
 const getRandBool = () => {
   return Math.random() > 0.5;
 };
@@ -1197,7 +1210,7 @@ export const movePlayerPieces = (
               _data[1].moveToTiles = moveToEnemy;
             } else if (isEnemyTooClose) {
               _data[1].lastAccTimeForFindPath = accTime;
-              const safeTile = getSafeTile(enemiesOnTiles, tileStatuses, scale);
+              const safeTile = getSafeTile({ enemyData: enemiesOnTiles, tileStatuses, isMap: true, scale });
               const toSafeTilePath = findPath(
                 _data[1].tile,
                 safeTile,
@@ -1304,7 +1317,7 @@ export const movePlayerPieces = (
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
             _data[i].isTeleported = !_data[i].isTeleported;
-            const teleportTile = getSafeTile(enemyData, tileStatuses, scale);//_path[_path.length - 1];
+            const teleportTile = getSafeTile({ enemyData, tileStatuses, isMap: true, scale });
             if (teleportTile) {
               const teleportLocation = getCharXAndY({ ...teleportTile, scale });
               _data[i].tile = teleportTile
@@ -1817,39 +1830,40 @@ const getRandomTileOnBoard = (scale, isTutorial) => {
     return tileIndices[randomInt];
   }
 };
-const getSafeTile = (kaijuData, tileStatuses, scale) => {
-  const kaijuLocations = kaijuData
-    .filter(({ lives }) => lives)
-    .map(({ charLocation }) => charLocation);
-  const allTiles = NOT_BRIDGE_TILES_VALS;
+export const getSafeTile = ({ enemyData, tileStatuses, isMap, scale }) => {
   let safeTileObj = {
     distance: Number.MIN_SAFE_INTEGER,
     index: getRandomTileOnBoard(scale)
   };
-  kaijuData.length &&
-    allTiles.forEach(currTile => {
-      const currTileXY = getCharXAndY({ ...currTile, scale });
-      const testSafeTileObj = kaijuLocations.reduce(
-        (acc, kaijuLocation) => {
-          const testDist = getDistance(currTileXY, kaijuLocation);
-          return acc.distance < testDist &&
-            tileStatuses &&
-            tileStatuses[currTile.i] &&
-            tileStatuses[currTile.i][currTile.j] &&
-            Object.keys(tileStatuses[currTile.i][currTile.j]).every(
-              k => !DEATH_TILE_STATUSES.includes(k)
-            )
-            ? { distance: testDist, index: currTile }
-            : acc;
-        },
-        {
-          distance: Number.MIN_SAFE_INTEGER,
-          index: getRandomTileOnBoard(scale)
-        }
-      );
-      if (testSafeTileObj.distance > safeTileObj.distance)
-        safeTileObj = testSafeTileObj;
-    });
+
+  if (!enemyData.length) {
+    return safeTileObj
+  }
+
+  const accKaijuAvgLocations = enemyData
+    .filter(({ lives }) => !!lives)
+    .map(({ tile }) => getCharXAndY({ ...tile, scale }))
+    .reduce((acc, item) => { acc.x += item.x; acc.y += item.y; return acc }, { x: 0, y: 0 });
+
+  const kaijuAvgLocation = { x: accKaijuAvgLocations.x / enemyData.length, y: accKaijuAvgLocations.y / enemyData.length };
+
+  const allTiles = isMap ? NOT_BRIDGE_TILES_VALS : []; // TO-DO: make method that generates all {i,j} for current board
+  allTiles.forEach(tile => {
+    const currTileXY = getCharXAndY({ ...tile, scale });
+    const testDist = getDistance(currTileXY, kaijuAvgLocation);
+    if (testDist > safeTileObj.distance) {
+      const isSafe = tileStatuses &&
+        tileStatuses[tile.i] &&
+        tileStatuses[tile.i][tile.j] &&
+        Object.entries(tileStatuses[tile.i][tile.j]).filter(([_, v]) => !v).every(([k, _]) => !DEATH_TILE_STATUSES.includes(k))
+      if (isSafe) {
+        safeTileObj = {
+          distance: testDist,
+          index: tile
+        };
+      }
+    }
+  });
   return safeTileObj.index;
 };
 export const getAdjacentTiles = tile => {
