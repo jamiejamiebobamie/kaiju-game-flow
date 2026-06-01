@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useKeyPress } from "../../../../Utils/utils";
+import { useKeyPress } from "Utils/utils";
 
 const COOLDOWN_VALS = Object.freeze({
   false: false,
@@ -9,7 +9,7 @@ const COOLDOWN_VALS = Object.freeze({
 });
 
 const ICON_LOOKUP = {
-  heart: {
+  love: {
     passive: "fa-gratipay",
     active: "fa-heart",
     loader: "fa-spinner"
@@ -22,6 +22,11 @@ const ICON_LOOKUP = {
   fire: {
     passive: "fa-fire",
     active: "fa-free-code-camp",
+    loader: "fa-spinner"
+  },
+  water: {
+    passive: "fa-exclamation-triangle",
+    active: "fa-tint",
     loader: "fa-spinner"
   },
   wood: {
@@ -171,7 +176,9 @@ const useHandlePlayerClickAbilityButtons = ({
   activateActive,
   cooldownTime,
   cooldownTimeAI,
-  passiveDurationTime
+  passiveDurationTime,
+  abilityData,
+  isTriggerPassiveImmediately
 }) => {
   useEffect(() => {
     if (isOnCoolDown && isCharacterAlive && !isPaused) activateAbilityFromPlayerClick({
@@ -190,7 +197,9 @@ const useHandlePlayerClickAbilityButtons = ({
       activateActive,
       cooldownTime,
       cooldownTimeAI,
-      passiveDurationTime
+      passiveDurationTime,
+      abilityData,
+      isTriggerPassiveImmediately
     });
   }, [isOnCoolDown]);
 };
@@ -211,7 +220,8 @@ const activateAbilityFromPlayerClick = ({
   activateActive,
   cooldownTime,
   cooldownTimeAI,
-  passiveDurationTime
+  passiveDurationTime,
+  isTriggerPassiveImmediately = true
 }) => { // player triggered their abilities or teammate's abilities 
   if (COOLDOWN_VALS.click === isOnCoolDown) {
 
@@ -225,29 +235,44 @@ const activateAbilityFromPlayerClick = ({
       scale
     );
 
-    if (togglePassive != undefined && setPlayerData != undefined) {
-      const delay = passiveDurationTime ?
-        passiveDurationTime : // required when the passive effect's duration needs to be shorter than the cooldown time
-        (playerIndex > 0 ?
-          cooldownTimeAI : cooldownTime);
-      // set timer to toggle-off player passive ability once cooldown ends
-      const timeoutRef = setTimeout(() => {
+    const triggerPassive = () => {
+      if (togglePassive != undefined && setPlayerData != undefined) {
+        const delay = passiveDurationTime ?
+          passiveDurationTime : // required when the passive effect's duration needs to be shorter than the cooldown time
+          (playerIndex > 0 ?
+            cooldownTimeAI : cooldownTime);
+        // set timer to toggle-off player passive ability once cooldown ends
+        const timeoutRef = setTimeout(() => {
+          setPlayerData(p => {
+            if (!!p[playerIndex]) {
+              const toggleOff = true;
+              const update = togglePassive(p[playerIndex], toggleOff);
+              p[playerIndex] = update;
+            }
+            return p;
+          });
+        }, delay);
+        // activate passive ability
         setPlayerData(p => {
           if (!!p[playerIndex]) {
-            const toggleOff = true;
-            const update = togglePassive(p[playerIndex], toggleOff);
+            const update = togglePassive(p[playerIndex]);
             p[playerIndex] = update;
+            p[playerIndex].abilities[abilityIndex].accTime = accTime;
+            p[playerIndex].abilities[abilityIndex].toggleOffPassiveTimeoutRef = timeoutRef;
           }
           return p;
         });
-      }, delay);
-      // activate passive ability
+      }
+    }
+
+    if (isTriggerPassiveImmediately) {
+      triggerPassive();
+    } else {
+      // store passive to trigger later
       setPlayerData(p => {
         if (!!p[playerIndex]) {
-          const update = togglePassive(p[playerIndex]);
-          p[playerIndex] = update;
-          p[playerIndex].abilities[abilityIndex].accTime = accTime;
-          p[playerIndex].abilities[abilityIndex].toggleOffPassiveTimeoutRef = timeoutRef;
+          // teleport passive is called after teleport
+          p[playerIndex].storedPassive = triggerPassive;
         }
         return p;
       });
@@ -321,7 +346,9 @@ export const Ability = ({
     activateActive,
     cooldownTime,
     cooldownTimeAI,
-    passiveDurationTime
+    passiveDurationTime,
+    abilityData,
+    isTriggerPassiveImmediately: element != "glass"
   });
 
   /* teammate triggered ability with AI logic. handle ability button aesthetics. */

@@ -76,7 +76,7 @@ const GameBoardOverlay = styled.div`
   width: ${props => props.isBackground ? "387px" : "1117px"};
   height: ${props => props.isBackground ? "46px" : "919px"};
 
-  ${props => props.isBackground ? "filter: brightness(0.2);" : "filter: drop-shadow(0px 5px 5px black);"}
+  ${props => !props.isBackground && "filter: drop-shadow(0px 5px 5px black);"}
 `;
 
 const ProgressCounterOverlay = styled.div`
@@ -202,7 +202,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
 
   const { MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
 
-  const TURN_DELAY = 100;
+  const TURN_DELAY = 50;
 
   // 100%, "normal size":
   const SCALE = 0.3;
@@ -217,12 +217,14 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [isPaused, setIsPaused] = useState(false);
 
   // units = tiles
-  const ROW_OFFSET = isPaused ? 5 : 0;
-  const ROW_LENGTH = (isPaused ? 15 : 36) - ROW_OFFSET;
+  const ROW_OFFSET = 0;//isPaused ? 5 : 0;
+  const ROW_LENGTH = 36;//(isPaused ? 15 : 36) - ROW_OFFSET;
 
-  const COL_OFFSET = isPaused ? 3 : 0;
-  const COL_LENGTH = (isPaused ? 20 : 24) - COL_OFFSET;
+  const COL_OFFSET = 0;//isPaused ? 3 : 0;
+  const COL_LENGTH = 24;//(isPaused ? 20 : 24) - COL_OFFSET;
   // - - - - - - -
+
+  const movementKeysPressed = useRef([]);
 
 
   const accTime = useRef(0);
@@ -344,19 +346,21 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isCharacterDead: false });
 
   const keyDown = code => {
-    setKeysPressed(keys => {
-      const newKeys = !keys.includes(code) ? [...keys, code] : keys; // add key
-      moveWASD(newKeys);
-      return newKeys;
-    });
+
+    movementKeysPressed.current = movementKeysPressed.current.includes(code) ? [...movementKeysPressed.current, code] : movementKeysPressed.current 
+    // setKeysPressed(keys => {
+    //   const newKeys = !keys.includes(code) ? [...keys, code] : keys; // add key
+    //   return newKeys;
+    // });
   }
 
   const keyUp = code => {
-    setKeysPressed(keys => {
-      const newKeys = keys.includes(code) ? keys.filter(k => k != code) : keys; // remove key
-      !!newKeys.length && moveWASD(newKeys);
-      return newKeys;
-    });
+    movementKeysPressed.current = movementKeysPressed.current.includes(code) ? movementKeysPressed.current.filter(k => k != code) : movementKeysPressed.current;
+
+    // setKeysPressed(keys => {
+    //   const newKeys = keys.includes(code) ? keys.filter(k => k != code) : keys; // remove key
+    //   return newKeys;
+    // });
   }
 
   useKeyPress({
@@ -439,8 +443,17 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     }
   }, [kaijuData, winner, isPlayingGame]);
 
+  const resetHightlightedTiles = () => {
+    setHoverLookupString('');
+    setHighlightedTiles0([]);
+    setPath([]);
+  }
+
   // pieces event tick
   useInterval(() => {
+
+    !!movementKeysPressed.current.length && moveWASD(movementKeysPressed.current);
+
     movePlayerPieces(
       playerData,
       setPlayerData,
@@ -453,25 +466,28 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       setPlayerKillCount,
       teleportData,
       setTeleportData,
-      false
+      false,
+      resetHightlightedTiles
     );
-    moveKaijuPieces({
-      data: kaijuData,
-      setData: setKaijuData,
-      tileStatuses,
-      setTileStatuses,
-      scale: scale,
-      accTime: accTime.current,
-      enemyData: playerData,
-      setEnemyData: setPlayerData,
-      dmgArray: dmgArray,
-      kaijuKillCount,
-      setKaijuKillCount,
-      isTutorial: false,
-      winner: winner,
-      setDeadKaijuLocations,
-      difficulty: selectedDifficulty
-    });
+    const gameTime = accTime.current;
+    if (gameTime > 7000) // delay Kaiju spawning by 7 seconds at start
+      moveKaijuPieces({
+        data: kaijuData,
+        setData: setKaijuData,
+        tileStatuses,
+        setTileStatuses,
+        scale: scale,
+        accTime: accTime.current,
+        enemyData: playerData,
+        setEnemyData: setPlayerData,
+        dmgArray: dmgArray,
+        kaijuKillCount,
+        setKaijuKillCount,
+        isTutorial: false,
+        winner: winner,
+        setDeadKaijuLocations,
+        difficulty: selectedDifficulty
+      });
     // update accumulated time.
     accTime.current =
       accTime.current > Number.MAX_SAFE_INTEGER - 10000
@@ -599,6 +615,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
                 ROW_OFFSET,
                 COL_OFFSET
               }}
+              teleportData={teleportData}
             />
             < UI
               playerData={playerData}

@@ -10,7 +10,10 @@ import {
   TUTORIAL_GAMEBOARD_CORNER_TILE_INDICES,
   BASE_PLAYER_STATS,
   MAX_ROWS,
-  MAX_COLS
+  MAX_COLS,
+  TILE_DIRS,
+  TILE_DIR_NORM_VECS,
+  TILE_DIR_ROTATIONS_IN_DEGREES
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 import { StyledIcon } from "Tutorial/Components/StyledComponents";
@@ -30,13 +33,14 @@ const getRandomAbilities = () => {
   const possibilities = [
     "Ice",
     "Fire",
+    "Water",
     "Wood",
     "Lightning",
     "Death",
     "Bubble",
     "Metal",
     "Glass",
-    "Heart"
+    "Love"
   ];
   for (let i = 0; i < 3; i++) {
     const currLastIndex = possibilities.length - i - 1;
@@ -220,7 +224,8 @@ export const initializeGameBoard = ({
   ROW_LENGTH,
   COL_LENGTH,
   ROW_OFFSET,
-  COL_OFFSET
+  COL_OFFSET,
+  isRenderTiles
 }) => {
   const tileIndices = PENINSULA_TILE_LOOKUP_VALS;
   // PLAYERS - - - - - - - - - - - -
@@ -277,7 +282,6 @@ export const initializeGameBoard = ({
 
   redrawTiles({
     highlightedTiles0: [],
-    setHoverRef: () => { },
     setClickedTile,
     setTiles,
     playerData,
@@ -290,7 +294,8 @@ export const initializeGameBoard = ({
     colLength: COL_LENGTH,
     rowOffset: ROW_OFFSET,
     colOffset: COL_OFFSET,
-    isMap
+    isMap,
+    isRenderTiles
   });
   // TILES      - - - - - - - - - -
 };
@@ -352,7 +357,8 @@ export const spawnKaiju = (
       dir,
       moveSpeed: KAIJU_MAX_SPEED,
       moveSpeedModifier: 0,
-      isGoingToSpewFire: false
+      isGoingToSpewFire: false,
+      abilities: [{ ...PLAYER_ABILITIES["kaijuFire"] }]
     }
     : {
       key,
@@ -446,6 +452,7 @@ export const redrawTiles = ({
   colLength = MAX_COLS,
   rowOffset = 0,
   colOffset = 0,
+  isRenderTiles = true
 }) => {
   if (tileStatuses) {
     const _tiles = [];
@@ -470,14 +477,14 @@ export const redrawTiles = ({
         _tiles.push(
           <HexagonTile
             key={key}
-            isVisible={isVisible}
+            isVisible={isRenderTiles && isVisible}
             tileLocation={tileLocation}
             rowLength={rowLength}
             scale={scale}
             i={i}
             j={j}
             setClickedIndex={isVisible ? setClickedTile : () => { }}
-            isHighlighted0={isVisible && highlightedTiles0.some(
+            isHighlighted0={isVisible && !tileStatus.isTeleportTile && highlightedTiles0.some(
               ({ h_i, h_j }) => h_i === i && h_j === j
             )}
             status={isVisible ? tileStatus : {}}
@@ -519,8 +526,8 @@ export const updateTileState = (
 
           // 1. solve what should be on the tile
           else if (safeTile.i == i && safeTile.j == j) {
-            // "isHomeBase" = sanctuary
-            _statuses[i][j] = { isHomeBase: true, updateKey: _statuses[i][j].updateKey };
+            // "isTeleportTile" = safe tile
+            _statuses[i][j] = { isTeleportTile: true, updateKey: _statuses[i][j].updateKey };
           } else if (_statuses[i][j].updateKey !== updateKey) {
             let tileStatus = solveForStatus(_statuses[i][j]);
             const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
@@ -570,12 +577,7 @@ export const updateTileState = (
                       // solve for statuses with rotating directions
                       if (
                         k === "isCold" && // tick 1 and 2 = spread in single direction
-                        // (count < (startCount * 3 / 5) ||
-                        // (((count % 3) && count >= (startCount - 10))  || //&& k == "isCold") || // tick 10+
                         (count < (startCount - 0) && count > (startCount - 8))// ) // tick 1-7
-                        //  count >= (startCount - 1))
-                        // ||
-                        // (k === "isOnFire" && count >= startCount)
                       ) {
                         direction = solveForRotatingDirectionStatus({ tileDirMapping, count })
                       }
@@ -598,15 +600,10 @@ export const updateTileState = (
                       else if (
                         k === "isOnKaijuFire" ||
                         k === "isOnFire" ||
+                        k === "isWet" ||
                         (k === "isBubble" && count >= startCount) ||
-                        k === "isShielded" || //||
-                        // (k == "isCold" && count == (startCount - 8)) ||// ) // tick 8
-
-                        // (count < (startCount - 3) && count > (startCount - 5) && k == "isCold") || // tick 4
-                        // (count % 2 && count >= (startCount - 10)  && k == "isCold") || // tick 10+
-                        //  (count >= (startCount - 3) && k === "isCold") ||
-                        //  (count == startCount && k === "isWooded")
-                        (k === "isWooded" && count == startCount)// || count > (startCount - 1))// ) // ticks 0-1, spread in place
+                        k === "isShielded" ||
+                        (k === "isWooded" && count == startCount)
                       ) {
                         direction = dirs;
                       }
@@ -614,14 +611,8 @@ export const updateTileState = (
                       // solve for statuses with tracking directions
                       else if (
                         k === "isGhosted" ||
-                        // k === "isWooded" ||
                         k === "isHealing" ||
-
-                        (k == "isCold" && count < (startCount - 7)) || // ) // tick 8+
-                        // (count >= (startCount - 5) && k == "isCold") || // tick 5+
-                        // (count % 2 && count >= (startCount - 10) && k == "isCold") || // tick 10+
-                        //  (count >= (startCount * 3 / 5) && k === "isCold") ||
-                        //  (count < startCount && k === "isWooded")
+                        (k == "isCold" && count < (startCount - 7)) || // tick 8+
                         (k === "isWooded" && count <= (startCount - 2)) // ticks 3+, track
                       ) {
                         direction = solveForTrackingStatusDirection({
@@ -650,7 +641,7 @@ export const updateTileState = (
                       });
 
                       // solve for "bouncy" tile statuses
-                    } else if (k === "isElectrified" || k === "isWooded" || k == 'isHealing' || k == 'isGhosted' || k === "isCold" || k === "isOnFire" || k === "isOnKaijuFire") {
+                    } else if (k === "isElectrified" || k === "isWooded" || k == 'isHealing' || k == 'isGhosted' || k === "isCold" || k === "isWet") { // || k === "isOnFire" || k === "isOnKaijuFire") {
                       solveForWallReflectionStatus({
                         k, d, i, j,
                         tileDirMapping,
@@ -675,7 +666,7 @@ export const updateTileState = (
                     ];
                     _statuses[i][j][k] =
                       !doNotErase.includes(k) ||
-                        (["isOnFire", "isOnKaijuFire"].includes(k) && count >= startCount) ||
+                        (["isOnFire", "isOnKaijuFire", "isWet"].includes(k) && count >= startCount) ||
                         entityOnTileStatus
                         ? undefined // ERASE
                         : {
@@ -898,20 +889,14 @@ export const shootPower = ({
             : [data[1].tile, 1]
           : getClosestEntityFromTile(targetData, originTile, scale);
       if (originTile && targetTile) {
-        // const excludeStatusesForTileStatusesNumTilesModifier = ["isBubble"];//, "isWooded", "isOnFire", "isHealing"];
         const excludeStatusesForTileStatusesCountModifier = [
           "isBubble"
-          // "isWooded",
-          // "isGhosted",
-          // "isHealing"
         ];
-        // const countReductionForNumTilesModifierStatus = statusKey == "isOnFire" && !!data[dataIndex].numTilesModifier ? 2 : 0;
         const [tile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
           data[dataIndex].numTilesModifier
-            // && !excludeStatusesForTileStatusesNumTilesModifier.includes(statusKey)
             ? Math.max(numTiles + data[dataIndex].numTilesModifier, 1)
             : numTiles
         );
@@ -943,8 +928,8 @@ export const shootPower = ({
 };
 const solveForStatus = tile => {
   switch (true) {
-    case !!tile.isHomeBase:
-      return { isHomeBase: tile.isHomeBase }
+    case !!tile.isTeleportTile:
+      return { isTeleportTile: tile.isTeleportTile }
     case !!tile.isHealing:
       return { isHealing: tile.isHealing }
     case !!tile.isBubble:
@@ -983,6 +968,10 @@ const solveForStatus = tile => {
     case !!tile.isOnKaijuFire:
       return {
         isOnKaijuFire: tile.isOnKaijuFire
+      };
+    case !!tile.isWet:
+      return {
+        isWet: tile.isWet
       };
     case !!tile.isWooded:
       return {
@@ -1103,6 +1092,38 @@ const getAdjacentTilesFromNormVec = (currTile, normVec, scale, numTiles) => {
     return [spawnPowerTile, []];
   }
 };
+export const getAngleOfRotationFromTileDirs = dirs => {
+  const normVecs = dirs.map(d => {
+    const i = TILE_DIRS.indexOf(d)
+    if (i != -1) {
+      return TILE_DIR_NORM_VECS[i];
+    } else {
+      return null;
+    }
+  });
+  const accNormVec = normVecs.filter(v => !!v).reduce((acc, item) => {
+    acc.x += item.x;
+    acc.y += item.y;
+    return acc;
+  }, { x: 0, y: 0 });
+
+  const avgNormVec = { x: accNormVec.x / dirs.length, y: accNormVec.y / dirs.length };
+
+  // Math.cos(avgNormVec.x) // faster way to determine angle from norm vec: x/y?
+  // Math.sin(avgNormVec.y)
+  const indexOfClosestDir = TILE_DIR_NORM_VECS.reduce((acc, item, i) => {
+    const dot = (item.x * avgNormVec.x) + (item.y * avgNormVec.y) / 2
+    if (dot > acc.largestDot)
+      return { largestDot: dot, i };
+    return acc;
+  }, { largestDot: -1, i: -1 }).i;
+
+  if (indexOfClosestDir != -1)
+    return TILE_DIR_ROTATIONS_IN_DEGREES[indexOfClosestDir]
+  else
+    return 0;
+
+};
 export const getRandomIntInRange = ({ min = 0, max }) => {
   const _min = Math.ceil(min);
   const _max = Math.floor(max + 1);
@@ -1163,7 +1184,8 @@ export const movePlayerPieces = (
   setPlayerKillCount,
   teleportData,
   setTeleportData,
-  isTutorial
+  isTutorial,
+  resetHightlightedTiles
 ) =>
   setData(_data => {
     const enemiesOnTiles = enemyData.filter(({ isOnTiles }) => !!isOnTiles);
@@ -1276,7 +1298,9 @@ export const movePlayerPieces = (
                 ) {
 
                   hasUsedOnePower = true;
-                  useAbility({
+
+                  // teleport passive is called after teleport
+                  _data[i].storedPassive = useAbility({
                     a,
                     data,
                     setData,
@@ -1287,7 +1311,8 @@ export const movePlayerPieces = (
                     setTeleportData,
                     enemiesOnTiles,
                     setTileStatuses,
-                    scale
+                    scale,
+                    isTriggerPassiveImmediately: a.element != "glass"
                   });
 
                 }
@@ -1306,18 +1331,19 @@ export const movePlayerPieces = (
           }
         }
 
+        const isPlayer = i == 0;
         if (
           _data[i].charLocation &&
           _data[i].moveFromLocation &&
           _data[i].moveToLocation &&
           (!_data[i].isThere ||
             _data[i].moveToTiles.length ||
-            (teleportData && teleportData.length))
+            (teleportData && teleportData.length && teleportData.includes(i) && (!isPlayer || _data[i].moveToTiles.length)))
         ) {
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
             _data[i].isTeleported = !_data[i].isTeleported;
-            const teleportTile = getSafeTile({ enemyData, tileStatuses, isMap: true, scale });
+            const teleportTile = isPlayer ? _data[i].moveToTiles[_data[i].moveToTiles.length - 1] : getSafeTile({ enemyData, tileStatuses, isMap: true, scale });
             if (teleportTile) {
               const teleportLocation = getCharXAndY({ ...teleportTile, scale });
               _data[i].tile = teleportTile
@@ -1325,7 +1351,10 @@ export const movePlayerPieces = (
               _data[i].moveToLocation = teleportLocation;
               _data[i].moveFromLocation = teleportLocation;
               _data[i].moveToTiles = [];
-              _data[i].isThere = false;
+              _data[i].isThere = true;
+              setTeleportData(td => td.filter(_i => _i != i));
+              isPlayer && resetHightlightedTiles();
+              !!_data[i].storedPassive && _data[i].storedPassive();
             }
           } else {
             const { newLocation, hasArrived } = moveTo({
@@ -1391,7 +1420,6 @@ export const movePlayerPieces = (
           _data[i].dir = "idle";
         }
 
-        let livesModifier = _data[i].livesModifier;
         dmgArray
           .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju) // what does this do...
           .forEach(dmg => {
@@ -1405,9 +1433,9 @@ export const movePlayerPieces = (
                 // also accTime might reset to zero, so check for that.
                 _data[i].lastDmg = accTime;
 
-                if (livesModifier > 0 && dmg.lifeDecrement > 0) {
+                if (_data[i].livesModifier > 0 && dmg.lifeDecrement > 0) {
                   // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
-                  const remainingDmg = dmg.lifeDecrement - livesModifier;
+                  const remainingDmg = dmg.lifeDecrement - _data[i].livesModifier;
                   dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
                   _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
 
@@ -1417,30 +1445,32 @@ export const movePlayerPieces = (
                     clearTimeout(woodAbility.toggleOffPassiveTimeoutRef);
                     woodAbility.toggleOffPassiveTimeoutRef = undefined;
                   }
-                } else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
-                  // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
-                  const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
-                  dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
-                  _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
+                  // } else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
+                  //   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
+                  //   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
+                  //   dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
+                  //   _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
 
-                  // only death ability gives: negative "livesModifier." clearTimeout as passive has been "toggled-off"
-                  const deathAbility = _data[i].abilities.find(({ element, toggleOffPassiveTimeoutRef }) => element == 'death' && !!toggleOffPassiveTimeoutRef);
+                  //   // only death ability gives: negative "livesModifier." clearTimeout as passive has been "toggled-off"
+                  //   const deathAbility = _data[i].abilities.find(({ element, toggleOffPassiveTimeoutRef }) => element == 'death' && !!toggleOffPassiveTimeoutRef);
 
 
-                  if (deathAbility) {
-                    clearTimeout(deathAbility.toggleOffPassiveTimeoutRef);
-                  }
+                  //   if (deathAbility) {
+                  //     clearTimeout(deathAbility.toggleOffPassiveTimeoutRef);
+                  //   }
                 }
 
-                _data[i].lives =
-                  dmg.lifeDecrement > 0 ||
-                    _data[i].lives - dmg.lifeDecrement < 5
-                    ? _data[i].lives - dmg.lifeDecrement
-                    : _data[i].lives;
+                const MAX_LIVES = 4;
+                const livesNewVal = _data[i].lives - dmg.lifeDecrement;
+                _data[i].lives = Math.min(MAX_LIVES, livesNewVal);
+                // dmg.lifeDecrement > 0 ||
+                //   (_data[i].lives - dmg.lifeDecrement) < 5
+                //   ? _data[i].lives - dmg.lifeDecrement
+                //   : _data[i].lives;
                 if (dmg.lifeDecrement < 0)
                   _data[i].isHealed = !_data[i].isHealed;
               }
-              if ((_data[i].lives + livesModifier) < 1) {
+              if ((_data[i].lives + _data[i].livesModifier) < 1) {
                 setPlayerKillCount(count => count + 1);
                 _data[i].isDead = true;
               }
@@ -1448,10 +1478,9 @@ export const movePlayerPieces = (
           });
       }
     }
-    teleportData && teleportData.length && setTeleportData([]);
     return _data;
   });
-const useAbility = ({
+export const useAbility = ({
   a,
   data,
   _data,
@@ -1462,7 +1491,8 @@ const useAbility = ({
   setTeleportData,
   enemiesOnTiles,
   setTileStatuses,
-  scale
+  scale,
+  isTriggerPassiveImmediately = true
 }) => {
   // update accTime
   _data[i].abilities[j].accTime = accTime;
@@ -1477,22 +1507,30 @@ const useAbility = ({
     scale
   );
 
-  // toggle-on teammate passive ability
-  if (!!_data[i]) {
-    _data[i] = a.togglePassive(_data[i]);
+  const triggerPassive = () => {
+    // toggle-on teammate passive ability
+    if (!!_data[i]) {
+      _data[i] = a.togglePassive(_data[i]);
+    }
+
+    const delay = a.passiveDurationTime ? a.passiveDurationTime : a.cooldownTimeAI;
+
+    // toggle-off teammate passive ability
+    const timeoutRef = setTimeout(() => setData(d => {
+      if (!!d[i]) {
+        const toggleOff = true;
+        d[i] = a.togglePassive(d[i], toggleOff);
+        d[i].abilities[j].toggleOffPassiveTimeoutRef = timeoutRef;
+      }
+      return d;
+    }), delay);
   }
 
-  const delay = a.passiveDurationTime ? a.passiveDurationTime : a.cooldownTimeAI;
-
-  // toggle-off teammate passive ability
-  const timeoutRef = setTimeout(() => setData(d => {
-    if (!!d[i]) {
-      const toggleOff = true;
-      d[i] = a.togglePassive(d[i], toggleOff);
-      d[i].abilities[j].toggleOffPassiveTimeoutRef = timeoutRef;
-    }
-    return d;
-  }), delay);
+  if (isTriggerPassiveImmediately) {
+    triggerPassive();
+  } else {
+    return triggerPassive;
+  }
 }
 export const moveKaijuPieces = ({
   data,
@@ -1512,198 +1550,194 @@ export const moveKaijuPieces = ({
   difficulty
 }) =>
   setData(_data => {
-    const { MAX_AT_ONCE, MAX_TO_WIN } = determineKaijuQuantity(difficulty);
+    const { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_COOL_DOWN } = determineKaijuQuantity(difficulty);
     let remainingNeeded;
     let currKillCount = kaijuKillCount.length;
 
     for (let i = 0; i < _data.length; i++) {
       if (!!_data[i].lives) {
         // use powers
-        if (_data[i].isOnTiles && _data[i].abilities.length) {
-          _data[i].abilities.forEach((a, j) => {
-            // AI triggers power immediately so delay next activation to let UI state catch-up
-            const isCooldownOver =
-              ((accTime - a.accTime) >= a.cooldownTimeAI) || (accTime < a.accTime);
-            if (isCooldownOver) {
-              const [targetTile, _] = getClosestEntityFromTile(
-                enemyData.filter(({ isDead }) => !isDead),
-                _data[i].tile,
-                scale
-              );
-              const numTilesFromTarget =
-                _data[i].tile &&
-                targetTile &&
-                findPath(_data[i].tile, targetTile, scale, isTutorial).length;
-              const isOffensivePowerAndTargetInRange =
-                a.type.includes("offensive") &&
-                numTilesFromTarget &&
-                a.range >= numTilesFromTarget;
-              if (isOffensivePowerAndTargetInRange) {
-                _data[i].abilities[j].accTime = accTime;
-                a.activateActive(
-                  i,
-                  data,
-                  () => { },
-                  enemyData,
-                  setTileStatuses,
-                  scale
-                );
-              }
-            } else {
-              // update dropShadowSize to show how close a Kaiju is to shooting fire.
-              const diff = accTime - a.accTime;
-              const HIGH = 20;
-              const LOW = 0;
-              const dropShadowSize = (HIGH - LOW) * diff / a.cooldownTimeAI + LOW;
-              _data[i].dropShadowSize = dropShadowSize;
-              // update the Kaiju sprite sheet if close to spewing fire  
-              const showFireTime = a.accTime // last game time the fire was spewed
-                + a.cooldownTimeAI // fire spew cooldown (12 seconds)
-                * 0.75; // show the fire after 3/4 of the cooldown time (9 seconds) 
-              _data[i].isGoingToSpewFire = accTime > showFireTime;
-            }
-            _data[i].gameTimeMilliseconds = accTime;
-          });
-        }
-        // - - - - - - - - - - -
-        // if Kaiju, and just spawned set isOnTiles to true when they reach the tiles
-        if (
-          _data[i].isKaiju &&
-          !_data[i].isOnTiles &&
-          _data[i].isThere &&
-          !_data[i].moveToTiles.length
-        ) {
-          _data[i].isOnTiles = true;
-
-          // also, reset the kaiju ability accTimes
-          _data[i].abilities.forEach(a => { a.accTime = accTime; })
-        }
-
-        // - - - - - - - - - - -
-        // if Kaiju and on tiles, move toward the closest player.
-        if (_data[i].isKaiju && _data[i].isOnTiles) {
-          if (enemyData.length) {
+        !!_data[i].abilities.length && _data[i].abilities.forEach((a, j) => {
+          // AI triggers power immediately so delay next activation to let UI state catch-up
+          const isCooldownOver = _data[i].isOnTiles &&
+            (((accTime - a.accTime) >= KAIJU_COOL_DOWN)/*a.cooldownTimeAI)*/ || (accTime < a.accTime));
+          if (isCooldownOver) {
             const [targetTile, _] = getClosestEntityFromTile(
               enemyData.filter(({ isDead }) => !isDead),
               _data[i].tile,
               scale
             );
-            const moveToTiles = findPath(
-              _data[i].tile,
-              targetTile,
-              scale,
-              isTutorial
-            );
-            _data[i].moveToTiles = moveToTiles;
-          } else if (_data[i].isThere) {
-            const moveToTiles = findPath(
-              _data[i].tile,
-              getRandAdjacentTile(_data[i].tile),
-              scale,
-              isTutorial
-            );
-            _data[i].moveToTiles = moveToTiles;
+            const numTilesFromTarget =
+              _data[i].tile &&
+              targetTile &&
+              findPath(_data[i].tile, targetTile, scale, isTutorial).length;
+            const isOffensivePowerAndTargetInRange =
+              a.type.includes("offensive") &&
+              numTilesFromTarget &&
+              a.range >= numTilesFromTarget;
+            if (isOffensivePowerAndTargetInRange) {
+              _data[i].abilities[j].accTime = accTime;
+              a.activateActive(
+                i,
+                data,
+                () => { },
+                enemyData,
+                setTileStatuses,
+                scale
+              );
+            }
+          } else {
+            // update dropShadowSize to show how close a Kaiju is to shooting fire.
+            const diff = accTime - a.accTime;
+            const HIGH = 20;
+            const LOW = 0;
+            const dropShadowSize = (HIGH - LOW) * diff / /*a.cooldownTimeAI*/ KAIJU_COOL_DOWN + LOW;
+            _data[i].dropShadowSize = dropShadowSize;
+            // update the Kaiju sprite sheet if close to spewing fire  
+            const showFireTime = a.accTime // last game time the fire was spewed
+              + KAIJU_COOL_DOWN // a.cooldownTimeAI // fire spew cooldown (12 seconds)
+              * 0.75; // show the fire after 3/4 of the cooldown time (9 seconds) 
+            _data[i].isGoingToSpewFire = !a.accTime || accTime > showFireTime;
           }
+        });
+      }
+      // - - - - - - - - - - -
+      // if Kaiju, and just spawned set isOnTiles to true when they reach the tiles
+      if (
+        _data[i].isKaiju &&
+        !_data[i].isOnTiles &&
+        _data[i].isThere &&
+        !_data[i].moveToTiles.length
+      ) {
+        _data[i].isOnTiles = true;
+
+        // also, reset the kaiju ability accTimes
+        // _data[i].abilities.forEach(a => { a.accTime = accTime; });
+      }
+
+      // - - - - - - - - - - -
+      // if Kaiju and on tiles, move toward the closest player.
+      if (_data[i].isKaiju && _data[i].isOnTiles) {
+        if (enemyData.length) {
+          const [targetTile, _] = getClosestEntityFromTile(
+            enemyData.filter(({ isDead }) => !isDead),
+            _data[i].tile,
+            scale
+          );
+          const moveToTiles = findPath(
+            _data[i].tile,
+            targetTile,
+            scale,
+            isTutorial
+          );
+          _data[i].moveToTiles = moveToTiles;
+        } else if (_data[i].isThere) {
+          const moveToTiles = findPath(
+            _data[i].tile,
+            getRandAdjacentTile(_data[i].tile),
+            scale,
+            isTutorial
+          );
+          _data[i].moveToTiles = moveToTiles;
         }
+      }
+      // - - - - - - - - - - -
+      if (
+        _data[i].charLocation &&
+        _data[i].moveFromLocation &&
+        _data[i].moveToLocation &&
+        (!_data[i].isThere || _data[i].moveToTiles.length)
+      ) {
+        const { newLocation, hasArrived } = moveTo({
+          currentLocation: _data[i].charLocation,
+          moveFromLocation: _data[i].moveFromLocation,
+          moveToLocation: _data[i].moveToLocation,
+          moveSpeed: _data[i].moveSpeed + _data[i].moveSpeedModifier
+        });
+        _data[i].charLocation = newLocation;
+        _data[i].isThere = hasArrived;
         // - - - - - - - - - - -
-        if (
-          _data[i].charLocation &&
-          _data[i].moveFromLocation &&
-          _data[i].moveToLocation &&
-          (!_data[i].isThere || _data[i].moveToTiles.length)
-        ) {
-          const { newLocation, hasArrived } = moveTo({
-            currentLocation: _data[i].charLocation,
-            moveFromLocation: _data[i].moveFromLocation,
-            moveToLocation: _data[i].moveToLocation,
-            moveSpeed: _data[i].moveSpeed + _data[i].moveSpeedModifier
-          });
-          _data[i].charLocation = newLocation;
-          _data[i].isThere = hasArrived;
-          // - - - - - - - - - - -
-          if (_data[i].isThere && _data[i].moveToTiles.length) {
-            const [nextTile, ...tiles] = _data[i].moveToTiles;
-            const playerDirection = _data[i].isOnTiles
-              ? getDirFromTiles(_data[i].tile, nextTile)
-              : _data[i].dir;
-            _data[i].dir = playerDirection;
-            if (!tiles.length) {
-              _data[i].moveToLocation =
-                getCharXAndY({
-                  ...nextTile,
-                  scale
-                }) || _data[i].moveToLocation;
-              _data[i].tile = nextTile;
-              _data[i].moveFromLocation = _data[i].charLocation;
-              _data[i].moveToTiles = [];
-              _data[i].isThere = false;
-            } else {
-              _data[i].tile = nextTile;
-              _data[i].moveToTiles = tiles;
-              _data[i].moveFromLocation = newLocation;
-              _data[i].moveToLocation = getCharXAndY({
+        if (_data[i].isThere && _data[i].moveToTiles.length) {
+          const [nextTile, ...tiles] = _data[i].moveToTiles;
+          const playerDirection = _data[i].isOnTiles
+            ? getDirFromTiles(_data[i].tile, nextTile)
+            : _data[i].dir;
+          _data[i].dir = playerDirection;
+          if (!tiles.length) {
+            _data[i].moveToLocation =
+              getCharXAndY({
                 ...nextTile,
                 scale
-              });
-            }
+              }) || _data[i].moveToLocation;
+            _data[i].tile = nextTile;
+            _data[i].moveFromLocation = _data[i].charLocation;
+            _data[i].moveToTiles = [];
+            _data[i].isThere = false;
+          } else {
+            _data[i].tile = nextTile;
+            _data[i].moveToTiles = tiles;
+            _data[i].moveFromLocation = newLocation;
+            _data[i].moveToLocation = getCharXAndY({
+              ...nextTile,
+              scale
+            });
           }
         }
-        if (
-          _data[i].isOnTiles &&
-          _data[i].isThere &&
-          !_data[i].moveToTiles.length &&
-          _data[i].dir !== "idle"
-        ) {
-          _data[i].dir = "idle";
-        }
-        // const playerHealthBonusFromKaijuDeath = [0, 0]; // [player, teammate]
-        dmgArray
-          .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju)
-          .forEach(dmg => {
+      }
+      if (
+        _data[i].isOnTiles &&
+        _data[i].isThere &&
+        !_data[i].moveToTiles.length &&
+        _data[i].dir !== "idle"
+      ) {
+        _data[i].dir = "idle";
+      }
+      // const playerHealthBonusFromKaijuDeath = [0, 0]; // [player, teammate]
+      dmgArray
+        .filter(({ isKaiju }) => !!isKaiju === _data[i].isKaiju)
+        .forEach(dmg => {
+          if (
+            _data[i].key === dmg.key &&
+            !!_data[i].lives &&
+            _data[i].isOnTiles
+          ) {
             if (
-              _data[i].key === dmg.key &&
-              !!_data[i].lives &&
-              _data[i].isOnTiles
+              accTime - _data[i].lastDmg > 750 ||
+              accTime - _data[i].lastDmg < 0
             ) {
-              if (
-                accTime - _data[i].lastDmg > 1000 ||
-                accTime - _data[i].lastDmg < 0
-              ) {
-                // can only get damaged once every 1 second.
-                // also accTime might reset to zero, so check for that.
-                _data[i].lastDmg = accTime;
+              // can only get damaged once every 500 milliseconds.
+              // also accTime might reset to zero, so check for that.
+              _data[i].lastDmg = accTime;
 
 
-                // if (_data[i].livesModifier > 0 && dmg.lifeDecrement > 0) {
-                //   // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
-                //   const remainingDmg = dmg.lifeDecrement - _data[i].livesModifier;
-                //   dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
-                //   _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
-                // }
-                // else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
-                //   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
-                //   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
-                //   dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
-                //   _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
-                // }
+              // if (_data[i].livesModifier > 0 && dmg.lifeDecrement > 0) {
+              //   // decrement from extra lives (positive "livesModifier") before decrementing from health ("lives")
+              //   const remainingDmg = dmg.lifeDecrement - _data[i].livesModifier;
+              //   dmg.lifeDecrement = remainingDmg > 0 ? remainingDmg : 0;
+              //   _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
+              // }
+              // else if (_data[i].livesModifier < 0 && dmg.lifeDecrement < 0) {
+              //   // allow heals (negative "lifeDecrement") to remove (negative "livesModifier")
+              //   const remainingHeal = _data[i].livesModifier - dmg.lifeDecrement;
+              //   dmg.lifeDecrement = remainingHeal > 0 ? remainingHeal * -1 : 0;
+              //   _data[i].livesModifier = remainingHeal < 0 ? remainingHeal : 0;
+              // }
 
-                _data[i].lives =
-                  dmg.lifeDecrement > 0 ||
-                    (_data[i].lives - dmg.lifeDecrement) < 5 // cap max health at 4... negative "lifeDecrement" is a heal
-                    ? _data[i].lives - dmg.lifeDecrement
-                    : _data[i].lives;
-                if (dmg.lifeDecrement < 0)
-                  _data[i].isHealed = !_data[i].isHealed;
-                if (!_data[i].lives) {
-                  setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
-                  setDeadKaijuLocations(deadKaijuLocations => [...deadKaijuLocations, { charLocation: _data[i].charLocation, color: _data[i].color, tile: _data[i].tile }]);
-                }
+              _data[i].lives =
+                dmg.lifeDecrement > 0 ||
+                  (_data[i].lives - dmg.lifeDecrement) < 5 // cap max health at 4... negative "lifeDecrement" is a heal
+                  ? _data[i].lives - dmg.lifeDecrement
+                  : _data[i].lives;
+              if (dmg.lifeDecrement < 0)
+                _data[i].isHealed = !_data[i].isHealed;
+              if (!_data[i].lives) {
+                setKaijuKillCount(kc => [...kc, dmg.playerIndex]);
+                setDeadKaijuLocations(deadKaijuLocations => [...deadKaijuLocations, { charLocation: _data[i].charLocation, color: _data[i].color, tile: _data[i].tile }]);
               }
             }
-          });
-      }
+          }
+        });
     }
-
 
     const numAlive = _data.filter(({ lives }) => lives > 0).length;
     remainingNeeded = MAX_TO_WIN - (currKillCount + numAlive);
@@ -1803,7 +1837,10 @@ export const useHover = () => {
 };
 export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isCharacterDead }) => {
   useEffect(() => {
-    const handler = ({ code }, callback) => {
+    const handler = ({ code, repeat }, callback) => {
+      // Exit immediately if the key is just being held down
+      if (repeat) return;
+
       if (Array.isArray(keyCodes) && keyCodes.includes(code)) {
         callback(code);
       } else if (keyCodes === code) {
@@ -2696,7 +2733,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         img: "",
         formatData: {}
       };
-    case "abilityHeartActive":
+    case "abilityLoveActive":
       return {
         title: "Heal",
         description: "Heal your teammate",
@@ -2709,11 +2746,11 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         icon: "fa-heart",
         color: "pink"
       };
-    case "abilityHeartPassive":
+    case "abilityLovePassive":
       return {
         title: "Good Vibes",
         description: "You send out good vibes",
-        effect1: "+1 range of effect",
+        effect1: "+1 effect range",
         effect2: "",
         img: "",
         formatData: {},
@@ -2724,7 +2761,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       return {
         title: "Seasoned Builder",
         description: "You are prolific",
-        effect1: "+2 area of effect",
+        effect1: "+1 effect range",
         effect2: "",
         // effect2: "+1 tile count modifier",
         img: "",
@@ -2748,9 +2785,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityGlassPassive":
       return {
-        title: "Teleport Sickness",
-        description: "Zipping through space-time makes you nauseous",
-        effect1: "-2 move speed",
+        title: "Warp Energy Overload",
+        description: "For a short time after teleporting, your magic is multiplied",
+        effect1: "+2 effect area",
         effect2: "",
         img: "",
         formatData: {},
@@ -2792,11 +2829,35 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
         icon: "fa-snowflake-o",
         color: "PaleTurquoise"
       };
+    case "abilityWaterPassive":
+      return {
+        title: "Slippery",
+        description: "...when wet. Exercise caution.",
+        effect1: "-1 movement speed",
+        effect2: "",
+        img: "",
+        formatData: {},
+        icon: "fa-exclamation-triangle",
+        color: "#3c7fde"
+      };
+    case "abilityWaterActive":
+      return {
+        title: "Tidal Wave",
+        description: "Create a single, lateral line of water",
+        effect1: "Water travels in the direction of your closest enemy",
+        effect2: "RoE: 10 AoE: 3",
+        RoE: "10",
+        AoE: "3",
+        img: "",
+        formatData: {},
+        icon: "fa-tint",
+        color: "#3c7fde"
+      };
     case "abilityFirePassive":
       return {
         title: "Uncontrolled Burn",
-        description: "All effects last longer and go farther",
-        effect1: "+2 range of effect",
+        description: "You've cleared a path...",
+        effect1: "+1 effect range",
         effect2: "",
         img: "",
         formatData: {},
@@ -2869,7 +2930,7 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
     case "abilityDeathPassive":
       return {
         title: "Blood Ritual",
-        description: "Nothing calls Death quicker than a fresh wound",
+        description: "You cut a fresh wound",
         effect1: "-1 health",
         effect2: "",
         img: "",
@@ -2892,9 +2953,9 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
       };
     case "abilityBubblePassive":
       return {
-        title: "Floating",
-        description: "Just drifting",
-        effect1: "-2 range of effect",//+1 number of tiles modifier",
+        title: "Insight",
+        description: "The bubbles teach you so many things",
+        effect1: "+1 effect range",
         effect2: "",
         img: "",
         formatData: {},
@@ -2938,33 +2999,37 @@ export const getAbilityPickerDescription = (string, playerData, playerIndex) => 
 };
 
 export const determineKaijuQuantity = difficulty => {
-  let MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED = undefined;
+  let MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED, KAIJU_COOL_DOWN = undefined;
   switch (difficulty) {
     case Difficulty.Easy:
       MAX_AT_ONCE = 2;
       MAX_TO_WIN = 5;
       KAIJU_MAX_HEALTH = 2;
       KAIJU_MAX_SPEED = 2;
+      KAIJU_COOL_DOWN = 12000;
       break;
     case Difficulty.Hard:
       MAX_AT_ONCE = 4;
       MAX_TO_WIN = 20;
       KAIJU_MAX_HEALTH = 3;
-      KAIJU_MAX_SPEED = 2;
+      KAIJU_MAX_SPEED = 3;
+      KAIJU_COOL_DOWN = 9000;
       break;
     case Difficulty.Xtreme:
       MAX_AT_ONCE = 5;
       MAX_TO_WIN = 50;
       KAIJU_MAX_HEALTH = 3;
-      KAIJU_MAX_SPEED = 2;
+      KAIJU_MAX_SPEED = 3;
+      KAIJU_COOL_DOWN = 6000;
       break;
     default: // Difficulty.Medium
       MAX_AT_ONCE = 3;
       MAX_TO_WIN = 10;
       KAIJU_MAX_HEALTH = 3;
       KAIJU_MAX_SPEED = 2;
+      KAIJU_COOL_DOWN = 12000;
   }
-  return { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED };
+  return { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED, KAIJU_COOL_DOWN };
 }
 export const modifyStats = (playerStats, toggleOff, attr, modifier) => {
   const mod = (toggleOff ? -1 : 1) * modifier;

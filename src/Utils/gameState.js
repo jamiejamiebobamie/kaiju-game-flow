@@ -1540,8 +1540,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 8000,
-    cooldownTime: 7000,
+    cooldownTimeAI: 7000,
+    cooldownTime: 6000,
     passiveDurationTime: 5000,
     color: "PaleTurquoise"
   },
@@ -1551,8 +1551,46 @@ export const PLAYER_ABILITIES = {
     range: 10,
     type: ["offensive"],
     // tileCountModifier: true,
-    // numTilesModifier: true,
+    tileCountModifier: true,
     // livesModifier: true,
+    // moveSpeedModifier: true,
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 1),
+    //   Math.random() < .01 ? modifyStats(playerStats, toggleOff, 'numTilesModifier', 1) :
+    //  modifyStats(playerStats, toggleOff, 'livesModifier', -1),
+    activateActive: (
+      k,
+      data,
+      _,
+      targetData,
+      setTileStatuses,
+      scale
+    ) =>
+      shootPower({
+        data,
+        dataIndex: k,
+        targetData,
+        scale,
+        count: 20,
+        statusKey: "isOnFire",
+        numTiles: 3,
+        setTileStatuses
+      }),
+    displayLookup: "abilityFire",
+    elementUppercase: "Fire",
+    element: "fire",
+    isPassive: false,
+    isActive: false,
+    accTime: 0,
+    cooldownTime: 2000,
+    cooldownTimeAI: 2500,
+    passiveDurationTime: 6000,
+    color: "tomato"
+  },
+  water: {
+    passiveName: "Slippery",
+    activeName: "Tidal Wave",
+    range: 10,
+    type: ["offensive"],
     moveSpeedModifier: true,
     togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -1),// 'tileCountModifier', 1),
     activateActive: (
@@ -1568,28 +1606,28 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 10,
-        statusKey: "isOnFire",
+        count: 15,
+        statusKey: "isWet",
         numTiles: 3,
         setTileStatuses
       }),
-    displayLookup: "abilityFire",
-    elementUppercase: "Fire",
-    element: "fire",
+    displayLookup: "abilityWater",
+    elementUppercase: "Water",
+    element: "water",
     isPassive: false,
     isActive: false,
     accTime: 0,
     cooldownTime: 2000,
     cooldownTimeAI: 3500,
-    passiveDurationTime: 3000,
-    color: "tomato"
+    passiveDurationTime: 4000,
+    color: "#3c7fde"
   },
   wood: {
     passiveName: "Healthy",
     activeName: "Overgrowth",
     type: ["offensive"],
     livesModifier: true,
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', -1),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'livesModifier', 1),
     activateActive: (
       k,
       data,
@@ -1617,7 +1655,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 4000,
-    cooldownTimeAI: 5000,
+    cooldownTimeAI: 4500,
     passiveDurationTime: 5000,
     color: "Chartreuse"
   },
@@ -1652,7 +1690,7 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 4000,
+    cooldownTime: 2500,
     cooldownTimeAI: 5000,
     passiveDurationTime: 6000,
     color: "cyan"
@@ -1694,7 +1732,7 @@ export const PLAYER_ABILITIES = {
     color: "GhostWhite"
   },
   bubble: {
-    passiveName: "Floating",
+    passiveName: "Insight",
     activeName: "Dispel",
     type: ["defensive"],
     // numTilesModifier: true,
@@ -1736,7 +1774,7 @@ export const PLAYER_ABILITIES = {
     type: ["defensive"],
     // numTilesModifier: true,
     tileCountModifier: true,
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff,'tileCountModifier', 1),// 'numTilesModifier', .5),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'tileCountModifier', 1),// 'numTilesModifier', .5),
     activateActive: (
       k,
       data,
@@ -1768,12 +1806,13 @@ export const PLAYER_ABILITIES = {
     color: "AntiqueWhite"
   },
   glass: {
-    passiveName: "Teleport Sickness",
+    passiveName: "Warp Energy",
     activeName: "Escape",
     range: 5,
     type: ["escape"],
     moveSpeedModifier: true,
-    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -4),
+    // togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'moveSpeedModifier', -4),
+    togglePassive: (playerStats, toggleOff) => modifyStats(playerStats, toggleOff, 'numTilesModifier', 2),
     activateActive: (
       k,
       data,
@@ -1781,7 +1820,7 @@ export const PLAYER_ABILITIES = {
       targetData,
       setTileStatuses,
       scale
-    ) => 
+    ) =>
       setTeleportData(_teleportData => [..._teleportData, k])
     ,
     getPlayerIndex: k => k,
@@ -1796,7 +1835,7 @@ export const PLAYER_ABILITIES = {
     cooldownTimeAI: 11000,
     color: "BlueViolet"
   },
-  heart: {
+  love: {
     passiveName: "Good Vibes",
     activeName: "Heal",
     type: ["heal"],
@@ -1821,9 +1860,9 @@ export const PLAYER_ABILITIES = {
         setTileStatuses
       }),
     range: 5,
-    displayLookup: "abilityHeart",
-    elementUppercase: "Heart",
-    element: "heart",
+    displayLookup: "abilityLove",
+    elementUppercase: "Love",
+    element: "love",
     isPassive: false,
     isActive: false,
     accTime: 0,
@@ -1871,7 +1910,8 @@ export const DEATH_TILE_STATUSES = [
   "isOnKaijuFire",
   "isGhosted",
   "isWooded",
-  "isCold"
+  "isCold",
+  "isWet"
 ];
 export const PLAYER_CLASSES = [
   {
@@ -1885,7 +1925,7 @@ export const PLAYER_CLASSES = [
     player_class_description: "Evil fairy."
   },
   {
-    elems: "Bubble,Death,Heart",
+    elems: "Bubble,Death,Love",
     class_name: "Wild Mage",
     player_class_description:
       "Your powers deal with life and death ...and bubbles?"
@@ -1917,7 +1957,7 @@ export const PLAYER_CLASSES = [
     player_class_description: "Magic!"
   },
   {
-    elems: "Bubble,Fire,Heart",
+    elems: "Bubble,Fire,Love",
     class_name: "Fire Sorcerer",
     player_class_description: "Pyromaniac."
   },
@@ -1942,7 +1982,7 @@ export const PLAYER_CLASSES = [
     player_class_description: "You put out fires?"
   },
   {
-    elems: "Bubble,Glass,Heart",
+    elems: "Bubble,Glass,Love",
     class_name: "Flighty Healer",
     player_class_description: "Run away! Run away!"
   },
@@ -1967,22 +2007,22 @@ export const PLAYER_CLASSES = [
     player_class_description: "Rainbow-rider!"
   },
   {
-    elems: "Bubble,Heart,Ice",
+    elems: "Bubble,Love,Ice",
     class_name: "Alchemist",
     player_class_description: "Practice temperance in all things."
   },
   {
-    elems: "Bubble,Heart,Lightning",
+    elems: "Bubble,Love,Lightning",
     class_name: "Magician",
     player_class_description: "Magical jack-of-all trades."
   },
   {
-    elems: "Bubble,Heart,Metal",
+    elems: "Bubble,Love,Metal",
     class_name: "Healer",
     player_class_description: "Full defensive build."
   },
   {
-    elems: "Bubble,Heart,Wood",
+    elems: "Bubble,Love,Wood",
     class_name: "Archdruid",
     player_class_description: "Nature calls!"
   },
@@ -2024,7 +2064,7 @@ export const PLAYER_CLASSES = [
     player_class_description: "Devil deals."
   },
   {
-    elems: "Death,Fire,Heart",
+    elems: "Death,Fire,Love",
     class_name: "Chaos Sorcerer",
     player_class_description: "You kiss boo-boos as much as you cause them."
   },
@@ -2049,7 +2089,7 @@ export const PLAYER_CLASSES = [
     player_class_description: "Nature's warrior."
   },
   {
-    elems: "Death,Glass,Heart",
+    elems: "Death,Glass,Love",
     class_name: "Psychopomp",
     player_class_description: "You travel between life and death."
   },
@@ -2076,22 +2116,22 @@ export const PLAYER_CLASSES = [
       "Not the real grim reaper, but your enemies can't tell the difference."
   },
   {
-    elems: "Death,Heart,Ice",
+    elems: "Death,Love,Ice",
     class_name: "Ice Healer",
     player_class_description: "Skilled in healing and icy death."
   },
   {
-    elems: "Death,Heart,Lightning",
+    elems: "Death,Love,Lightning",
     class_name: "Dark Sorcerer",
     player_class_description: "Evil sorcerer."
   },
   {
-    elems: "Death,Heart,Metal",
+    elems: "Death,Love,Metal",
     class_name: "Forsaken Paladin",
     player_class_description: "No longer good."
   },
   {
-    elems: "Death,Heart,Wood",
+    elems: "Death,Love,Wood",
     class_name: "Undead Shaman",
     player_class_description: "Rotting flesh hangs off of you."
   },
@@ -2126,7 +2166,7 @@ export const PLAYER_CLASSES = [
     player_class_description: "You protect the land you were born on."
   },
   {
-    elems: "Fire,Glass,Heart",
+    elems: "Fire,Glass,Love",
     class_name: "Fire Mage",
     player_class_description: "Heals and fireballs."
   },
@@ -2151,22 +2191,22 @@ export const PLAYER_CLASSES = [
     player_class_description: "A liminal fighter."
   },
   {
-    elems: "Fire,Heart,Ice",
+    elems: "Fire,Love,Ice",
     class_name: "Sorcerer",
     player_class_description: "You're a standard sorcerer."
   },
   {
-    elems: "Fire,Heart,Lightning",
+    elems: "Fire,Love,Lightning",
     class_name: "Wizard Apprentice",
     player_class_description: "You're new."
   },
   {
-    elems: "Fire,Heart,Metal",
+    elems: "Fire,Love,Metal",
     class_name: "Crusader",
     player_class_description: "For God's glory!"
   },
   {
-    elems: "Fire,Heart,Wood",
+    elems: "Fire,Love,Wood",
     class_name: "Harvester",
     player_class_description: "A controlled burn heals the land."
   },
@@ -2201,22 +2241,22 @@ export const PLAYER_CLASSES = [
     player_class_description: "The battlefield: your glorious creation!"
   },
   {
-    elems: "Glass,Heart,Ice",
+    elems: "Glass,Love,Ice",
     class_name: "Interloper",
     player_class_description: "Never in one place long."
   },
   {
-    elems: "Glass,Heart,Lightning",
+    elems: "Glass,Love,Lightning",
     class_name: "Valkyrie",
     player_class_description: "Sheild-maiden of Valahala! I salute you!"
   },
   {
-    elems: "Glass,Heart,Metal",
+    elems: "Glass,Love,Metal",
     class_name: "Cleric",
     player_class_description: "Full defensive build."
   },
   {
-    elems: "Glass,Heart,Wood",
+    elems: "Glass,Love,Wood",
     class_name: "Weakling",
     player_class_description: "You're a weakling. I doubt you'll win."
   },
@@ -2252,33 +2292,33 @@ export const PLAYER_CLASSES = [
       "You shape the landscape to your green thumb's curve."
   },
   {
-    elems: "Heart,Ice,Lightning",
+    elems: "Love,Ice,Lightning",
     class_name: "Soothsayer",
     player_class_description: "Austere, yet loving."
   },
   {
-    elems: "Heart,Ice,Metal",
+    elems: "Love,Ice,Metal",
     class_name: "Icy Settler",
     player_class_description: "Icy endeavours across the arctic."
   },
   {
-    elems: "Heart,Ice,Wood",
+    elems: "Love,Ice,Wood",
     class_name: "Hedge Witch",
     player_class_description:
       "Your magic is as wild as nature, but you have a good heart."
   },
   {
-    elems: "Heart,Lightning,Metal",
+    elems: "Love,Lightning,Metal",
     class_name: "Enchanted Archer",
     player_class_description: "Not like the other archers."
   },
   {
-    elems: "Heart,Lightning,Wood",
+    elems: "Love,Lightning,Wood",
     class_name: "Nurturing Druid",
     player_class_description: "Yay!"
   },
   {
-    elems: "Heart,Metal,Wood",
+    elems: "Love,Metal,Wood",
     class_name: "Ranger",
     player_class_description: "Strider? The ranger?"
   },
@@ -2334,7 +2374,7 @@ export const BASE_PLAYER_STATS = {
   dir: "idle",
   isThere: true,
   lives: 4,
-  moveSpeed: 6,
+  moveSpeed: 7,//6,
   isOnTiles: true,
   isKaiju: false,
   isDead: false,
@@ -2349,9 +2389,10 @@ export const BASE_PLAYER_STATS = {
 };
 
 export const ICON_LOOKUP = {
-  heart: "fa-gratipay",
+  love: "fa-gratipay",
   glass: "fa-tencent-weibo",
   fire: "fa-fire",
+  water: "fa-fa-exclamation-triangle",
   wood: "fa-tree",
   lightning: "fa-hourglass-half",
   death: "fa-heartbeat",
@@ -2362,3 +2403,28 @@ export const ICON_LOOKUP = {
 
 export const MAX_ROWS = 36;
 export const MAX_COLS = 24;
+
+export const TILE_DIRS = [
+  "up",
+  "up right",
+  "down right",
+  "down",
+  "down left",
+  "up left"
+];
+export const TILE_DIR_NORM_VECS = [
+  { x: 0, y: -1 },
+  { x: 0.868, y: -0.496 },
+  { x: 0.868, y: 0.496 },
+  { x: 0, y: 1 },
+  { x: -0.868, y: 0.496 },
+  { x: -0.868, y: -0.496 }
+];
+export const TILE_DIR_ROTATIONS_IN_DEGREES = [
+  180, // up
+  -135, // up right
+  -45, // down right,
+  0, // down
+  45, // down left
+  135, // up right
+];

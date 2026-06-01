@@ -68,7 +68,7 @@ export const Abilities = ({
   const OffensivePowers =
     PLAYER_ABILITIES &&
     Object.values(PLAYER_ABILITIES)
-      .slice(0, 5)
+      .slice(0, 6)
       .map(
         (
           {
@@ -113,7 +113,7 @@ export const Abilities = ({
   const DefensivePowers =
     PLAYER_ABILITIES &&
     Object.values(PLAYER_ABILITIES)
-      .slice(5, 7)
+      .slice(6, 8)
       .map(
         (
           {
@@ -158,7 +158,7 @@ export const Abilities = ({
   const UtilityPowers =
     PLAYER_ABILITIES &&
     Object.values(PLAYER_ABILITIES)
-      .slice(7, 9)
+      .slice(8, 10)
       .map(
         (
           {

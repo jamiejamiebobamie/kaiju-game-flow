@@ -53,6 +53,12 @@ export const Abilities = ({
       isActive: false
     },
     {
+      displayLookup: "abilityWater",
+      element: "water",
+      isPassive: false,
+      isActive: false
+    },
+    {
       displayLookup: "abilityWood",
       element: "wood",
       isPassive: false,

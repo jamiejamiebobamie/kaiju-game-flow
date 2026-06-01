@@ -23,13 +23,13 @@ export const GlobalSettingsContext = createContext({
   setSelectedAvatar: () => { }, 
   isAvatarChangedOnce: false, 
   setIsAvatarChangedOnce: () => { },
-  selectedDifficulty: Difficulty.Medium, 
+  selectedDifficulty: Difficulty.Hard,//Medium, 
   setSelectedDifficulty: () => { }, 
 });
 
 export const Home = ({ triggerTransition }) => {
   const [selectedAvatar, setSelectedAvatar] = useState("guy");
-  const [selectedDifficulty, setSelectedDifficulty] = useState(Difficulty.Medium);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(Difficulty.Hard);
   const [isAvatarChangedOnce, setIsAvatarChangedOnce] = useState(false);
   const [currPage, setCurrPage] = useState(PAGES.Home);
   const handleClickHome = () => {

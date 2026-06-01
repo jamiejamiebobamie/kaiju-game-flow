@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useHover } from "Utils/utils";
 
 const ICON_LOOKUP = {
-  heart: {
+  love: {
     Passive: "fa-gratipay",
     Active: "fa-heart",
     loader: "fa-spinner"
@@ -16,6 +16,11 @@ const ICON_LOOKUP = {
   fire: {
     Passive: "fa-fire",
     Active: "fa-free-code-camp",
+    loader: "fa-spinner"
+  },
+  water: {
+    Passive: "fa-exclamation-triangle",
+    Active: "fa-tint",
     loader: "fa-spinner"
   },
   wood: {
@@ -88,16 +93,14 @@ export const Ability = ({
   useEffect(() => setDisplayString(hoverLookupString), [hoverLookupString]);
   return (
     <Wrapper
-      onClick={() => {}}
       ref={setHoverRef(`${displayLookup}${isActive ? "Active" : "Passive"}`)}
       title={name}
       color={isPicked && color}
     >
       <AbilityIcon
         color={isPicked && color}
-        className={`fa ${
-          ICON_LOOKUP[element][isActive ? "Active" : "Passive"]
-        }`}
+        className={`fa ${ICON_LOOKUP[element][isActive ? "Active" : "Passive"]
+          }`}
       />
     </Wrapper>
   );

@@ -65,7 +65,7 @@ const PlayerPictureBackground = styled.div`
 const ModifierList = styled.ul`
     position: absolute;
     // scale(.75)
-    transform: translate(${props => props.translation ? props.translation : `475px, -46px`});
+    transform: translate(${props => props.translation ? props.translation : `173px, -98px`});
     display: flex;
     flex-direction: column;
     list-style-type: none;
@@ -227,10 +227,10 @@ export const PlayerUI = ({
       </FloatingEffect>
     </ModifierListitem>);
   const modifierDisplay = <BlinkFadeEffect high={90} low={75}>
-    <ModifierList translation={isTeammate ? `475px, -46px` : undefined}>
+    <ModifierList translation={isTeammate ? `173px, -98px` : undefined}>
       {modifierListItem(0, !!inLoadOut['livesModifier'], '#8dde86ff', 'Health', livesModifier, Math.sin(0))}
       {modifierListItem(1, !!inLoadOut['moveSpeedModifier'], '#86d8deff', 'Speed', moveSpeedModifier, Math.sin(Math.PI))}
-      {modifierListItem(2, !!inLoadOut['tileCountModifier'], '#d4d07bff', 'Range', tileCountModifier, Math.sin(2*Math.PI), "17px")}
+      {modifierListItem(2, !!inLoadOut['tileCountModifier'], '#d4d07bff', 'Range', tileCountModifier, Math.sin(2*Math.PI), "-47px")}
       {modifierListItem(3, !!inLoadOut['numTilesModifier'], '#d4aa7bff', 'Area', numTilesModifier, Math.sin(3*Math.PI))}
     </ModifierList>
   </BlinkFadeEffect>;

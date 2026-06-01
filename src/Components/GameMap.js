@@ -2,6 +2,8 @@ import { React } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
+  position: absolute;
+  z-index: -55;
   width: ${props => props.width}px;
   height: ${props => props.height}px;
   opacity: ${props => props.isVisible ? 1 : 0};
@@ -12,7 +14,6 @@ const BackgroundImage = styled.img`
   position: absolute;
   z-index: -4;
   pointer-events: none;
-  background-color: #06080c;
 `;
 const GameMapDimmer = styled.img`
   position: absolute;

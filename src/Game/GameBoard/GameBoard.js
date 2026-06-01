@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Player } from "./Pieces/PlayerPiece";
 import { DeadPlayer } from "./Pieces/DeadPlayerPiece";
@@ -59,7 +59,8 @@ export const GameBoard = ({
   COL_LENGTH,
   ROW_OFFSET,
   COL_OFFSET,
-  initializationProps
+  initializationProps,
+  teleportData
 }) => {
   const playerIndex = 0;
 
@@ -68,8 +69,36 @@ export const GameBoard = ({
   const TILE_STATUS_TURN_DELAY = GAME_PIECES_TURN_DELAY * 1.5;
 
   const isRenderCityMap = !isPaused;
+  const isRenderTiles = !isPaused;
 
-  useEffect(() => initializeGameBoard({ ...initializationProps, isMap: isRenderCityMap }), []);
+  const [gameBoardInterval, setGameBoardInterval] = useState(TILE_STATUS_TURN_DELAY);
+
+  useEffect(() => initializeGameBoard({ ...initializationProps, isMap: true, isRenderTiles }), []);
+
+  useEffect(() => {
+    if (isPaused) {
+      setGameBoardInterval(null);
+      // redraw tiles once to trigger tile animation from "isRenderTiles: false"
+      redrawTiles({
+        highlightedTiles0,
+        setClickedTile,
+        setTiles,
+        playerData,
+        kaijuData,
+        tileStatuses,
+        setTileStatuses,
+        scale,
+        rowLength: ROW_LENGTH,
+        colLength: COL_LENGTH,
+        rowOffset: ROW_OFFSET,
+        colOffset: COL_OFFSET,
+        isMap: true,//isRenderCityMap,
+        isRenderTiles: false
+      });
+    } else {
+      setGameBoardInterval(TILE_STATUS_TURN_DELAY);
+    }
+  }, [isPaused]);
 
   useEffect(() => {
     const { i, _ } = clickedTile;
@@ -91,7 +120,7 @@ export const GameBoard = ({
       0
     );
 
-    const safeTile = getSafeTile({ enemyData: kaijuData, tileStatuses, isMap: isRenderCityMap, scale });
+    const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {}
     updateTileState(
       playerData,
       kaijuData,
@@ -101,11 +130,10 @@ export const GameBoard = ({
       height,
       scale,
       accTime.current,
-      safeTile
+      { i: teleportTile.h_i, j: teleportTile.h_j }
     );
     redrawTiles({
       highlightedTiles0,
-      setHoverRef: () => { },
       setClickedTile,
       setTiles,
       playerData,
@@ -117,9 +145,10 @@ export const GameBoard = ({
       colLength: COL_LENGTH,
       rowOffset: ROW_OFFSET,
       colOffset: COL_OFFSET,
-      isMap: isRenderCityMap
+      isMap: true,//isRenderCityMap,
+      isRenderTiles
     });
-  }, TILE_STATUS_TURN_DELAY);
+  }, gameBoardInterval);
 
   const kaiju = kaijuData.map(k => (
     <Kaiju
