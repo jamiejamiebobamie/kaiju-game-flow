@@ -3,6 +3,7 @@ import { Home } from "./Home";
 import { SplashScreen } from "./Components/SplashScreen";
 import styled, { css } from "styled-components";
 import "./App.css";
+import "./font-awesome-4.7.0/css/font-awesome.css";
 
 const TransitionWrapper = styled.div`
   position: absolute;

@@ -31,7 +31,7 @@ const SpriteSheet = styled.div`
   transform: scale(0.4) translate(-169px, -169px);
   height: 230.33px;
   width: 180px;
-  ${props => `filter: drop-shadow(0 0 ${props.dropShadowSize}px #bf40bf)`};
+  filter: drop-shadow(0 0 3px #bf40bf);
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
@@ -216,7 +216,7 @@ const Character = styled.div`
   }
 }
 `;
-export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize, isGoingToSpewFire, isOnTiles }) => {
+export const Kaiju = ({ zIndex, dir, charLocation, color, lives, isGoingToSpewFire }) => {
   const [healthModifierText, setHealthModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
@@ -246,7 +246,7 @@ export const Kaiju = ({ zIndex, dir, charLocation, color, lives, dropShadowSize,
       {healthModifierText}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <Character isDamaged={isDamaged}>
-        <SpriteSheet isGoingToSpewFire={isGoingToSpewFire} lives={lives} anim={anim} color={color} dropShadowSize={!dropShadowSize ? 3 : dropShadowSize} />
+        <SpriteSheet isGoingToSpewFire={isGoingToSpewFire} lives={lives} anim={anim} color={color} />
       </Character>
     </Monster>
   );

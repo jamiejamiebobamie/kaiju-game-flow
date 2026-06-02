@@ -13,7 +13,8 @@ import {
   MAX_COLS,
   TILE_DIRS,
   TILE_DIR_NORM_VECS,
-  TILE_DIR_ROTATIONS_IN_DEGREES
+  TILE_DIR_ROTATIONS_IN_DEGREES,
+  TILE_STATUSES
 } from "./gameState";
 import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 import { StyledIcon } from "Tutorial/Components/StyledComponents";
@@ -161,7 +162,6 @@ export const initializeTutorialGameBoard = ({
     const _status = [];
     for (let j = 0; j < colLength; j++) {
       _status.push({
-        updateKey: Math.random(),
         playerGender:
           playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
           playerData.find(({ tile }) => tile.i === i && tile.j === j).gender,
@@ -267,7 +267,6 @@ export const initializeGameBoard = ({
     const status = [];
     for (let j = 0; j < ROW_LENGTH; j++) {
       status.push({
-        updateKey: Math.random(),
         playerGender:
           playerData.find(({ tile }) => tile.i === i && tile.j === j) &&
           playerData.find(({ tile }) => tile.i === i && tile.j === j).gender,
@@ -495,228 +494,320 @@ export const redrawTiles = ({
     setTiles(_tiles);
   }
 };
-export const updateTileState = (
+
+const determineTileState = ({
+  updateKey,
+  _statuses,
+  newDmg,
+  start_i = 0,
+  start_j = 0,
+  isNotEndConditionI = i => i < MAX_COLS,
+  isNotEndConditionJ = j => j < MAX_ROWS,
+  increment = i => ++i,
   playerData,
   kaijuData,
-  setDmgArray,
-  setTileStatuses,
-  width,
-  height,
   scale,
   accTime,
-  safeTile,
+  teleportTile,
   rowLength = MAX_ROWS,
   colLength = MAX_COLS,
   rowOffset = 0,
   colOffset = 0,
   isMap = true
-) => {
-  setTileStatuses(_statuses => {
-    if (_statuses) {
-      const updateKey = Math.random();
-      const newDmg = [];
-      for (let i = 0; i < MAX_COLS; i++) {
-        for (let j = 0; j < MAX_ROWS; j++) {
+}) => {
 
-          const key = `${i} ${j}`;
-          const isVisible = isTileVisible({ i, j, key, rowOffset, rowLength, colOffset, colLength, isMap });
-          if (!isVisible) {
-            _statuses[i][j] = {};
+  for (let i = start_i; isNotEndConditionI(i); i = increment(i)) {
+    for (let j = start_j; isNotEndConditionJ(j); j = increment(j)) {
+
+      const key = `${i} ${j}`;
+      const isVisible = isTileVisible({ i, j, key, rowOffset, rowLength, colOffset, colLength, isMap });
+      if (!isVisible) {
+        _statuses[i][j] = {};
+      }
+
+      // 1. solve what should be on the tile
+      else if (teleportTile.i == i && teleportTile.j == j) {
+        // "isTeleportTile" = safe tile
+        _statuses[i][j] = { isTeleportTile: {}, updateKey };
+      } else if (_statuses[i][j].updateKey !== updateKey) {
+        let tileStatus = solveForStatus(_statuses[i][j]);
+        const entry = Object.entries(tileStatus).find(([_, v]) => v);
+        if (entry) {
+          const playerOnTile = playerData.find(
+            ({ tile, isDead }) => !isDead && (tile && tile.i === i && tile.j === j)
+          );
+          const kaijuOnTile = kaijuData
+            .filter(({ isOnTiles, lives }) => isOnTiles && lives)
+            .find(
+              ({ tile, isDead }) => !isDead && (tile && tile.i === i && tile.j === j)
+            );
+          const entityOnTileStatus = playerOnTile || kaijuOnTile;
+          const playerKaijuConflictKey = playerOnTile && kaijuOnTile ? playerOnTile.key : undefined;
+          const [k, data] = entry;
+          const {
+            dirs,
+            count,
+            targetIndex,
+            isKaiju,
+            startCount,
+            playerIndex,
+            bounceCount
+          } = data;
+
+          if (!count) {
+            // 2. erase winning tile status if out of counts, unless status is "persistent"
+            solveForStatusWithNoCounts({ i, j, k, _statuses, entityOnTileStatus, tileStatus });
+          } else {
+            Array.isArray(dirs) &&
+              dirs.forEach((d, l) => {
+                // 3. move the status based on the directions
+                const offset = getTileOffsetFromDir(d, { i, j });
+                const nextTile = { i: i + offset.i, j: j + offset.j };
+                const tileDirMapping = [
+                  "up",
+                  "up right",
+                  "down right",
+                  "down",
+                  "down left",
+                  "up left"
+                ];
+                let direction = [d];
+
+                const isNextTileVisible = isTileVisible({ i: nextTile.i, j: nextTile.j, key: `${nextTile.i} ${nextTile.j}`, rowOffset, rowLength, colOffset, colLength, isMap });
+                if (isNextTileVisible) {
+                  // solve for statuses with rotating directions
+                  if (
+                    k === "isCold" && // tick 1 and 2 = spread in single direction
+                    (count < (startCount - 0) && count > (startCount - 8)) // tick 1-7
+                  ) {
+                    direction = solveForRotatingDirectionStatus({ tileDirMapping, count })
+                  }
+
+                  // handle multiply with delay
+                  else if (
+                    k === "isElectrified" &&
+                    count == (startCount - 3)
+                  ) {
+                    const [_, newDirs] = getAdjacentTilesFromTile(
+                      { i, j },
+                      nextTile,
+                      scale,
+                      3
+                    );
+                    direction = newDirs;
+                  }
+
+                  // maintain dirs for some statuses
+                  else if (
+                    k === "isOnKaijuFire" ||
+                    k === "isOnFire" ||
+                    k === "isWet" ||
+                    (k === "isBubble" && count >= startCount) ||
+                    k === "isShielded" ||
+                    (k === "isWooded" && count == startCount)
+                  ) {
+                    direction = dirs;
+                  }
+
+                  // solve for statuses with tracking directions
+                  else if (
+                    k === "isGhosted" ||
+                    k === "isHealing" ||
+                    (k == "isCold" && count < (startCount - 7)) || // tick 8+
+                    (k === "isWooded" && count <= (startCount - 2)) // ticks 3+, track
+                  ) {
+                    direction = solveForTrackingStatusDirection({
+                      isKaiju,
+                      playerData,
+                      kaijuData,
+                      targetIndex,
+                      nextTile,
+                      scale
+                    });
+                  }
+
+                  setNextTileStatus({
+                    k,
+                    l,
+                    count,
+                    _statuses,
+                    nextTile,
+                    direction,
+                    dirs,
+                    targetIndex,
+                    startCount,
+                    isKaiju,
+                    playerIndex,
+                    updateKey,
+                    bounceCount
+                  });
+
+                  // solve for "bouncy" tile statuses
+                } else if (k === "isElectrified" || k === "isWooded" || k == 'isHealing' || k == 'isGhosted' || k === "isCold" || k === "isWet" || k === "isOnFire" || k === "isOnKaijuFire") {
+                  solveForWallReflectionStatus({
+                    k, d, i, j,
+                    tileDirMapping,
+                    _statuses,
+                    count,
+                    targetIndex,
+                    startCount,
+                    isKaiju,
+                    playerIndex,
+                    updateKey,
+                    bounceCount,
+                    rowOffset, rowLength, colOffset, colLength, isMap
+                  });
+                }
+
+                // UNSURE... - - - - - - - -
+                // 3. erase current tile's state
+                const doNotErase = [
+                  "isElectrified",
+                  "isShielded",
+                  "isWooded",
+                  "isCold"
+                ];
+                _statuses[i][j][k] =
+                  !doNotErase.includes(k) ||
+                    (["isOnFire", "isOnKaijuFire", "isWet"].includes(k) && count >= startCount) ||
+                    entityOnTileStatus
+                    ? undefined // ERASE
+                    : {
+                      ...tileStatus[k], // add <"isElectrified", "isShielded", "isWooded", "isOnFire", "isOnKaijuFire"> statuses to tile
+                      count: 0
+                    };
+                _statuses[i][j].updateKey = updateKey;
+                // - - - - - - - - - - - - - -- - - -
+                // May be a "fallback" (?)
+
+                if (_statuses[i][j][k] === undefined)
+                  delete _statuses[i][j][k];
+              });
           }
 
-          // 1. solve what should be on the tile
-          else if (safeTile.i == i && safeTile.j == j) {
-            // "isTeleportTile" = safe tile
-            _statuses[i][j] = { isTeleportTile: true, updateKey: _statuses[i][j].updateKey };
-          } else if (_statuses[i][j].updateKey !== updateKey) {
-            let tileStatus = solveForStatus(_statuses[i][j]);
-            const entry = Object.entries(tileStatus).find(([_k, _v]) => _v);
-            if (entry) {
-              const playerOnTile = playerData.find(
-                ({ tile, isDead }) => !isDead && (tile && tile.i === i && tile.j === j)
-              );
-              const kaijuOnTile = kaijuData
-                .filter(({ isOnTiles, lives }) => isOnTiles && lives)
-                .find(
-                  ({ tile, isDead }) => !isDead && (tile && tile.i === i && tile.j === j)
-                );
-              const entityOnTileStatus = playerOnTile || kaijuOnTile;
-              const playerKaijuConflictKey = playerOnTile && kaijuOnTile ? playerOnTile.key : undefined;
-              const [k, data] = entry;
-              const {
-                dirs,
-                count,
-                targetIndex,
-                isKaiju,
-                startCount,
-                playerIndex
-              } = data;
-              const healthTiles = ["isHealing"];
+          const healthTiles = ["isHealing"];
+          if (DEATH_TILE_STATUSES.includes(k) || healthTiles.includes(k)) {
+            const entityOnTile = isKaiju
+              ? playerOnTile
+              : kaijuOnTile;
 
-              if (!count) {
-                // 2. erase winning tile status if out of counts, unless status is "persistent"
-                solveForStatusWithNoCounts({ i, j, k, _statuses, entityOnTileStatus, tileStatus });
-              } else {
-                Array.isArray(dirs) &&
-                  dirs.forEach((d, l) => {
-                    // 3. move the status based on the directions
-                    const offset = getTileOffsetFromDir(d, { i, j });
-                    const nextTile = { i: i + offset.i, j: j + offset.j };
-                    const tileDirMapping = [
-                      "up",
-                      "up right",
-                      "down right",
-                      "down",
-                      "down left",
-                      "up left"
-                    ];
-                    let direction = [d];
-
-                    const isNextTileVisible = isTileVisible({ i: nextTile.i, j: nextTile.j, key: `${nextTile.i} ${nextTile.j}`, rowOffset, rowLength, colOffset, colLength, isMap });
-                    if (isNextTileVisible) {
-                      // solve for statuses with rotating directions
-                      if (
-                        k === "isCold" && // tick 1 and 2 = spread in single direction
-                        (count < (startCount - 0) && count > (startCount - 8))// ) // tick 1-7
-                      ) {
-                        direction = solveForRotatingDirectionStatus({ tileDirMapping, count })
-                      }
-
-                      // handle multiply with delay
-                      else if (
-                        k === "isElectrified" &&
-                        count == (startCount - 3)
-                      ) {
-                        const [_, newDirs] = getAdjacentTilesFromTile(
-                          { i, j },
-                          nextTile,
-                          scale,
-                          3
-                        );
-                        direction = newDirs;
-                      }
-
-                      // solve for statuses with "spreading" directions
-                      else if (
-                        k === "isOnKaijuFire" ||
-                        k === "isOnFire" ||
-                        k === "isWet" ||
-                        (k === "isBubble" && count >= startCount) ||
-                        k === "isShielded" ||
-                        (k === "isWooded" && count == startCount)
-                      ) {
-                        direction = dirs;
-                      }
-
-                      // solve for statuses with tracking directions
-                      else if (
-                        k === "isGhosted" ||
-                        k === "isHealing" ||
-                        (k == "isCold" && count < (startCount - 7)) || // tick 8+
-                        (k === "isWooded" && count <= (startCount - 2)) // ticks 3+, track
-                      ) {
-                        direction = solveForTrackingStatusDirection({
-                          isKaiju,
-                          playerData,
-                          kaijuData,
-                          targetIndex,
-                          nextTile,
-                          scale,
-                        });
-                      }
-
-                      setNextTileStatus({
-                        k,
-                        l,
-                        count,
-                        _statuses,
-                        nextTile,
-                        direction,
-                        dirs,
-                        targetIndex,
-                        startCount,
-                        isKaiju,
-                        playerIndex,
-                        updateKey
-                      });
-
-                      // solve for "bouncy" tile statuses
-                    } else if (k === "isElectrified" || k === "isWooded" || k == 'isHealing' || k == 'isGhosted' || k === "isCold" || k === "isWet") { // || k === "isOnFire" || k === "isOnKaijuFire") {
-                      solveForWallReflectionStatus({
-                        k, d, i, j,
-                        tileDirMapping,
-                        _statuses,
-                        count,
-                        targetIndex,
-                        startCount,
-                        isKaiju,
-                        playerIndex,
-                        updateKey,
-                        rowOffset, rowLength, colOffset, colLength, isMap
-                      });
-                    }
-
-                    // UNSURE... - - - - - - - -
-                    // 3. erase current tile's state
-                    const doNotErase = [
-                      "isElectrified",
-                      "isShielded",
-                      "isWooded",
-                      "isCold" // ADDED... test
-                    ];
-                    _statuses[i][j][k] =
-                      !doNotErase.includes(k) ||
-                        (["isOnFire", "isOnKaijuFire", "isWet"].includes(k) && count >= startCount) ||
-                        entityOnTileStatus
-                        ? undefined // ERASE
-                        : {
-                          ...tileStatus[k], // add <"isElectrified", "isShielded", "isWooded", "isOnFire", "isOnKaijuFire"> statuses to tile
-                          count: 0
-                        };
-                    _statuses[i][j].updateKey = updateKey;
-                    // - - - - - - - - - - - - - -- - - -
-                    // May be a "fallback"
-
-
-                    if (_statuses[i][j][k] === undefined)
-                      delete _statuses[i][j][k];
-                  });
-              }
-
-              if (DEATH_TILE_STATUSES.includes(k) || healthTiles.includes(k)) {
-                const entityOnTile = isKaiju
-                  ? playerData.find(({ tile }) => tile.i === i && tile.j === j)
-                  : kaijuData.find(({ tile }) => tile.i === i && tile.j === j);
-                if (entityOnTile) {
-                  const dmgObj = {
-                    isKaiju: !isKaiju, // to determine correct state array
-                    key: entityOnTile.key, // to determine correct entity in array
-                    lifeDecrement: DEATH_TILE_STATUSES.includes(k) ? 1 : -1, // lives + or -
-                    accTime, // to remove stale data from the dmgArray
-                    playerIndex // to determine who killed the Kaiju.
-                  };
-                  newDmg.push(dmgObj);
-                }
-              }
-              if (playerKaijuConflictKey) {
-                const dmgObj = {
-                  isKaiju: false, // to determine correct state array
-                  key: playerKaijuConflictKey, // to determine correct entity in array
-                  lifeDecrement: 1, //lives + or - // possible healing ability...
-                  accTime // to remove stale data from the dmgArray
-                };
-                newDmg.push(dmgObj);
-              }
+            if (entityOnTile) {
+              const dmgObj = {
+                isKaiju: !isKaiju, // to determine correct state array
+                key: entityOnTile.key, // to determine correct entity in array
+                lifeDecrement: DEATH_TILE_STATUSES.includes(k) ? 1 : -1, // lives + or -
+                accTime, // to remove stale data from the dmgArray
+                playerIndex, // to determine who killed the Kaiju.
+                i, j
+              };
+              newDmg.push(dmgObj);
             }
           }
-          _statuses[i][j].updateKey = updateKey;
+
+          if (playerKaijuConflictKey) {
+            const dmgObj = {
+              isKaiju: false, // to determine correct state array
+              key: playerKaijuConflictKey, // to determine correct entity in array
+              lifeDecrement: 1, //lives + or - // possible healing ability...
+              accTime, // to remove stale data from the dmgArray
+              i, j
+            };
+            newDmg.push(dmgObj);
+          }
+        }
+        _statuses[i][j].updateKey = updateKey;
+      }
+    }
+  }
+}
+export const updateTileState = ({
+  playerData,
+  kaijuData,
+  setDmgArray,
+  setTileStatuses,
+  scale,
+  accTime,
+  teleportTile,
+  rowLength = MAX_ROWS,
+  colLength = MAX_COLS,
+  rowOffset = 0,
+  colOffset = 0,
+  isMap = true
+}) => {
+  setTileStatuses(_statuses => {
+    if (!_statuses) return _statuses;
+    const updateKey = Math.random() * 100;
+    const newDmg = [];
+
+    /*
+      iterate over gameboard tiles twice,
+      then save tile statuses that are shared.
+
+      fixes a bug that duplicates "isOnFire" / "isOnKaijuFire" / "isWet" statuses 
+        when they are traveling in the opposite direction as the update loops (ie. the nested for-loops iterating over the tiles).
+    */
+
+    // iterate from top-left
+    const statuses1 = structuredClone(_statuses);
+    determineTileState({
+      updateKey,
+      _statuses: statuses1,
+      newDmg,
+      start_i: 0,
+      start_j: 0,
+      isNotEndConditionI: i => i < MAX_COLS,
+      isNotEndConditionJ: j => j < MAX_ROWS,
+      increment: k => ++k,
+      playerData,
+      kaijuData,
+      scale,
+      accTime,
+      teleportTile,
+      rowLength, colLength, rowOffset, colOffset, isMap
+    });
+    // iterate from bottom-right
+    const statuses2 = structuredClone(_statuses);
+    determineTileState({
+      updateKey,
+      _statuses: statuses2,
+      newDmg,
+      start_i: MAX_COLS - 1,
+      start_j: MAX_ROWS - 1,
+      isNotEndConditionI: i => i > -1,
+      isNotEndConditionJ: j => j > -1,
+      increment: i => --i,
+      playerData,
+      kaijuData,
+      scale,
+      accTime,
+      teleportTile,
+      rowLength, colLength, rowOffset, colOffset, isMap
+    });
+    for (let i = 0; i < MAX_COLS; i++) {
+      for (let j = 0; j < MAX_ROWS; j++) {
+        // if (!!statuses1[i][j] && Object.values(statuses1[i][j]).filter(v => !!v).length) {
+        //   console.log(statuses1[i][j])
+        // }
+
+        const activeStatuses1 = Object.entries(statuses1[i][j]).filter(([k, v]) => TILE_STATUSES.includes(k) && typeof v == 'object');
+        const activeStatuses2 = Object.entries(statuses2[i][j]).filter(([k, v]) => TILE_STATUSES.includes(k) && typeof v == 'object');
+        /* comparing status keys, eg. "isWet" */
+        const matchingStatuses = activeStatuses1.length == 1 && !!activeStatuses2.length == 1 && !!activeStatuses1[0][0] && activeStatuses1[0][0] == activeStatuses2[0][0];
+        if (!matchingStatuses) {
+          _statuses[i][j] = {};
+        } else {
+          const k = activeStatuses1[0][0];
+          const v = activeStatuses1[0][1];
+          _statuses[i][j] = { [k]: v };
         }
       }
-      setDmgArray(newDmg);
-      return _statuses;
-    } else {
-      return _statuses;
     }
+    setDmgArray(Object.values(newDmg.reduce((acc, item) => {
+      const key = `${item.i} ${item.j}`;
+      acc[key] = item;
+      return acc;
+    }, {})));
+    return _statuses;
   });
 };
 const solveForRotatingDirectionStatus = ({ tileDirMapping, count }) => {
@@ -730,7 +821,8 @@ const solveForTrackingStatusDirection = ({
   kaijuData,
   targetIndex,
   nextTile,
-  scale
+  scale,
+  numTiles = 1
 }) => {
   const targetTile = isKaiju
     ? playerData[targetIndex] &&
@@ -741,7 +833,7 @@ const solveForTrackingStatusDirection = ({
     nextTile,
     targetTile || { i: 0, j: 0 },
     scale,
-    1
+    numTiles
   );
   return targetDirection;
 }
@@ -757,7 +849,8 @@ const setNextTileStatus = ({
   startCount,
   isKaiju,
   playerIndex,
-  updateKey
+  updateKey,
+  bounceCount
 }) => {
   const _count =
     count -
@@ -782,7 +875,8 @@ const setNextTileStatus = ({
     targetIndex,
     startCount,
     isKaiju,
-    playerIndex
+    playerIndex,
+    bounceCount
   };
   const nextTilesStatus = solveForStatus(
     _statuses[nextTile.i][nextTile.j]
@@ -796,6 +890,7 @@ const solveForWallReflectionStatus = ({
   _statuses,
   count,
   targetIndex,
+  bounceCount,
   startCount,
   isKaiju,
   playerIndex,
@@ -827,11 +922,12 @@ const solveForWallReflectionStatus = ({
       nextTile.j
     ][k] = {
       dirs: [newDir],
-      count: count > 8 ? 8 : count - 1,
+      count: count > bounceCount ? bounceCount : count - 1, 
       targetIndex,
       startCount,
       isKaiju,
-      playerIndex
+      playerIndex,
+      bounceCount
     };
 
     const nextTilesStatus = solveForStatus(_statuses[nextTile.i][nextTile.j]);
@@ -875,6 +971,7 @@ export const shootPower = ({
   targetData,
   scale,
   count,
+  bounceCount=8,
   statusKey,
   numTiles,
   setTileStatuses
@@ -882,17 +979,26 @@ export const shootPower = ({
   data.forEach(d => {
     if (dataIndex === d.i) {
       const originTile = d.tile;
-      const [targetTile, targetIndex] =
+      let [targetTile, targetIndex] =
         statusKey === "isHealing"
           ? data.length < 2 || !!data[1].isDead || ((data[0].lives <= data[1].lives) && !data[0].isDead)
             ? [data[0].tile, 0]
             : [data[1].tile, 1]
-          : getClosestEntityFromTile(targetData, originTile, scale);
+          : getClosestEntityTileAndIndexFromOriginTile(targetData, originTile, scale);
+
+      const isNoTarget = targetTile.i == 0 && targetTile.j == 0;
+      if (isNoTarget) {
+        // shoot power in direction player is facing
+        const tileOffset = getTileOffsetFromDir(d.dir, originTile);;
+        targetTile.x = tileOffset.x + originTile.x;
+        targetTile.y = tileOffset.y + originTile.y;
+      }
+
       if (originTile && targetTile) {
         const excludeStatusesForTileStatusesCountModifier = [
           "isBubble"
         ];
-        const [tile, dirs] = getAdjacentTilesFromTile(
+        const [spawnPowerTile, dirs] = getAdjacentTilesFromTile(
           originTile,
           targetTile,
           scale,
@@ -907,16 +1013,17 @@ export const shootPower = ({
           : count
 
         setTileStatuses(_tiles => {
-          if (!!tile && !!_tiles && !!_tiles[tile.i] && !!_tiles[tile.i][tile.j]) {
-            _tiles[tile.i][tile.j] = {
-              ..._tiles[tile.i][tile.j],
+          if (!!spawnPowerTile && !!_tiles && !!_tiles[spawnPowerTile.i] && !!_tiles[spawnPowerTile.i][spawnPowerTile.j]) {
+            _tiles[spawnPowerTile.i][spawnPowerTile.j] = {
+              ..._tiles[spawnPowerTile.i][spawnPowerTile.j],
               [statusKey]: {
                 dirs,
                 count: tileCount, //Math.max(tileCount - countReductionForNumTilesModifierStatus, 0),
                 targetIndex,
                 isKaiju: d.isKaiju || statusKey === "isHealing",
                 startCount: count, //Math.max(countReductionForNumTilesModifierStatus ? tileCount - countReductionForNumTilesModifierStatus : count, 0),
-                playerIndex: d.isKaiju ? undefined : dataIndex
+                playerIndex: d.isKaiju ? undefined : dataIndex,
+                bounceCount
               }
             };
           }
@@ -960,7 +1067,6 @@ const solveForStatus = tile => {
         : {
           isOnKaijuFire: tile.isOnKaijuFire
         };
-      return;
     case !!tile.isOnFire:
       return {
         isOnFire: tile.isOnFire
@@ -1155,11 +1261,11 @@ export const getDistance = (to, from) => {
     (to.x - from.x) * (to.x - from.x) + (to.y - from.y) * (to.y - from.y)
   );
 };
-const getClosestEntityFromTile = (entityData, tile, scale) => {
+const getClosestEntityTileAndIndexFromOriginTile = (entityData, originTile, scale) => {
   const index = entityData
     .map(entity =>
       entity.lives > 0 && entity.isOnTiles
-        ? getDistance(getCharXAndY({ ...tile, scale }), entity.charLocation)
+        ? getDistance(getCharXAndY({ ...originTile, scale }), entity.charLocation)
         : null
     )
     .reduce(
@@ -1201,7 +1307,7 @@ export const movePlayerPieces = (
           const isEnemiesOnTiles = !!enemiesOnTiles.length;
           if (isEnemiesOnTiles) {
             // find the closest kaiju
-            const [_targetTile, _] = getClosestEntityFromTile(
+            const [_targetTile, _] = getClosestEntityTileAndIndexFromOriginTile(
               enemiesOnTiles,
               _data[i].tile,
               scale
@@ -1469,10 +1575,15 @@ export const movePlayerPieces = (
                 //   : _data[i].lives;
                 if (dmg.lifeDecrement < 0)
                   _data[i].isHealed = !_data[i].isHealed;
-              }
-              if ((_data[i].lives + _data[i].livesModifier) < 1) {
-                setPlayerKillCount(count => count + 1);
-                _data[i].isDead = true;
+
+                const lives = _data[i].lives + _data[i].livesModifier;
+
+                console.log({ _data, i }, "isDead outside");
+                if (!_data[i].isDead && lives < 1) {
+                  console.log({ _data, i }, "isDead");
+                  _data[i].isDead = true;
+                  setPlayerKillCount(count => count + 1);
+                }
               }
             }
           });
@@ -1562,7 +1673,7 @@ export const moveKaijuPieces = ({
           const isCooldownOver = _data[i].isOnTiles &&
             (((accTime - a.accTime) >= KAIJU_COOL_DOWN)/*a.cooldownTimeAI)*/ || (accTime < a.accTime));
           if (isCooldownOver) {
-            const [targetTile, _] = getClosestEntityFromTile(
+            const [targetTile, _] = getClosestEntityTileAndIndexFromOriginTile(
               enemyData.filter(({ isDead }) => !isDead),
               _data[i].tile,
               scale
@@ -1588,12 +1699,12 @@ export const moveKaijuPieces = ({
             }
           } else {
             // update dropShadowSize to show how close a Kaiju is to shooting fire.
-            const diff = accTime - a.accTime;
-            const HIGH = 20;
-            const LOW = 0;
-            const dropShadowSize = (HIGH - LOW) * diff / /*a.cooldownTimeAI*/ KAIJU_COOL_DOWN + LOW;
-            _data[i].dropShadowSize = dropShadowSize;
-            // update the Kaiju sprite sheet if close to spewing fire  
+            // const diff = accTime - a.accTime;
+            // const HIGH = 20;
+            // const LOW = 0;
+            // const dropShadowSize = (HIGH - LOW) * diff / /*a.cooldownTimeAI*/ KAIJU_COOL_DOWN + LOW;
+            // _data[i].dropShadowSize = dropShadowSize;
+            // // update the Kaiju sprite sheet if close to spewing fire  
             const showFireTime = a.accTime // last game time the fire was spewed
               + KAIJU_COOL_DOWN // a.cooldownTimeAI // fire spew cooldown (12 seconds)
               * 0.75; // show the fire after 3/4 of the cooldown time (9 seconds) 
@@ -1619,7 +1730,7 @@ export const moveKaijuPieces = ({
       // if Kaiju and on tiles, move toward the closest player.
       if (_data[i].isKaiju && _data[i].isOnTiles) {
         if (enemyData.length) {
-          const [targetTile, _] = getClosestEntityFromTile(
+          const [targetTile, _] = getClosestEntityTileAndIndexFromOriginTile(
             enemyData.filter(({ isDead }) => !isDead),
             _data[i].tile,
             scale
@@ -1702,10 +1813,10 @@ export const moveKaijuPieces = ({
             _data[i].isOnTiles
           ) {
             if (
-              accTime - _data[i].lastDmg > 750 ||
+              accTime - _data[i].lastDmg > 400 ||
               accTime - _data[i].lastDmg < 0
             ) {
-              // can only get damaged once every 500 milliseconds.
+              // can only get damaged once every 400 milliseconds.
               // also accTime might reset to zero, so check for that.
               _data[i].lastDmg = accTime;
 

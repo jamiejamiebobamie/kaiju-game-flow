@@ -1570,6 +1570,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
+        bounceCount: 3,
         count: 20,
         statusKey: "isOnFire",
         numTiles: 3,
@@ -1643,8 +1644,8 @@ export const PLAYER_ABILITIES = {
         scale,
         count: 25,
         statusKey: "isWooded",
-        // numTiles: 2,
-        numTiles: 6,
+        numTiles: 2,
+        // numTiles: 6,
         setTileStatuses
       }),
     range: 10,
@@ -1716,6 +1717,7 @@ export const PLAYER_ABILITIES = {
         targetData,
         scale,
         count: 30,
+        bounceCount: 10,
         statusKey: "isGhosted",
         numTiles: 1,
         setTileStatuses
@@ -1854,7 +1856,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 9,
+        count: 20,
         statusKey: "isHealing",
         numTiles: 1,
         setTileStatuses
@@ -2428,3 +2430,5 @@ export const TILE_DIR_ROTATIONS_IN_DEGREES = [
   45, // down left
   135, // up right
 ];
+
+export const TILE_STATUSES = ['isTeleportTile', 'isHealing', 'isBubble', 'isGhosted', 'isElectrified', 'isCold', 'isShielded', 'isOnFire', 'isOnKaijuFire', 'isWet','isWooded'];

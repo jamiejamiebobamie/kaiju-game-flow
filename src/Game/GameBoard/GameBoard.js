@@ -6,7 +6,7 @@ import { ExplodingKaiju } from "./Pieces/ExplodingKaijuPiece";
 import { Kaiju } from "./Pieces/KaijuPiece";
 import { PauseModal } from "./PauseModal";
 import { GameMap } from "../../Components/GameMap.js";
-import { useInterval, initializeGameBoard, getFlattenedArrayIndex, getDistance, updateTileState, redrawTiles, updateHighlightedTiles, getSafeTile } from "../../Utils/utils";
+import { initializeGameBoard, getFlattenedArrayIndex, getDistance, redrawTiles } from "../../Utils/utils";
 
 const Board = styled.div`
   position: relative;
@@ -45,40 +45,29 @@ export const GameBoard = ({
   hoverLookupString,
   setHoverLookupString,
   deadKaijuLocations,
-  //
   highlightedTiles0,
-  setHighlightedTiles0,
-  setPath,
-  setDmgArray,
   setTiles,
   tileStatuses,
   setTileStatuses,
-  accTime,
-  GAME_PIECES_TURN_DELAY,
   ROW_LENGTH,
   COL_LENGTH,
   ROW_OFFSET,
   COL_OFFSET,
   initializationProps,
-  teleportData
 }) => {
   const playerIndex = 0;
 
   const isPlayerDead = !!playerData[playerIndex] && playerData[playerIndex].isDead;
 
-  const TILE_STATUS_TURN_DELAY = GAME_PIECES_TURN_DELAY * 1.5;
-
   const isRenderCityMap = !isPaused;
   const isRenderTiles = !isPaused;
+  const isMap = true;
 
-  const [gameBoardInterval, setGameBoardInterval] = useState(TILE_STATUS_TURN_DELAY);
-
-  useEffect(() => initializeGameBoard({ ...initializationProps, isMap: true, isRenderTiles }), []);
+  useEffect(() => initializeGameBoard({ ...initializationProps, isMap: true, isRenderTiles: true }), []);
 
   useEffect(() => {
     if (isPaused) {
-      setGameBoardInterval(null);
-      // redraw tiles once to trigger tile animation from "isRenderTiles: false"
+      // trigger tile redraw to see the scale down effect on pause
       redrawTiles({
         highlightedTiles0,
         setClickedTile,
@@ -92,11 +81,9 @@ export const GameBoard = ({
         colLength: COL_LENGTH,
         rowOffset: ROW_OFFSET,
         colOffset: COL_OFFSET,
-        isMap: true,//isRenderCityMap,
+        isMap: isMap,
         isRenderTiles: false
       });
-    } else {
-      setGameBoardInterval(TILE_STATUS_TURN_DELAY);
     }
   }, [isPaused]);
 
@@ -108,48 +95,6 @@ export const GameBoard = ({
     }
   }, [clickedTile]);
 
-  // gameboard tiles event tick
-  useInterval(() => {
-    updateHighlightedTiles(
-      setHighlightedTiles0,
-      playerData,
-      hoverLookupString,
-      path,
-      setPath,
-      scale,
-      0
-    );
-
-    const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {}
-    updateTileState(
-      playerData,
-      kaijuData,
-      setDmgArray,
-      setTileStatuses,
-      width,
-      height,
-      scale,
-      accTime.current,
-      { i: teleportTile.h_i, j: teleportTile.h_j }
-    );
-    redrawTiles({
-      highlightedTiles0,
-      setClickedTile,
-      setTiles,
-      playerData,
-      kaijuData,
-      tileStatuses,
-      setTileStatuses,
-      scale,
-      rowLength: ROW_LENGTH,
-      colLength: COL_LENGTH,
-      rowOffset: ROW_OFFSET,
-      colOffset: COL_OFFSET,
-      isMap: true,//isRenderCityMap,
-      isRenderTiles
-    });
-  }, gameBoardInterval);
-
   const kaiju = kaijuData.map(k => (
     <Kaiju
       key={k.key}
@@ -159,9 +104,7 @@ export const GameBoard = ({
       scale={scale}
       lives={k.lives}
       zIndex={getFlattenedArrayIndex(k.tile)}
-      dropShadowSize={k.dropShadowSize}
       isGoingToSpewFire={k.isGoingToSpewFire}
-      isOnTiles={k.isOnTiles}
     />
   ));
   const players = playerData.map(p => (

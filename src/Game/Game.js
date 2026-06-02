@@ -12,7 +12,10 @@ import {
   determineKaijuQuantity,
   getTileOffsetFromDir,
   isTileOnGameBoard,
-  findPath
+  findPath,
+  updateTileState,
+  redrawTiles,
+  updateHighlightedTiles
 } from "Utils/utils";
 import { FullscreenPage } from "Components/FullscreenPage.js";
 import { HolographGridBackground } from "Game/UI/HolographGridBackground";
@@ -202,7 +205,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
 
   const { MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
 
-  const TURN_DELAY = 50;
+  const TURN_DELAY = 20;
 
   // 100%, "normal size":
   const SCALE = 0.3;
@@ -223,8 +226,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const COL_OFFSET = 0;//isPaused ? 3 : 0;
   const COL_LENGTH = 24;//(isPaused ? 20 : 24) - COL_OFFSET;
   // - - - - - - -
-
-  const movementKeysPressed = useRef([]);
 
 
   const accTime = useRef(0);
@@ -250,6 +251,9 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [fullScreenPageData, setFullScreenPageData] = useState(DEFAULT_FULLSCREEN_PAGE_DATA);
   const [isPlayerDead, setIsPlayerDead] = useState(false);
   const [keysPressed, setKeysPressed] = useState([]);
+  const isEndKeyPress = useRef(true);
+  const pressedKeys = useRef([]);
+
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -343,24 +347,35 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     });
   }
 
+
   useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isCharacterDead: false });
 
   const keyDown = code => {
 
-    movementKeysPressed.current = movementKeysPressed.current.includes(code) ? [...movementKeysPressed.current, code] : movementKeysPressed.current 
-    // setKeysPressed(keys => {
-    //   const newKeys = !keys.includes(code) ? [...keys, code] : keys; // add key
-    //   return newKeys;
-    // });
+    pressedKeys.current = !pressedKeys.current.includes(code) ? [...pressedKeys.current, code] : pressedKeys.current;
+
+    // if (isEndKeyPress.current) {
+    //   setKeysPressed(keys => {
+    //     const newKeys = !keys.includes(code) ? [...keys, code] : keys; // add key
+    //     moveWASD(newKeys);
+    //     return newKeys;
+    //   });
+    //   isEndKeyPress.current = false;
+    // }
   }
 
   const keyUp = code => {
-    movementKeysPressed.current = movementKeysPressed.current.includes(code) ? movementKeysPressed.current.filter(k => k != code) : movementKeysPressed.current;
 
-    // setKeysPressed(keys => {
-    //   const newKeys = keys.includes(code) ? keys.filter(k => k != code) : keys; // remove key
-    //   return newKeys;
-    // });
+    pressedKeys.current = pressedKeys.current.includes(code) ? pressedKeys.current.filter(k => k != code) : pressedKeys.current; // remove key
+
+    // if (!isEndKeyPress.current) {
+    //   setKeysPressed(keys => {
+    //     isEndKeyPress.current = false;
+    //     const newKeys = keys.includes(code) ? keys.filter(k => k != code) : keys; // remove key
+    //     moveWASD(newKeys);
+    //     return newKeys;
+    //   });
+    // }
   }
 
   useKeyPress({
@@ -382,7 +397,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
 
     if (!!playerData.length && !!playerData[0] && playerData[0].isDead) {
       setIsPlayerDead(true);
-      setKeysPressed([]);
+      // setKeysPressed([]);
+      pressedKeys.current = [];
       setHighlightedTiles0([]);
     }
   }, [kaijuKillCount, playerKillCount, MAX_TO_WIN]);
@@ -452,42 +468,84 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   // pieces event tick
   useInterval(() => {
 
-    !!movementKeysPressed.current.length && moveWASD(movementKeysPressed.current);
-
-    movePlayerPieces(
+    // if (shouldUpdate(accTime.current, 20)) {
+    updateHighlightedTiles(
+      setHighlightedTiles0,
       playerData,
-      setPlayerData,
-      tileStatuses,
-      setTileStatuses,
+      hoverLookupString,
+      path,
+      setPath,
       scale,
-      accTime.current,
-      kaijuData,
-      dmgArray,
-      setPlayerKillCount,
-      teleportData,
-      setTeleportData,
-      false,
-      resetHightlightedTiles
+      0
     );
-    const gameTime = accTime.current;
-    if (gameTime > 7000) // delay Kaiju spawning by 7 seconds at start
-      moveKaijuPieces({
-        data: kaijuData,
-        setData: setKaijuData,
+    // }
+
+    if (shouldUpdate(accTime.current, 100)) {
+      const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {};
+      updateTileState({
+        playerData,
+        kaijuData,
+        setDmgArray,
+        setTileStatuses,
+        scale,
+        accTime: accTime.current,
+        teleportTile: { i: teleportTile.h_i, j: teleportTile.h_j }
+      });
+      redrawTiles({
+        highlightedTiles0,
+        setClickedTile,
+        setTiles,
+        playerData,
+        kaijuData,
         tileStatuses,
         setTileStatuses,
-        scale: scale,
-        accTime: accTime.current,
-        enemyData: playerData,
-        setEnemyData: setPlayerData,
-        dmgArray: dmgArray,
-        kaijuKillCount,
-        setKaijuKillCount,
-        isTutorial: false,
-        winner: winner,
-        setDeadKaijuLocations,
-        difficulty: selectedDifficulty
+        scale,
+        rowLength: ROW_LENGTH,
+        colLength: COL_LENGTH,
+        rowOffset: ROW_OFFSET,
+        colOffset: COL_OFFSET,
+        isMap: true,//isRenderCityMap,
+        isRenderTiles: !isPaused
       });
+    }
+
+    if (shouldUpdate(accTime.current, 60)) {
+      !!pressedKeys.current.length && moveWASD(pressedKeys.current);
+      movePlayerPieces(
+        playerData,
+        setPlayerData,
+        tileStatuses,
+        setTileStatuses,
+        scale,
+        accTime.current,
+        kaijuData,
+        dmgArray,
+        setPlayerKillCount,
+        teleportData,
+        setTeleportData,
+        false,
+        resetHightlightedTiles
+      );
+      const gameTime = accTime.current;
+      if (gameTime > 7000) // delay Kaiju spawning by 7 seconds at start
+        moveKaijuPieces({
+          data: kaijuData,
+          setData: setKaijuData,
+          tileStatuses,
+          setTileStatuses,
+          scale: scale,
+          accTime: accTime.current,
+          enemyData: playerData,
+          setEnemyData: setPlayerData,
+          dmgArray: dmgArray,
+          kaijuKillCount,
+          setKaijuKillCount,
+          isTutorial: false,
+          winner: winner,
+          setDeadKaijuLocations,
+          difficulty: selectedDifficulty
+        });
+    }
     // update accumulated time.
     accTime.current =
       accTime.current > Number.MAX_SAFE_INTEGER - 10000

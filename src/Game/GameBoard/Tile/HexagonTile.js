@@ -16,6 +16,8 @@ const PopInEffect = styled.div`
     `transform: translate(${props.isVisible ? 0 : 285 * props.scale}px, ${props.isVisible ? 0 : 285 * props.scale}px) scale(${props.isVisible ? 1 : 0});`};
   zindex: ${props => props.zIndex};
   ${props => !props.isTutorial && "pointer-events: none;"}
+  ${props => !props.isVisible ? 'filter: drop-shadow(0 0 2px #80EF80);' : ''}
+
   transition: transform;
   transition-duration: 2s;
 `;
@@ -105,9 +107,10 @@ export const HexagonTile = ({
           isHighlighted0={isHighlighted0}
           status={status}
           color={color}
+          isVisible={isVisible}
         />
         <BlinkFadeEffect>
-          <Icon zIndex={zIndex} className={className} color={color} rotation={!!rotationShift ? iconRotation + rotationShift : iconRotation} />
+          <Icon zIndex={zIndex} className={className} color={color} rotation={className === "fa fa-free-code-camp" ? 0 : !!rotationShift ? iconRotation + rotationShift : iconRotation} />
         </BlinkFadeEffect>
         <Border color={color} />
       </PopInEffect>

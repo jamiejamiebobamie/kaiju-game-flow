@@ -217,7 +217,7 @@ export const PlayerUI = ({
       modSrc={modifierListItemSrcImgPaths[i].modSrc}
       noModSrc={modifierListItemSrcImgPaths[i].noModSrc}
       modIsApplied={value != 0}
-      notInLoadOut={!inLoadOut}
+      notInLoadOut={false}//!inLoadOut}
       translateX={translateX}>
       <FloatingEffect
         styles={`position: relative; display: flex; flex-direction: column; ${isTeammate ? `animation-delay: ${animDelay}s;` : `animation-delay: ${animDelay}s;`}`}
@@ -228,10 +228,10 @@ export const PlayerUI = ({
     </ModifierListitem>);
   const modifierDisplay = <BlinkFadeEffect high={90} low={75}>
     <ModifierList translation={isTeammate ? `173px, -98px` : undefined}>
-      {modifierListItem(0, !!inLoadOut['livesModifier'], '#8dde86ff', 'Health', livesModifier, Math.sin(0))}
-      {modifierListItem(1, !!inLoadOut['moveSpeedModifier'], '#86d8deff', 'Speed', moveSpeedModifier, Math.sin(Math.PI))}
-      {modifierListItem(2, !!inLoadOut['tileCountModifier'], '#d4d07bff', 'Range', tileCountModifier, Math.sin(2*Math.PI), "-47px")}
-      {modifierListItem(3, !!inLoadOut['numTilesModifier'], '#d4aa7bff', 'Area', numTilesModifier, Math.sin(3*Math.PI))}
+      {modifierListItem(0, true/*!!inLoadOut['livesModifier']*/, '#8dde86ff', 'Health', livesModifier, Math.sin(0))}
+      {modifierListItem(1, true/*!!inLoadOut['moveSpeedModifier']*/, '#86d8deff', 'Speed', moveSpeedModifier, Math.sin(Math.PI))}
+      {modifierListItem(2, true/*!!inLoadOut['tileCountModifier']*/, '#d4d07bff', 'Range', tileCountModifier, Math.sin(2*Math.PI), "-47px")}
+      {modifierListItem(3, true/*!!inLoadOut['numTilesModifier']*/, '#d4aa7bff', 'Area', numTilesModifier, Math.sin(3*Math.PI))}
     </ModifierList>
   </BlinkFadeEffect>;
 

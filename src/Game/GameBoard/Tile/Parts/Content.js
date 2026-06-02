@@ -1,4 +1,4 @@
-import React, { useContext }  from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { GlobalSettingsContext } from 'Home';
 
@@ -38,18 +38,15 @@ const Image = styled.div`
   -ms-transform: rotate(-60deg);
   -o-transform: rotate(-60deg);
   transform: rotate(-60deg);
-  // background-color: #a54dff;
-  // background-color: lightgrey;
 
-  ${props =>
-    props.color
-      ? `background-color: ${props.color}; opacity: .2;`
-      : `${
-          props.isTutorial
-            ? "background-color: #db974f; opacity: 0.1;"
-            : // : "background-color: #a54dff; opacity: .15;"
-              "background-color: lightgrey; opacity: .1;"
-        }`}
+  ${props => props.color
+    ? `background-color: ${props.color}; opacity: .2;`
+    : `${props.isTutorial
+      ? "background-color: #db974f; opacity: 0.1;"
+      : !props.isVisible
+        ? 'background-color: #80EF80; opacity: .1;'
+        : "background-color: lightgrey; opacity: .1;"
+    }`}
   ${props =>
     props.isHighlighted0 && !props.playerGender &&
     `background-color: ${props.selectedAvatar == "guy" ? "#55AAff" : "salmon"}; opacity: .4;`} // player1
@@ -61,8 +58,8 @@ const Image = styled.div`
     props.playerGender == "guy"
       ? "background-color: #55AAff; opacity: .4;" // player1
       : props.playerGender == "girl"
-      ? "background-color: salmon; opacity: .4;" // player2
-      : null};
+        ? "background-color: salmon; opacity: .4;" // player2
+        : null};
 `;
 export const Content = ({
   isHighlighted0 = false,
@@ -72,21 +69,22 @@ export const Content = ({
   status,
   color,
   isTutorial,
+  isVisible
 }) => {
   const { i, j } = index;
   const { selectedAvatar } = useContext(GlobalSettingsContext);
   return (
     <ContentWrapper>
       <ImageWrapper>
-         <Image
-          ref={isTutorial ? setHoverRef(`${i} ${j}`) : undefined}
+        <Image
+          ref={isTutorial ? setHoverRef(`${i} ${j} `) : undefined}
           onClick={isTutorial ? onClick : undefined}
           isKaiju={status.isKaiju}
           isHighlighted0={isHighlighted0}
           selectedAvatar={selectedAvatar}
           playerGender={status.playerGender}
           color={color}
-          isTutorial={isTutorial}
+          isVisible={isVisible}
         />
       </ImageWrapper>
     </ContentWrapper>
