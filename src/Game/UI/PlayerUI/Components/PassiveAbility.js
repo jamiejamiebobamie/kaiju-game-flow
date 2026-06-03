@@ -43,7 +43,6 @@ const PassiveAbilityWrapper = styled.div`
     mask-image: url('spritesheet/passiveAbilityActivationSprite_TEST.png');
 
     // background-blend-mode: multiply;
-
     // background-image: url('spritesheet/passiveAbilityActivationSprite_TEST.png');
 
 
