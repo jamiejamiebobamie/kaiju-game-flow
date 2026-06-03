@@ -1540,8 +1540,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 7000,
-    cooldownTime: 6000,
+    cooldownTimeAI: 5000,
+    cooldownTime: 4000,
     passiveDurationTime: 5000,
     color: "PaleTurquoise"
   },
@@ -1619,7 +1619,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 2000,
-    cooldownTimeAI: 3500,
+    cooldownTimeAI: 2500,
     passiveDurationTime: 4000,
     color: "#3c7fde"
   },
@@ -1644,7 +1644,7 @@ export const PLAYER_ABILITIES = {
         scale,
         count: 25,
         statusKey: "isWooded",
-        numTiles: 2,
+        numTiles: 3,
         // numTiles: 6,
         setTileStatuses
       }),
@@ -1655,8 +1655,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 4000,
-    cooldownTimeAI: 4500,
+    cooldownTime: 3000,
+    cooldownTimeAI: 3500,
     passiveDurationTime: 5000,
     color: "Chartreuse"
   },
@@ -1692,7 +1692,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 2000,
-    cooldownTimeAI: 4000,
+    cooldownTimeAI: 3000,
     passiveDurationTime: 6000,
     color: "cyan"
   },
@@ -1729,7 +1729,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 2000,
-    cooldownTimeAI: 3000,
+    cooldownTimeAI: 2500,
     passiveDurationTime: 8000,
     color: "GhostWhite"
   },
@@ -1766,7 +1766,7 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     cooldownTime: 1000,
-    cooldownTimeAI: 2000,
+    cooldownTimeAI: 1500,
     passiveDurationTime: 4000,
     color: "Thistle"
   },
@@ -1833,8 +1833,8 @@ export const PLAYER_ABILITIES = {
     isActive: false,
     accTime: 0,
     passiveDurationTime: 4000,
-    cooldownTime: 10000,
-    cooldownTimeAI: 11000,
+    cooldownTime: 15000,
+    cooldownTimeAI: 16000,
     color: "BlueViolet"
   },
   love: {
@@ -1868,8 +1868,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTimeAI: 11000,
-    cooldownTime: 10000,
+    cooldownTimeAI: 15000,
+    cooldownTime: 14000,
     passiveDurationTime: 20000,
     color: "pink"
   },

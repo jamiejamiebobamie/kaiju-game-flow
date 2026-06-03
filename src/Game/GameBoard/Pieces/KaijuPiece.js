@@ -31,7 +31,7 @@ const SpriteSheet = styled.div`
   transform: scale(0.4) translate(-169px, -169px);
   height: 230.33px;
   width: 180px;
-  filter: drop-shadow(0 0 3px #bf40bf);
+  filter: drop-shadow(0 0 20px #bf40bf);
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;

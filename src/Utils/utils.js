@@ -685,7 +685,7 @@ export const updateTileState = ({
       then save tile statuses that are shared.
 
       fixes a bug that duplicates "isOnFire" / "isOnKaijuFire" / "isWet" statuses 
-        when they are traveling in the opposite direction as the update loops (ie. the nested for-loops iterating over the tiles).
+        when they are traveling in the opposite direction to the update loops (the nested for-loops iterating over the tiles).
     */
 
     // iterate from top-left
@@ -726,10 +726,6 @@ export const updateTileState = ({
     });
     for (let i = 0; i < MAX_COLS; i++) {
       for (let j = 0; j < MAX_ROWS; j++) {
-        // if (!!statuses1[i][j] && Object.values(statuses1[i][j]).filter(v => !!v).length) {
-        //   console.log(statuses1[i][j])
-        // }
-
         const activeStatuses1 = Object.entries(statuses1[i][j]).filter(([k, v]) => TILE_STATUSES.includes(k) && typeof v == 'object');
         const activeStatuses2 = Object.entries(statuses2[i][j]).filter(([k, v]) => TILE_STATUSES.includes(k) && typeof v == 'object');
         /* comparing status keys, eg. "isWet" */
@@ -812,7 +808,7 @@ const solveForNextTile = ({
   else if (
     k == "isElectrified"
     &&
-    (count == (startCount - 9) || count == (startCount - 3))// || count >= startCount)
+    (count == (startCount - 9) || count == (startCount - 3) || count == startCount)
   ) {
     const [_, newDirs] = getAdjacentTilesFromTile(
       { i, j },

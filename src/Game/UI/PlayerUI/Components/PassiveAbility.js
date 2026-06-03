@@ -36,16 +36,22 @@ const PassiveAbilityWrapper = styled.div`
     height: 214px;
     pointer-events: none;
 
-    background-color: ${props => props.color};
     background-position: center;
 
+    background-color: ${props => props.color};
     -webkit-mask-image: url('spritesheet/passiveAbilityActivationSprite_TEST.png');
     mask-image: url('spritesheet/passiveAbilityActivationSprite_TEST.png');
+
+    // background-blend-mode: multiply;
+
+    // background-image: url('spritesheet/passiveAbilityActivationSprite_TEST.png');
+
+
     animation: ${props =>
-    props.isOnCooldown && !props.isPassiveRetriggered ?
-      'play-particle1 .75s steps(11) 1 forwards'
-      : props.isPassiveRetriggered ?
-        'play-particle2 .75s steps(11) 1 forwards'
+    props.isPassiveRetriggered ?
+      'play-particle .75s steps(11) 1 forwards'
+      : props.isOnCooldown && !props.isPassiveRetriggered ?
+        'rotate-particle .75s steps(11) infinite ease-in-out'
         : 'empty-anim 1s infinite'
   };
 
@@ -55,7 +61,8 @@ const PassiveAbilityWrapper = styled.div`
   }
 
   @keyframes empty-anim{}
-  @keyframes play-particle1 {
+
+  @keyframes play-particle {
     from {
       -webkit-mask-position: 0px 214px; 
       mask-position: 0px 214px;
@@ -65,16 +72,61 @@ const PassiveAbilityWrapper = styled.div`
         mask-position: -852px 214px;
     }
   }
-  @keyframes play-particle2 {
-    from {
-      -webkit-mask-position: 0px 214px; 
-      mask-position: 0px 214px;
+
+  @keyframes rotate-particle {
+    0% {
+        transform-origin: 40px 10px;
+        transform: scale(.75) rotate(0deg) translate(5px, -176px);
+        -webkit-mask-position: 0px 214px; 
+        mask-position: 0px 214px;
     }
-    to {
-        -webkit-mask-position: -852px 214px; 
-        mask-position: -852px 214px;
+
+   50%{
+        transform-origin: 40px 10px;
+        transform: scale(.8) rotate(180deg) translate(5px, -176px);
+        -webkit-mask-position: 0px 214px; 
+        mask-position: 0px 214px;
+   } 
+
+   75%{
+        transform-origin: 40px 10px;
+        transform: scale(.5) rotate(270deg) translate(5px, -176px);
+        -webkit-mask-position: 0px 214px; 
+        mask-position: 0px 214px;
+   } 
+
+    100% {
+        transform-origin: 40px 10px;
+        transform: scale(.75) rotate(360deg) translate(5px, -176px);
+        -webkit-mask-position: 0px 214px; 
+        mask-position:  0px 214px;
     }
   }    
+
+
+  //   @keyframes play-particle {
+  //   from {
+  //     background-position: 0px 214px;
+  //   }
+  //   to {
+  //       background-position: -852px 214px;
+  //   }
+  // }
+
+  // @keyframes rotate-particle {
+  //   from {
+  //       transform-origin: 40px 10px;
+  //       transform: rotate(0deg) translate(5px, -176px);
+  //       background-position: 0px 214px;
+  //   }
+  //   to {
+  //       transform-origin: 40px 10px;
+  //       transform: rotate(360deg) translate(5px, -176px);
+  //       background-position: 0px 214px;
+  //   }
+  // }   
+
+
 `;
 
 const PassiveIcon = styled.i`
@@ -111,7 +163,7 @@ export const PassiveAbility = ({
       color={color}
       isOnCooldown={isOnCooldown} // ensure power has been cast once (a.accTime != 0) before highlighting passive 
       isTeammate={isTeammate}
-      accTime={isPassiveRetriggered}
+      isPassiveRetriggered={isPassiveRetriggered}
     >
       <PassiveIcon className={`fa ${ICON_LOOKUP[element]}`} />
     </PassiveAbilityWrapper>
