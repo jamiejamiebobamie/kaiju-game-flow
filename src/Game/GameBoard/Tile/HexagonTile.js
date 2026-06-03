@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Content } from "./Parts/Content";
 import { Border } from "./Parts/Border";
 import { Icon } from "./Parts/Icon";
-import { BlinkFadeEffect } from 'Components/AvatarSelection';
 import { getAngleOfRotationFromTileDirs } from 'Utils/utils'
 
 const Hexagon = styled.div`
@@ -21,21 +20,25 @@ const PopInEffect = styled.div`
   transition: transform;
   transition-duration: 2s;
 `;
+
+const returnValue = v => v;
+const flipRotationBasedOnTileIndex = (rotation, i, j) => (i + j) % 2 === 0 ? rotation : -rotation;
+const doNotRotate = _ => 0;
+const add180 = v => v + 180;
+
 const ICON_LOOKUP = {
-  isOnKaijuFire: { finalStatus: 'isOnKaijuFire', className: "fa-free-code-camp", color: "#df73ff", rotationShift: 180 },
-  isOnFire: { finalStatus: 'isOnFire', className: "fa-free-code-camp", color: "tomato", rotationShift: 180 },
-  isWet: { finalStatus: 'isWet', className: "fa-tint", color: "#3c7fde" },
-  isWooded: { finalStatus: 'isWooded', className: "fa-leaf", color: "Chartreuse" },
-  isElectrified: { finalStatus: 'isElectrified', className: "fa-bolt", color: "cyan" },
-  isGhosted: { finalStatus: 'isGhosted', className: "fa-snapchat-ghost", color: "GhostWhite", rotationShift: 180 },
-  isBubble: { finalStatus: 'isBubble', className: "fa-question-circle-o", color: "Thistle" },
-  isShielded: { finalStatus: 'isShielded', className: "fa-shield", color: "AntiqueWhite", rotationShift: 180 },
-  // isGraveyard: { className: "fa-toggle-off", color: "white" },
-  // isMonster: { className: "fa-optin-monster", color: "purple" },
-  isCold: { finalStatus: 'isCold', className: "fa-snowflake-o", color: "PaleTurquoise" },
-  isHealing: { finalStatus: 'isHealing', className: "fa-heart", color: "pink", rotationShift: 180 },
-  isTeleportTile: { finalStatus: 'isTeleportTile', className: "fa-ravelry", color: "BlueViolet" },
-  IS_BLANK: { finalStatus: '', className: "", color: "" },
+  isOnKaijuFire: { finalStatus: 'isOnKaijuFire', className: "fa-free-code-camp", color: "#df73ff", rotationShift: doNotRotate },
+  isOnFire: { finalStatus: 'isOnFire', className: "fa-free-code-camp", color: "tomato", rotationShift: doNotRotate },
+  isWet: { finalStatus: 'isWet', className: "fa-tint", color: "#3c7fde", rotationShift: returnValue },
+  isWooded: { finalStatus: 'isWooded', className: "fa-leaf", color: "Chartreuse", rotationShift: flipRotationBasedOnTileIndex },
+  isElectrified: { finalStatus: 'isElectrified', className: "fa-bolt", color: "cyan", rotationShift: returnValue },
+  isGhosted: { finalStatus: 'isGhosted', className: "fa-snapchat-ghost", color: "GhostWhite", rotationShift: add180 },
+  isBubble: { finalStatus: 'isBubble', className: "fa-question-circle-o", color: "Thistle", rotationShift: returnValue },
+  isShielded: { finalStatus: 'isShielded', className: "fa-shield", color: "AntiqueWhite", rotationShift: doNotRotate },
+  isCold: { finalStatus: 'isCold', className: "fa-snowflake-o", color: "PaleTurquoise", rotationShift: returnValue },
+  isHealing: { finalStatus: 'isHealing', className: "fa-heart", color: "pink", rotationShift: add180 },
+  isTeleportTile: { finalStatus: 'isTeleportTile', className: "fa-ravelry", color: "BlueViolet", rotationShift: doNotRotate },
+  IS_BLANK: { finalStatus: '', className: "", color: "", rotationShift: doNotRotate },
 };
 const determineIcon = status => {
   switch (true) {
@@ -109,9 +112,7 @@ export const HexagonTile = ({
           color={color}
           isVisible={isVisible}
         />
-        <BlinkFadeEffect>
-          <Icon zIndex={zIndex} className={className} color={color} rotation={className === "fa fa-free-code-camp" ? 0 : !!rotationShift ? iconRotation + rotationShift : iconRotation} />
-        </BlinkFadeEffect>
+        <Icon zIndex={zIndex} className={className} color={color} rotation={rotationShift(iconRotation)} />
         <Border color={color} />
       </PopInEffect>
     </Hexagon>

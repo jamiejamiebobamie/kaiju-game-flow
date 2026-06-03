@@ -205,7 +205,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
 
   const { MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
 
-  const TURN_DELAY = 20;
+  const TURN_DELAY = 50;
 
   // 100%, "normal size":
   const SCALE = 0.3;
@@ -465,10 +465,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setPath([]);
   }
 
-  // pieces event tick
   useInterval(() => {
-
-    // if (shouldUpdate(accTime.current, 20)) {
     updateHighlightedTiles(
       setHighlightedTiles0,
       playerData,
@@ -478,74 +475,72 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       scale,
       0
     );
-    // }
+  }, 1);
 
-    if (shouldUpdate(accTime.current, 100)) {
-      const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {};
-      updateTileState({
-        playerData,
-        kaijuData,
-        setDmgArray,
+  // pieces event tick
+  useInterval(() => {
+    const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {};
+    updateTileState({
+      playerData,
+      kaijuData,
+      setDmgArray,
+      setTileStatuses,
+      scale,
+      accTime: accTime.current,
+      teleportTile: { i: teleportTile.h_i, j: teleportTile.h_j }
+    });
+    redrawTiles({
+      highlightedTiles0,
+      setClickedTile,
+      setTiles,
+      playerData,
+      kaijuData,
+      tileStatuses,
+      setTileStatuses,
+      scale,
+      rowLength: ROW_LENGTH,
+      colLength: COL_LENGTH,
+      rowOffset: ROW_OFFSET,
+      colOffset: COL_OFFSET,
+      isMap: true,//isRenderCityMap,
+      isRenderTiles: !isPaused
+    });
+
+    !!pressedKeys.current.length && moveWASD(pressedKeys.current);
+    movePlayerPieces(
+      playerData,
+      setPlayerData,
+      tileStatuses,
+      setTileStatuses,
+      scale,
+      accTime.current,
+      kaijuData,
+      dmgArray,
+      setPlayerKillCount,
+      teleportData,
+      setTeleportData,
+      false,
+      resetHightlightedTiles
+    );
+    const gameTime = accTime.current;
+    if (gameTime > 3000) // delay Kaiju spawning by 7 seconds at start
+      moveKaijuPieces({
+        data: kaijuData,
+        setData: setKaijuData,
+        tileStatuses,
         setTileStatuses,
-        scale,
+        scale: scale,
         accTime: accTime.current,
-        teleportTile: { i: teleportTile.h_i, j: teleportTile.h_j }
+        enemyData: playerData,
+        setEnemyData: setPlayerData,
+        dmgArray: dmgArray,
+        kaijuKillCount,
+        setKaijuKillCount,
+        isTutorial: false,
+        winner: winner,
+        setDeadKaijuLocations,
+        difficulty: selectedDifficulty
       });
-      redrawTiles({
-        highlightedTiles0,
-        setClickedTile,
-        setTiles,
-        playerData,
-        kaijuData,
-        tileStatuses,
-        setTileStatuses,
-        scale,
-        rowLength: ROW_LENGTH,
-        colLength: COL_LENGTH,
-        rowOffset: ROW_OFFSET,
-        colOffset: COL_OFFSET,
-        isMap: true,//isRenderCityMap,
-        isRenderTiles: !isPaused
-      });
-    }
-
-    if (shouldUpdate(accTime.current, 60)) {
-      !!pressedKeys.current.length && moveWASD(pressedKeys.current);
-      movePlayerPieces(
-        playerData,
-        setPlayerData,
-        tileStatuses,
-        setTileStatuses,
-        scale,
-        accTime.current,
-        kaijuData,
-        dmgArray,
-        setPlayerKillCount,
-        teleportData,
-        setTeleportData,
-        false,
-        resetHightlightedTiles
-      );
-      const gameTime = accTime.current;
-      if (gameTime > 7000) // delay Kaiju spawning by 7 seconds at start
-        moveKaijuPieces({
-          data: kaijuData,
-          setData: setKaijuData,
-          tileStatuses,
-          setTileStatuses,
-          scale: scale,
-          accTime: accTime.current,
-          enemyData: playerData,
-          setEnemyData: setPlayerData,
-          dmgArray: dmgArray,
-          kaijuKillCount,
-          setKaijuKillCount,
-          isTutorial: false,
-          winner: winner,
-          setDeadKaijuLocations,
-          difficulty: selectedDifficulty
-        });
-    }
     // update accumulated time.
     accTime.current =
       accTime.current > Number.MAX_SAFE_INTEGER - 10000

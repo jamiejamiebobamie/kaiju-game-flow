@@ -18,6 +18,11 @@ const StyledIcon = styled.i`
   ${props => props.className === "fa fa-shield" && "margin-left: 5px;"}
   ${props => props.className === "fa fa-bolt" && "margin-left: 10px;"}
 
+  ${props => `filter: drop-shadow(0 0 2px ${props.color});`};
+
+  transition: drop-shadow;
+  transition-duration: .5s;
+
   &::before{
       position: absolute;
       transform: rotate(${props => props.rotation}deg);

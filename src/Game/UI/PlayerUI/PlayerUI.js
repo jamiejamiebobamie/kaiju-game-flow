@@ -237,7 +237,7 @@ export const PlayerUI = ({
 
   const _playerUI = (
     <Wrapper percentZoom={percentZoom} isTeammate={isTeammate}>
-      {modifierDisplay}
+      {/* {modifierDisplay} */}
       {isTeammate ? (
         <> {/* teammate's UI */}
           <Abilities
