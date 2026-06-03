@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { ICON_LOOKUP } from 'Utils/gameState';
 
@@ -42,10 +42,12 @@ const PassiveAbilityWrapper = styled.div`
     -webkit-mask-image: url('spritesheet/passiveAbilityActivationSprite_TEST.png');
     mask-image: url('spritesheet/passiveAbilityActivationSprite_TEST.png');
     animation: ${props =>
-      props.isOnCooldown ?
-        'play-particle .75s steps(11) 1 forwards'
-          : 'empty-anim 1s infinite'
-    };
+    props.isOnCooldown && !props.isPassiveRetriggered ?
+      'play-particle1 .75s steps(11) 1 forwards'
+      : props.isPassiveRetriggered ?
+        'play-particle2 .75s steps(11) 1 forwards'
+        : 'empty-anim 1s infinite'
+  };
 
     opacity: ${props => (props.isOnCooldown ? 0.3 : 0)};
     transition: opacity .5s ease-in-out;
@@ -53,7 +55,7 @@ const PassiveAbilityWrapper = styled.div`
   }
 
   @keyframes empty-anim{}
-  @keyframes play-particle {
+  @keyframes play-particle1 {
     from {
       -webkit-mask-position: 0px 214px; 
       mask-position: 0px 214px;
@@ -63,6 +65,16 @@ const PassiveAbilityWrapper = styled.div`
         mask-position: -852px 214px;
     }
   }
+  @keyframes play-particle2 {
+    from {
+      -webkit-mask-position: 0px 214px; 
+      mask-position: 0px 214px;
+    }
+    to {
+        -webkit-mask-position: -852px 214px; 
+        mask-position: -852px 214px;
+    }
+  }    
 `;
 
 const PassiveIcon = styled.i`
@@ -76,17 +88,32 @@ export const PassiveAbility = ({
   passiveName,
   color,
   isOnCooldown,
-  isTeammate
-}) => (<Wrapper i={i}>
-  <PassiveAbilityWrapper
-    key={i}
-    i={i}
-    title={passiveName}
-    color={color}
-    isOnCooldown={isOnCooldown} // ensure power has been cast once (a.accTime != 0) before highlighting passive 
-    isTeammate={isTeammate}
-  >
-    <PassiveIcon className={`fa ${ICON_LOOKUP[element]}`} />
-  </PassiveAbilityWrapper>
-</Wrapper>
-)
+  isTeammate,
+  accTime
+}) => {
+
+  const timeoutRef = useRef();
+  const [isPassiveRetriggered, setIsPassiveRetriggered] = useState(false);
+
+  useEffect(() => {
+    clearTimeout(timeoutRef.current);
+    setIsPassiveRetriggered(true);
+    timeoutRef.current = setTimeout(() => {
+      setIsPassiveRetriggered(false);
+    }, 1000);
+  }, [accTime])
+
+  return (<Wrapper i={i}>
+    <PassiveAbilityWrapper
+      key={i}
+      i={i}
+      title={passiveName}
+      color={color}
+      isOnCooldown={isOnCooldown} // ensure power has been cast once (a.accTime != 0) before highlighting passive 
+      isTeammate={isTeammate}
+      accTime={isPassiveRetriggered}
+    >
+      <PassiveIcon className={`fa ${ICON_LOOKUP[element]}`} />
+    </PassiveAbilityWrapper>
+  </Wrapper>)
+}

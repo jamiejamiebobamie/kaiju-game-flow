@@ -763,7 +763,7 @@ const solveForCurrentTile = ({
 
   // leave status on current tile until next update
   // this helps ensure dmg is registered
-  const DO_NOT_PERSIST = ['isHealing', 'isGhosted', 'isCold', 'isBubble'];
+  const DO_NOT_PERSIST = ['isHealing', 'isGhosted', 'isBubble'];
   const ERASE = undefined;
 
   _statuses[i][j][k] = DO_NOT_PERSIST.includes(k) || entityOnTileStatus
@@ -810,8 +810,9 @@ const solveForNextTile = ({
 
   // handle multiply with delay
   else if (
-    k === "isElectrified" &&
-    count == (startCount - 3)
+    k == "isElectrified"
+    &&
+    (count == (startCount - 9) || count == (startCount - 3))// || count >= startCount)
   ) {
     const [_, newDirs] = getAdjacentTilesFromTile(
       { i, j },
@@ -822,12 +823,26 @@ const solveForNextTile = ({
     direction = newDirs;
   }
 
+    else if (
+     k == "isBubble"
+    &&
+    (count == (startCount - 1))
+  ) {
+    const [_, newDirs] = getAdjacentTilesFromTile(
+      { i, j },
+      nextTile,
+      scale,
+      6
+    );
+    direction = newDirs;
+  }
+
   // maintain dirs for some statuses
   else if (
     k === "isOnKaijuFire" ||
     k === "isOnFire" ||
     k === "isWet" ||
-    (k === "isBubble" && count >= startCount) ||
+    (k === "isBubble" && (count >= (startCount - 2))) ||
     k === "isShielded" ||
     (k === "isWooded" && count == startCount)
   ) {
@@ -1716,7 +1731,8 @@ export const moveKaijuPieces = ({
   isTutorial,
   winner,
   setDeadKaijuLocations,
-  difficulty
+  difficulty,
+  TURN_DELAY
 }) =>
   setData(_data => {
     const { MAX_AT_ONCE, MAX_TO_WIN, KAIJU_COOL_DOWN } = determineKaijuQuantity(difficulty);
@@ -1908,18 +1924,21 @@ export const moveKaijuPieces = ({
         });
     }
 
+    const addNewKaijuInterval = TURN_DELAY * 100;
+    const respawnDeadKaijuInterval = TURN_DELAY * 10;
+
     const numAlive = _data.filter(({ lives }) => lives > 0).length;
     remainingNeeded = MAX_TO_WIN - (currKillCount + numAlive);
 
     const newKaiju =
       !isTutorial &&
-      shouldUpdate(accTime, 10000) &&
+      shouldUpdate(accTime, addNewKaijuInterval) &&
       _data.length < MAX_AT_ONCE &&
       spawnKaiju(_data, enemyData, scale, false, isTutorial, difficulty);
 
     const respawnedKaijuData =
       !newKaiju &&
-      shouldUpdate(accTime, 3000) &&
+      shouldUpdate(accTime, respawnDeadKaijuInterval) &&
       remainingNeeded > 0 &&
       _data.map(k => {
         if (!k.lives && remainingNeeded > 0) {

@@ -33,6 +33,7 @@ export const PassiveAbilities = ({
         color={a.color}
         isOnCooldown={!!a.accTime && isOnCooldown} // ensure power has been cast once (a.accTime != 0) to highlight passive 
         isTeammate={isTeammate}
+        accTime={a.accTime}
       />
     )
   });

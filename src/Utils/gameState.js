@@ -1679,7 +1679,7 @@ export const PLAYER_ABILITIES = {
         dataIndex: k,
         targetData,
         scale,
-        count: 13,
+        count: 15,
         statusKey: "isElectrified",
         numTiles: 3,
         setTileStatuses
@@ -1691,8 +1691,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 2500,
-    cooldownTimeAI: 5000,
+    cooldownTime: 2000,
+    cooldownTimeAI: 4000,
     passiveDurationTime: 6000,
     color: "cyan"
   },
@@ -1765,8 +1765,8 @@ export const PLAYER_ABILITIES = {
     isPassive: false,
     isActive: false,
     accTime: 0,
-    cooldownTime: 2000,
-    cooldownTimeAI: 3000,
+    cooldownTime: 1000,
+    cooldownTimeAI: 2000,
     passiveDurationTime: 4000,
     color: "Thistle"
   },

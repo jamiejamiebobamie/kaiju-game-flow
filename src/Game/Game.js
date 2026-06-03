@@ -205,7 +205,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
 
   const { MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
 
-  const TURN_DELAY = 50;
+  const TURN_DELAY = 110;//75;//50;
 
   // 100%, "normal size":
   const SCALE = 0.3;
@@ -475,7 +475,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       scale,
       0
     );
-  }, 1);
+  });
 
   // pieces event tick
   useInterval(() => {
@@ -505,7 +505,10 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       isMap: true,//isRenderCityMap,
       isRenderTiles: !isPaused
     });
+  }, intervalTime + 50);
 
+    // pieces event tick
+  useInterval(() => {
     !!pressedKeys.current.length && moveWASD(pressedKeys.current);
     movePlayerPieces(
       playerData,
@@ -523,7 +526,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       resetHightlightedTiles
     );
     const gameTime = accTime.current;
-    if (gameTime > 3000) // delay Kaiju spawning by 7 seconds at start
+    if (gameTime > 3000) // delay Kaiju spawning at start
       moveKaijuPieces({
         data: kaijuData,
         setData: setKaijuData,
@@ -539,7 +542,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
         isTutorial: false,
         winner: winner,
         setDeadKaijuLocations,
-        difficulty: selectedDifficulty
+        difficulty: selectedDifficulty,
+        TURN_DELAY
       });
     // update accumulated time.
     accTime.current =
