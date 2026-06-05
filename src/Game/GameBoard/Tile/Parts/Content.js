@@ -27,18 +27,28 @@ const ImageWrapper = styled.div`
   -o-transform: rotate(-60deg);
   transform: rotate(-60deg);
 `;
-const Image = styled.div`
-  width: 100%;
-  height: 100%;
-  background-repeat: no-repeat;
-  background-position: 50%;
-  visibility: visible;
-  -webkit-transform: rotate(-60deg);
-  -moz-transform: rotate(-60deg);
-  -ms-transform: rotate(-60deg);
-  -o-transform: rotate(-60deg);
-  transform: rotate(-60deg);
 
+
+const determineBackgroundColor = props => {
+  switch(true){
+    case (props.playerGender == "guy" || props.playerGender == "girl"):
+      return props.playerGender == "guy"
+      ? "background-color: #55AAff; opacity: .4;" // guy
+      : "background-color: salmon; opacity: .4;" // girl
+    case !!props.isKaiju:
+      return "background-color: #BF40BF; opacity: .4;" // kaiju
+    case !!props.isHighlighted0 && props.selectedAvatar == 'guy':
+      return "background-color: #55AAff; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as guy
+    case !!props.isHighlighted0 && props.selectedAvatar == 'girl':
+      return "background-color: salmon; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as girl
+    case !!props.color:
+      return `background-color: ${props.color}; opacity: .2;` // status color
+    default:
+      return `background-color: transparent; opacity: .2;` // transparent
+  }
+}
+
+/*
   ${props => props.color
     ? `background-color: ${props.color}; opacity: .2;`
     : `${props.isTutorial
@@ -60,6 +70,20 @@ const Image = styled.div`
       : props.playerGender == "girl"
         ? "background-color: salmon; opacity: .4;" // player2
         : null};
+*/
+
+const Image = styled.div`
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  visibility: visible;
+  -webkit-transform: rotate(-60deg);
+  -moz-transform: rotate(-60deg);
+  -ms-transform: rotate(-60deg);
+  -o-transform: rotate(-60deg);
+  transform: rotate(-60deg);
+  ${props => determineBackgroundColor(props)};
 `;
 export const Content = ({
   isHighlighted0 = false,
@@ -73,6 +97,7 @@ export const Content = ({
 }) => {
   const { i, j } = index;
   const { selectedAvatar } = useContext(GlobalSettingsContext);
+
   return (
     <ContentWrapper>
       <ImageWrapper>

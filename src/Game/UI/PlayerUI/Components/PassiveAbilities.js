@@ -21,7 +21,9 @@ export const PassiveAbilities = ({
   abilities = []
 }) => {
 
-  const passiveAbilityIcons = abilities.map((a, i) => {
+  const passiveAbilityIcons = abilities.map((_, i) => {
+    const j = abilities.length - 1 - i;
+    const a = abilities[j];
     const cooldownTime = a.passiveDurationTime ? a.passiveDurationTime : isTeammate ? a.cooldownTimeAI : a.cooldownTime;
     const isOnCooldown = (a.accTime + cooldownTime) > accTime;
     return (

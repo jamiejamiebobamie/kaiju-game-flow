@@ -426,9 +426,19 @@ export const updateHighlightedTiles = (
     playerData[0] &&
     playerData[0].moveToTiles.length > 0
   ) {
-    _highlightedTiles = playerData[0].moveToTiles.map(t => {
-      return { h_i: t.i, h_j: t.j };
-    });
+    if (playerData[0].isMovementKeyInput) {
+      /*
+        WASD or arrow keys path. only show first tile in path.
+      */
+      _highlightedTiles = [{ h_i: playerData[0].moveToTiles[0].i, h_j: playerData[0].moveToTiles[0].j }];
+    } else {
+      /*
+        mouse click path. show full path.
+      */
+      _highlightedTiles = playerData[0].moveToTiles.map(t => {
+        return { h_i: t.i, h_j: t.j };
+      });
+    }
   }
   setHighlightedTiles(_highlightedTiles);
 };
@@ -451,7 +461,7 @@ export const redrawTiles = ({
   colLength = MAX_COLS,
   rowOffset = 0,
   colOffset = 0,
-  isRenderTiles = true
+  isRenderTiles = true,
 }) => {
   if (tileStatuses) {
     const _tiles = [];
@@ -507,7 +517,7 @@ const determineTileState = ({
   playerData,
   kaijuData,
   scale,
-  accTime,
+  gameTime,
   teleportTile,
   rowLength = MAX_ROWS,
   colLength = MAX_COLS,
@@ -637,7 +647,7 @@ const determineTileState = ({
                 isKaiju: !isKaiju, // to determine correct state array
                 key: entityOnTile.key, // to determine correct entity in array
                 lifeDecrement: DEATH_TILE_STATUSES.includes(k) ? 1 : -1, // lives + or -
-                accTime, // to remove stale data from the dmgArray
+                accTime: gameTime, // to remove stale data from the dmgArray
                 playerIndex, // to determine who killed the Kaiju.
                 i, j
               };
@@ -650,7 +660,7 @@ const determineTileState = ({
               isKaiju: false, // to determine correct state array
               key: playerKaijuConflictKey, // to determine correct entity in array
               lifeDecrement: 1, //lives + or - // possible healing ability...
-              accTime, // to remove stale data from the dmgArray
+              accTime: gameTime, // to remove stale data from the dmgArray
               i, j
             };
             newDmg.push(dmgObj);
@@ -667,7 +677,7 @@ export const updateTileState = ({
   setDmgArray,
   setTileStatuses,
   scale,
-  accTime,
+  gameTime,
   teleportTile,
   rowLength = MAX_ROWS,
   colLength = MAX_COLS,
@@ -677,7 +687,7 @@ export const updateTileState = ({
 }) => {
   setTileStatuses(_statuses => {
     if (!_statuses) return _statuses;
-    const updateKey = Math.random() * 100;
+    // const updateKey = Math.trunc(Math.random() * 100);
     const newDmg = [];
 
     /*
@@ -691,7 +701,7 @@ export const updateTileState = ({
     // iterate from top-left
     const statuses1 = structuredClone(_statuses);
     determineTileState({
-      updateKey,
+      updateKey: gameTime,
       _statuses: statuses1,
       newDmg,
       start_i: 0,
@@ -702,14 +712,14 @@ export const updateTileState = ({
       playerData,
       kaijuData,
       scale,
-      accTime,
+      gameTime,
       teleportTile,
       rowLength, colLength, rowOffset, colOffset, isMap
     });
     // iterate from bottom-right
     const statuses2 = structuredClone(_statuses);
     determineTileState({
-      updateKey,
+      updateKey: gameTime,
       _statuses: statuses2,
       newDmg,
       start_i: MAX_COLS - 1,
@@ -720,7 +730,7 @@ export const updateTileState = ({
       playerData,
       kaijuData,
       scale,
-      accTime,
+      gameTime,
       teleportTile,
       rowLength, colLength, rowOffset, colOffset, isMap
     });
@@ -731,11 +741,11 @@ export const updateTileState = ({
         /* comparing status keys, eg. "isWet" */
         const matchingStatuses = activeStatuses1.length == 1 && !!activeStatuses2.length == 1 && !!activeStatuses1[0][0] && activeStatuses1[0][0] == activeStatuses2[0][0];
         if (!matchingStatuses) {
-          _statuses[i][j] = {};
+          _statuses[i][j] = { updateKey: gameTime };
         } else {
           const k = activeStatuses1[0][0];
           const v = activeStatuses1[0][1];
-          _statuses[i][j] = { [k]: v };
+          _statuses[i][j] = { [k]: v, updateKey: gameTime };
         }
       }
     }
@@ -808,7 +818,7 @@ const solveForNextTile = ({
   else if (
     k == "isElectrified"
     &&
-    (count == (startCount - 9) || count == (startCount - 3) || count == startCount)
+    (/*count == (startCount - 9) ||*/ count == (startCount - 3) || count == startCount)
   ) {
     const [_, newDirs] = getAdjacentTilesFromTile(
       { i, j },
@@ -819,8 +829,8 @@ const solveForNextTile = ({
     direction = newDirs;
   }
 
-    else if (
-     k == "isBubble"
+  else if (
+    k == "isBubble"
     &&
     (count == (startCount - 1))
   ) {
@@ -1347,7 +1357,7 @@ const getClosestEntityTileAndIndexFromOriginTile = (entityData, originTile, scal
     ).j;
   return index !== -1 ? [entityData[index].tile, index] : [{ i: 0, j: 0 }, 0];
 };
-export const movePlayerPieces = (
+export const movePlayerPieces = ({
   data,
   setData,
   tileStatuses,
@@ -1360,14 +1370,16 @@ export const movePlayerPieces = (
   teleportData,
   setTeleportData,
   isTutorial,
-  resetHightlightedTiles
-) =>
+  resetHightlightedTiles,
+  pressedKeys
+}) =>
   setData(_data => {
     const enemiesOnTiles = enemyData.filter(({ isOnTiles }) => !!isOnTiles);
     for (let i = 0; i < _data.length; i++) {
       if (!_data[i].isDead) {
         // set logic for teammate
-        if (i === 1) {
+        const isTeammate = i === 1;
+        if (isTeammate) {
 
           let isEnemy = false;
           let powersCount = 3;
@@ -1385,7 +1397,7 @@ export const movePlayerPieces = (
             isEnemy = targetTile.i !== 0;
             powersCount = _data[i].abilities.length;
           }
-          // teammate should do his own thing and attack kaiju
+          // teammate should do his own thing and attack enemy kaiju
           if (isEnemy) {
             const powersRangeAcc = _data[i].abilities
               .map(({ range }) => range)
@@ -1507,13 +1519,28 @@ export const movePlayerPieces = (
         }
 
         const isPlayer = i == 0;
-        if (
-          _data[i].charLocation &&
+        const isRequiredData = _data[i].charLocation &&
           _data[i].moveFromLocation &&
-          _data[i].moveToLocation &&
-          (!_data[i].isThere ||
-            _data[i].moveToTiles.length ||
-            (teleportData && teleportData.length && teleportData.includes(i) && (!isPlayer || _data[i].moveToTiles.length)))
+          _data[i].moveToLocation;
+        const isThere = _data[i].isThere;
+        const isMoreTilesToTraverseInPath = !!_data[i].moveToTiles.length;
+        const isTeleportDesired = teleportData && teleportData.length && teleportData.includes(i);
+        const isMoveWasd = isPlayer &&
+          (!!pressedKeys.current.length &&
+            (_data[i].dir
+              != convertWasdDirToAnimationDir(getDirFromPlayerInput(pressedKeys, _data[i].tile)))
+            || (!pressedKeys.current.length && _data[i].isMovementKeyInput));
+        const isCurrentPlayerInput = !!pressedKeys.current.length;
+        const isPastPlayerInput = _data[i].isMovementKeyInput;
+        const isChangeOfDirection = _data[i].dir != convertWasdDirToAnimationDir(getDirFromPlayerInput(pressedKeys, _data[i].tile));
+
+        if (
+          isRequiredData &&
+          (!isThere ||
+            isMoreTilesToTraverseInPath ||
+            isMoveWasd ||
+            // teammate teleport uses 'getSafeTile'. player teleport uses 'moveToTiles'
+            (isTeleportDesired && (!isPlayer || isMoreTilesToTraverseInPath)))
         ) {
           const shouldTeleport = !!(teleportData && teleportData.includes(i));
           if (shouldTeleport) {
@@ -1530,6 +1557,71 @@ export const movePlayerPieces = (
               setTeleportData(td => td.filter(_i => _i != i));
               isPlayer && resetHightlightedTiles();
               !!_data[i].storedPassive && _data[i].storedPassive();
+            }
+
+            /*
+              player ended input.
+              wait for 'isThere' to be true,
+                that means character is moved fully to the next tile.
+              stop moving.            
+            */
+          } else if (isPlayer && isThere && isPastPlayerInput && !isCurrentPlayerInput) {
+
+            _data[i].isMovementKeyInput = false;
+
+            _data[i].dir = 'idle';
+            _data[i].moveToLocation = _data[i].moveToLocation;
+            _data[i].moveFromLocation = _data[i].charLocation;
+            _data[i].moveToTiles = [];
+
+            // set new path if player input is detected.
+          } else if (isPlayer && isCurrentPlayerInput && (!isPastPlayerInput || (isThere && isChangeOfDirection))) {
+
+            _data[i].isMovementKeyInput = true;
+
+            const moveToTiles = [];
+            let tile, wasdDir;
+
+            // start path at current tile   
+            tile = _data[i].tile;
+
+            // direction for tile offset used in pathing
+            wasdDir = getDirFromPlayerInput(pressedKeys, tile);
+
+            let desiredOffset = getTileOffsetFromDir(wasdDir, tile);
+            let nextTile = { i: tile.i + desiredOffset.i, j: tile.j + desiredOffset.j };
+            let isValid = isTileOnGameBoard(nextTile);
+            if (isValid) {
+              moveToTiles.push(nextTile);
+              while (isValid) {
+                const lastTile = moveToTiles[moveToTiles.length - 1];
+                desiredOffset = getTileOffsetFromDir(wasdDir, lastTile);
+                nextTile = { i: lastTile.i + desiredOffset.i, j: lastTile.j + desiredOffset.j };
+                isValid = isTileOnGameBoard(nextTile);
+                if (isValid) {
+                  moveToTiles.push(nextTile);
+                }
+              }
+
+              // set new movement path from WASD-arrow_key input
+              _data[i].moveToLocation =
+                getCharXAndY({
+                  ...moveToTiles[0],
+                  scale
+                }) || _data[i].moveToLocation;
+              _data[i].moveFromLocation = _data[i].charLocation;
+              _data[i].moveToTiles = moveToTiles;
+              _data[i].isThere = false;
+
+              // animation direction
+              _data[i].dir = convertWasdDirToAnimationDir(wasdDir);
+            } else {
+              // no valid tile.
+              // end movement
+              _data[i].dir = 'idle';
+              _data[i].moveToLocation = _data[i].moveToLocation;
+              _data[i].moveFromLocation = _data[i].charLocation;
+              _data[i].moveToTiles = [];
             }
           } else {
             const { newLocation, hasArrived } = moveTo({
@@ -1660,6 +1752,60 @@ export const movePlayerPieces = (
     }
     return _data;
   });
+
+const convertWasdDirToAnimationDir = (wasdDir) => wasdDir.split(" ").reduce((acc, item) => !acc ? item : acc + item[0].toUpperCase() + item.slice(1), '');
+
+export const getDirFromPlayerInput = (pressedKeysRef, tile) => {
+  const keys = pressedKeysRef.current;
+
+  if (!pressedKeysRef.current.length) return 'idle';
+
+  const sortLookup = {
+    "KeyW": 0, "KeyS": 1, "KeyA": 2, "KeyD": 3,
+    "ArrowUp": 0, "ArrowDown": 1, "ArrowLeft": 2, "ArrowRight": 3
+  };
+
+  const dirLookup = {
+    "KeyW": "up", "KeyA": "left", "KeyS": "down", "KeyD": "right",
+    "ArrowUp": "up", "ArrowLeft": "left", "ArrowDown": "down", "ArrowRight": "right"
+  };
+
+  const dirs = keys
+    // sort based on priority
+    .sort((a, b) => sortLookup[a] - sortLookup[b])
+    // map keys to directions
+    .map(k => dirLookup[k])
+    // remove duplicates in case of Arrow Keys and WASD are pressed at same time
+    .reduce((acc, item) => !acc.includes(item) ? [...acc, item] : acc, []);
+
+  let dir = dirs[0];
+  if (dirs.length > 1) {
+    const isConflictingDirs = (dirs.includes("up") && dirs.includes("down")) || (dirs.includes("left") && dirs.includes("right"));
+    if (isConflictingDirs) {
+      dir = dirs[0];
+    } else {
+      dir = `${dirs[0]} ${dirs[1]}`;
+    }
+  }
+
+  if (!!tile) {
+    if (dir == "right" || dir == "left") {
+      /*
+        handle left-right movement on hexagonal grid.
+        prefix "up " or "down " depending on
+          column index of current player tile.
+      */
+      const { j } = tile;
+      if (j % 2) {
+        dir = `up ${dir}`;
+      } else {
+        dir = `down ${dir}`;
+      }
+    }
+  }
+  return dir;
+}
+
 export const useAbility = ({
   a,
   data,
@@ -2392,20 +2538,20 @@ export const useEventTick = ({
   });
   // move players
   playerData.length &&
-    movePlayerPieces(
+    movePlayerPieces({
       playerData,
       setPlayerData,
       tileStatuses,
       setTileStatuses,
       scale,
-      accTime.current,
+      accTime: accTime.current,
       kaijuData,
       dmgArray,
-      () => { },
+      setPlayerKillCount: () => { },
       teleportData,
       setTeleportData,
       isTutorial
-    );
+    });
   // move monsters
   kaijuData.length &&
     shouldKaijuMove &&

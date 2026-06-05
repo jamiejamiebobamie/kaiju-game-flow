@@ -8,7 +8,7 @@ import { getAngleOfRotationFromTileDirs } from 'Utils/utils'
 const Hexagon = styled.div`
   ${props =>
     `transform: translate(${props.x}px, ${props.y}px) scale(${props.scale});`};
-  zindex: ${props => props.zIndex};
+    zindex: ${props => props.zIndex};
 `;
 const PopInEffect = styled.div`
   ${props =>
@@ -22,7 +22,12 @@ const PopInEffect = styled.div`
 `;
 
 const returnValue = v => v;
-const flipRotationBasedOnTileIndex = (rotation, i, j) => (i + j) % 2 === 0 ? rotation : -rotation;
+const addNeg240 = v => v - 240;
+const addNeg240AndRandRotByIJ = (v, _, __, ___, i, j) => v - 240 + (i % 2 ? -1 : 1) * j % 15;// + 60 * (updateKey % 2 === 0) ? -1 : 1;
+const shiver10 = v => Math.random() * 10 * (Math.random() > .5 ? -1 : 1);// + 60 * (updateKey % 2 === 0) ? -1 : 1;
+const rotate360ByCount = (v, count, startCount) => v + (count / startCount) * 360;
+const rotate360ByUpdateKey = (v, _, __, updateKey) => updateKey % 360;
+
 const doNotRotate = _ => 0;
 const add180 = v => v + 180;
 
@@ -30,14 +35,15 @@ const ICON_LOOKUP = {
   isOnKaijuFire: { finalStatus: 'isOnKaijuFire', className: "fa-free-code-camp", color: "#df73ff", rotationShift: doNotRotate },
   isOnFire: { finalStatus: 'isOnFire', className: "fa-free-code-camp", color: "tomato", rotationShift: doNotRotate },
   isWet: { finalStatus: 'isWet', className: "fa-tint", color: "#3c7fde", rotationShift: returnValue },
-  isWooded: { finalStatus: 'isWooded', className: "fa-leaf", color: "Chartreuse", rotationShift: flipRotationBasedOnTileIndex },
+  isWooded: { finalStatus: 'isWooded', className: "fa-leaf", color: "Chartreuse", rotationShift: addNeg240 },
   isElectrified: { finalStatus: 'isElectrified', className: "fa-bolt", color: "cyan", rotationShift: returnValue },
   isGhosted: { finalStatus: 'isGhosted', className: "fa-snapchat-ghost", color: "GhostWhite", rotationShift: add180 },
-  isBubble: { finalStatus: 'isBubble', className: "fa-question-circle-o", color: "Thistle", rotationShift: returnValue },
+  isBubble: { finalStatus: 'isBubble', className: "fa-question-circle-o", color: "Thistle", rotationShift: rotate360ByCount },
   isShielded: { finalStatus: 'isShielded', className: "fa-shield", color: "AntiqueWhite", rotationShift: doNotRotate },
-  isCold: { finalStatus: 'isCold', className: "fa-snowflake-o", color: "PaleTurquoise", rotationShift: returnValue },
+  isCold: { finalStatus: 'isCold', className: "fa-snowflake-o", color: "PaleTurquoise", rotationShift: rotate360ByCount },
   isHealing: { finalStatus: 'isHealing', className: "fa-heart", color: "pink", rotationShift: add180 },
   isTeleportTile: { finalStatus: 'isTeleportTile', className: "fa-ravelry", color: "BlueViolet", rotationShift: doNotRotate },
+  // IS_BLANK: { finalStatus: '_blank', className: 'fa-connectdevelop', color: 'blue', rotationShift: doNotRotate },
   IS_BLANK: { finalStatus: '', className: "", color: "", rotationShift: doNotRotate },
 };
 const determineIcon = status => {
@@ -94,6 +100,8 @@ export const HexagonTile = ({
   const { className, color, finalStatus, rotationShift } = determineIcon(status);
   const iconRotation = !!status && !!status[finalStatus] && !!status[finalStatus].dirs && !!status[finalStatus].dirs.length ? getAngleOfRotationFromTileDirs(status[finalStatus].dirs) : 0;
 
+  const { count, startCount } = !!status && !!status[finalStatus] ? status[finalStatus] : { count: 0, startCount: 1 }
+  const { updateKey } = !!status ? status : { updateKey: 0 };
   return (
     <Hexagon
       zIndex={zIndex}
@@ -112,7 +120,7 @@ export const HexagonTile = ({
           color={color}
           isVisible={isVisible}
         />
-        <Icon zIndex={zIndex} className={className} color={color} rotation={rotationShift(iconRotation)} />
+        <Icon zIndex={zIndex} className={className} color={color} rotation={rotationShift(iconRotation, count, startCount, updateKey, i, j)} />
         <Border color={color} />
       </PopInEffect>
     </Hexagon>

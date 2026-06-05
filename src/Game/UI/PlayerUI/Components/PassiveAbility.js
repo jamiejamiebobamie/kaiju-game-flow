@@ -50,12 +50,12 @@ const PassiveAbilityWrapper = styled.div`
     props.isPassiveRetriggered ?
       'play-particle .75s steps(11) 1 forwards'
       : props.isOnCooldown && !props.isPassiveRetriggered ?
-        'rotate-particle .75s steps(11) infinite ease-in-out'
+        'rotate-particle 2s infinite linear'
         : 'empty-anim 1s infinite'
   };
 
-    opacity: ${props => (props.isOnCooldown ? 0.3 : 0)};
-    transition: opacity .5s ease-in-out;
+    opacity: ${props => props.isOnCooldown ? 0.3 : 0};
+    transition: opacity, transform .5s ease-in-out;
     transform: translate(0px, -176px);
   }
 
@@ -75,30 +75,44 @@ const PassiveAbilityWrapper = styled.div`
   @keyframes rotate-particle {
     0% {
         transform-origin: 40px 10px;
-        transform: scale(.75) rotate(0deg) translate(5px, -176px);
+        transform: scale(1) rotate(0deg) translate(5px, -176px); 
         -webkit-mask-position: 0px 214px; 
         mask-position: 0px 214px;
+        opacity: .3;
     }
-
-   50%{
+    
+    
+   25%{
         transform-origin: 40px 10px;
-        transform: scale(.8) rotate(180deg) translate(5px, -176px);
+        transform: scale(.6) rotate(90deg) translate(5px, -176px);
+        opacity: .1;
         -webkit-mask-position: 0px 214px; 
         mask-position: 0px 214px;
    } 
 
+   50%{
+        transform-origin: 40px 10px;
+        transform: scale(.9) rotate(180deg) translate(5px, -176px);
+        opacity: .3;
+        -webkit-mask-position: 0px 214px; 
+        mask-position: 0px 214px;
+   } 
+
+   
    75%{
         transform-origin: 40px 10px;
-        transform: scale(.5) rotate(270deg) translate(5px, -176px);
+        transform: scale(.7) rotate(270deg) translate(5px, -176px);
+        opacity: .1;
         -webkit-mask-position: 0px 214px; 
         mask-position: 0px 214px;
    } 
 
     100% {
         transform-origin: 40px 10px;
-        transform: scale(.75) rotate(360deg) translate(5px, -176px);
+        transform: scale(1) rotate(360deg) translate(5px, -176px);
         -webkit-mask-position: 0px 214px; 
         mask-position:  0px 214px;
+        opacity: .3;
     }
   }    
 

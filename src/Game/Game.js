@@ -10,9 +10,6 @@ import {
   movePlayerPieces,
   moveKaijuPieces,
   determineKaijuQuantity,
-  getTileOffsetFromDir,
-  isTileOnGameBoard,
-  findPath,
   updateTileState,
   redrawTiles,
   updateHighlightedTiles
@@ -281,101 +278,15 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setIntervalTime(_intervalTime => (_intervalTime === null ? TURN_DELAY : null));
   };
 
-  const moveWASD = keys => {
-    const sortLookup = {
-      "KeyW": 0, "KeyS": 1, "KeyA": 2, "KeyD": 3,
-      "ArrowUp": 0, "ArrowDown": 1, "ArrowLeft": 2, "ArrowRight": 3
-    };
-
-    const dirLookup = {
-      "KeyW": "up", "KeyA": "left", "KeyS": "down", "KeyD": "right",
-      "ArrowUp": "up", "ArrowLeft": "left", "ArrowDown": "down", "ArrowRight": "right"
-    };
-
-    const dirs = keys
-      // sort based on priority
-      .sort((a, b) => sortLookup[a] - sortLookup[b])
-      // map keys to directions
-      .map(k => dirLookup[k])
-      // remove duplicates in case of Arrow Keys and WASD are pressed at same time
-      .reduce((acc, item) => !acc.includes(item) ? [...acc, item] : acc, []);
-
-    let dir = dirs[0];
-    if (dirs.length > 1) {
-      const isConflictingDirs = (dirs.includes("up") && dirs.includes("down")) || (dirs.includes("left") && dirs.includes("right"));
-      if (isConflictingDirs) {
-        dir = dirs[0];
-      } else {
-        dir = `${dirs[0]} ${dirs[1]}`;
-      }
-    }
-
-    let tile;
-    setPlayerData(data => {
-      if (Array.isArray(data) && !!data.length) {
-        tile = data[0].tile;
-        if (!!tile) {
-          if (dir == "right" || dir == "left") {
-            /*
-              handle left-right movement on hexagonal grid.
-              prefix "up " or "down " depending on
-                column index of current player tile.
-            */
-            const { j } = tile;
-            if (j % 2) {
-              dir = `up ${dir}`;
-            } else {
-              dir = `down ${dir}`;
-            }
-          }
-          const desiredOffset = getTileOffsetFromDir(dir, tile);
-          const nextTile = { i: tile.i + desiredOffset.i, j: tile.j + desiredOffset.j };
-          const isValid = isTileOnGameBoard(nextTile);
-
-          if (isValid) {
-            const path = findPath(
-              tile,
-              nextTile,
-              scale
-            );
-            setPlayerMoveToTiles(path);
-            setHoverLookupString(`${nextTile.i} ${nextTile.j}`);
-          }
-        }
-      }
-      return data
-    });
-  }
-
-
   useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isCharacterDead: false });
 
   const keyDown = code => {
-
     pressedKeys.current = !pressedKeys.current.includes(code) ? [...pressedKeys.current, code] : pressedKeys.current;
-
-    // if (isEndKeyPress.current) {
-    //   setKeysPressed(keys => {
-    //     const newKeys = !keys.includes(code) ? [...keys, code] : keys; // add key
-    //     moveWASD(newKeys);
-    //     return newKeys;
-    //   });
-    //   isEndKeyPress.current = false;
-    // }
+    setHoverLookupString('');
   }
 
   const keyUp = code => {
-
     pressedKeys.current = pressedKeys.current.includes(code) ? pressedKeys.current.filter(k => k != code) : pressedKeys.current; // remove key
-
-    // if (!isEndKeyPress.current) {
-    //   setKeysPressed(keys => {
-    //     isEndKeyPress.current = false;
-    //     const newKeys = keys.includes(code) ? keys.filter(k => k != code) : keys; // remove key
-    //     moveWASD(newKeys);
-    //     return newKeys;
-    //   });
-    // }
   }
 
   useKeyPress({
@@ -486,7 +397,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       setDmgArray,
       setTileStatuses,
       scale,
-      accTime: accTime.current,
+      gameTime: accTime.current,
       teleportTile: { i: teleportTile.h_i, j: teleportTile.h_j }
     });
     redrawTiles({
@@ -503,28 +414,28 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       rowOffset: ROW_OFFSET,
       colOffset: COL_OFFSET,
       isMap: true,//isRenderCityMap,
-      isRenderTiles: !isPaused
+      isRenderTiles: !isPaused,
     });
   }, intervalTime + 50);
 
-    // pieces event tick
+  // pieces event tick
   useInterval(() => {
-    !!pressedKeys.current.length && moveWASD(pressedKeys.current);
-    movePlayerPieces(
-      playerData,
-      setPlayerData,
+    movePlayerPieces({
+      data: playerData,
+      setData: setPlayerData,
       tileStatuses,
       setTileStatuses,
       scale,
-      accTime.current,
-      kaijuData,
+      accTime: accTime.current,
+      enemyData: kaijuData,
       dmgArray,
       setPlayerKillCount,
       teleportData,
       setTeleportData,
-      false,
-      resetHightlightedTiles
-    );
+      isTutorial: false,
+      resetHightlightedTiles,
+      pressedKeys
+    });
     const gameTime = accTime.current;
     if (gameTime > 3000) // delay Kaiju spawning at start
       moveKaijuPieces({
@@ -643,7 +554,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
               deadKaijuLocations={deadKaijuLocations}
               //
               highlightedTiles0={highlightedTiles0}
-              setHighlightedTiles0={setHighlightedTiles0}
               setPath={setPath}
               setDmgArray={setDmgArray}
               setTiles={setTiles}

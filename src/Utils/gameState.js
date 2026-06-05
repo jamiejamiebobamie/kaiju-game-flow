@@ -2387,7 +2387,8 @@ export const BASE_PLAYER_STATS = {
   moveSpeedModifier: 0,
   playerClass: "",
   playerClassDescription: "",
-  elements: ""
+  elements: "",
+  isMovementKeyInput: false
 };
 
 export const ICON_LOOKUP = {
