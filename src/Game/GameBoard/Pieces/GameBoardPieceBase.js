@@ -1,0 +1,427 @@
+export class GameBoardPieceBase {
+    constructor({
+        pieceIndex = 0,
+        teamIndex = 0,
+        avatar = 'guy',
+        color = "#55AAff",
+        maxLives = 4,
+        moveSpeed = 7,
+        spriteSheetSrc = '',
+        deadSpriteSrc = '',
+        isVisible = true,
+        isTeamLeader = false,
+        isNpc = true,
+        isDoAvoidEnemy = true,
+        gameManagerProxy
+    }) {
+
+        this.gameManagerProxy = gameManagerProxy;
+
+        this.pieceIndex = pieceIndex;
+        this.teamIndex = teamIndex;
+        this.isTeamLeader = isTeamLeader;
+        this.isNpc = isNpc;
+        this.isCharmed = false;
+
+        // aesthetics
+        this.avatar = avatar; // enum?
+        this.color = color;
+        this.isVisible = isVisible;
+
+        // piece class
+        this.pieceClass = '';
+        this.pieceClassDescription = '';
+        this.elements = '';
+
+        // active abilities
+        this.abilities = [];
+        this.abilityAccTimeInterval = 500; // amt of time in milliseconds to wait between ability usages
+
+        // passive abilities
+        this.storedPassive = undefined; // teleport passive is called after teleport
+        this.livesModifier = 0;
+        this.moveSpeedModifier = 0;
+        this.numTilesModifier = 0;
+        this.tileCountModifier = 0;
+        this.dmgModifier = 0;
+
+        // for rendering dmg/healing and teleport floating text
+        this.isHealed = false;
+        this.isTeleported = false;
+
+        // animation
+        this.dir = 'idle';
+        this.spriteSheetSrc = spriteSheetSrc;
+        this.deadSpriteSrc = deadSpriteSrc;
+
+        // health
+        this.lives = maxLives;
+        this.maxLives = maxLives;
+        this.isDead = false;
+        this.lastDmgAccTime = 0; // in milliseconds
+        this.lastDmgAccTimeInterval = 1000; // in milliseconds
+
+        // movement
+        this.shouldTeleport = false;
+        this.isThere = true; // tracks if piece is at the next tile in moveToTiles array
+        this.moveSpeed = moveSpeed;
+        this.isOnTiles = true;
+        this.charLocation = { x: 0, y: 0 };
+        this.moveFromLocation = { x: 0, y: 0 };
+        this.moveToLocation = { x: 0, y: 0 };
+        this.moveToTiles = [];
+        this.tileIndex = { i: 0, j: 0 };
+        this.followDistance = 3; // in number of tiles
+        this.isDoAvoidEnemy = isDoAvoidEnemy; // does NPC pathing avoid enemies
+
+        /*
+            Biases the piece to be closer (negative value) or farther away (positive value) from enemy
+        */
+        this.enemyDistanceBias = 5; // in number of tiles.
+    }
+
+    movePiece({ accTime, TimeoutHandler, PlayerInputHandler }) {
+        if (this.isDead) return;
+
+        // intention: even the player can be Charmed and lose control for a moment of his piece....
+        if (this.isNpc) {
+
+            const enemy = this.gameManagerProxy.getClosestEnemy(this.pieceIndex);
+
+            // DETERMINE DESIRED MOVEMENT LOGIC
+            if (!enemy) {
+                this.followLeader();
+            } else {
+                this.moveWithEnemy();
+            } // - - - - - - - - - - - -
+
+            this.useAbilities(accTime, TimeoutHandler);
+        } else {
+            handlePlayerInput(PlayerInputHandler);
+        }
+
+        // TO-DO: ensure 'this.shouldTeleport' is only true 
+        // for the player if they have 'moveToTiles'.length
+        if (this.shouldTeleport) {
+            this.teleportPiece();
+        }
+
+        // MOVE PIECE
+        this.move();
+
+        if (this.isThere && this.moveToTiles.length) {
+            this.getNextDestination();
+        } else {
+            this.stopMoving();
+        }
+
+        // includes Kaiju tiles and dmg status tiles (includes 'Heals', ie. negative dmg)
+        const dmg = this.gameManagerProxy.getDmg(this.pieceIndex)
+        if (!!dmg) {
+            this.decrementHealth(accTime, dmg);
+        }
+    }
+
+    getNextDestination() {
+        const [nextTileIndex, ...tileIndices] = this.moveToTiles;
+        const playerDirection = this.gameManagerProxy.getDirFromTiles(this.tileIndex, nextTileIndex);
+        this.dir = playerDirection;
+
+        // this.isThere = false;
+        this.tileIndex = nextTileIndex;
+        this.moveToTiles = tileIndices;
+        this.moveToLocation = this.gameManagerProxy.getCharXAndYFromTileIndex(nextTileIndex);
+    }
+
+    move() {
+        const { newLocation, hasArrived } = this.gameManagerProxy.moveTo({
+            currentLocation: this.charLocation,
+            moveFromLocation: this.moveFromLocation,
+            moveToLocation: this.moveToLocation,
+            moveSpeed: this.moveSpeed + this.moveSpeedModifier
+        });
+        this.charLocation = newLocation;
+        this.moveFromLocation = newLocation;
+        this.isThere = hasArrived;
+    }
+
+    handlePlayerInput(PlayerInputHandler) {
+
+        /*
+            player ended input.
+            wait for 'isThere' to be true; character is fully moved to the next tile.
+            stop moving.
+         */
+        if (this.isThere && PlayerInputHandler.getIsPastPlayerInput() && !PlayerInputHandler.getIsCurrentPlayerInput()) {
+            PlayerInputHandler.setIsPastPlayerInput(false);
+            this.stopMoving();
+        } else if (PlayerInputHandler.getIsCurrentPlayerInput() && (!PlayerInputHandler.getIsPastPlayerInput() || PlayerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex))) {
+            PlayerInputHandler.setIsPastPlayerInput(true);
+
+            const moveToTiles = [];
+            let tileIndex, wasdDir;
+
+            // start path at current tile   
+            tileIndex = this.tileIndex;
+
+            // direction for tile offset used in pathing
+            wasdDir = PlayerInputHandler.getDirFromPlayerInput(tileIndex);
+
+            let desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, tileIndex);
+            let nextTileIndex = { i: tileIndex.i + desiredOffset.i, j: tileIndex.j + desiredOffset.j };
+            let isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
+            if (isValid) {
+                moveToTiles.push(nextTileIndex);
+                while (isValid) {
+                    const lastTileIndex = moveToTiles[moveToTiles.length - 1];
+                    desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, lastTileIndex);
+                    nextTileIndex = { i: lastTileIndex.i + desiredOffset.i, j: lastTileIndex.j + desiredOffset.j };
+                    isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
+                    if (isValid) {
+                        moveToTiles.push(nextTileIndex);
+                    }
+                }
+
+                // set new movement path from WASD-arrow_key input
+                this.updateMovmement(moveToTiles);
+
+                // update animation direction
+                this.dir = PlayerInputHandler.convertWasdDirToAnimationDir(wasdDir);
+            } else {
+                // no valid tile
+                this.stopMoving();
+            }
+        }
+    }
+
+    updateMovmement(moveToTiles) {
+        this.moveToLocation = this.gameManagerProxy.getCharXAndYFromTile(moveToTiles[0]) || this.moveToLocation;
+        this.moveFromLocation = this.charLocation;
+        this.moveToTiles = moveToTiles;
+        this.isThere = false;
+    }
+
+    teleportPiece() {
+        // updates useEffect to trigger floating text 'Zip!'
+        this.isTeleported = !this.isTeleported;
+
+        const teleportTile = this.isNpc ? this.gameManagerProxy.getSafeTile(this.pieceIndex) : this.moveToTiles[this.moveToTiles.length - 1];
+
+        if (teleportTile) {
+            const teleportLocation = this.gameManagerProxy.getCharXAndYFromTile(teleportTile);
+            this.tileIndex = teleportTile
+            this.charLocation = teleportLocation;
+            this.moveToLocation = teleportLocation;
+            this.moveFromLocation = teleportLocation;
+            this.moveToTiles = [];
+            this.isThere = true;
+
+            if (!this.isNpc) {
+                this.gameManagerProxy.resetHightlightedTiles();
+            }
+
+            // teleport passive is triggered after teleport is triggered...
+            if (!!this.storedPassive) this.storedPassive();
+        }
+    }
+
+    stopMoving() {
+        this.dir = 'idle';
+        this.moveToLocation = this.charLocation;
+        this.moveFromLocation = this.charLocation;
+        this.moveToTiles = [];
+
+        if (!this.isOnTiles && this.isThere && !this.moveToTiles.length) {
+            this.isOnTiles = true;
+        }
+    }
+
+    useAbilities(accTime) {
+        let hasUsedOneAbility = getHasUsedOneAbility(accTime);
+
+        if (hasUsedOneAbility) return;
+
+        const moveToTilesToEnemy = this.gameManagerProxy.getPathToClosestEnemy(this.pieceIndex);
+        const numTilesToEnemy = moveToTilesToEnemy.length;
+        const isInDanger = this.gameManagerProxy.getIsPieceInDanger(this.pieceIndex);
+        const isHealRequired = this.gameManagerProxy.getIsTeamDamaged(this.pieceIndex);
+
+        // use abilities
+        this.abilities.forEach(a => {
+            if (!hasUsedOneAbility && !a.isOnCooldown) {
+                const type = a.getType();
+                const desiredAIRange = a.getDesiredAIRange();
+                const isOffensivePowerAndTargetInRange =
+                    type.includes("offensive") &&
+                    !!numTilesToEnemy &&
+                    desiredAIRange >= numTilesToEnemy;
+                const isDefensivePowerAndIsInDanger =
+                    type.includes("defensive") && isInDanger;
+                const isEscapePowerAndIsInDanger =
+                    type.includes("escape") &&
+                    (
+                        (!!numTilesToEnemy && desiredAIRange > numTilesToEnemy)
+                        || isInDanger
+                    );
+                const isHealPowerAndIsTeammateHealthLow =
+                    a.type.includes("heal") && isHealRequired;
+
+                if (
+                    isOffensivePowerAndTargetInRange ||
+                    isDefensivePowerAndIsInDanger ||
+                    isEscapePowerAndIsInDanger ||
+                    isHealPowerAndIsTeammateHealthLow
+                ) {
+
+                    hasUsedOneAbility = true;
+
+                    // TO-DO: determine required data...
+                    this.storedPassive = a.useAbility({
+                        accTime,
+                        piece: this,
+                        registerTimeout: this.gameManagerProxy.registerTimeout,
+                        shootPower: this.gameManagerProxy.shootPower
+                    });
+                }
+            }
+        });
+    }
+
+    getHasUsedOneAbility(accTime) {
+        return this.abilities.some(v => (accTime - v.accTime) < this.abilityAccTimeInterval);
+    }
+
+    moveWithEnemy() {
+        const idealDistance = this.getIdealDistanceFromEnemy();
+        const moveToTilesToEnemy = this.gameManagerProxy.getPathToClosestEnemy(this.pieceIndex);
+
+        const isEnemyTooFar = moveToTilesToEnemy.length > idealDistance + this.enemyDistanceBias;
+        const isEnemyTooClose = moveToTilesToEnemy.length < idealDistance;
+
+        if (isEnemyTooFar) {
+            // move closer to enemy
+            this.setMoveToTilesGivenIdealDistanceFromEnemy(moveToTilesToEnemy, idealDistance);
+        } else if (isEnemyTooClose) {
+            // move closer to safe tile, away from enemy
+            const moveToTilesToSafety = this.isDoAvoidEnemy ?
+                this.gameManagerProxy.getPathToSafeTileAndAvoidEnemies(this.pieceIndex)
+                : this.gameManagerProxy.getPathToSafeTile(this.pieceIndex);
+            this.setMoveToTilesGivenIdealDistanceFromEnemy(moveToTilesToSafety, idealDistance);
+        }
+    }
+
+    setMoveToTilesGivenIdealDistanceFromEnemy(moveToTiles, idealDistance) {
+        this.moveToTiles = (moveToTiles.length - idealDistance) > 0 ? moveToTiles.slice(0, moveToTiles.length - idealDistance) : moveToTiles;
+    }
+
+    followLeader() {
+        const moveToTiles = this.gameManagerProxy.getPathToTeamLeader(this.pieceIndex);
+        this.moveToTiles = moveToTiles.length > this.followDistance ?
+            // ensure piece follows within the range of 'this.followDistance'
+            moveToTiles.slice(0, moveToTiles.length - this.followDistance)
+            : [];
+    }
+
+    getIdealDistanceFromEnemy() {
+        return !this.abilities.length || !this.abilities.some(({ isOnCooldown }) => !isOnCooldown) ?
+            10 // default to 10 tiles (away from enemy) if all abilities are on cooldown
+            : this.abilities.reduce((acc, item) => acc + item.desiredAIRange, 0) / this.abilities.length;
+    }
+
+    decrementHealth(accTime, dmg) {
+        if (this.getIsDamageable(accTime)) {
+            this.setLastDmgAccTime(accTime);
+
+            const isHeal = dmg < 0;
+            const isExtraLives = this.livesModifier > 0;
+            let remainingDmg = 0;
+
+            if (!isHeal && isExtraLives) {
+                remainingDmg = this.decrementExtraLives(dmg);
+            }
+
+            const livesNewVal = this.lives - remainingDmg;
+            // constrain health to [0, this.maxLives]
+            this.lives = Math.max(Math.min(this.maxLives, livesNewVal), 0);
+
+            if (isHeal) {
+                // triggers useEffect to show 
+                this.isHealed = !this.isHealed;
+            }
+
+            const lives = this.lives + this.livesModifier;
+
+            if (!this.isDead && lives < 1) {
+                this.handleDeath();
+            }
+        }
+    }
+
+    decrementExtraLives(dmg) {
+        /*
+            decrement from extra lives (positive "livesModifier")
+                before decrementing from health ("lives")
+        */
+        const remainingDmg = Math.max(dmg - this.livesModifier, 0);
+        _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
+
+        /*
+            ISSUE1: below code only works if dmg clears ALL livesModifier.
+                if passive adds +2 livesModifier (for example) and dmg removes -1 livesModifier
+                clearing the timeout to remove the modifier will end-up adding permanent health
+                
+            ISSUE2: TimeoutHandler class needs to handle all timeout logic
+        */
+
+        // ability gives: positive "livesModifier." clearTimeout as passive has been toggled-off by decrementing extra lives
+        const toggledOnPassives = this.abilities.filter(({ fieldToModify }) => fieldToModify == 'livesModifier' && modifierVal > 0 && !!isPassiveApplied);
+        toggledOnPassives.forEach(({ clearPassiveTimeout }) => clearPassiveTimeout());
+
+        return remainingDmg;
+    }
+
+    setLastDmgAccTime(accTime) {
+        this.lastDmgAccTime = accTime;
+    }
+
+    getIsDamageable(accTime) {
+        // piece is dead. piece CANNOT be dmged
+        if (this.isDead) return false;
+        // piece never dmged. piece CAN be dmged
+        if (this.lastDmgAccTime == 0) return true;
+
+        // wait until the current game time is greater than the last game time the piece was dmged + the wait time interval
+        return accTime > (this.lastDmgAccTime + this.lastDmgAccTimeInterval)
+    }
+
+    getNumMoveToTiles() {
+        return this.moveToTiles.length;
+    }
+
+    // intended for 'Charm' ability - 
+    setTeamIndex(index) { this.teamIndex = index; }
+    setColor(color) { this.color = color; }
+    // - - - - - - - - - - - - - - - -
+
+    handleDeath() {
+        setIsDead();
+        spawnDeathPiece();
+        if (!this.isCharmed) {
+            this.gameManagerProxy.updateScore(this.teamIndex);
+        }
+    }
+
+    spawnDeathPiece() {
+        this.isVisible = false;
+        /*
+            pieceAdded to the board on piece's death.
+            representation varies per piece.
+            (example: 'Exploding Kaiju' sprite anim.)
+        */
+        this.gameManagerProxy.spawnDeathPieceAtLocation(this.charLocation, this.avatar, this.tileIndex, this.color);
+    }
+
+    setIsDead(isDead) {
+        this.isDead = isDead;
+    }
+}

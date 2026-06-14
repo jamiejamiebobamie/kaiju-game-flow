@@ -1,4 +1,36 @@
 import { shootPower, modifyStats } from "./utils";
+
+const PAGES = Object.freeze({
+  Home: 'Home',
+  Game: 'Game',
+  Tutorial: 'Tutorial',
+  Settings: 'Settings'
+});
+
+export const Difficulty = Object.freeze({
+  Easy: 1,
+  Medium: 2,
+  Hard: 3,
+  Xtreme: 4
+});
+
+export const GameMode = Object.freeze({
+  Story: 1,
+  Custom: 2,
+});
+
+export const Bounds = Object.freeze({
+  Lookup: 1,
+  Grid: 2,
+});
+
+export const ZoomLvl = Object.freeze({
+  NoZoom: 1,
+  MediumZoom: 2,
+  MaximumZoom: 3,
+});
+
+
 export const PENINSULA_TILE_LOOKUP = {
   "14 26": { i: 14, j: 26 },
   "3 31": { i: 3, j: 31 },
@@ -2432,4 +2464,4 @@ export const TILE_DIR_ROTATIONS_IN_DEGREES = [
   135, // up right
 ];
 
-export const TILE_STATUSES = ['isTeleportTile', 'isHealing', 'isBubble', 'isGhosted', 'isElectrified', 'isCold', 'isShielded', 'isOnFire', 'isOnKaijuFire', 'isWet','isWooded'];
+export const TILE_STATUSES = ['isTeleportTile', 'isHealing', 'isBubble', 'isGhosted', 'isElectrified', 'isCold', 'isShielded', 'isOnFire', 'isOnKaijuFire', 'isWet', 'isWooded'];

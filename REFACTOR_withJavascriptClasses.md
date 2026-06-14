@@ -30,6 +30,10 @@ CLASSES:
 
 
 
+8\. Team
+
+
+
 
 
 DATA\_FILES:
@@ -188,6 +192,8 @@ METHODS:
 
 &#x20;          'getPathToClosestEnemy',
 
+&#x09;   'getIsPieceInDanger'
+
 &#x20;          'getPathToSafeTile',
 
 &#x20;          'getPathToSafeTileAndAvoidEnemies',
@@ -290,7 +296,11 @@ METHODS:
 
 &#x09;   'scale' // scale of gameboard: map + pieces + tiles
 
-&#x09;   'gameMode' // enum
+&#x09;   'gameMode' // Enum
+
+&#x09;   'zoomLvl' // enum, 3 values: no-zoom, zoomLvl1, zoomLvl2. dictates: Kaiju piece size, map scale and position, tile visibility, player piece movement (move tiles vs move pieces)
+
+&#x09;   'timeoutHandler' // a class for handling all setIntervals and setTimeouts...
 
 
 
@@ -398,6 +408,12 @@ METHODS:
 
 &#x09;  - updateKey // stored accTime of last tileStatus update
 
+&#x09;  - dmgModifier
+
+
+
+
+
 &#x09;  // - - - - - - - - - - - - - - -
 
 &#x09;
@@ -415,6 +431,8 @@ METHODS:
 &#x09;  'updateScale'
 
 &#x09;  'updateIsHighlighted'
+
+&#x09;  'getIsDmgTile'
 
 
 
@@ -468,8 +486,6 @@ METHODS:
 
 &#x09;	- isPersistent // do not erase if count = 0
 
-&#x09;	- isDmgTile // includes 'isHealing' status
-
 &#x09;	- dmgAmt // 'isHealing' = -1, all other isDmgTile = true tiles are +1 for dmgAmt
 
 &#x09;	- isBouncy: true/false // reflect status back onto gameboard if status moves out of boundaries of gameboard
@@ -519,6 +535,22 @@ METHODS:
 &#x09;	- updateIsReverseDirection(\[countToTriggerEvent1, countToTriggerEvent2, ...])
 
 &#x09;	- updateDmgAmt
+
+&#x09;	- getDmgAmt
+
+
+
+
+
+/\*
+
+
+
+
+
+
+
+\*/
 
 
 
@@ -584,13 +616,21 @@ METHODS:
 
 &#x09;	- toggleOffPassiveTimeoutRef // integer
 
+&#x09;	- isPassiveApplied // true/false
+
+&#x09;	- isOnCooldown
+
 
 
 
 
 &#x09;METHODS:
 
+&#x09;
+
 &#x09;	- getElementUppercase
+
+&#x09;	- useAbility
 
 &#x09;	- togglePassive // <- COPY. ability instances(?) need to be unique between characters so they do not trigger each other's abilities.
 
