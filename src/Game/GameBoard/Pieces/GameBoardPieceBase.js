@@ -12,7 +12,8 @@ export class GameBoardPieceBase {
         isTeamLeader = false,
         isNpc = true,
         isDoAvoidEnemy = true,
-        gameManagerProxy
+        gameManagerProxy,
+        abilities=[]
     }) {
 
         this.gameManagerProxy = gameManagerProxy;
@@ -34,7 +35,7 @@ export class GameBoardPieceBase {
         this.elements = '';
 
         // active abilities
-        this.abilities = [];
+        this.abilities = abilities;
         this.abilityAccTimeInterval = 500; // amt of time in milliseconds to wait between ability usages
 
         // passive abilities
@@ -78,6 +79,18 @@ export class GameBoardPieceBase {
             Biases the piece to be closer (negative value) or farther away (positive value) from enemy
         */
         this.enemyDistanceBias = 5; // in number of tiles.
+    }
+
+    getLives(){
+        return this.lives;
+    }
+
+    setAbilities(abilities){
+        this.abilities = abilities;
+    }
+
+    setIsTeamLeader(isTeamLeader){
+        this.isTeamLeader = isTeamLeader;
     }
 
     movePiece({ accTime, TimeoutHandler, PlayerInputHandler }) {
@@ -195,7 +208,7 @@ export class GameBoardPieceBase {
     }
 
     updateMovmement(moveToTiles) {
-        this.moveToLocation = this.gameManagerProxy.getCharXAndYFromTile(moveToTiles[0]) || this.moveToLocation;
+        this.moveToLocation = this.gameManagerProxy.getCharXAndYFromTileIndex(moveToTiles[0]) || this.moveToLocation;
         this.moveFromLocation = this.charLocation;
         this.moveToTiles = moveToTiles;
         this.isThere = false;
@@ -205,11 +218,11 @@ export class GameBoardPieceBase {
         // updates useEffect to trigger floating text 'Zip!'
         this.isTeleported = !this.isTeleported;
 
-        const teleportTile = this.isNpc ? this.gameManagerProxy.getSafeTile(this.pieceIndex) : this.moveToTiles[this.moveToTiles.length - 1];
+        const teleportTileIndex = this.isNpc ? this.gameManagerProxy.getSafeTileIndex(this.pieceIndex) : this.moveToTiles[this.moveToTiles.length - 1];
 
-        if (teleportTile) {
-            const teleportLocation = this.gameManagerProxy.getCharXAndYFromTile(teleportTile);
-            this.tileIndex = teleportTile
+        if (teleportTileIndex) {
+            const teleportLocation = this.gameManagerProxy.getCharXAndYFromTileIndex(teleportTileIndex);
+            this.tileIndex = teleportTileIndex
             this.charLocation = teleportLocation;
             this.moveToLocation = teleportLocation;
             this.moveFromLocation = teleportLocation;

@@ -2464,4 +2464,874 @@ export const TILE_DIR_ROTATIONS_IN_DEGREES = [
   135, // up right
 ];
 
+export const PIECES_INFO = {
+  'guy': {
+    color: "#55AAff",
+    spriteSheetSrc: 'spritesheet/player.png',
+    deadSpriteSrc: 'dead_player.png',
+    avatar: 'guy'
+  },
+  'girl': {
+    color: "salmon",
+    spriteSheetSrc: 'spritesheet/teammate.png',
+    deadSpriteSrc: 'dead_teammate.png',
+    avatar: 'girl'
+  },
+  'punk1': {},
+  'punk2': {},
+  'kaiju': {
+    color: "#bf40bf",
+    spriteSheetSrc: 'spritesheet/kaiju_sprite2.png',
+    deadSpriteSrc: 'spritesheet/burning_kaiju_sprite.png',
+    avatar: 'kaiju'
+  }
+};
+
+
 export const TILE_STATUSES = ['isTeleportTile', 'isHealing', 'isBubble', 'isGhosted', 'isElectrified', 'isCold', 'isShielded', 'isOnFire', 'isOnKaijuFire', 'isWet', 'isWooded'];
+
+const ABILITY_ON_COOLDOWN_ICON = "fa-spinner";
+
+export const TILE_STATUSES_AND_ABILITY_DATA = [
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isCold',
+    beats: { isShielded: true, isWooded: true },
+
+    range: 25, // count / startCount / totalCount
+    area: 6, // numTiles
+    dmgAmt: 1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 8, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: true,
+
+    // TICK RANGES -
+    isRotating: [{ tickFrom: 1, tickTo: 7 }],
+    isConserveDirections: [],
+    isTracking: [{ tickFrom: 8, tickTo: 25 }],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["offensive"],//, "defensive"], // ??
+    desiredAIRange: 5,
+    cooldownTimePlayer: 4000,
+    cooldownTimeAI: 5000,
+    passiveDurationTime: 5000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: -1,
+    fieldToModify: 'moveSpeedModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "PaleTurquoise",
+    displayLookup: "abilityIce",
+    element: "ice",
+
+    rotationShift: 'rotate360ByCount',
+
+    activeIcon: "fa-snowflake-o",
+    passiveIcon: "fa-thermometer-quarter",
+
+    activeName: "Ice Slice",
+    activeDesc: "Conjure a stationary vortex of ice",
+    activeEffect1: "After a delay, ice pursues the closest enemy",
+
+    passiveName: "Inclement Weather",
+    passiveDesc: "The forecast calls for snow",
+    passiveEffect1: "-1 speed",
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isOnFire',
+    beats: { isCold: true, isWooded: true },
+
+    range: 25, // count / startCount / totalCount
+    area: 3, // numTiles
+    dmgAmt: 1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 3, // after status reflection, set the count to this number if greater than this number
+
+    /*
+      TO-DO: 
+        implement custom bounce logic...
+        fire should only be reflected "upward"
+        reflected dirs should should only be: "up", "upLeft", "upRight", etc.      
+    */
+    bounceLogic: undefined,
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: true,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [{ tickFrom: 0, tickTo: 20 }],
+    isTracking: [],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["offensive"],
+    desiredAIRange: 10,
+    cooldownTimePlayer: 2000,
+    cooldownTimeAI: 2500,
+    passiveDurationTime: 6000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: 1,
+    fieldToModify: 'tileCountModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "tomato",
+    displayLookup: "abilityFire",
+    element: "fire",
+
+    rotationShift: 'doNotRotate',
+
+    activeIcon: "fa-free-code-camp",
+    passiveIcon: "fa-fire",
+
+    activeName: "Wildfire",
+    activeDesc: "Create a single, lateral line of fire",
+    activeEffect1: "Fire travels in the direction of your closest enemy",
+
+    passiveName: "Uncontrolled Burn",
+    passiveDesc: "You've cleared a path...",
+    passiveEffect1: "+1 range",
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isWet',
+    beats: { isOnFire: true, isOnKaijuFire: true },
+
+    range: 15, // count / startCount / totalCount
+    area: 3, // numTiles
+    dmgAmt: 1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 8, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: true,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [{ tickFrom: 0, tickTo: 15 }],
+    isTracking: [],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [0, 5], // send backward at tick 0, then reverse at tick 5 (like a building wave...)
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["offensive"],
+    desiredAIRange: 8,
+    cooldownTimePlayer: 2000,
+    cooldownTimeAI: 2500,
+    passiveDurationTime: 4000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: -1,
+    fieldToModify: 'moveSpeedModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "#3c7fde",
+    displayLookup: "abilityWater",
+    element: "water",
+
+    rotationShift: 'returnValue',
+
+    activeIcon: "fa-tint",
+    passiveIcon: "fa-exclamation-triangle",
+
+    activeName: "Tidal Wave",
+    activeDesc: "Create a single, lateral line of water",
+    activeEffect1: "Water travels in the direction of your closest enemy",
+
+    passiveName: "Slippery",
+    passiveDesc: "...when wet. Exercise caution.",
+    passiveEffect1: "-1 speed",
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isWooded',
+
+    beats: { isShielded: true, isWet: true },
+
+    range: 25, // count / startCount / totalCount
+    area: 6, // numTiles
+    dmgAmt: 1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 8, // after status reflection, set the count to this number if greater than this number
+
+    /*
+      TO-DO: 
+        implement custom bounce logic...
+        ivy should repeat start behavior
+        ie, (1) ignore target, spread outward
+          in all directions (~3) briefly,
+          (2) then condense to 1 direction, tracking target.
+              new target may be acquired on after bounce?      
+    */
+    bounceLogic: undefined,
+
+    isPersistent: true, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: true,
+
+    // TICK RANGES -
+    isRotating: [],
+    // shoot in all (6) directions at TICK 0
+    isConserveDirections: [{ tickFrom: 2, tickTo: 2 }], // at TICK 2, conserve single direction of each 6 tiles.
+    isTracking: [{ tickFrom: 3, tickTo: 25 }], // at TICK 3+ track enemy. 6 ivy trails condense to 1.
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [{ tick: 1, dirs: [1] }], // at TICK 1, reduce directions to 1 tile. 
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["offensive"],
+    desiredAIRange: 8,
+    cooldownTimePlayer: 3000,
+    cooldownTimeAI: 3500,
+    passiveDurationTime: 5000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: 1,
+    fieldToModify: 'livesModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "Chartreuse",
+    displayLookup: "abilityWood",
+    element: "wood",
+
+    rotationShift: 'addNeg240',
+
+    activeIcon: "fa-leaf",
+    passiveIcon: "fa-tree",
+
+    activeName: "Overgrowth",
+    activeDesc: "Poison ivy travels to your closest enemy",
+    activeEffect1: "Status remains on the tile until walked on",
+
+    passiveName: "Healthy",
+    passiveDesc: "You're extra healthy from all the vegetables",
+    passiveEffect1: "+1 health",
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isElectrified',
+
+    beats: { isShielded: true, isWet: true },
+
+    range: 15, // count / startCount / totalCount
+    area: 3, // numTiles
+    dmgAmt: 1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 8, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: true,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [],
+    isTracking: [],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [{ tick: 1, dirs: 3 }, { tick: 3, dirs: 3 }],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["offensive"],
+    desiredAIRange: 15,
+    cooldownTimePlayer: 2000,
+    cooldownTimeAI: 3000,
+    passiveDurationTime: 6000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: 2,
+    fieldToModify: 'moveSpeedModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "cyan",
+    displayLookup: "abilityLightning",
+    element: "lightning",
+
+    rotationShift: 'returnValue',
+
+    activeIcon: "fa-bolt",
+    passiveIcon: "fa-hourglass-half",
+
+    activeName: "Discharge",
+    activeDesc: "Cast 3 bolts of lightning in the direction of your closest enemy",
+    activeEffect1: "Bolts ricochet off the walls of the map",
+
+    passiveName: "Charged Step",
+    passiveDesc: "Electrical energy courses through your body",
+    passiveEffect1: "+2 speed",
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isGhosted',
+
+    beats: {
+      isElectrified: true,
+      isCold: true,
+      isShielded: true,
+      isOnFire: true,
+      isOnKaijuFire: true,
+      isWet: true,
+      isWooded: true
+    },
+
+    range: 30, // count / startCount / totalCount
+    area: 1, // numTiles
+    dmgAmt: 1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 8, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: false,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [],
+    isTracking: [{ tickFrom: 0, tickTo: 30 }],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["offensive"],
+    desiredAIRange: 15,
+    cooldownTimePlayer: 2000,
+    cooldownTimeAI: 2500,
+    passiveDurationTime: 8000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: -1,
+    fieldToModify: 'livesModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "GhostWhite",
+    displayLookup: "abilityDeath",
+    element: "death",
+
+    rotationShift: 'add180',
+
+    activeIcon: "fa-snapchat-ghost",
+    passiveIcon: "fa-heartbeat",
+
+    activeName: "Haunt",
+    activeDesc: "Shoot a ghost at your closest enemy",
+    activeEffect1: "",
+
+    passiveName: "Lichdom",
+    passiveDesc: "Power comes at a price.",
+    passiveEffect1: "-1 health",
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isBubble',
+
+    beats: {
+      isGhosted: true,
+      isElectrified: true,
+      isCold: true,
+      isShielded: true, // ???
+      isHealing: true, // ???
+      isOnFire: true,
+      isOnKaijuFire: true,
+      isWet: true,
+      isWooded: true
+    },
+
+    range: 7, // count / startCount / totalCount
+    area: 6, // numTiles
+    dmgAmt: 0, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 3, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: false,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [{ tickFrom: 2, tickTo: 7 }],
+    isTracking: [],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [{ tick: 1, dirs: 6 }],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["defensive"],
+    desiredAIRange: 15,
+    cooldownTimePlayer: 1000,
+    cooldownTimeAI: 1500,
+    passiveDurationTime: 4000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: 1,
+    fieldToModify: 'tileCountModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "Thistle",
+    displayLookup: "abilityBubble",
+    element: "bubble",
+
+    rotationShift: 'rotate360ByCount',
+
+    activeIcon: "fa-question-circle-o",
+    passiveIcon: "fa-universal-access",
+
+    activeName: "Dispel",
+    activeDesc: "Dispel all tile effects around you",
+    activeEffect1: "Clears both positive and negative statuses",
+
+    passiveName: "Like My Dreams",
+    passiveDesc: "...they fade and die.",
+    passiveEffect1: "+1 range", // TO-DO: determine better passive...
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isShielded',
+
+    beats: {
+      isOnFire: true,
+      isOnKaijuFire: true,
+      isWet: true,
+    },
+
+    range: 2, // count / startCount / totalCount
+    area: 6, // numTiles
+    dmgAmt: 0, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 0, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: true, // do not delete status from if 'currCount' is 0
+    isBouncy: false, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: true,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [{ tickFrom: 0, tickTo: 2 }],
+    isTracking: [],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["defensive"],
+    desiredAIRange: 4,
+    cooldownTimePlayer: 4000,
+    cooldownTimeAI: 5000,
+    passiveDurationTime: 6000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: 1,
+    fieldToModify: 'tileCountModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "AntiqueWhite",
+    displayLookup: "abilityMetal",
+    element: "metal",
+
+    rotationShift: 'doNotRotate',
+
+    activeIcon: "fa-shield",
+    passiveIcon: "fa-wrench",
+
+    activeName: "Aegis",
+    activeDesc: "Create an area of protection around you. Blocking many ranged attacks",
+    activeEffect1: "Status remains on the tile until walked on",
+
+    passiveName: "Seasoned Builder",
+    passiveDesc: "You are prolific",
+    passiveEffect1: "+1 range", // TO-DO: determine better passive...
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isTeleportTile',
+
+    beats: {
+      isHealing: true,
+      isBubble: true,
+      isGhosted: true,
+      isElectrified: true,
+      isCold: true,
+      isShielded: true,
+      isOnFire: true,
+      isOnKaijuFire: true,
+      isWet: true,
+      isWooded: true,
+    },
+
+    range: 0, // count / startCount / totalCount
+    area: 0, // numTiles
+    dmgAmt: 0, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 0, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: false, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: false,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [],
+    isTracking: [],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["escape"],
+    desiredAIRange: 5,
+    cooldownTimePlayer: 15000,
+    cooldownTimeAI: 16000,
+    passiveDurationTime: 4000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: false,
+    modifierVal: 2,
+    fieldToModify: 'numTilesModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "BlueViolet",
+    displayLookup: "abilityGlass",
+    element: "glass",
+
+    rotationShift: 'doNotRotate',
+
+    activeIcon: "fa-ravelry",
+    passiveIcon: "fa-tencent-weibo",
+
+    activeName: "Escape",
+    activeDesc: "Instantly travel to a safe tile",
+    activeEffect1: "",
+
+    passiveName: "Warp Energy Overload",
+    passiveDesc: "For a short time after teleporting, your magic is explosive",
+    passiveEffect1: "+2 area", // TO-DO: determine better passive...
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isHealing',
+
+    beats: {
+      // isBubble: true,
+      isGhosted: true,
+      isElectrified: true,
+      isCold: true,
+      isShielded: true,
+      isOnFire: true,
+      isOnKaijuFire: true,
+      isWet: true,
+      isWooded: true,
+    },
+
+    range: 20, // count / startCount / totalCount
+    area: 1, // numTiles
+    dmgAmt: -1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 8, // after status reflection, set the count to this number if greater than this number
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: false,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [],
+    isTracking: [{ tickFrom: 0, tickTo: 20 }],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["heal"],
+    desiredAIRange: 10,
+    cooldownTimePlayer: 14000,
+    cooldownTimeAI: 15000,
+    passiveDurationTime: 20000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: 1,
+    fieldToModify: 'tileCountModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "pink",
+    displayLookup: "abilityLove",
+    element: "love",
+
+    rotationShift: 'add180',
+
+    activeIcon: "fa-heart",
+    passiveIcon: "fa-gratipay",
+
+    activeName: "Heal",
+    activeDesc: "Heal your teammate or yourself with the power of love!",
+    activeEffect1: "Heal will pursue the teammate with the least health",
+
+    passiveName: "Long Distance",
+    passiveDesc: "You're in a long distance relationship.",
+    passiveEffect1: "+1 range", // TO-DO: determine better passive...
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  },
+  {
+    // TILE STATUS data - - - - - - - - - - - - - - - - -
+    appliedStatus: 'isOnKaijuFire',
+    beats: { isCold: true, isWooded: true },
+
+    range: 15, // count / startCount / totalCount
+    area: 3, // numTiles
+    dmgAmt: 1, // amt of dmg done to Piece when piece is on a tile with the status
+
+    bounceCountResetVal: 3, // after status reflection, set the count to this number if greater than this number
+
+    /*
+      TO-DO: 
+        implement custom bounce logic...
+        fire should only be reflected "upward"
+        reflected dirs should should only be: "up", "upLeft", "upRight", etc.      
+    */
+    bounceLogic: undefined,
+
+    isPersistent: false, // do not delete status from if 'currCount' is 0
+    isBouncy: true, // reflect status back onto gameboard if status goes off board
+
+    /*
+      if true, when status moves to adjacent tile,
+      leave the status on the current tile with a count of 0.
+
+      "trail" will be deleted next update if 'isPersistent' is false.
+    */
+    isLeaveTrail: true,
+
+    // TICK RANGES -
+    isRotating: [],
+    isConserveDirections: [{ tickFrom: 0, tickTo: 15 }],
+    isTracking: [],
+    // - - - - - - -
+
+    // TICK EVENTS - 
+    isSpread: [],
+    isReverseDirection: [],
+    // - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    // AI data - - - -
+    type: ["offensive"],
+    desiredAIRange: 30,
+    cooldownTimePlayer: 10000,
+    cooldownTimeAI: 12000,
+    passiveDurationTime: 20000,
+    // - - - - - - - -
+
+    // PASSIVE ability data
+    isTriggerPassiveImmediately: true,
+    modifierVal: 1,
+    fieldToModify: 'tileCountModifier',
+    // - - - - - - - - - - -
+
+    // UI data - - - - - - - - - -
+    color: "#df73ff",
+    displayLookup: "abilityFire",
+    element: "kaijuFire",
+
+    rotationShift: 'doNotRotate',
+
+    activeIcon: "fa-free-code-camp",
+    passiveIcon: "fa-fire",
+
+    activeName: "Wildfire",
+    activeDesc: "Create a single, lateral line of fire",
+    activeEffect1: "Fire travels in the direction of your closest enemy",
+
+    passiveName: "Uncontrolled Burn",
+    passiveDesc: "You've cleared a path...",
+    passiveEffect1: "+1 range",
+
+    activeEffect2: '',
+    passiveEffect2: '',
+    // - - - - - - - - - - - - - -
+  }
+]
+
+
+

@@ -4,19 +4,25 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
     constructor(params) {
         super(params);
         this.isGoingToSpewFire = false;
+        this.spewFireCoolDown = params.spewFireCoolDown;
+        this.isOnTiles = false;
+
+        this.pieceClass = 'Kaiju!';
+        this.pieceClassDescription = 'They come from the sea, at night!';
+        this.elements = 'kaijuFire';
+
+        
     }
 
     useAbilities(accTime) {
         if (!this.isOnTiles) return;
-
-        const { KAIJU_COOL_DOWN } = this.gameManagerProxy.determineKaijuDetailsFromDifficulty(difficulty);
 
         const moveToTilesToEnemy = this.gameManagerProxy.getPathToClosestEnemy(this.pieceIndex);
         const numTilesToEnemy = moveToTilesToEnemy.length;
 
         this.abilities.forEach((a, i) => {
             const isCooldownOver =
-                (((accTime - a.accTime) >= KAIJU_COOL_DOWN) || (accTime < a.accTime));
+                (((accTime - a.accTime) >= this.spewFireCoolDown) || (accTime < a.accTime));
 
             if (isCooldownOver) {
 

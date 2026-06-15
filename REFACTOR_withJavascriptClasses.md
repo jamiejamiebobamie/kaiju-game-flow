@@ -546,6 +546,38 @@ METHODS:
 
 
 
+key = isOnFire
+
+
+
+solver = { 'isWooded': -1,  }
+
+
+
+&#x09;		'isTeleportTile'
+
+&#x09;		'isHealing'
+
+&#x09;		'isBubble'
+
+&#x09;		'isGhosted'
+
+&#x09;		'isElectrified'
+
+&#x09;		'isCold'
+
+&#x09;		'isShielded'
+
+&#x09;		'isOnFire'
+
+&#x09;		'isOnKaijuFire'
+
+&#x09;		'isWet'
+
+&#x09;		'isWooded'
+
+
+
 
 
 

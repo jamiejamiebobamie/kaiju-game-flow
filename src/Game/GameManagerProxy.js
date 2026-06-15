@@ -51,8 +51,8 @@ export class GameManagerProxy {
         return this.props.getIsInBounds(tileIndex);
     }
 
-    getSafeTile(pieceIndex) {
-        return this.props.getSafeTile(pieceIndex);
+    getSafeTileIndex(pieceIndex) {
+        return this.props.getSafeTileIndex(pieceIndex);
     }
 
     resetHightlightedTiles() {

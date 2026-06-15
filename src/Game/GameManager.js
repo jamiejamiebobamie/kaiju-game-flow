@@ -1,18 +1,22 @@
-import { Bounds, PENINSULA_TILE_LOOKUP, Difficulty, GameMode, ZoomLvl, MAX_ROWS, MAX_COLS } from 'Utils/gameState';
+import { Bounds, PENINSULA_TILE_LOOKUP, Difficulty, GameMode, ZoomLvl, MAX_ROWS, MAX_COLS, PIECES_INFO, TILE_STATUSES_AND_ABILITY_DATA } from 'Utils/gameState';
 import { TimeoutHandler } from './TimeoutHandler';
 import { GameManagerProxy } from './GameManagerProxy';
 import { PlayerInputHandler } from './PlayerInputHandler';
+import { SettingsManager } from './PlayerInputHandler';
+import { GameBoardPieceBase } from './GameBoard/Pieces/GameBoardPieceBase';
+import { GameBoardPieceKaiju } from './GameBoard/Pieces/GameBoardPieceKaiju';
+import { GameBoardTile } from 'Game/GameBoard/Tile/GameBoardTile'
+import { GameBoardTileStatusAndAbilityData } from 'Game/GameBoard/Tile/GameBoardTileStatusAndAbilityData';
 
 export class GameManager {
-    constructor({ scale }) {
+    constructor({ scale, settingsManager }) {
         this.pieces = [];
         this.deathPieces = [];
         this.teams = [];
         this.tiles = [[]]; // per tile (unique 'i' and 'j') rendering and tile status info
         this.numTileColumns = MAX_COLS;
         this.numTileRows = MAX_ROWS;
-        this.abilitiesData = []; // FLYWEIGHT of ~11 abilities...
-        this.tileStatuses = []; // FLYWEIGHT of ~11 statuses...
+        this.abilityAndTileStatusData = {}; // FLYWEIGHT of ~11 ability/status data...
         this.score = 0;
         this.highlightedTiles = [];
         this.isTutorial = false;
@@ -40,6 +44,7 @@ export class GameManager {
         this.boundsLookup = PENINSULA_TILE_LOOKUP;
         this.gameManagerProxy = new GameManagerProxy();
         this.playerInputHandler = new PlayerInputHandler();
+        this.settingsManager = settingsManager;//new SettingsManager();
         this.difficulty = Difficulty.Medium;
         this.playerAvatar = 'guy';
     }
@@ -81,11 +86,45 @@ export class GameManager {
         }
     }
 
-    initGameBoard() { }
+    initGameBoard() {
+
+        resetGame();
+
+        // TO-DO: pass in user-defined ability edits as param
+        const abilityEdits = this.settingsManager.getAbilityEdits();
+        this.initAbilityStatusData(abilityEdits)
+
+        // - what is player's avatar?
+        const playerAvatar = this.settingsManager.getPlayerAvatar();
+
+        // - what are player's chosen abilities?
+        const playerAbilities = this.settingsManager.getPlayerChosenAbilities();
+
+        // add player
+        this.addPiece({ ...PIECES_INFO[playerAvatar], isNpc: false, abilities: playerAbilities });
+
+        // - does player want a teammate
+        if (this.settingsManager.getIsTeammate()) {
+            // add teammate
+            const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy';
+            this.addPiece({
+                ...PIECES_INFO[teammateAvatar], abilities: this.getThreeRandomAbilities()
+            });
+        }
+
+        if (this.gameMode == GameMode.Story) {
+            this.updateBounds(); // ...to peninsula map
+
+            // - what is the difficulty?
+            const { MAX_AT_ONCE } = determineKaijuDetailsFromDifficulty();
+            this.maxKaijuAtOnce = MAX_AT_ONCE;
+        }
+
+        this.initTiles();
+    }
 
     movePieces(accTime) {
         this.pieces.forEach(p => p.movePiece({ accTime, PlayerInputHandler: this.playerInputHandler }));
-        // this.deathPieces.forEach(d => d.draw());
     }
 
     runGame(accTime) {
@@ -123,16 +162,58 @@ export class GameManager {
     }
 
     shootPower = ({
+        accTime,
         pieceIndex,
-        range,
-        area,
         appliedStatus
     }) => {
-        // TO-DO...
-        // overwrite the piece's tile with the appliedStatus status...
-    };
-    // - - - - - - - - 
+        const pieceTileIndex = this.pieces[pieceIndex].tileIndex;
 
+        // determine target of power
+        let target;
+        if (appliedStatus == 'isHealing') {
+            target = this.getMostDmgedTeammate(pieceIndex);
+        } else {
+            target = this.getClosestEnemy(pieceIndex);
+        }
+        const targetTileIndex = target.tileIndex;
+        const tileStatus = this.abilityAndTileStatusData[appliedStatus];
+
+        /*
+            1. get the 'tileIndex' of the tile to update with the 'appliedStatus'
+            2. also: get the directions ('dirs') the status will spread in
+                from that tile on next update
+        */
+        const { area } = tileStatus;
+        const [tileIndex, dirs] = this.getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex: pieceTileIndex, toTileIndex: targetTileIndex, numTiles: area })
+
+        const targetIndex = target.pieceIndex;
+        const { teamIndex } = this.pieces[pieceIndex];
+        const { range } = tileStatus;
+        if (Array.isArray(this.tiles[tileIndex.i]) && !!this.tiles[tileIndex.i][tileIndex.j]) {
+            this.tiles[tileIndex.i][tileIndex.j].updateTileStatus({ updateKey: accTime, tileStatus, currCount: range, dirs, teamIndex, targetIndex })
+        }
+    };
+
+    initAbilityStatusData() {
+        const abilityAndTileStatusData = TILE_STATUSES_AND_ABILITY_DATA.reduce((acc, statusData) => {
+            const abilityTileStatus = new GameBoardTileStatusAndAbilityData(statusData);
+            acc[abilityTileStatus.appliedStatus] = abilityTileStatus;
+            return acc;
+        }, {});
+        this.abilityAndTileStatusData = abilityAndTileStatusData;
+    }
+
+    resetGame() {
+
+        this.resetHightlightedTiles();
+        this.resetPieces();
+
+        this.score = 0;
+        this.kaijuCount = 0;
+
+        this.tiles = [[]];
+    }
+    // - - - - - - - - 
 
 
     // TEAM MANAGER - -
@@ -144,22 +225,102 @@ export class GameManager {
             return teammate.lives < teammate.maxLives;
         });
     }
+
     getOtherTeamsPieces(pieceIndex) {
         const teamIndex = this.pieces[pieceIndex].teamIndex;
         const otherTeamsPieces = this.pieces.filter(p => p.teamIndex != teamIndex);
         return otherTeamsPieces;
     }
 
-    addTeam(team) {
-        team.teamIndex = this.teams.length;
-        this.teams.push(team);
+    addTeam(pieceIndex) {
+        const newTeam = new Team({ teamLeaderIndex: pieceIndex, teamIndex: this.teams.length, teammateIndices: [pieceIndex] });
+        this.teams.push(newTeam);
     }
 
-    removeTeam(team) {
-        if (this.teams.some(({ teamIndex }) => team.teamIndex == teamIndex)) {
-            this.teams.splice(team.teamIndex, 1);
+    removeTeam(teamIndex) {
+        if (this.teams.some(t => t.teamIndex == teamIndex)) {
+            this.teams.splice(teamIndex, 1);
         }
     }
+
+    addPiece(pieceInfo, teamIndex = 0) {
+
+        const pieceIndex = this.pieces.length;
+
+        const classInfo = { pieceInfo, pieceIndex, teamIndex, gameManagerProxy: this.gameManagerProxy };
+
+        const newPiece = new GameBoardPieceBase(classInfo);
+        this.pieces.push(newPiece);
+
+        // SIDE-EFFECT: create new Team if team does not exist
+        if (!this.teams[teamIndex]) {
+            this.addTeam(pieceIndex);
+            newPiece.setIsTeamLeader(true);
+        } else {
+            this.teams[teamIndex].addTeammate(pieceIndex);
+        }
+    }
+
+    addKaiju() {
+
+        const { KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED, KAIJU_COOL_DOWN } = this.determineKaijuDetailsFromDifficulty();
+
+        const pieceIndex = this.pieces.length;
+        const teamIndex = this.kaijuTeamIndex;
+
+        const classInfo = {
+            ...PIECES_INFO['kaiju'],
+            pieceIndex,
+            teamIndex,
+            abilities: this.getKaijuAbilities(),
+            spewFireCoolDown: KAIJU_COOL_DOWN,
+            maxLives: KAIJU_MAX_HEALTH,
+            moveSpeed: KAIJU_MAX_SPEED,
+            isDoAvoidEnemy: false,
+            gameManagerProxy: this.gameManagerProxy
+        };
+
+        const newKaiju = new GameBoardPieceKaiju(classInfo);
+        /*
+            TO-DO: need to init Kaiju random location off screen and desired tile to move to...
+     
+                this.shouldTeleport = false;
+                this.isThere = true; // tracks if piece is at the next tile in moveToTiles array
+                this.moveSpeed = moveSpeed;
+                this.isOnTiles = true;
+                this.charLocation = { x: 0, y: 0 };
+                this.moveFromLocation = { x: 0, y: 0 };
+                this.moveToLocation = { x: 0, y: 0 };
+                this.moveToTiles = [];
+                this.tileIndex = { i: 0, j: 0 };
+                this.followDistance = 3; // in number of tiles
+                this.isDoAvoidEnemy = isDoAvoidEnemy; // does NPC pathing avoid enemies
+        */
+        this.pieces.push(newKaiju);
+
+        // SIDE-EFFECT: create new Team if team does not exist
+        if (!this.teams[teamIndex]) {
+            this.addTeam(pieceIndex);
+            newKaiju.updateIsTeamLeader(true);
+        } else {
+            this.teams[teamIndex].addTeammate(pieceIndex);
+        }
+
+        this.kaijuCount += 1;
+    }
+
+    removePiece(pieceIndex) {
+        const removedPiece = this.pieces.splice(pieceIndex, 1);
+        this.teams[removedPiece.teamIndex].removeTeammate(removedPiece.pieceIndex);
+    }
+
+    resetPieces() {
+        this.pieces = [];
+        this.teams = [];
+        this.deathPieces = [];
+    }
+    getThreeRandomAbilities() { return []; }
+    getKaijuAbilities() { return []; }
     // - - - - - - - - - -
 
 
@@ -178,9 +339,8 @@ export class GameManager {
     }
 
     updateAbility() { } // ability editor 
+    getPlayerChosenAbilities() { return []; }
     // - - - - - - - - - - -
-
-
 
     // KAIJU MANAGER - - - -
     determineKaijuDetailsFromDifficulty() {
@@ -222,7 +382,7 @@ export class GameManager {
     }
 
     spawnNewKaiju() {
-        this.kaijuCount += 1;
+        this.addKaiju();
     }
 
     respawnKaiju() { }
@@ -258,6 +418,23 @@ export class GameManager {
     redrawTiles() { }
     resetHightlightedTiles() {
         this.highlightedTiles = [];
+    }
+    initTiles() {
+        const tiles = [];
+        for (let i = 0; i < this.numTileColumns; i++) {
+            for (let j = 0; j < this.numTileRows; j++) {
+                const tileIndex = { i, j };
+                const newTile = new GameBoardTile({
+                    tileIndex,
+                    isVisible: this.getIsInBounds(tileIndex),
+                    tileLocation: this.getTileXAndYFromTileIndex(tileIndex),
+                    zIndex: this.getFlattenedArrayIndex(tileIndex),
+                    scale: this.scale,
+                })
+                tiles.push(newTile);
+            }
+        }
+        this.tiles = tiles;
     }
     // - - - - - - - - - -
 
@@ -304,15 +481,49 @@ export class GameManager {
         } : { x: 0, y: 0 };
         return normVec;
     }
+    getDotProduct(from, to){
+        const components = Object.keys(from);
+        return components.reduce((acc, k) => acc + from[k] * to[k], 0);
+    }
     // - - - - - - - - - - - - 
 
 
     // GAMEBOARD HELPER - - - - - -
+
+    /* "PRIVATE" METHOD... call 'updateBounds' */
     changeBounds({ newBounds = '', lookup = PENINSULA_TILE_LOOKUP, rows = MAX_ROWS, columns = MAX_COLS }) {
         this.bounds = !!Bounds[newBounds] ? Bounds[newBounds] : Bounds.Lookup;
         this.boundsLookup = lookup;
         this.numTileRows = rows;
         this.numTileColumns = columns;
+    }
+    // - - - - - - - - - - - - - - - - - - - - -
+
+    updateBounds({ newBounds = '', lookup = PENINSULA_TILE_LOOKUP, rows = MAX_ROWS, columns = MAX_COLS }) {
+        this.changeBounds({ newBounds, lookup, rows, columns });
+        this.gameManagerProxy.updateProps({
+            getDmg: this.getDmg,
+            determineKaijuDetailsFromDifficulty: this.determineKaijuDetailsFromDifficulty,
+            getPathToClosestEnemy: this.getPathToClosestEnemy,
+            getClosestEnemy: this.getClosestEnemy,
+            getCharXAndYFromTileIndex: this.getCharXAndYFromTileIndex,
+            moveTo: this.moveTo,
+            getTileOffsetFromDir: this.getTileOffsetFromDir,
+            getIsInBounds: this.getIsInBounds,
+            getSafeTileIndex: this.getSafeTileIndex,
+            resetHightlightedTiles: this.resetHightlightedTiles,
+            getIsPieceInDanger: this.getIsPieceInDanger,
+            getIsTeamDamaged: this.getIsTeamDamaged,
+            getPathToSafeTileAndAvoidEnemies: this.getPathToSafeTileAndAvoidEnemies,
+            getPathToSafeTile: this.getPathToSafeTile,
+            getPathToTeamLeader: this.getPathToTeamLeader,
+            spawnDeathPieceAtLocation: this.spawnDeathPieceAtLocation,
+            getDirFromTiles: this.getDirFromTiles,
+            registerTimeout: this.registerTimeout,
+            unregisterTimeout: this.unregisterTimeout,
+            shootPower: this.shootPower,
+            updateScore: this.updateScore,
+        });
     }
 
     getIsInBounds(tileIndex) {
@@ -436,6 +647,11 @@ export class GameManager {
             }).filter(tileIndex => this.getIsInBounds(tileIndex))
     };
 
+    getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex, toTileIndex, numTiles }) {
+        const normVec = this.getNormVecFromTileIndices({ fromTileIndex, toTileIndex });
+        return this.getAdjacentTilesFromNormVec(fromTileIndex, normVec, numTiles);
+    }
+
     getAdjacentAdjacentTileIndices = tileIndex => {
         return [
             // ADJACENT TILES
@@ -489,6 +705,25 @@ export class GameManager {
         const tileIndex = this.pieces[pieceIndex].tileIndex;
         const [_, enemyPieceIndex] = this.getClosestPieceFromTileIndex(otherTeamsPieces, tileIndex);
         return enemyPieceIndex == -1 ? undefined : this.pieces[enemyPieceIndex];
+    }
+
+    getMostDmgedTeammate(pieceIndex) {
+
+        const teamIndex = this.pieces[pieceIndex].teamIndex;
+        const teammateIndices = this.teams[teamIndex].getTeamPiecesIndices();
+
+        let mostDmgedTeammateIndex = pieceIndex;
+        let lowestHealth = this.pieces[pieceIndex].getLives();
+
+        teammateIndices.forEach(i => {
+            const test = this.pieces[i].getLives();
+            if (lowestHealth > test) {
+                lowestHealth = test;
+                mostDmgedTeammateIndex = i;
+            }
+        })
+
+        return this.pieces[mostDmgedTeammateIndex];
     }
 
     getPathToClosestEnemy(pieceIndex) {
@@ -707,20 +942,94 @@ export class GameManager {
             return dir;
 
         } else {
-
-            const originXY = this.getTileXAndYFromTileIndex(currTileIndex)
-            const destXY = this.getTileXAndYFromTileIndex(nextTileIndex)
-            const normVec = getNormVecFromDestAndOrigin(destXY, originXY)
+            const normVec = getNormVecFromTileIndices({ fromTileIndex: currTileIndex, toTileIndex: nextTileIndex });
             const dir = getDirFromNormVec(normVec);
             return dir;
         }
 
     };
 
+    getNormVecFromTileIndices({ fromTileIndex, toTileIndex }) {
+        const originXY = this.getTileXAndYFromTileIndex(fromTileIndex);
+        const destXY = this.getTileXAndYFromTileIndex(toTileIndex);
+        const normVec = getNormVecFromDestAndOrigin(destXY, originXY);
+        return normVec;
+    }
+
     getDirFromNormVec(normVec) {
         const xDir = normVec.x > 0 ? "Right" : "Left"; // go right
         const yDir = normVec.y > 0 ? "down" : "up"; // go up
         return `${yDir}${xDir}`;
     }
+
+    getAdjacentTilesFromNormVec(currTile, normVec, area) {
+        const directionMapping = [
+            { x: 0, y: -1 },
+            { x: 0.868, y: -0.496 },
+            { x: 0.868, y: 0.496 },
+            { x: 0, y: 1 },
+            { x: -0.868, y: 0.496 },
+            { x: -0.868, y: -0.496 }
+        ];
+        const tileIndexMapping = [
+            { i: 0, j: -1 }, // up
+            { i: 1, j: currTile.i % 2 ? 0 : -1 }, // up right
+            { i: 1, j: currTile.i % 2 ? 1 : 0 }, // down right
+            { i: 0, j: 1 }, // down
+            { i: -1, j: currTile.i % 2 ? 1 : 0 }, // down left
+            { i: -1, j: currTile.i % 2 ? 0 : -1 } // up left
+        ];
+        const coords = directionMapping[0];
+        const dot = Math.MIN_SAFE_INTEGER;
+        const closest = directionMapping.reduce(
+            (acc, item, i) => {
+                // const distance = this.getDistance(item, normVec);
+                
+                const dot = this.getDotProduct(item, normVec);
+                if (
+                    // distance < acc.distance 
+
+                    dot > acc.dot // TO-DO: TEST!
+                    && this.getIsInBounds({
+                    i: currTile.i + tileIndexMapping[i].i,
+                    j: currTile.j + tileIndexMapping[i].j
+                })) {
+                    return { i, coords: item, dot }
+                } else {
+                    return acc;
+                }
+            },
+            { i: 0, coords, dot }
+        );
+        const tileDirMapping = [
+            "up",
+            "up right",
+            "down right",
+            "down",
+            "down left",
+            "up left"
+        ];
+        const i = closest.i;
+        let spawnPowerTileIndex = {
+            i: currTile.i + tileIndexMapping[i].i,
+            j: currTile.j + tileIndexMapping[i].j
+        };
+        if (area >= 6) {
+            return [spawnPowerTileIndex, tileDirMapping];
+        } else if (area) {
+            const dirs = [tileDirMapping[i]];
+            for (let k = 1; k < area - 1; k++) {
+                const l = i - k < 0 ? 6 - i - k : i - k;
+                const m = i + k > 5 ? -1 * (6 - k - i) : i + k;
+                dirs.push(tileDirMapping[l]);
+                dirs.push(tileDirMapping[m]);
+            }
+            return [spawnPowerTileIndex, dirs];
+        } else {
+            return [spawnPowerTileIndex, []];
+        }
+    };
+
+
     // - - - - - - - - - - - - - - -
 }

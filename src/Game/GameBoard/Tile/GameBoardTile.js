@@ -34,7 +34,7 @@ export class GameBoardTile {
 
         this.isHighlighted = isHighlighted; // replaces: 'isHighlighted0'
 
-        // CLASS: 'GameBoardTileStatus' (shared "flyweight" instances)
+        // CLASS: 'GameBoardTileStatusAndAbilityData' (shared "flyweight" instances)
         this.tileStatus = tileStatus;
 
         // List of adjacent tile indices that have statuses that want to move into this tile
@@ -100,8 +100,22 @@ export class GameBoardTile {
         return this.tileStatus;
     }
 
+    setUpdateKey(updateKey) {
+        this.updateKey = updateKey;
+    }
+
     setTileStatus(tileStatus) {
         this.tileStatus = tileStatus;
+    }
+
+    updateTileStatus({ updateKey, tileStatus, currCount, dirs, teamIndex, targetIndex }) {
+        this.setUpdateKey(updateKey);
+        this.setTileStatus(tileStatus);
+
+        this.currCount = currCount;
+        this.dirs = dirs;
+        this.teamIndex = teamIndex;
+        this.targetIndex = targetIndex;
     }
 
     setClickedTile() { }

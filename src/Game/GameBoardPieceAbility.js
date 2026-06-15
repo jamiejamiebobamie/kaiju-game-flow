@@ -6,7 +6,7 @@ export class GameBoardPieceAbility {
         isPassiveApplied = false,
         isOnCooldown = false,
         toggleOffPassiveTimeoutRef = undefined, // TO-DO... handle this with timeout manager class...
-        gameBoardPieceAbilityData = undefined
+        gameBoardPieceAbilityData = undefined // GameBoardTileStatusAndAbilityData
     }) {
         this.accTime = accTime;
         this.toggleOffPassiveTimeoutRef = toggleOffPassiveTimeoutRef;
@@ -26,9 +26,8 @@ export class GameBoardPieceAbility {
         // activate teammate active ability
         shootPower({
             pieceIndex: piece.pieceIndex,
-            range: this.gameBoardPieceAbilityData.range,
-            area: this.gameBoardPieceAbilityData.area,
-            appliedStatus: this.gameBoardPieceAbilityData.appliedStatus
+            appliedStatus: this.gameBoardPieceAbilityData.appliedStatus,
+            accTime
         });
         const triggerPassive = () => {
             // toggle-on teammate passive ability
