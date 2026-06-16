@@ -416,6 +416,10 @@ export class GameBoardPieceBase {
     setColor(color) { this.color = color; }
     // - - - - - - - - - - - - - - - -
 
+    getColor(){
+        return this.color;
+    }
+
     handleDeath() {
         setIsDead();
         spawnDeathPiece();
@@ -434,7 +438,33 @@ export class GameBoardPieceBase {
         this.gameManagerProxy.spawnDeathPieceAtLocation(this.charLocation, this.avatar, this.tileIndex, this.color);
     }
 
+    getIsDead() {
+        return this.isDead;
+    }
+
     setIsDead(isDead) {
         this.isDead = isDead;
+    }
+
+    respawn(accTime){
+        this.lives = this.maxLives;
+        this.isDead = false;
+        // TO-DO: remove dead game piece
+        this.isVisible = true;
+
+        // reset passive ability stats
+        this.storedPassive = undefined;
+        this.livesModifier = 0;
+        this.moveSpeedModifier = 0;
+        this.numTilesModifier = 0;
+        this.tileCountModifier = 0;
+        this.dmgModifier = 0;
+        // - - - - - - - - - - 
+
+        // reset active ability data
+        this.lastDmgAccTime = accTime;
+        this.shouldTeleport = false;
+
+        // TO-DO: override for Kaiju piece
     }
 }

@@ -33,7 +33,7 @@ export class GameBoardTileStatusAndAbilityData {
         cooldownTimeAI,
         cooldownTimePlayer,
         passiveDurationTime,
-        appliedStatus,
+        appliedStatus, // string tile status, eg. "isWet", "isOnFire", etc.
         isTriggerPassiveImmediately = true,
         modifierVal = 0,
         fieldToModify = '',
@@ -100,6 +100,10 @@ export class GameBoardTileStatusAndAbilityData {
         this.fieldToModify = fieldToModify;
     }
 
+    getAppliedStatus(){
+        return this.appliedStatus;
+    }
+
     updateTotalCount(totalCount) {
         this.totalCount = totalCount;
     }
@@ -140,12 +144,28 @@ export class GameBoardTileStatusAndAbilityData {
         this.dmgAmt = dmgAmt;
     }
 
+    getColor() {
+        return this.color;
+    }
+
     getDmgAmt() {
         return this.dmgAmt;
     }
 
     getBeats() {
         return this.beats;
+    }
+
+    getIsPersistent() {
+        return this.isPersistent;
+    }
+
+    getIsBouncy() {
+        return this.isBouncy;
+    }
+
+    getIsLeaveTrail() {
+        return this.isLeaveTrail;
     }
 
     getElementUppercase() {
@@ -161,4 +181,92 @@ export class GameBoardTileStatusAndAbilityData {
         const modification = piece[this.fieldToModify] + mod;
         piece[this.fieldToModify] = modification;
     };
+
+    rotateStatus(count) {
+        const newDir =
+            ["up",
+                "up right",
+                "down right",
+                "down",
+                "down left",
+                "up left"
+            ][count % 6];
+        return [newDir];
+    }
+
+    reverseDir(currDir) {
+        const dirs = [
+            "up",
+            "up right",
+            "down right",
+            "down",
+            "down left",
+            "up left"
+        ];
+
+        const i = dirs.indexOf(currDir);
+
+        if (i == -1) return currDir; // failure... do not reverse
+
+        const newDir = dirs[(i + 3) % 6];
+        return [newDir];
+    }
+
+    reflectDir() {
+        const dirs = [
+            "up",
+            "up right",
+            "down right",
+            "down",
+            "down left",
+            "up left"
+        ];
+
+        const i = dirs.indexOf(currDir);
+
+        if (i == -1) return currDir; // failure... do not reflect
+
+        const ri = i > 2 ? i - 2 : i + 2; // TO-DO: use this.bounceLogic here...
+        const rd = dirs[ri];
+
+        return [rd];
+    }
+
+    getBounceCount(currCount) {
+        return Math.min(currCount, this.bounceCountResetVal);
+    }
+
+    isInRange(range, currCount) { return currCount >= range.tickFrom && currCount <= range.tickTo; }
+
+    // isRotating: [{ tickFrom: 1, tickTo: 7 }],
+    getIsRotating(currCount) {
+        return this.isRotating.some(range => isInRange(range, currCount))
+    }
+
+    // isConserveDirections: [{ tickFrom: 0, tickTo: 20 }],
+    getIsConserveDirections(currCount) {
+        return this.isConserveDirections.some(range => isInRange(range, currCount))
+    }
+
+    // isTracking: [{ tickFrom: 8, tickTo: 25 }],
+    getIsTracking(currCount) {
+        return this.isTracking.some(range => isInRange(range, currCount))
+    }
+
+    // isSpread: [{ tick: 1, area: 1 }], // example: at TICK 1, reduce directions to 1 tile. 
+    getIsSpread(currCount) {
+        return this.isSpread.some(({ tick }) => tick == currCount);
+    }
+
+    // isReverseDirection: [0, 5], // example: send backward at tick 0, then reverse at tick 5 (like a building wave...)
+    getIsReverseDirection(currCount) {
+        return this.isReverseDirection.includes(currCount);
+    }
+
+    // isSpread: [{ tick: 1, area: 1 }], // example: at TICK 1, reduce directions to 1 tile. 
+    getSpreadArea(currCount) {
+        const spread = this.isSpread.find(({ tick }) => tick == currCount)
+        return !!spread ? spread.area : 0;
+    }
+
 }

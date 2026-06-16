@@ -2750,7 +2750,7 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
     // - - - - - - -
 
     // TICK EVENTS - 
-    isSpread: [{ tick: 1, dirs: [1] }], // at TICK 1, reduce directions to 1 tile. 
+    isSpread: [{ tick: 1, area: 1 }], // at TICK 1, reduce directions to 1 tile. 
     isReverseDirection: [],
     // - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -2820,7 +2820,7 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
     // - - - - - - -
 
     // TICK EVENTS - 
-    isSpread: [{ tick: 1, dirs: 3 }, { tick: 3, dirs: 3 }],
+    isSpread: [{ tick: 1, area: 3 }, { tick: 3, area: 3 }],
     isReverseDirection: [],
     // - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -2978,7 +2978,7 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
     // - - - - - - -
 
     // TICK EVENTS - 
-    isSpread: [{ tick: 1, dirs: 6 }],
+    isSpread: [{ tick: 1, area: 6 }],
     isReverseDirection: [],
     // - - - - - - - - - - - - - - - - - - - - - - - - - 
 

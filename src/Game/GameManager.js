@@ -7,6 +7,7 @@ import { GameBoardPieceBase } from './GameBoard/Pieces/GameBoardPieceBase';
 import { GameBoardPieceKaiju } from './GameBoard/Pieces/GameBoardPieceKaiju';
 import { GameBoardTile } from 'Game/GameBoard/Tile/GameBoardTile'
 import { GameBoardTileStatusAndAbilityData } from 'Game/GameBoard/Tile/GameBoardTileStatusAndAbilityData';
+import { TileContender } from 'Game/GameBoard/Tile/TileContender';
 
 export class GameManager {
     constructor({ scale, settingsManager }) {
@@ -79,7 +80,7 @@ export class GameManager {
         });
     }
 
-    updateScore(teamIndex) {
+    updateScore = (teamIndex) => {
         const playerTeamIndex = this.pieces[0].teamIndex;
         if (teamIndex != playerTeamIndex) {
             this.score += 1;
@@ -132,6 +133,7 @@ export class GameManager {
 
         if (this.isKaiju)
             // Kaiju spawner doesn't consider paused time...
+            // TO-DO: make this run on a timeout that repeats, to use TimeoutHandler class
             this.manageKaijuSpawn(accTime);
 
         this.movePieces(accTime);
@@ -146,16 +148,16 @@ export class GameManager {
         }
     }
 
-    registerTimeout(accTime, callback, delay) {
+    registerTimeout = (accTime, callback, delay) => {
         const timeoutRef = this.timeoutHandler.registerTimeout(accTime, callback, delay);
         return timeoutRef;
     }
 
-    unregisterTimeout(timeoutRef) {
+    unregisterTimeout = (timeoutRef) => {
         this.timeoutHandler.unregisterTimeout(timeoutRef);
     }
 
-    spawnDeathPieceAtLocation(charLocation, avatar, tileIndex, color) {
+    spawnDeathPieceAtLocation = (charLocation, avatar, tileIndex, color) => {
         const zIndex = this.getFlattenedArrayIndex(tileIndex);
         const deathPiece = new DeathPiece(charLocation, avatar, zIndex, color); // TO-DO: make a DeathPiece class.
         this.deathPieces.push(deathPiece);
@@ -174,6 +176,9 @@ export class GameManager {
             target = this.getMostDmgedTeammate(pieceIndex);
         } else {
             target = this.getClosestEnemy(pieceIndex);
+            if (!target) {
+                target = this.pieces[pieceIndex]; // set target as self as fail-safe so game doesn't crash
+            }
         }
         const targetTileIndex = target.tileIndex;
         const tileStatus = this.abilityAndTileStatusData[appliedStatus];
@@ -190,6 +195,7 @@ export class GameManager {
         const { teamIndex } = this.pieces[pieceIndex];
         const { range } = tileStatus;
         if (Array.isArray(this.tiles[tileIndex.i]) && !!this.tiles[tileIndex.i][tileIndex.j]) {
+            // TO-DO: consider setting tile's 'contenders' with desired status
             this.tiles[tileIndex.i][tileIndex.j].updateTileStatus({ updateKey: accTime, tileStatus, currCount: range, dirs, teamIndex, targetIndex })
         }
     };
@@ -217,7 +223,7 @@ export class GameManager {
 
 
     // TEAM MANAGER - -
-    getIsTeamDamaged(pieceIndex) {
+    getIsTeamDamaged = (pieceIndex) => {
         const teamIndex = this.pieces[pieceIndex].teamIndex;
         const teammates = this.teams[teamIndex].teammateIndices;
         return teammates.some(pieceIndex => {
@@ -321,6 +327,13 @@ export class GameManager {
     }
     getThreeRandomAbilities() { return []; }
     getKaijuAbilities() { return []; }
+    getPieceColorsLookup() {
+        // create lookup of tileindex string: '0 1' to GamePiece color for 'redrawTiles' method
+        return this.pieces.reduce((lookup, piece) => {
+            lookup[`${piece.tileIndex.i} ${piece.tileIndex.j}`] = piece.getColor();
+            return lookup;
+        }, {});
+    }
     // - - - - - - - - - -
 
 
@@ -343,7 +356,7 @@ export class GameManager {
     // - - - - - - - - - - -
 
     // KAIJU MANAGER - - - -
-    determineKaijuDetailsFromDifficulty() {
+    determineKaijuDetailsFromDifficulty = () => {
         let MAX_AT_ONCE, MAX_TO_WIN, KAIJU_MAX_HEALTH, KAIJU_MAX_SPEED, KAIJU_COOL_DOWN = undefined;
         switch (this.difficulty) {
             case Difficulty.Easy:
@@ -385,7 +398,17 @@ export class GameManager {
         this.addKaiju();
     }
 
-    respawnKaiju() { }
+    respawnKaiju() {
+        if (!this.getIsAnyDeadKaiju()) return;
+
+        const kaijuTeamIndex = this.kaijuTeamIndex;
+        const kaijuPieceIndices = this.teams[kaijuTeamIndex].getTeamPiecesIndices();
+        const deadKaijuPieceIndex = kaijuPieceIndices.reduce((acc, pieceIndex) => this.pieces[pieceIndex].getIsDead() && acc == -1 ? pieceIndex : acc, -1);
+
+        if (deadKaijuPieceIndex != -1) {
+            this.pieces[deadKaijuPieceIndex].respawn();
+        }
+    }
 
     manageKaijuSpawn(accTime) {
 
@@ -393,7 +416,7 @@ export class GameManager {
         const spawnInterval = isRespawn ? this.kaijuRespawnInterval : this.kaijuSpawnInterval;
 
         if (getIsSpawnNewKaiju(accTime, spawnInterval)) {
-            if (isRespawn && this.getIsAnyDeadKaiju()) {
+            if (isRespawn) {
                 this.respawnKaiju();
             } else {
                 this.spawnNewKaiju();
@@ -409,14 +432,152 @@ export class GameManager {
 
 
     // TILE STATE MANAGER - - -
-    updateTileState() { }
-    solveForStatusWithNoCounts() { }
-    solveForNextTile() { }
-    solveForWallReflectionStatus() { }
-    solveForCurrentTile() { }
-    solveForStatus() { }
-    redrawTiles() { }
-    resetHightlightedTiles() {
+    updateTileState(accTime) {
+
+        // iterate TWICE through gameboard tiles
+        let iterCount = 1;
+        // FIRST ITERATION: iterate from TOP-LEFT corner to BOTTOM-RIGHT corner
+        for (let i = 0; i < MAX_COLS; i++) {
+            for (let j = 0; j < MAX_ROWS; j++) {
+                iterateThroughGameboardTilesAndCreateContenders(i, j, accTime, iterCount)
+            }
+        }
+
+        iterCount++;
+        /*
+            SECOND ITERATION: iterate from BOTTOM-RIGHT corner to TOP-LEFT corner
+            Fixes bug when status is travelling in the opposite direction as the update...
+
+            TO-DO: test if this is still necessary...
+        */
+        for (let i = MAX_COLS - 1; i > -1; i--) {
+            for (let j = MAX_ROWS - 1; j > -1; j--) {
+                iterateThroughGameboardTilesAndCreateContenders(i, j, accTime, iterCount)
+            }
+        }
+
+        const checkedKeys = {};
+        // A tile status is valid (and not an update bug) if it is present in a tile's 'contenders' lookup twice
+        for (let i = 0; i < MAX_COLS; i++) {
+            for (let j = 0; j < MAX_ROWS; j++) {
+                const tile = this.tiles[i][j];
+                const contenders = tile.getContenders();
+                const validContenders = Object.entries(contenders).reduce((acc, [k, v]) => {
+                    const kParts = k.split(" ");
+                    kParts.pop(); // remove 'iterCount' from key
+                    const key = kParts.join(" ");
+                    const isValid = contenders[`${key} ${1}`] && contenders[`${key} ${2}`];
+                    const isChecked = checkedKeys[key];
+                    checkedKeys[key] = true; // only add the contender once
+                    if (isValid && !isChecked) {
+                        const appliedStatus = v.getAppliedStatus()
+                        if (!!acc[appliedStatus]) {
+                            acc[appliedStatus].mergeSameStatusContenders(v)
+                        } else {
+                            acc[appliedStatus] = v;
+                        }
+                    }
+                    return acc;
+                }, {});
+
+                if (!!Object.keys(validContenders).length) {
+                    // NOTE: 'validContenders' lookup uses 'appliedStatus' keys
+                    tile.setContenders(validContenders);
+                    tile.resolveContendersAndSetNewTileStatus();
+                }
+
+                tile.clearContenders();
+            }
+        }
+    }
+
+    iterateThroughGameboardTilesAndCreateContenders({ i, j, accTime, iterCount }) {
+        const tile = this.tiles[i][j];
+        const tileIndex = tile.tileIndex;
+
+        tile.setUpdateKey(accTime);
+
+        if (tile.isVisible) { // is on board
+
+            const tileStatus = tile.getTileStatus();
+
+            if (!!tileStatus) {
+
+                const currCount = tile.getCurrCount();
+
+                // 1. clear curr tile's status
+                if (currCount == 0 && !tileStatus.getIsPersistent()) {
+                    tile.clearTileStatus();
+                }
+
+                // 2. persist curr tile's status on curr tile
+                else if (tileStatus.getIsPersistent() || (tileStatus.getIsLeaveTrail() && currCount != 0)) {
+                    const contenderCount = 0;
+
+                    const tileContender = tile.getTileContenderFromTile({ contenderCount });
+                    const key = tileContender.getKey(iterCount);
+                    // add current tile status to contenders
+                    tile.addContender(key, tileContender);
+                }
+
+                // 3. move curr tile's status to adjacent tiles based on dirs
+                if (currCount != 0) {
+                    const dirs = tile.getDirs();
+                    dirs.forEach(d => {
+                        const tileIndexOffset = this.getTileOffsetFromDir(d, tileIndex);
+                        const nextTileIndex = { i: tileIndex.i + tileIndexOffset.i, j: tileIndex.j + tileIndexOffset.j };
+
+                        let newDirs;
+                        if (this.getIsInBounds(nextTileIndex)) {
+                            if (tileStatus.getIsRotating(currCount)) {
+                                newDirs = tileStatus.rotateStatus(currCount);
+                            } else if (tileStatus.getIsConserveDirections(currCount)) {
+                                newDirs = dirs;
+                            } else if (tileStatus.getIsTracking(currCount)) {
+                                const targetTileIndex = this.pieces[tile.targetIndex].tileIndex;
+                                const [_, dirs] = this.getNumAdjacentTilesInDirectionFromTileToTile({ tileIndex, targetTileIndex });
+                                newDirs = dirs;
+                            } else if (tileStatus.getIsSpread(currCount)) {
+                                const area = tileStatus.getSpreadArea(currCount);
+                                const [_, dirs] = this.getNumAdjacentTilesInDirectionFromTileToTile({ tileIndex, nextTileIndex, area });
+                                newDirs = dirs;
+                            } else if (tileStatus.getIsReverseDirection(currCount)) {
+                                newDirs = tileStatus.reverseDir(d);
+                            }
+
+                            // SIDE EFFECT: 'getTileContenderFromTile' decrements currCount for next tile update
+                            // NOTE: count was being decremented by -1 or -2... (ie. removed randomness)
+                            const tileContender = tile.getTileContenderFromTile({ newDirs });
+                            const key = tileContender.getKey(iterCount);
+
+                            const nextTile = this.tiles[nextTileIndex.i][nextTileIndex.j];
+                            // add current tile status to next tile's contenders
+                            nextTile.addContender(key, tileContender);
+                        } else if (tileStatus.getIsBouncy()) {
+                            /*
+                                next tile is not on game board,
+                                if status isBouncy, reflect status back onto the game board.
+                                find the reflected dir based on tileStatus' 'bounceLogic'
+                            */
+
+                            const rd = tileStatus.reflectDir(d);
+                            const tileIndexOffset = this.getTileOffsetFromDir(rd, tileIndex);
+                            const reflectedTileIndex = { i: tileIndex.i + tileIndexOffset.i, j: tileIndex.j + tileIndexOffset.j };
+                            if (this.getIsInBounds(reflectedTileIndex)) {
+                                const tileContender = tile.getTileContenderFromTile({ currCount: tileStatus.getBounceCount(currCount), newDirs: rd });
+                                const key = tileContender.getKey(iterCount);
+
+                                const reflectedTile = this.tiles[reflectedTileIndex.i][reflectedTileIndex.j];
+                                // add current tile status to next tile's contenders
+                                reflectedTile.addContender(key, tileContender);
+                            }
+                        }
+                    })
+                }
+            }
+        }
+    }
+    resetHightlightedTiles = () => {
         this.highlightedTiles = [];
     }
     initTiles() {
@@ -481,7 +642,7 @@ export class GameManager {
         } : { x: 0, y: 0 };
         return normVec;
     }
-    getDotProduct(from, to){
+    getDotProduct(from, to) {
         const components = Object.keys(from);
         return components.reduce((acc, k) => acc + from[k] * to[k], 0);
     }
@@ -526,7 +687,7 @@ export class GameManager {
         });
     }
 
-    getIsInBounds(tileIndex) {
+    getIsInBounds = (tileIndex) => {
         if (this.bounds == Bounds.Grid) {
             // ASSUMES: (1) non-inclusive and (2) i = rows, j = columns... CONFIRM/TEST
             return tileIndex.i < this.numTileRows && tileIndex.j < this.numTileColumns;
@@ -611,7 +772,7 @@ export class GameManager {
         return { x, y };
     };
 
-    getCharXAndYFromTileIndex({ i, j }) {
+    getCharXAndYFromTileIndex = ({ i, j }) => {
         const x =
             (i === 0 ? i * 45 - 25 : i * 45 + 25 * (i - 1)) * this.scale + 52.5 * this.scale;
         const y = (i % 2 ? j * 80 + 40 : j * 80) * this.scale + 42.5 * this.scale;
@@ -647,7 +808,7 @@ export class GameManager {
             }).filter(tileIndex => this.getIsInBounds(tileIndex))
     };
 
-    getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex, toTileIndex, numTiles }) {
+    getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex, toTileIndex, numTiles = 1 }) {
         const normVec = this.getNormVecFromTileIndices({ fromTileIndex, toTileIndex });
         return this.getAdjacentTilesFromNormVec(fromTileIndex, normVec, numTiles);
     }
@@ -700,7 +861,7 @@ export class GameManager {
         return pieceIndex != -1 ? [entityData[pieceIndex].tileIndex, pieceIndex] : [{ i: 0, j: 0 }, -1];
     };
 
-    getClosestEnemy(pieceIndex) {
+    getClosestEnemy = (pieceIndex) => {
         const otherTeamsPieces = this.getOtherTeamsPieces(pieceIndex);
         const tileIndex = this.pieces[pieceIndex].tileIndex;
         const [_, enemyPieceIndex] = this.getClosestPieceFromTileIndex(otherTeamsPieces, tileIndex);
@@ -726,14 +887,14 @@ export class GameManager {
         return this.pieces[mostDmgedTeammateIndex];
     }
 
-    getPathToClosestEnemy(pieceIndex) {
+    getPathToClosestEnemy = (pieceIndex) => {
         const tileIndex = this.pieces[pieceIndex].tileIndex;
         const enemy = this.getClosestEnemy(pieceIndex);
         const path = !!enemy ? this.findPathFromTo(tileIndex, enemy.tileIndex) : [];
         return path;  // aka: 'moveToTiles'
     }
 
-    getPathToTeamLeader(pieceIndex) {
+    getPathToTeamLeader = (pieceIndex) => {
         const teamIndex = this.pieces[pieceIndex].teamIndex;
         const leaderPieceIndex = this.teams[teamIndex].teamLeaderIndex;
         const leaderPiece = this.pieces[leaderPieceIndex];
@@ -742,12 +903,12 @@ export class GameManager {
         return path;  // aka: 'moveToTiles'
     }
 
-    moveTo({
+    moveTo = ({
         currentLocation,
         moveFromLocation,
         moveToLocation,
         moveSpeed
-    }) {
+    }) => {
         const distanceFromStart = this.getDistanceToFrom(moveFromLocation, currentLocation);
         const distanceToFinish = this.getDistanceToFrom(moveToLocation, currentLocation);
         const totalDistance = this.getDistanceToFrom(moveFromLocation, moveToLocation);
@@ -769,7 +930,7 @@ export class GameManager {
         };
     };
 
-    getSafeTileIndex(pieceIndex) {
+    getSafeTileIndex = (pieceIndex) => {
         const otherTeamsPieces = this.getOtherTeamsPieces(pieceIndex);
 
         const otherTeamsTilesLookup = otherTeamsPieces.reduce((acc, { tileIndex }) => {
@@ -847,14 +1008,14 @@ export class GameManager {
         }
     };
 
-    getPathToSafeTile(pieceIndex) {
+    getPathToSafeTile = (pieceIndex) => {
         const safeTileIndex = this.getSafeTileIndex(pieceIndex);
         const tileIndex = this.pieces[pieceIndex].tileIndex;
         const path = this.findPathFromTo(tileIndex, safeTileIndex);
         return path;  // aka: 'moveToTiles'
     }
 
-    getPathToSafeTileAndAvoidEnemies(pieceIndex) {
+    getPathToSafeTileAndAvoidEnemies = (pieceIndex) => {
         const safeTileIndex = this.getSafeTileIndex(pieceIndex);
         const tileIndex = this.pieces[pieceIndex].tileIndex;
         const otherTeamsPieces = this.getOtherTeamsPieces(pieceIndex);
@@ -862,7 +1023,7 @@ export class GameManager {
         return path;  // aka: 'moveToTiles'
     }
 
-    getIsPieceInDanger(pieceIndex) {
+    getIsPieceInDanger = (pieceIndex) => {
         const otherTeamsTilesLookup = this.getOtherTeamsPieces(pieceIndex).reduce((acc, { tileIndex }) => {
             acc[`${tileIndex.i} ${tileIndex.j}`] = tileIndex;
             return acc;
@@ -890,14 +1051,14 @@ export class GameManager {
         return isInDanger;
     }
 
-    getDmg(pieceIndex) {
+    getDmg = (pieceIndex) => {
         let { tileIndex, teamIndex } = this.pieces[pieceIndex];
         const tile = this.tiles[tileIndex.i][tileIndex.j];
         const isDmg = tile.getIsDmgTile(teamIndex);
         return isDmg ? tile.getDmgAmt() : 0;
     }
 
-    getTileOffsetFromDir(dir, tileIndex) {
+    getTileOffsetFromDir = (dir, tileIndex) => {
         switch (dir) {
             case "up":
                 return { i: 0, j: -1 }; // up
@@ -916,7 +1077,7 @@ export class GameManager {
         }
     }
 
-    getDirFromTiles(currTileIndex, nextTileIndex) {
+    getDirFromTiles = (currTileIndex, nextTileIndex) => {
         const areAdjacent = getAreTilesAdjacent(currTileIndex, nextTileIndex);
 
         if (areAdjacent) {
@@ -984,16 +1145,16 @@ export class GameManager {
         const closest = directionMapping.reduce(
             (acc, item, i) => {
                 // const distance = this.getDistance(item, normVec);
-                
+
                 const dot = this.getDotProduct(item, normVec);
                 if (
                     // distance < acc.distance 
 
                     dot > acc.dot // TO-DO: TEST!
                     && this.getIsInBounds({
-                    i: currTile.i + tileIndexMapping[i].i,
-                    j: currTile.j + tileIndexMapping[i].j
-                })) {
+                        i: currTile.i + tileIndexMapping[i].i,
+                        j: currTile.j + tileIndexMapping[i].j
+                    })) {
                     return { i, coords: item, dot }
                 } else {
                     return acc;

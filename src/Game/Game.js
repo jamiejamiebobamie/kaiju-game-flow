@@ -388,7 +388,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     );
   });
 
-  // pieces event tick
+  // tiles event tick
   useInterval(() => {
     const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {};
     updateTileState({
