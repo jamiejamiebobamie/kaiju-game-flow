@@ -1,5 +1,3 @@
-
-
 export class GameBoardPieceAbility {
     constructor({
         accTime = 0,
@@ -19,12 +17,12 @@ export class GameBoardPieceAbility {
         accTime,
         piece,
         registerTimeout,
-        shootPower
+        updateTileWithAbilityStatus
     }) {
         // update accTime
         this.accTime = accTime;
         // activate teammate active ability
-        shootPower({
+        updateTileWithAbilityStatus({
             pieceIndex: piece.pieceIndex,
             appliedStatus: this.gameBoardPieceAbilityData.appliedStatus,
             accTime

@@ -8,10 +8,8 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
         this.isOnTiles = false;
 
         this.pieceClass = 'Kaiju!';
-        this.pieceClassDescription = 'They come from the sea, at night!';
+        this.pieceClassDescription = 'They come every night--from the sea!';
         this.elements = 'kaijuFire';
-
-        
     }
 
     useAbilities(accTime) {
@@ -20,7 +18,7 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
         const moveToTilesToEnemy = this.gameManagerProxy.getPathToClosestEnemy(this.pieceIndex);
         const numTilesToEnemy = moveToTilesToEnemy.length;
 
-        this.abilities.forEach((a, i) => {
+        this.abilities.forEach(a => {
             const isCooldownOver =
                 (((accTime - a.accTime) >= this.spewFireCoolDown) || (accTime < a.accTime));
 
@@ -31,9 +29,12 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
                     !!numTilesToEnemy &&
                     a.range >= numTilesToEnemy;
                 if (isOffensivePowerAndTargetInRange) {
-                    a.useAbility(
-                        // TO-DO: determine required data...
-                    );
+                    a.useAbility({
+                        accTime,
+                        piece: this,
+                        registerTimeout: this.gameManagerProxy.registerTimeout,
+                        updateTileWithAbilityStatus: this.gameManagerProxy.updateTileWithAbilityStatus
+                    });
                 }
             } else {
                 this.determineIfIsGoingToSpewFire(a, accTime);
@@ -42,11 +43,16 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
     }
 
     determineIfIsGoingToSpewFire(a, accTime) {
-        const { KAIJU_COOL_DOWN } = this.gameManagerProxy.determineKaijuDetailsFromDifficulty(difficulty);
+        const { KAIJU_COOL_DOWN } = this.gameManagerProxy.determineKaijuDetailsFromDifficulty();
 
         const showFireTime = a.accTime // last game time the fire was spewed
             + KAIJU_COOL_DOWN // a.cooldownTimeAI // fire spew cooldown (12 seconds)
             * 0.75; // show the fire after 3/4 of the cooldown time (9 seconds) 
-        _data[i].isGoingToSpewFire = !a.accTime || accTime > showFireTime;
+        this.isGoingToSpewFire = !a.accTime || accTime > showFireTime;
+    }
+
+    respawn(){
+        super.respawn();
+        this.initCharLocation(); // reset Kaiju position to off screen
     }
 }

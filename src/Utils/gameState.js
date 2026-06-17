@@ -15,8 +15,10 @@ export const Difficulty = Object.freeze({
 });
 
 export const GameMode = Object.freeze({
+  Tutorial: -1,
+  StoryPlusTutorial: 0,
   Story: 1,
-  Custom: 2,
+  Freeplay: 2,
 });
 
 export const Bounds = Object.freeze({

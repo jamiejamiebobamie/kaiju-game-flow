@@ -15,7 +15,8 @@ export class GameBoardTile {
         teamIndex = -1,
         dirs = [],
         dmgMultiplier = 1,
-        updateKey = 0
+        updateKey = 0,
+        gameManagerProxy
     }) {
 
         // CACHED ON INIT - - - - - - - -
@@ -50,6 +51,8 @@ export class GameBoardTile {
 
         // stored accTime of last tileStatus update
         this.updateKey = updateKey;
+
+        this.gameManagerProxy = gameManagerProxy;
     }
 
     updateIsVisible(isVisible) {
@@ -69,7 +72,8 @@ export class GameBoardTile {
     }
 
     getIsDmgTile(teamIndex) {
-        const dmg = this.tileStatus.getDmg();
+        if (!this.tileStatus) return 0;
+        const dmg = this.tileStatus.getDmgAmt();
         const isDmg = this.teamIndex != teamIndex && dmg > 0;
         const isHeal = this.teamIndex == teamIndex && dmg < 0;
         return isHeal || isDmg;
@@ -103,6 +107,11 @@ export class GameBoardTile {
 
     clearTileStatus() {
         this.tileStatus = undefined;
+
+        this.currCount = 0;
+        this.targetIndex = -1;
+        this.teamIndex = -1;
+        this.dirs = [];
     }
 
     getCurrCount() {
@@ -134,7 +143,7 @@ export class GameBoardTile {
     setClickedTile() { }
 
     getTileContenderFromTile({ currCount, newDirs }) {
-        const newContender = TileContender({
+        const newContender = new TileContender({
             tileStatus: this.tileStatus,
             currCount: currCount || Math.max(this.currCount - 1, 0), // SIDE EFFECT: decrement count
             targetIndex: this.targetIndex,
@@ -174,9 +183,9 @@ export class GameBoardTile {
         } else {
             if (winners.length > 1) {
                 // Pick random winner if more than one
-                i = getRandomIntInRange({ max: winners.length - 1 }); // TO-DO: import math helper class
+                i = this.gameManagerProxy.getRandomIntInRange({ max: winners.length - 1 });
             }
-            const winningAppliedStatus = winners[i];
+            const [winningAppliedStatus, _] = winners[i];
             const winningContender = this.contenders[winningAppliedStatus];
             this.updateTileStatus({ updateKey: this.updateKey, ...winningContender.getTileStatusValues() });
         }

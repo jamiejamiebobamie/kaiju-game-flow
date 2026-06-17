@@ -1,6 +1,5 @@
 export class Team {
     constructor({ teamLeaderIndex = 0, teamIndex=0, teammateIndices = [] }) {
-        this.props = props;
         this.teamIndex = teamIndex;
         this.teamLeaderIndex = teamLeaderIndex;
         this.teammateIndices = teammateIndices;
@@ -23,6 +22,10 @@ export class Team {
         if (!this.teammateIndices.some(i => i == pieceIndex))
             this.teammateIndices.push(pieceIndex);
         this.teamLeaderIndex = pieceIndex;
+    }
+
+    getTeamLeaderIndex(){
+        return this.teamLeaderIndex;
     }
 
     getTeamPiecesIndices(){

@@ -13,7 +13,8 @@ export class GameBoardPieceBase {
         isNpc = true,
         isDoAvoidEnemy = true,
         gameManagerProxy,
-        abilities=[]
+        abilities = [],
+        isOnTiles = true
     }) {
 
         this.gameManagerProxy = gameManagerProxy;
@@ -66,7 +67,7 @@ export class GameBoardPieceBase {
         this.shouldTeleport = false;
         this.isThere = true; // tracks if piece is at the next tile in moveToTiles array
         this.moveSpeed = moveSpeed;
-        this.isOnTiles = true;
+        this.isOnTiles = isOnTiles;
         this.charLocation = { x: 0, y: 0 };
         this.moveFromLocation = { x: 0, y: 0 };
         this.moveToLocation = { x: 0, y: 0 };
@@ -81,23 +82,55 @@ export class GameBoardPieceBase {
         this.enemyDistanceBias = 5; // in number of tiles.
     }
 
-    getLives(){
+    initCharLocation(isOnTiles = false) {
+        this.isOnTiles = isOnTiles;
+        if (isOnTiles) {
+            const tileIndex = this.gameManagerProxy.getRandomTileIndexOnBoard();
+            const charLocation = this.gameManagerProxy.getCharXAndYFromTileIndex(tileIndex);
+            this.charLocation = charLocation;
+            this.moveFromLocation = charLocation;
+            this.moveToLocation = charLocation;
+            this.moveToTiles = [];
+            this.isThere = true;
+            this.tileIndex = tileIndex;
+            this.dir = 'idle';
+        } else {
+            const { charLocation, tileIndex, dir } = this.gameManagerProxy.getMoveOntoGameBoardMovementData();
+            this.charLocation = charLocation;
+            this.moveFromLocation = charLocation;
+            this.moveToLocation = this.gameManagerProxy.getCharXAndYFromTileIndex(tileIndex);
+            this.moveToTiles = [tileIndex];
+            this.isThere = false;
+            this.tileIndex = tileIndex;
+            this.dir = dir;
+        }
+    }
+
+    getTileIndex() {
+        return this.tileIndex;
+    }
+
+    getPieceIndex() {
+        return this.pieceIndex;
+    }
+
+    getLives() {
         return this.lives;
     }
 
-    setAbilities(abilities){
+    setAbilities(abilities) {
         this.abilities = abilities;
     }
 
-    setIsTeamLeader(isTeamLeader){
+    setIsTeamLeader(isTeamLeader) {
         this.isTeamLeader = isTeamLeader;
     }
 
-    movePiece({ accTime, TimeoutHandler, PlayerInputHandler }) {
+    movePiece({ accTime, timeoutHandler, playerInputHandler }) {
         if (this.isDead) return;
 
         // intention: even the player can be Charmed and lose control for a moment of his piece....
-        if (this.isNpc) {
+        if (this.isNpc && this.isOnTiles) {
 
             const enemy = this.gameManagerProxy.getClosestEnemy(this.pieceIndex);
 
@@ -105,12 +138,12 @@ export class GameBoardPieceBase {
             if (!enemy) {
                 this.followLeader();
             } else {
-                this.moveWithEnemy();
+                this.moveWithEnemy(enemy);
             } // - - - - - - - - - - - -
 
-            this.useAbilities(accTime, TimeoutHandler);
-        } else {
-            handlePlayerInput(PlayerInputHandler);
+            this.useAbilities(accTime, timeoutHandler);
+        } else if (!this.isNpc) {
+            this.handlePlayerInput(playerInputHandler);
         }
 
         // TO-DO: ensure 'this.shouldTeleport' is only true 
@@ -250,7 +283,7 @@ export class GameBoardPieceBase {
     }
 
     useAbilities(accTime) {
-        let hasUsedOneAbility = getHasUsedOneAbility(accTime);
+        let hasUsedOneAbility = this.getHasUsedOneAbility(accTime);
 
         if (hasUsedOneAbility) return;
 
@@ -277,7 +310,7 @@ export class GameBoardPieceBase {
                         || isInDanger
                     );
                 const isHealPowerAndIsTeammateHealthLow =
-                    a.type.includes("heal") && isHealRequired;
+                    type.includes("heal") && isHealRequired;
 
                 if (
                     isOffensivePowerAndTargetInRange ||
@@ -288,12 +321,11 @@ export class GameBoardPieceBase {
 
                     hasUsedOneAbility = true;
 
-                    // TO-DO: determine required data...
                     this.storedPassive = a.useAbility({
                         accTime,
                         piece: this,
                         registerTimeout: this.gameManagerProxy.registerTimeout,
-                        shootPower: this.gameManagerProxy.shootPower
+                        updateTileWithAbilityStatus: this.gameManagerProxy.updateTileWithAbilityStatus
                     });
                 }
             }
@@ -304,9 +336,9 @@ export class GameBoardPieceBase {
         return this.abilities.some(v => (accTime - v.accTime) < this.abilityAccTimeInterval);
     }
 
-    moveWithEnemy() {
+    moveWithEnemy(enemy) {
         const idealDistance = this.getIdealDistanceFromEnemy();
-        const moveToTilesToEnemy = this.gameManagerProxy.getPathToClosestEnemy(this.pieceIndex);
+        const moveToTilesToEnemy = this.gameManagerProxy.getPathFromTileToTile({ fromTile: this.tileIndex, toTile: enemy.tileIndex });
 
         const isEnemyTooFar = moveToTilesToEnemy.length > idealDistance + this.enemyDistanceBias;
         const isEnemyTooClose = moveToTilesToEnemy.length < idealDistance;
@@ -338,7 +370,9 @@ export class GameBoardPieceBase {
     getIdealDistanceFromEnemy() {
         return !this.abilities.length || !this.abilities.some(({ isOnCooldown }) => !isOnCooldown) ?
             10 // default to 10 tiles (away from enemy) if all abilities are on cooldown
-            : this.abilities.reduce((acc, item) => acc + item.desiredAIRange, 0) / this.abilities.length;
+            : this.abilities
+                .filter(({ isOnCooldown }) => !isOnCooldown)
+                .reduce((acc, item) => acc + item.getDesiredAIRange(), 0) / this.abilities.length;
     }
 
     decrementHealth(accTime, dmg) {
@@ -376,7 +410,7 @@ export class GameBoardPieceBase {
                 before decrementing from health ("lives")
         */
         const remainingDmg = Math.max(dmg - this.livesModifier, 0);
-        _data[i].livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
+        this.livesModifier = remainingDmg < 0 ? remainingDmg * -1 : 0;
 
         /*
             ISSUE1: below code only works if dmg clears ALL livesModifier.
@@ -387,7 +421,7 @@ export class GameBoardPieceBase {
         */
 
         // ability gives: positive "livesModifier." clearTimeout as passive has been toggled-off by decrementing extra lives
-        const toggledOnPassives = this.abilities.filter(({ fieldToModify }) => fieldToModify == 'livesModifier' && modifierVal > 0 && !!isPassiveApplied);
+        const toggledOnPassives = this.abilities.filter(({ fieldToModify, modifierVal, isPassiveApplied }) => fieldToModify == 'livesModifier' && modifierVal > 0 && !!isPassiveApplied);
         toggledOnPassives.forEach(({ clearPassiveTimeout }) => clearPassiveTimeout());
 
         return remainingDmg;
@@ -411,19 +445,22 @@ export class GameBoardPieceBase {
         return this.moveToTiles.length;
     }
 
+    getTeamIndex() { return this.teamIndex; }
+
+
     // intended for 'Charm' ability - 
     setTeamIndex(index) { this.teamIndex = index; }
     setColor(color) { this.color = color; }
     // - - - - - - - - - - - - - - - -
 
-    getColor(){
+    getColor() {
         return this.color;
     }
 
     handleDeath() {
-        setIsDead();
-        spawnDeathPiece();
-        if (!this.isCharmed) {
+        this.setIsDead();
+        this.spawnDeathPiece();
+        if (!this.isCharmed) { // TO-DO: think about this...
             this.gameManagerProxy.updateScore(this.teamIndex);
         }
     }
@@ -446,7 +483,7 @@ export class GameBoardPieceBase {
         this.isDead = isDead;
     }
 
-    respawn(accTime){
+    respawn(accTime) {
         this.lives = this.maxLives;
         this.isDead = false;
         // TO-DO: remove dead game piece
@@ -464,7 +501,5 @@ export class GameBoardPieceBase {
         // reset active ability data
         this.lastDmgAccTime = accTime;
         this.shouldTeleport = false;
-
-        // TO-DO: override for Kaiju piece
     }
 }

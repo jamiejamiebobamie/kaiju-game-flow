@@ -1,6 +1,7 @@
 // FLYWEIGHT
 export class GameBoardTileStatusAndAbilityData {
     constructor({
+        appliedStatus, // string tile status, eg. "isWet", "isOnFire", etc.
         beats = {}, // status key lookup. tracks which statuses the current status wins against
         bounceCountResetVal = 0,
         isPersistent = true,
@@ -33,7 +34,6 @@ export class GameBoardTileStatusAndAbilityData {
         cooldownTimeAI,
         cooldownTimePlayer,
         passiveDurationTime,
-        appliedStatus, // string tile status, eg. "isWet", "isOnFire", etc.
         isTriggerPassiveImmediately = true,
         modifierVal = 0,
         fieldToModify = '',
@@ -173,7 +173,7 @@ export class GameBoardTileStatusAndAbilityData {
     }
 
     togglePassive(piece, toggleOff) {
-        modifyStats(piece, toggleOff);
+        this.modifyStats(piece, toggleOff);
     }
 
     modifyStats(piece, toggleOff) {
@@ -212,7 +212,7 @@ export class GameBoardTileStatusAndAbilityData {
         return [newDir];
     }
 
-    reflectDir() {
+    reflectDir(currDir) {
         const dirs = [
             "up",
             "up right",
@@ -240,17 +240,17 @@ export class GameBoardTileStatusAndAbilityData {
 
     // isRotating: [{ tickFrom: 1, tickTo: 7 }],
     getIsRotating(currCount) {
-        return this.isRotating.some(range => isInRange(range, currCount))
+        return this.isRotating.some(range => this.isInRange(range, currCount))
     }
 
     // isConserveDirections: [{ tickFrom: 0, tickTo: 20 }],
     getIsConserveDirections(currCount) {
-        return this.isConserveDirections.some(range => isInRange(range, currCount))
+        return this.isConserveDirections.some(range => this.isInRange(range, currCount))
     }
 
     // isTracking: [{ tickFrom: 8, tickTo: 25 }],
     getIsTracking(currCount) {
-        return this.isTracking.some(range => isInRange(range, currCount))
+        return this.isTracking.some(range => this.isInRange(range, currCount))
     }
 
     // isSpread: [{ tick: 1, area: 1 }], // example: at TICK 1, reduce directions to 1 tile. 

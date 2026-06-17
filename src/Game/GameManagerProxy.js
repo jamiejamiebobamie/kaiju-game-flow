@@ -1,15 +1,60 @@
+
+/*
+    centralized proxy class for calling functions from various delegate classes in GameManager.
+    some functions are dependent on the GameBoard boundaries and need to be updated in the proxy when the Bounds change
+*/
 export class GameManagerProxy {
     constructor(props) {
         this.props = props;
     }
 
-    // Call this when the game inits and when the Bounds change
+    // Call 'updateProps' when the Bounds change
     updateProps(props) {
         this.props = props;
     }
 
+    getFlattenedArrayIndex(tileIndex) {
+        return this.props.getFlattenedArrayIndex(tileIndex);
+    }
+
+    getPieceTileIndex(pieceIndex) {
+        return this.props.getPieceTileIndex(pieceIndex);
+    }
+
+    getMostDmgedTeammate() {
+        return this.props.getMostDmgedTeammate();
+    }
+
+    getPiece(pieceIndex) {
+        return this.props.getPiece(pieceIndex);
+    }
+
+    getPieceTeamIndex(pieceIndex) {
+        return this.props.getPieceTeamIndex(pieceIndex);
+    }
+
+    getOtherTeamsPieces(pieceIndex) {
+        return this.props.getOtherTeamsPieces(pieceIndex);
+    }
+
+    getTeamLeaderPiece(pieceIndex) {
+        return this.props.getTeamLeaderPiece(pieceIndex);
+    }
+
+    getAbilityAndTileStatusData() {
+        return this.props.getAbilityAndTileStatusData();
+    }
+
     getDmg(pieceIndex) {
         return this.props.getDmg(pieceIndex);
+    }
+
+    addPiece(accTime) {
+        return this.props.addPiece(accTime);
+
+    }
+    getTeamPieces(teamIndex) {
+        return this.props.getTeamPieces(teamIndex);
     }
 
     determineKaijuDetailsFromDifficulty() {
@@ -20,6 +65,10 @@ export class GameManagerProxy {
         return this.props.getPathToClosestEnemy(pieceIndex);
     }
 
+    getPathFromTileToTile({ fromTile, toTile }) {
+        return this.props.getPathFromTileToTile({ fromTile, toTile });
+    }
+
     getClosestEnemy(pieceIndex) {
         return this.props.getClosestEnemy(pieceIndex);
     }
@@ -28,18 +77,34 @@ export class GameManagerProxy {
         return this.props.getCharXAndYFromTileIndex(tileIndex);
     }
 
+    getRandomTileIndexOnBoard() {
+        return this.props.getRandomTileIndexOnBoard();
+    }
+
+    getMoveOntoGameBoardMovementData() {
+        return this.props.getMoveOntoGameBoardMovementData();
+    }
+
+    getAbilityAndTileStatusData(tileIndex) {
+        return this.props.getAbilityAndTileStatusData(tileIndex);
+    }
+
+    getKaijuAbilities(tileIndex) {
+        return this.props.getKaijuAbilities(tileIndex);
+    }
+
     moveTo({
         currentLocation,
         moveFromLocation,
         moveToLocation,
         moveSpeed
     }) {
-        const { newLocation, hasArrived } = this.props.moveTo(
+        const { newLocation, hasArrived } = this.props.moveTo({
             currentLocation,
             moveFromLocation,
             moveToLocation,
             moveSpeed
-        );
+        });
         return { newLocation, hasArrived };
     }
 
@@ -87,22 +152,22 @@ export class GameManagerProxy {
         return this.props.getDirFromTiles(fromTile, toTile)
     }
 
-    registerTimeout(accTime, callback, delay) {
+    registerTimeout = (accTime, callback, delay) => {
         const timeoutRef = this.props.registerTimeout(accTime, callback, delay);
         return timeoutRef;
     }
 
-    unregisterTimeout(timeoutRef) {
+    unregisterTimeout = (timeoutRef) => {
         this.props.unregisterTimeout(timeoutRef);
     }
 
-    shootPower({
+    updateTileWithAbilityStatus = ({
         pieceIndex,
         range,
         area,
         appliedStatus
-    }) {
-        this.props.shootPower({
+    }) => {
+        this.props.updateTileWithAbilityStatus({
             pieceIndex,
             range,
             area,
@@ -110,7 +175,7 @@ export class GameManagerProxy {
         });
     }
 
-    updateScore(teamIndex){
+    updateScore(teamIndex) {
         this.props.updateScore(teamIndex);
     }
 }

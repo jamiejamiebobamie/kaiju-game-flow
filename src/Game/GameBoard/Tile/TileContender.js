@@ -17,12 +17,12 @@ export class TileContender {
     }
 
     getKey(iterCount) {
-        // TO-DO: check 'compareLocale' is correct...
-        return `${this.tileStatus.getAppliedStatus()} ${this.currCount} ${this.targetIndex} ${this.teamIndex} ${this.dirs.length ? this.dirs.sort((a, b) => a.compareLocale(b)).join("") : '_'} ${iterCount}`
+        // TO-DO: check sort strings method 'compareLocale'...
+        return `${this.tileStatus.getAppliedStatus()} ${this.currCount} ${this.targetIndex} ${this.teamIndex} ${this.dirs.length ? this.dirs.sort((a, b) => a - b).join("") : '_'} ${iterCount}`
     }
 
     getTileStatus() {
-        return this.tileStatus();
+        return this.tileStatus;
     }
 
     getAppliedStatus() {

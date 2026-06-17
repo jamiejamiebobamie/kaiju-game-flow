@@ -1739,9 +1739,7 @@ export const movePlayerPieces = ({
 
                 const lives = _data[i].lives + _data[i].livesModifier;
 
-                console.log({ _data, i }, "isDead outside");
                 if (!_data[i].isDead && lives < 1) {
-                  console.log({ _data, i }, "isDead");
                   _data[i].isDead = true;
                   setPlayerKillCount(count => count + 1);
                 }

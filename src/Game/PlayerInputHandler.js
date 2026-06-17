@@ -77,7 +77,7 @@ export class PlayerInputHandler {
     }
 
     getIsCurrentPlayerInput() {
-        const isCurrentPlayerInput = !!this.pressedKeys.current.length
+        const isCurrentPlayerInput = !!this.pressedKeys.length
         return isCurrentPlayerInput;
     }
 
