@@ -14,12 +14,28 @@ export class GameManager {
         this.isPaused = false;
         this.tutorialIndex = 0;
         this.settingsManager = !!settingsManager ? settingsManager : new SettingsManager();
-        this.playerInputHandler = new PlayerInputHandler();
         this.timeoutHandler = new TimeoutHandler();
         this.gameManagerProxy = new GameManagerProxy();
+        this.playerInputHandler = new PlayerInputHandler({ gameManagerProxy: this.gameManagerProxy });
         this.gameBoardPiecesManager = new GameBoardPiecesManager({ gameManagerProxy: this.gameManagerProxy });
         this.gameBoardManager = new GameBoardManager({ gameManagerProxy: this.gameManagerProxy, scale });
         this.kaijuManager = new KaijuManager({ gameManagerProxy: this.gameManagerProxy });
+    }
+
+    getPlayerInputHandler() {
+        return this.playerInputHandler;
+    }
+
+    getTiles() {
+        return this.gameBoardManager.getTilesInFlatArray();
+    }
+
+    getPieceColorsLookup() {
+        return this.gameBoardPiecesManager.getPieceColorsLookup();
+    }
+
+    getPieces() {
+        return this.gameBoardPiecesManager.getPieces();
     }
 
     setScale(scale) {
@@ -52,10 +68,12 @@ export class GameManager {
         // - does player want a teammate?
         if (mandatoryTeammateGamemodes.includes(gameMode) || this.settingsManager.getIsTeammate()) {
             const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy';
-            const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
+            for (let i = 0; i < 10; i++) {
+                const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
 
-            // add teammate
-            this.gameBoardPiecesManager.addTeammate({ teammateAvatar, teammateAbilities });
+                // add teammate
+                this.gameBoardPiecesManager.addTeammate({ teammateAvatar, teammateAbilities });
+            }
         }
 
         // must be set before calling updateBounds
@@ -80,7 +98,7 @@ export class GameManager {
             this.kaijuManager.startKaijuSpawner(accTime);
     }
 
-    updateTileState(accTime){
+    updateTileState(accTime) {
         this.gameBoardManager.updateTileState(accTime);
     }
 
@@ -90,6 +108,11 @@ export class GameManager {
 
         const isOnlyOneTeamStillAlive = this.gameBoardPiecesManager.getIsAllLivingPiecesFromOneTeam();
         return isOnlyOneTeamStillAlive; // GAME OVER
+    }
+
+    testBounds(){
+        this.gameBoardManager.updateBounds({ newBounds: this.gameBoardManager.bounds == 2 ? 'Lookup' : 'Grid' });
+        this.gameBoardManager.initTiles();
     }
 
     updateScore = (teamIndex) => {
@@ -140,12 +163,18 @@ export class GameManager {
             getRandomTileIndexOnBoard: this.gameBoardManager.getRandomTileIndexOnBoard,
             getMoveOntoGameBoardMovementData: this.gameBoardManager.getMoveOntoGameBoardMovementData,
             moveTo: this.gameBoardManager.moveTo,
+            getIsHightlightedTiles: this.gameBoardManager.getIsHightlightedTiles(),
             getTileOffsetFromDir: this.gameBoardManager.getTileOffsetFromDir,
             getIsInBounds: this.gameBoardManager.getIsInBounds,
             getSafeTileIndex: this.gameBoardManager.getSafeTileIndex,
+            setHightlightedTiles: this.gameBoardManager.setHightlightedTiles,
             resetHightlightedTiles: this.gameBoardManager.resetHightlightedTiles,
             getIsPieceInDanger: this.gameBoardManager.getIsPieceInDanger,
             getIsTeamDamaged: this.gameBoardPiecesManager.getIsTeamDamaged,
+            getPlayerPiece: this.gameBoardPiecesManager.getPlayerPiece,
+            updatePlayerDestinationFromClick: this.playerInputHandler.updatePlayerDestinationFromClick,
+            updateHighlightedTilesFromPlayerHover: this.playerInputHandler.updateHighlightedTilesFromPlayerHover,
+            findPathFromTo: this.gameBoardManager.findPathFromTo,
             getPathToSafeTileAndAvoidEnemies: this.gameBoardManager.getPathToSafeTileAndAvoidEnemies,
             getPathToSafeTile: this.gameBoardManager.getPathToSafeTile,
             getPathToTeamLeader: this.gameBoardManager.getPathToTeamLeader,
@@ -160,7 +189,7 @@ export class GameManager {
             getTeamPieces: this.gameBoardPiecesManager.getTeamPieces,
             getPieceTeamIndex: this.gameBoardPiecesManager.getPieceTeamIndex,
             getOtherTeamsPieces: this.gameBoardPiecesManager.getOtherTeamsPieces,
-            getTeamLeaderPiece: this.gameBoardPiecesManager.getTeamLeaderPiece,
+            getTeamLeaderPiece: this.gameBoardPiecesManager.getTeamLeaderPiece
         });
     }
 

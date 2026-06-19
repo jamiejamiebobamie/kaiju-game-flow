@@ -178,4 +178,28 @@ export class GameManagerProxy {
     updateScore(teamIndex) {
         this.props.updateScore(teamIndex);
     }
+
+    findPathFromTo({ from, to, avoid }) {
+        return this.props.findPathFromTo(from, to, avoid);
+    }
+
+    getPlayerPiece() {
+        return this.props.getPlayerPiece();
+    }
+
+    updatePlayerDestinationFromClick(tileIndex) {
+        return this.props.updatePlayerDestinationFromClick(tileIndex);
+    }
+
+    updateHighlightedTilesFromPlayerHover(tileIndex) {
+        return this.props.updateHighlightedTilesFromPlayerHover(tileIndex);
+    }
+
+    getIsHightlightedTiles(){
+        this.props.getIsHightlightedTiles();
+    }
+    
+    setHightlightedTiles(moveToTiles) {
+        return this.props.setHightlightedTiles(moveToTiles);
+    }
 }

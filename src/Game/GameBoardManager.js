@@ -7,7 +7,7 @@ export class GameBoardManager {
         this.gameManagerProxy = gameManagerProxy;
         this.updateProxyProps = undefined;
         this.highlightedTiles = [];
-        this.tiles = [[]]; // per tile (unique 'i' and 'j') rendering and tile status info
+        this.tiles = []; // per tile (unique 'i' and 'j') rendering and tile status info
         this.numTileColumns = MAX_COLS;
         this.numTileRows = MAX_ROWS;
         this.isRenderTiles = true;
@@ -15,11 +15,49 @@ export class GameBoardManager {
         this.bounds = Bounds.Lookup;
         this.boundsLookup = PENINSULA_TILE_LOOKUP;
         this.scale = scale;
+        this.tilesLookupVals = []
+    }
+
+    initTiles() {
+        const tiles = [];
+        for (let i = 0; i < this.numTileColumns; i++) {
+            const row = []
+            for (let j = 0; j < this.numTileRows; j++) {
+                const tileIndex = { i, j };
+                const newTile = new GameBoardTile({
+                    tileIndex,
+                    isVisible: this.getIsInBounds(tileIndex),
+                    tileLocation: this.getTileXAndYFromTileIndex(tileIndex),
+                    zIndex: this.getFlattenedArrayIndex(tileIndex),
+                    scale: this.scale,
+                    gameManagerProxy: this.gameManagerProxy
+                })
+                row.push(newTile);
+            }
+            tiles.push(row);
+        }
+        this.tiles = tiles;
+    }
+
+    getNumTileColumns() {
+        return this.numTileColumns;
+    }
+
+    getTilesInFlatArray() {
+        return this.tiles.flat();
+    }
+
+    async getTilesIterator() {
+        for (let i = 0; i < this.numTileColumns; i++) {
+            for (let j = 0; j < this.numTileRows; j++) {
+                await this.tiles[i][j];
+            }
+        }
     }
 
     resetTiles() {
         this.highlightedTiles = [];
-        this.tile = [[]];
+        this.tiles = [];
     }
 
     setUpdateProxyProps(updateMethod) {
@@ -222,29 +260,36 @@ export class GameBoardManager {
         return i !== undefined && j !== undefined ? this.numTileRows * j + i : 0;
     };
 
+    getIsHightlightedTiles = () => {
+        return !this.highlightedTiles.length;
+    }
+
     resetHightlightedTiles = () => {
         this.highlightedTiles = [];
     }
 
-    initTiles() {
-        const tiles = [];
+    setHightlightedTiles = (tileIndices) => {
+        this.highlightedTiles = tileIndices;
+        console.log({ tileIndices, tiles: this.tiles });
+        const lookup = new Set()
+        tileIndices.forEach(({ i, j }) => lookup.add(`${i} ${j}`))
+        console.log({ lookup, tiles: this.tiles, highlightedTiles: this.highlightedTiles });
+        // TO-DO: try to make an iterator
+        // this.tiles = getTilesIterator().map(t => {
+        //     const { i, j } = t.tileIndex
+        //     if (lookup[`${i} ${j}`]) {
+        //         t.isHighlighted = true;
+        //     } else {
+        //         t.isHighlighted = false;
+        //     }
+        //     return t;
+        // })
+
         for (let i = 0; i < this.numTileColumns; i++) {
-            const row = []
             for (let j = 0; j < this.numTileRows; j++) {
-                const tileIndex = { i, j };
-                const newTile = new GameBoardTile({
-                    tileIndex,
-                    isVisible: this.getIsInBounds(tileIndex),
-                    tileLocation: this.getTileXAndYFromTileIndex(tileIndex),
-                    zIndex: this.getFlattenedArrayIndex(tileIndex),
-                    scale: this.scale,
-                    gameManagerProxy: this.gameManagerProxy
-                })
-                row.push(newTile);
+                this.tiles[i][j].isHighlighted = !!lookup[`${i} ${j}`];
             }
-            tiles.push(row);
         }
-        this.tiles = tiles;
     }
 
     /* "PRIVATE" METHOD... call 'updateBounds' */
@@ -257,19 +302,20 @@ export class GameBoardManager {
 
     updateBounds({ newBounds = '', lookup = PENINSULA_TILE_LOOKUP, rows = MAX_ROWS, columns = MAX_COLS }) {
         this.changeBounds({ newBounds, lookup, rows, columns });
+        this.tilesLookupVals = this.getLookupVals();
         this.updateProxyProps();
     }
 
     getIsInBounds = (tileIndex) => {
         if (this.bounds == Bounds.Grid) {
             // ASSUMES: (1) non-inclusive and (2) i = rows, j = columns... CONFIRM/TEST
-            return tileIndex.i < this.numTileRows && tileIndex.j < this.numTileColumns;
+            return tileIndex.i < this.numTileColumns && tileIndex.j < this.numTileRows;
         } else {
             return !!this.boundsLookup[`${tileIndex.i} ${tileIndex.j}`];
         }
     }
 
-    findPathFromTo(startIndex, goalIndex, /* and (optionally) avoid: */ enemyTiles = undefined) {
+    findPathFromTo = (startIndex, goalIndex, /* and (optionally) avoid: */ enemyTiles = undefined, isAlwaysAvoid = false) => {
         const recur = (currTileIndex, arr, count) => {
             if ((currTileIndex.i === goalIndex.i && currTileIndex.j === goalIndex.j) || count > 400)
                 return arr;
@@ -288,7 +334,7 @@ export class GameBoardManager {
                 });
 
                 // do not allow teammate to run through enemies (if possible...)
-                if (!!tilesWithEnemyTilesRemoved.length) {
+                if (isAlwaysAvoid || !!tilesWithEnemyTilesRemoved.length) {
                     adjacentTiles = tilesWithEnemyTilesRemoved;
                 }
             }
@@ -451,7 +497,9 @@ export class GameBoardManager {
     getPathToTeamLeader = (pieceIndex) => {
         const piece = this.gameManagerProxy.getPiece(pieceIndex);
         const leaderPiece = this.gameManagerProxy.getTeamLeaderPiece(pieceIndex);
-        const path = this.findPathFromTo(piece.getTileIndex(), leaderPiece.getTileIndex());
+        const teamPieces = this.gameManagerProxy.getTeamPieces(piece.teamIndex);
+        const isAlwaysAvoid = true;
+        const path = this.findPathFromTo(piece.getTileIndex(), leaderPiece.getTileIndex(), teamPieces, isAlwaysAvoid);
         return path;  // aka: 'moveToTiles'
     }
 
@@ -511,7 +559,7 @@ export class GameBoardManager {
         const avgLocation = { x: sumLocations.x / otherTeamsPieces.length, y: sumLocations.y / otherTeamsPieces.length };
 
         const teamIndex = this.gameManagerProxy.getPieceTeamIndex(pieceIndex);
-        const allTiles = this.getLookupVals();
+        const allTiles = this.tilesLookupVals;//this.getLookupVals();
         allTiles.forEach(tileIndex => {
             const currTileXY = this.getCharXAndYFromTileIndex(tileIndex);
             const testDist = getDistanceToFrom(currTileXY, avgLocation);
@@ -533,10 +581,14 @@ export class GameBoardManager {
         return safeTileObj.tileIndex;
     };
 
+    getGridLookupVals() {
+        const tileIndices = this.getTilesInFlatArray().map(({ tileIndex }) => tileIndex)
+        return tileIndices;
+    }
+
     getLookupVals() {
         if (this.bounds == Bounds.Grid) {
-            // TO-DO: make this work... check with Google...
-            const gridVals = [[]]//Array(this.numTileRows, this.numTileColumns).fill(0).map((_, i, j) => { i, j });
+            const gridVals = this.getGridLookupVals()
             return gridVals;
         } else if (this.boundsLookup == PENINSULA_TILE_LOOKUP) {
             return PENINSULA_TILE_LOOKUP_VALS;
@@ -584,7 +636,7 @@ export class GameBoardManager {
                 j: getRandomIntInRange({ max: this.numTileRows })
             };
         } else {
-            const tileIndices = this.getLookupVals(); // eg. [{ i: 0, j: 0 }, ...]
+            const tileIndices = this.tilesLookupVals;//this.getLookupVals(); // eg. [{ i: 0, j: 0 }, ...]
             const randomInt = getRandomIntInRange({ max: tileIndices.length - 1 });
             return tileIndices[randomInt];
         }

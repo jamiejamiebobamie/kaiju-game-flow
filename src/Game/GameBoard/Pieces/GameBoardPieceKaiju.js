@@ -6,6 +6,7 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
         this.isGoingToSpewFire = false;
         this.spewFireCoolDown = params.spewFireCoolDown;
         this.isOnTiles = false;
+        this.isShowHealthBarOnComponent = true;
 
         this.pieceClass = 'Kaiju!';
         this.pieceClassDescription = 'They come every night--from the sea!';

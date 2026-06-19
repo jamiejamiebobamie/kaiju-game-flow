@@ -1,7 +1,9 @@
 export class PlayerInputHandler {
-    constructor() {
+    constructor({ gameManagerProxy }) {
         this.pressedKeys = [];
         this.isMovementKeyInput = false;
+
+        this.gameManagerProxy = gameManagerProxy;
     }
 
     addKey(code) {
@@ -84,5 +86,29 @@ export class PlayerInputHandler {
     getIsChangeOfDirection(dir, tileIndex) {
         const isChangeOfDirection = dir != this.convertWasdDirToAnimationDir(this.getDirFromPlayerInput(tileIndex));
         return isChangeOfDirection;
+    }
+
+    updatePlayerDestinationFromClick(clickedTileIndex) {
+        if(!clickedTileIndex) return;
+        const player = this.gameManagerProxy.getPlayerPiece();
+        const playerTileIndex = player.getTileIndex();
+        const moveToTiles = this.gameManagerProxy.findPathFromTo({ from: playerTileIndex, to: clickedTileIndex });
+        player.updateMovmement(moveToTiles);
+    }
+
+    updateHighlightedTilesFromPlayerHover(hoveredTileIndex) {
+        const player = this.gameManagerProxy.getPlayerPiece();
+        if (!hoveredTileIndex) {
+            if (player.getIsMoving()) {
+                this.gameManagerProxy.setHightlightedTiles(player.getMoveToTiles());
+            }
+            else if (this.gameManagerProxy.getIsHightlightedTiles()) {
+                this.gameManagerProxy.resetHightlightedTiles();
+            }
+        } else {
+            const playerTileIndex = player.getTileIndex();
+            const moveToTiles = this.gameManagerProxy.findPathFromTo({ from: playerTileIndex, to: hoveredTileIndex });
+            this.gameManagerProxy.setHightlightedTiles(moveToTiles);
+        }
     }
 }

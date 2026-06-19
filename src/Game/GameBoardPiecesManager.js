@@ -11,9 +11,19 @@ export class GameBoardPiecesManager {
         this.gameManagerProxy = gameManagerProxy;
     }
 
+    
+    getPlayerPiece = () => {
+        const player = this.pieces[0];
+        return player;
+    }
+
     getPiece = (pieceIndex) => {
         const piece = this.pieces[pieceIndex];
         return piece;
+    }
+
+    getPieces() {
+        return this.pieces;
     }
 
     getMostDmgedTeammate(pieceIndex) {
@@ -178,7 +188,7 @@ export class GameBoardPiecesManager {
     }
     getPieceColorsLookup() {
         // create lookup of tileindex string: '0 1' to GamePiece color for 'redrawTiles' method
-        return this.pieces.reduce((lookup, piece) => {
+        return this.pieces.filter(p => p.isOnTiles && !p.isDead).reduce((lookup, piece) => {
             lookup[`${piece.tileIndex.i} ${piece.tileIndex.j}`] = piece.getColor();
             return lookup;
         }, {});

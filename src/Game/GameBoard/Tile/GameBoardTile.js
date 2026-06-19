@@ -1,4 +1,11 @@
 import { TileContender } from 'Game/GameBoard/Tile/TileContender';
+import {
+    TILE_DIRS,
+    TILE_DIR_NORM_VECS,
+    TILE_DIR_ROTATIONS_IN_DEGREES,
+    ICON_ROTATION_METHODS
+} from 'Utils/gameState';
+
 
 export class GameBoardTile {
     constructor({
@@ -53,6 +60,78 @@ export class GameBoardTile {
         this.updateKey = updateKey;
 
         this.gameManagerProxy = gameManagerProxy;
+    }
+
+    getAngleOfRotationFromTileDirs() {
+        const dirs = this.dirs;
+        const normVecs = dirs.map(d => {
+            const i = TILE_DIRS.indexOf(d)
+            if (i != -1) {
+                return TILE_DIR_NORM_VECS[i];
+            } else {
+                return null;
+            }
+        });
+        const accNormVec = normVecs.filter(v => !!v).reduce((acc, item) => {
+            acc.x += item.x;
+            acc.y += item.y;
+            return acc;
+        }, { x: 0, y: 0 });
+
+        const avgNormVec = { x: accNormVec.x / dirs.length, y: accNormVec.y / dirs.length };
+
+        // Math.cos(avgNormVec.x) // faster way to determine angle from norm vec: x/y?
+        // Math.sin(avgNormVec.y)
+        const indexOfClosestDir = TILE_DIR_NORM_VECS.reduce((acc, item, i) => {
+            const dot = (item.x * avgNormVec.x) + (item.y * avgNormVec.y) / 2
+            if (dot > acc.largestDot)
+                return { largestDot: dot, i };
+            return acc;
+        }, { largestDot: -1, i: -1 }).i;
+
+        if (indexOfClosestDir != -1)
+            return TILE_DIR_ROTATIONS_IN_DEGREES[indexOfClosestDir]
+        else
+            return 0;
+    };
+
+    getAppliedStatus() {
+        return this.tileStatus ? this.tileStatus.getAppliedStatus() : ''
+    }
+
+    getColor() {
+        return this.tileStatus ? this.tileStatus.getColor() : ''
+    }
+
+    getRotation() {
+        if (!!this.tileStatus) {
+            // each tile icon uses the dirs rotation in a different way (sometimes overwriting it)
+            const perIconRotation = ICON_ROTATION_METHODS[this.tileStatus.getRotationShift()]
+            const rotation = perIconRotation(this.getAngleOfRotationFromTileDirs());
+            return rotation;
+        }
+        return 0;
+    }
+
+    getRotationShift() {
+        return this.tileStatus ? this.tileStatus.getRotationShift() : ''
+    }
+
+    getActiveIcon() {
+        return this.tileStatus ? this.tileStatus.getActiveIcon() : ''
+    }
+
+    getIsVisible() {
+        return this.isVisible;
+    }
+
+    getIsHighlighted() {
+        return this.isHighlighted;
+    }
+
+    getZIndex() {
+        return this.zIndex;
+        // return this.gameManagerProxy.getFlattenedArrayIndex(this.tileIndex);
     }
 
     updateIsVisible(isVisible) {
@@ -140,7 +219,9 @@ export class GameBoardTile {
         this.targetIndex = targetIndex;
     }
 
-    setClickedTile() { }
+    setClickedTile() {
+        this.gameManagerProxy.updatePlayerDestinationFromClick(this.tileIndex);
+     }
 
     getTileContenderFromTile({ currCount, newDirs }) {
         const newContender = new TileContender({

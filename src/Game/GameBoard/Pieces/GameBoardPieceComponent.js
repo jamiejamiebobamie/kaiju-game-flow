@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.i`
-  display: ${props => (!props.isDead ? "flex" : "none")};
   position: absolute;
   ${props =>
     props.zIndex ? `z-index: ${props.zIndex + 20001}` : "z-index:20001"};
@@ -10,22 +9,77 @@ const Wrapper = styled.i`
   top: ${props => `${props.charLocation.y}px`};
   color: ${props => props.color};
   pointer-events: none;
+
+  display: ${props =>
+    props.charLocation.x < 0 ||
+      props.charLocation.x > 500 ||
+      props.charLocation.y < 0 ||
+      props.charLocation.y > 800
+      ? "none"
+      : props.isVisible ? "flex" : "none"};
+`;
+
+const HealthBarWrapper = styled.div`
+  display: ${props => (props.lives > 0 ? "flex" : "none")};
+  width: 40px;
+  justify-content: center;
+  margin-top: -70px;
+`;
+
+const Bar = styled.div`
+  display: ${props => (props.lives > 0 ? "flex" : "none")};
+  width: 7px;
+  height: 3px;
+  margin: 1px;
+  margin-top: -5px;
+  align-self: center;
+  border-radius: 3px;
+  border-style: solid;
+  border-width: thin;
+  background: linear-gradient(45deg, #d22b2b, #880808);
+  border-color: #880808;
+  pointer-events: none;
+  margin-top: -15px;
 `;
 
 const SpriteSheet = styled.div`
+  position: relative;
   pointer-events: none;
-  ${props =>
-    props.gender == "guy"
-      ? 'background: url("spritesheet/player.png");'
-      : 'background: url("spritesheet/teammate.png");'}
-  transform: scale(.4) translate(-130px, -165px);
+
+  ${props => `background: url(${props.spriteSheetSrc});`}
+  ${props => props.avatar == 'kaiju' ? `
+  transform: scale(0.4) translate(-169px, -169px);
+  height: 230.33px;
+  width: 180px;` : `
+    transform: scale(.4) translate(-130px, -165px);
   height: 200px;
   width: 152px;
+  ` } 
+
+
   ${props => `filter: drop-shadow(0 0 20px ${props.color});`}
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   -webkit-transition: -webkit-transform 3s ease-in-out;
   ${props => `animation: ${props.anim} 1s steps(10) infinite;`};
+
+
+    &::before {
+    content: "";
+    position: absolute;
+    height: 230.33px;
+    width: 180px;
+    pointer-events: none;
+
+    background: url("spritesheet/kaiju_sprite_FIRE1.png");
+    background-position: center;
+
+    ${props => `animation: ${props.anim} 1.25s steps(10) infinite;`};
+
+    opacity: ${props => (props.isGoingToSpewFire ? 1 : 0)};
+    transition: opacity 0.5s ease-in-out;
+  }
+
   @keyframes upRight {
     from {
       background-position-x: -152px;
@@ -147,6 +201,69 @@ const SpriteSheet = styled.div`
       background-position-y: 1100px;
     }
   }
+
+  
+  @keyframes upRightKaiju {
+    from {
+      background-position-x: 0px;
+      background-position-y: 0px;
+    }
+    to {
+      background-position-x: -1800px;
+      background-position-y: 0px;
+    }
+  }
+  @keyframes upKaiju  {
+    from {
+      background-position-x: 0px;
+      background-position-y: 230.33px;
+    }
+    to {
+      background-position-x: -1800px;
+      background-position-y: 230.33px;
+    }
+  }
+  @keyframes upLeftKaiju {
+    from {
+      background-position-x: 0px;
+      background-position-y: 460.66px;
+    }
+    to {
+      background-position-x: -1800px;
+      background-position-y: 460.66px;
+    }
+  }
+  @keyframes downLeftKaiju {
+    from {
+      background-position-x: 0px;
+      background-position-y: 691px;
+    }
+    to {
+      background-position-x: -1800px;
+      background-position-y: 691px;
+    }
+  }
+  @keyframes downKaiju {
+    from {
+      background-position-x: 0px;
+      background-position-y: 921.33px;
+    }
+    to {
+      background-position-x: -1800px;
+      background-position-y: 921.33px;
+    }
+  }
+  @keyframes downRightKaiju {
+    from {
+      background-position-x: 0px;
+      background-position-y: 1151.66px;
+    }
+    to {
+      background-position-x: -1800px;
+      background-position-y: 1151.66px;
+    }
+  }
+
 `;
 const Character = styled.div`
     margin-left: -20px;
@@ -228,16 +345,20 @@ const ModiferText = styled.p`
   }
 `;
 
-export const Player = ({
-  dir,
-  lives,
-  charLocation,
-  isDead,
-  isHealed,
-  isTeleported,
-  color,
+export const GameBoardPieceComponent = ({
   zIndex,
-  gender
+  charLocation,
+  avatar,
+  color,
+  isVisible,
+  isHealed,
+  isCharmed, // future feature...
+  isTeleported,
+  dir,
+  spriteSheetSrc,
+  lives,
+  isGoingToSpewFire,
+  isShowHealthBarOnComponent
 }) => {
   const [modifierText, setModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
@@ -247,7 +368,7 @@ export const Player = ({
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [anim, setAnim] = useState("down");
   useEffect(() => {
-    dir && setAnim(dir === "idle" ? `${dir}${anim}` : dir);
+    dir && setAnim(dir === "idle" ? `${dir}${anim}${avatar == 'kaiju' ? 'Kaiju' : ''}` : dir);
   }, [dir]);
   useEffect(() => {
     if (isFirstLoad) {
@@ -298,12 +419,23 @@ export const Player = ({
       }
     }
   }, [isTeleported]);
+
+  const bars = !isShowHealthBarOnComponent ? undefined : Array(lives).fill(0).map((_, i) => <Bar lives={lives} key={i} />)
   return (
-    <Wrapper zIndex={zIndex} isDead={isDead} charLocation={charLocation}>
+    <Wrapper zIndex={zIndex} isVisible={isVisible} charLocation={charLocation}>
       {modifierText}
+      <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <Character isDamaged={isDamaged}>
-        <SpriteSheet gender={gender} anim={anim} color={color} />
+        <SpriteSheet
+          avatar={avatar}
+          spriteSheetSrc={spriteSheetSrc}
+          isGoingToSpewFire={isGoingToSpewFire} // Kaiju-only
+          lives={lives}
+          anim={anim}
+          color={color}
+        />
       </Character>
     </Wrapper>
   );
 };
+

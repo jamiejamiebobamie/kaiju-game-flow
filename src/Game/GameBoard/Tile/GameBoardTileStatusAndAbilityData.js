@@ -100,7 +100,23 @@ export class GameBoardTileStatusAndAbilityData {
         this.fieldToModify = fieldToModify;
     }
 
-    getAppliedStatus(){
+    getColor(){
+        return this.color;
+    }
+
+    getRotationShift() {
+        return this.rotationShift;
+    }
+
+    getActiveIcon() {
+        return this.activeIcon;
+    }
+
+    getPassiveIcon() {
+        return this.passiveIcon;
+    }
+
+    getAppliedStatus() {
         return this.appliedStatus;
     }
 

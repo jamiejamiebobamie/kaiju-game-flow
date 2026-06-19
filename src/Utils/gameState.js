@@ -2466,6 +2466,19 @@ export const TILE_DIR_ROTATIONS_IN_DEGREES = [
   135, // up right
 ];
 
+export const ICON_ROTATION_METHODS = {
+  returnValue: v => v,
+  addNeg240: v => v - 240,
+  addNeg240AndRandRotByIJ: (v, _, __, ___, i, j) => v - 240 + (i % 2 ? -1 : 1) * j % 15,// + 60 * (updateKey % 2 === 0) ? -1 : 1;
+  shiver10: v => Math.random() * 10 * (Math.random() > .5 ? -1 : 1),// + 60 * (updateKey % 2 === 0) ? -1 : 1;
+  rotate360ByCount: (v, count, startCount) => v + (count / startCount) * 360,
+  rotate360ByUpdateKey: (v, _, __, updateKey) => updateKey % 360,
+  doNotRotate: _ => 0,
+  add180: v => v + 180
+}
+
+
+
 export const PIECES_INFO = {
   'guy': {
     color: "#55AAff",

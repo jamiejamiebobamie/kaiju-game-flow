@@ -90,7 +90,7 @@ export const Content = ({
   onClick,
   index,
   setHoverRef,
-  status,
+  // status,
   color,
   isTutorial,
   isVisible
@@ -104,10 +104,10 @@ export const Content = ({
         <Image
           ref={isTutorial ? setHoverRef(`${i} ${j} `) : undefined}
           onClick={isTutorial ? onClick : undefined}
-          isKaiju={status.isKaiju}
+          // isKaiju={status.isKaiju}
           isHighlighted0={isHighlighted0}
           selectedAvatar={selectedAvatar}
-          playerGender={status.playerGender}
+          // playerGender={status.playerGender}
           color={color}
           isVisible={isVisible}
         />

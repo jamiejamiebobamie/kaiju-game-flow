@@ -5,7 +5,7 @@ export class GameBoardPieceBase {
         avatar = 'guy',
         color = "#55AAff",
         maxLives = 4,
-        moveSpeed = 7,
+        moveSpeed = 13,//7,
         spriteSheetSrc = '',
         deadSpriteSrc = '',
         isVisible = true,
@@ -62,6 +62,7 @@ export class GameBoardPieceBase {
         this.isDead = false;
         this.lastDmgAccTime = 0; // in milliseconds
         this.lastDmgAccTimeInterval = 1000; // in milliseconds
+        this.isShowHealthBarOnComponent = false;
 
         // movement
         this.shouldTeleport = false;
@@ -73,13 +74,17 @@ export class GameBoardPieceBase {
         this.moveToLocation = { x: 0, y: 0 };
         this.moveToTiles = [];
         this.tileIndex = { i: 0, j: 0 };
-        this.followDistance = 3; // in number of tiles
+        this.followDistance = 3 + pieceIndex * 2; // in number of tiles
         this.isDoAvoidEnemy = isDoAvoidEnemy; // does NPC pathing avoid enemies
 
         /*
             Biases the piece to be closer (negative value) or farther away (positive value) from enemy
         */
         this.enemyDistanceBias = 5; // in number of tiles.
+    }
+
+    getZIndex() {
+        return this.gameManagerProxy.getFlattenedArrayIndex(this.tileIndex);
     }
 
     initCharLocation(isOnTiles = false) {
@@ -143,14 +148,16 @@ export class GameBoardPieceBase {
 
             this.useAbilities(accTime, timeoutHandler);
         } else if (!this.isNpc) {
-            this.handlePlayerInput(playerInputHandler);
+            // TO-DO: re-implement move with WASD
+
+            // this.handlePlayerInput(playerInputHandler);
         }
 
         // TO-DO: ensure 'this.shouldTeleport' is only true 
         // for the player if they have 'moveToTiles'.length
-        if (this.shouldTeleport) {
-            this.teleportPiece();
-        }
+        // if (this.shouldTeleport) {
+        //     this.teleportPiece();
+        // }
 
         // MOVE PIECE
         this.move();
@@ -158,7 +165,8 @@ export class GameBoardPieceBase {
         if (this.isThere && this.moveToTiles.length) {
             this.getNextDestination();
         } else {
-            this.stopMoving();
+            // TO-DO: fix this...
+            // this.stopMoving();
         }
 
         // includes Kaiju tiles and dmg status tiles (includes 'Heals', ie. negative dmg)
@@ -168,11 +176,21 @@ export class GameBoardPieceBase {
         }
     }
 
+    getIsMoving() {
+        return !this.isThere;
+    }
+
+    getMoveToTiles() {
+        return this.moveToTiles;
+    }
+
     getNextDestination() {
         const [nextTileIndex, ...tileIndices] = this.moveToTiles;
         const playerDirection = this.gameManagerProxy.getDirFromTiles(this.tileIndex, nextTileIndex);
         this.dir = playerDirection;
-
+        console.log('getNextDestination', { 
+            nextTileIndex, tileIndices
+         })
         // this.isThere = false;
         this.tileIndex = nextTileIndex;
         this.moveToTiles = tileIndices;
@@ -191,18 +209,18 @@ export class GameBoardPieceBase {
         this.isThere = hasArrived;
     }
 
-    handlePlayerInput(PlayerInputHandler) {
+    handlePlayerInput(playerInputHandler) {
 
         /*
             player ended input.
             wait for 'isThere' to be true; character is fully moved to the next tile.
             stop moving.
          */
-        if (this.isThere && PlayerInputHandler.getIsPastPlayerInput() && !PlayerInputHandler.getIsCurrentPlayerInput()) {
-            PlayerInputHandler.setIsPastPlayerInput(false);
+        if (this.isThere && playerInputHandler.getIsPastPlayerInput() && !playerInputHandler.getIsCurrentPlayerInput()) {
+            playerInputHandler.setIsPastPlayerInput(false);
             this.stopMoving();
-        } else if (PlayerInputHandler.getIsCurrentPlayerInput() && (!PlayerInputHandler.getIsPastPlayerInput() || PlayerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex))) {
-            PlayerInputHandler.setIsPastPlayerInput(true);
+        } else if (playerInputHandler.getIsCurrentPlayerInput() && (!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex))) {
+            playerInputHandler.setIsPastPlayerInput(true);
 
             const moveToTiles = [];
             let tileIndex, wasdDir;
@@ -211,7 +229,7 @@ export class GameBoardPieceBase {
             tileIndex = this.tileIndex;
 
             // direction for tile offset used in pathing
-            wasdDir = PlayerInputHandler.getDirFromPlayerInput(tileIndex);
+            wasdDir = playerInputHandler.getDirFromPlayerInput(tileIndex);
 
             let desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, tileIndex);
             let nextTileIndex = { i: tileIndex.i + desiredOffset.i, j: tileIndex.j + desiredOffset.j };
@@ -232,7 +250,7 @@ export class GameBoardPieceBase {
                 this.updateMovmement(moveToTiles);
 
                 // update animation direction
-                this.dir = PlayerInputHandler.convertWasdDirToAnimationDir(wasdDir);
+                this.dir = playerInputHandler.convertWasdDirToAnimationDir(wasdDir);
             } else {
                 // no valid tile
                 this.stopMoving();
