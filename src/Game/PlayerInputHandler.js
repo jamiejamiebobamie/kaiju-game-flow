@@ -8,10 +8,12 @@ export class PlayerInputHandler {
 
     addKey(code) {
         this.pressedKeys = !this.pressedKeys.includes(code) ? [...this.pressedKeys, code] : this.pressedKeys;
+        console.log('addKey', { code, pressedKeys: this.pressedKeys });
     }
 
     removeKey(code) {
         this.pressedKeys = this.pressedKeys.includes(code) ? this.pressedKeys.filter(k => k != code) : this.pressedKeys;
+        console.log('removeKey', { code, pressedKeys: this.pressedKeys });
     }
 
     getDirFromPlayerInput(tileIndex) {
@@ -62,6 +64,7 @@ export class PlayerInputHandler {
                 }
             }
         }
+        console.log({ keys });
         return dir;
     }
 
@@ -88,27 +91,15 @@ export class PlayerInputHandler {
         return isChangeOfDirection;
     }
 
-    updatePlayerDestinationFromClick(clickedTileIndex) {
-        if(!clickedTileIndex) return;
+    updatePlayerDestinationAndClickedTileFromClick(clickedTileIndex) {
+        if (!clickedTileIndex) return; // TO-DO: do I want to clear the clicked tile in this case?
+        this.gameManagerProxy.setClickedTileIndex(clickedTileIndex);
+        const { highlightedTileIndices } = this.gameManagerProxy.getHighlightedTiles();
         const player = this.gameManagerProxy.getPlayerPiece();
-        const playerTileIndex = player.getTileIndex();
-        const moveToTiles = this.gameManagerProxy.findPathFromTo({ from: playerTileIndex, to: clickedTileIndex });
-        player.updateMovmement(moveToTiles);
+        player.updateMovmement(highlightedTileIndices); // updates player's 'moveToTiles'
     }
 
-    updateHighlightedTilesFromPlayerHover(hoveredTileIndex) {
-        const player = this.gameManagerProxy.getPlayerPiece();
-        if (!hoveredTileIndex) {
-            if (player.getIsMoving()) {
-                this.gameManagerProxy.setHightlightedTiles(player.getMoveToTiles());
-            }
-            else if (this.gameManagerProxy.getIsHightlightedTiles()) {
-                this.gameManagerProxy.resetHightlightedTiles();
-            }
-        } else {
-            const playerTileIndex = player.getTileIndex();
-            const moveToTiles = this.gameManagerProxy.findPathFromTo({ from: playerTileIndex, to: hoveredTileIndex });
-            this.gameManagerProxy.setHightlightedTiles(moveToTiles);
-        }
+    updateHoveredTileFromPlayerHover(hoveredTileIndex) {
+        this.gameManagerProxy.setHoveredTileIndex(hoveredTileIndex);
     }
 }

@@ -66,15 +66,15 @@ export class GameManager {
             GameMode.Story
         ]
         // - does player want a teammate?
-        if (mandatoryTeammateGamemodes.includes(gameMode) || this.settingsManager.getIsTeammate()) {
-            const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy';
-            for (let i = 0; i < 10; i++) {
-                const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
+        // if (mandatoryTeammateGamemodes.includes(gameMode) || this.settingsManager.getIsTeammate()) {
+        //     const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy';
+        //     for (let i = 0; i < 10; i++) {
+        //         const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
 
-                // add teammate
-                this.gameBoardPiecesManager.addTeammate({ teammateAvatar, teammateAbilities });
-            }
-        }
+        //         // add teammate
+        //         this.gameBoardPiecesManager.addTeammate({ teammateAvatar, teammateAbilities });
+        //     }
+        // }
 
         // must be set before calling updateBounds
         this.gameBoardManager.setUpdateProxyProps(this.updateProxyProps);
@@ -163,17 +163,17 @@ export class GameManager {
             getRandomTileIndexOnBoard: this.gameBoardManager.getRandomTileIndexOnBoard,
             getMoveOntoGameBoardMovementData: this.gameBoardManager.getMoveOntoGameBoardMovementData,
             moveTo: this.gameBoardManager.moveTo,
-            getIsHightlightedTiles: this.gameBoardManager.getIsHightlightedTiles(),
             getTileOffsetFromDir: this.gameBoardManager.getTileOffsetFromDir,
             getIsInBounds: this.gameBoardManager.getIsInBounds,
             getSafeTileIndex: this.gameBoardManager.getSafeTileIndex,
-            setHightlightedTiles: this.gameBoardManager.setHightlightedTiles,
-            resetHightlightedTiles: this.gameBoardManager.resetHightlightedTiles,
+            getHighlightedTiles: this.gameBoardManager.getHighlightedTiles,
+            getClickedTileIndex: this.gameBoardManager.getClickedTileIndex,
+            getHoveredTileIndex: this.gameBoardManager.getHoveredTileIndex,
+            setClickedTileIndex: this.gameBoardManager.setClickedTileIndex,
+            setHoveredTileIndex: this.gameBoardManager.setHoveredTileIndex,
             getIsPieceInDanger: this.gameBoardManager.getIsPieceInDanger,
             getIsTeamDamaged: this.gameBoardPiecesManager.getIsTeamDamaged,
             getPlayerPiece: this.gameBoardPiecesManager.getPlayerPiece,
-            updatePlayerDestinationFromClick: this.playerInputHandler.updatePlayerDestinationFromClick,
-            updateHighlightedTilesFromPlayerHover: this.playerInputHandler.updateHighlightedTilesFromPlayerHover,
             findPathFromTo: this.gameBoardManager.findPathFromTo,
             getPathToSafeTileAndAvoidEnemies: this.gameBoardManager.getPathToSafeTileAndAvoidEnemies,
             getPathToSafeTile: this.gameBoardManager.getPathToSafeTile,

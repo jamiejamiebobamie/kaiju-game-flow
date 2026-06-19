@@ -261,15 +261,15 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       const gm = new GameManager({ scale });
       gameManager.current = gm;
       gameManager.current.initGame();
-      gameManager.current.startKaijuSpawner(0);
+      // gameManager.current.startKaijuSpawner(0);
       inputHandler.current = gameManager.current.getPlayerInputHandler();
     }
   }, [intervalTime]);
   // TESTING...
-  useInterval(() => {
-    gameManager.current.testBounds();
-    console.log({ gameManager: gameManager.current })
-  }, 10000);
+  // useInterval(() => {
+  //   gameManager.current.testBounds();
+  //   console.log({ gameManager: gameManager.current })
+  // }, 10000);
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -300,12 +300,11 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isCharacterDead: false });
 
   const keyDown = code => {
-    pressedKeys.current = !pressedKeys.current.includes(code) ? [...pressedKeys.current, code] : pressedKeys.current;
-    setHoverLookupString('');
+    inputHandler.current.addKey(code);
   }
 
   const keyUp = code => {
-    pressedKeys.current = pressedKeys.current.includes(code) ? pressedKeys.current.filter(k => k != code) : pressedKeys.current; // remove key
+    inputHandler.current.removeKey(code);
   }
 
   useKeyPress({
@@ -422,6 +421,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
 
     gameManager.current.updateTileState(accTime.current);
     const tiles = gameManager.current.getTiles();
+    // console.log({ tiles, highlighted: tiles.filter(tile => tile.getIsVisible() && tile.getIsHighlighted()) })
     setTiles(tiles);
 
     // redrawTiles({
@@ -450,8 +450,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     const piecesTilesColorLookup = gameManager.current.getPieceColorsLookup();
     setColorLookup(piecesTilesColorLookup);
     setPieces(pieces);
-
-    console.log({ pieces });
+    // console.log({ pieces });
 
     // movePlayerPieces({
     //   data: playerData,

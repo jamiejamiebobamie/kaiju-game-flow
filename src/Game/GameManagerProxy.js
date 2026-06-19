@@ -187,19 +187,27 @@ export class GameManagerProxy {
         return this.props.getPlayerPiece();
     }
 
-    updatePlayerDestinationFromClick(tileIndex) {
-        return this.props.updatePlayerDestinationFromClick(tileIndex);
-    }
-
-    updateHighlightedTilesFromPlayerHover(tileIndex) {
-        return this.props.updateHighlightedTilesFromPlayerHover(tileIndex);
-    }
-
-    getIsHightlightedTiles(){
+    getIsHightlightedTiles() {
         this.props.getIsHightlightedTiles();
     }
-    
-    setHightlightedTiles(moveToTiles) {
-        return this.props.setHightlightedTiles(moveToTiles);
+
+    getClickedTileIndex() {
+        return this.props.getClickedTileIndex();
+    }
+
+    setClickedTileIndex(clickedTileIndex) {
+        this.props.setClickedTileIndex(clickedTileIndex);
+    }
+
+    getHoveredTileIndex() {
+        return this.props.getHoveredTileIndex();
+    }
+
+    setHoveredTileIndex(hoveredTileIndex) {
+        this.props.setHoveredTileIndex(hoveredTileIndex);
+    }
+
+    getHighlightedTiles() {
+        return this.props.getHighlightedTiles();
     }
 }

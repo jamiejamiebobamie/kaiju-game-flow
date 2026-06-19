@@ -149,8 +149,7 @@ export class GameBoardPieceBase {
             this.useAbilities(accTime, timeoutHandler);
         } else if (!this.isNpc) {
             // TO-DO: re-implement move with WASD
-
-            // this.handlePlayerInput(playerInputHandler);
+            this.handlePlayerInput(playerInputHandler);
         }
 
         // TO-DO: ensure 'this.shouldTeleport' is only true 
@@ -188,9 +187,6 @@ export class GameBoardPieceBase {
         const [nextTileIndex, ...tileIndices] = this.moveToTiles;
         const playerDirection = this.gameManagerProxy.getDirFromTiles(this.tileIndex, nextTileIndex);
         this.dir = playerDirection;
-        console.log('getNextDestination', { 
-            nextTileIndex, tileIndices
-         })
         // this.isThere = false;
         this.tileIndex = nextTileIndex;
         this.moveToTiles = tileIndices;
@@ -231,26 +227,37 @@ export class GameBoardPieceBase {
             // direction for tile offset used in pathing
             wasdDir = playerInputHandler.getDirFromPlayerInput(tileIndex);
 
+            console.log({ bool: 
+                playerInputHandler.getIsCurrentPlayerInput() && (!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)),
+                getIsCurrentPlayerInput: playerInputHandler.getIsCurrentPlayerInput(),
+                partialBool:(!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)),
+                getIsPastPlayerInput: !playerInputHandler.getIsPastPlayerInput(),
+                getIsChangeOfDirection: playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex),
+                wasdDir, tileIndex, playerInputHandler })
             let desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, tileIndex);
             let nextTileIndex = { i: tileIndex.i + desiredOffset.i, j: tileIndex.j + desiredOffset.j };
             let isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
             if (isValid) {
+                moveToTiles.push(this.tileIndex);
                 moveToTiles.push(nextTileIndex);
-                while (isValid) {
-                    const lastTileIndex = moveToTiles[moveToTiles.length - 1];
-                    desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, lastTileIndex);
-                    nextTileIndex = { i: lastTileIndex.i + desiredOffset.i, j: lastTileIndex.j + desiredOffset.j };
-                    isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
-                    if (isValid) {
-                        moveToTiles.push(nextTileIndex);
-                    }
-                }
+                // while (isValid) {
+                //     const lastTileIndex = moveToTiles[moveToTiles.length - 1];
+                //     desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, lastTileIndex);
+                //     nextTileIndex = { i: lastTileIndex.i + desiredOffset.i, j: lastTileIndex.j + desiredOffset.j };
+                //     isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
+                //     console.log({ moveToTiles, isValid, nextTileIndex, desiredOffset, lastTileIndex });
+                //     if (isValid) {
+                //         moveToTiles.push(nextTileIndex);
+                //     }
+                // }
 
-                // set new movement path from WASD-arrow_key input
+                /*
+                 (1) set new movement path from WASD-arrow_key input
+                 (2) and update animation direction
+                */
                 this.updateMovmement(moveToTiles);
 
-                // update animation direction
-                this.dir = playerInputHandler.convertWasdDirToAnimationDir(wasdDir);
+
             } else {
                 // no valid tile
                 this.stopMoving();
@@ -259,10 +266,14 @@ export class GameBoardPieceBase {
     }
 
     updateMovmement(moveToTiles) {
+        if (!moveToTiles || !moveToTiles.length) return;
         this.moveToLocation = this.gameManagerProxy.getCharXAndYFromTileIndex(moveToTiles[0]) || this.moveToLocation;
         this.moveFromLocation = this.charLocation;
         this.moveToTiles = moveToTiles;
         this.isThere = false;
+
+        const playerDirection = this.gameManagerProxy.getDirFromTiles(this.tileIndex, moveToTiles[0]);
+        this.dir = playerDirection;
     }
 
     teleportPiece() {

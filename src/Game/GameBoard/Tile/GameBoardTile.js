@@ -146,7 +146,7 @@ export class GameBoardTile {
         this.scale = scale;
     }
 
-    updateIsHighlighted(isHighlighted) {
+    setIsHighlighted(isHighlighted) {
         this.isHighlighted = isHighlighted;
     }
 

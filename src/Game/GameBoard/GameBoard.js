@@ -204,12 +204,16 @@ export const GameBoard = ({
       onClick={e => {
         if (isPlayerDead) return;
         const tileIndex = getBoardTileIndexFromHtml(e, tiles);
-        inputHandler.updatePlayerDestinationFromClick(tileIndex);
+        inputHandler.updatePlayerDestinationAndClickedTileFromClick(tileIndex);
       }}
       onMouseMove={e => {
         if (isPlayerDead) return;
         const tileIndex = getBoardTileIndexFromHtml(e, tiles);
-        inputHandler.updateHighlightedTilesFromPlayerHover(tileIndex);
+        inputHandler.updateHoveredTileFromPlayerHover(tileIndex);
+      }}
+      onMouseOut={() => {
+        if (isPlayerDead) return;
+        inputHandler.updateHoveredTileFromPlayerHover(undefined);
       }}
       width={width}
       height={height}>

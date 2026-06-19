@@ -6,7 +6,8 @@ export class GameBoardManager {
     constructor({ scale, gameManagerProxy }) {
         this.gameManagerProxy = gameManagerProxy;
         this.updateProxyProps = undefined;
-        this.highlightedTiles = [];
+        this.clickedTileIndex = undefined;
+        this.hoveredTileIndex = undefined;
         this.tiles = []; // per tile (unique 'i' and 'j') rendering and tile status info
         this.numTileColumns = MAX_COLS;
         this.numTileRows = MAX_ROWS;
@@ -39,6 +40,22 @@ export class GameBoardManager {
         this.tiles = tiles;
     }
 
+    getClickedTileIndex = () => {
+        return this.clickedTileIndex;
+    }
+
+    getHoveredTileIndex = () => {
+        return this.hoveredTileIndex;
+    }
+
+    setClickedTileIndex = (clickedTileIndex) => {
+        this.clickedTileIndex = clickedTileIndex;
+    }
+
+    setHoveredTileIndex = (hoveredTileIndex) => {
+        this.hoveredTileIndex = hoveredTileIndex;
+    }
+
     getNumTileColumns() {
         return this.numTileColumns;
     }
@@ -56,7 +73,6 @@ export class GameBoardManager {
     }
 
     resetTiles() {
-        this.highlightedTiles = [];
         this.tiles = [];
     }
 
@@ -132,6 +148,8 @@ export class GameBoardManager {
             }
         }
 
+        const { lookup } = this.getHighlightedTiles();
+
         const checkedKeys = {};
         // A tile status is valid (and not an update bug) if it is present in a tile's 'contenders' lookup twice
         for (let i = 0; i < this.numTileColumns; i++) {
@@ -163,6 +181,10 @@ export class GameBoardManager {
                 }
 
                 tile.clearContenders();
+
+                // update player tile highlight from hovered or clicked tile
+                const isHighlighted = lookup.has(`${i} ${j}`);
+                this.tiles[i][j].setIsHighlighted(isHighlighted);
             }
         }
     }
@@ -260,36 +282,19 @@ export class GameBoardManager {
         return i !== undefined && j !== undefined ? this.numTileRows * j + i : 0;
     };
 
-    getIsHightlightedTiles = () => {
-        return !this.highlightedTiles.length;
-    }
-
-    resetHightlightedTiles = () => {
-        this.highlightedTiles = [];
-    }
-
-    setHightlightedTiles = (tileIndices) => {
-        this.highlightedTiles = tileIndices;
-        console.log({ tileIndices, tiles: this.tiles });
+    getHighlightedTiles = () => {
+        let highlightedTileIndices = [];
         const lookup = new Set()
-        tileIndices.forEach(({ i, j }) => lookup.add(`${i} ${j}`))
-        console.log({ lookup, tiles: this.tiles, highlightedTiles: this.highlightedTiles });
-        // TO-DO: try to make an iterator
-        // this.tiles = getTilesIterator().map(t => {
-        //     const { i, j } = t.tileIndex
-        //     if (lookup[`${i} ${j}`]) {
-        //         t.isHighlighted = true;
-        //     } else {
-        //         t.isHighlighted = false;
-        //     }
-        //     return t;
-        // })
 
-        for (let i = 0; i < this.numTileColumns; i++) {
-            for (let j = 0; j < this.numTileRows; j++) {
-                this.tiles[i][j].isHighlighted = !!lookup[`${i} ${j}`];
-            }
+        const toTileIndex = this.hoveredTileIndex || this.clickedTileIndex;
+        if (toTileIndex) {
+            const player = this.gameManagerProxy.getPlayerPiece();
+            const playerTileIndex = player.getTileIndex();
+            highlightedTileIndices = this.findPathFromTo(playerTileIndex, toTileIndex);
+            highlightedTileIndices.forEach(({ i, j }) => lookup.add(`${i} ${j}`));
         }
+
+        return { lookup, highlightedTileIndices };
     }
 
     /* "PRIVATE" METHOD... call 'updateBounds' */
