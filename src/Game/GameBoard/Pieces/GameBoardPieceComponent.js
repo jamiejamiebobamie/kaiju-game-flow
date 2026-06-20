@@ -24,6 +24,7 @@ const HealthBarWrapper = styled.div`
   width: 40px;
   justify-content: center;
   margin-top: -70px;
+  margin-left: -15px;
 `;
 
 const Bar = styled.div`
@@ -47,15 +48,11 @@ const SpriteSheet = styled.div`
   pointer-events: none;
 
   ${props => `background: url(${props.spriteSheetSrc});`}
-  ${props => props.avatar == 'kaiju' ? `
-  transform: scale(0.4) translate(-169px, -169px);
-  height: 230.33px;
-  width: 180px;` : `
-    transform: scale(.4) translate(-130px, -165px);
-  height: 200px;
-  width: 152px;
-  ` } 
 
+  ${props => props.avatar == 'kaiju' ?
+    `transform: scale(0.4) translate(-169px, -169px); height: 230.33px; width: 180px;`
+    : `transform: scale(.4) translate(-130px, -165px); height: 200px; width: 152px;`
+  }
 
   ${props => `filter: drop-shadow(0 0 20px ${props.color});`}
   -webkit-transition-duration: 0.4s;
@@ -368,7 +365,28 @@ export const GameBoardPieceComponent = ({
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [anim, setAnim] = useState("down");
   useEffect(() => {
-    dir && setAnim(dir === "idle" ? `${dir}${anim}${avatar == 'kaiju' ? 'Kaiju' : ''}` : dir);
+
+    if (dir) {
+      setAnim(
+
+        // handle 'idle' anim
+        dir == "idle" ?
+          avatar == 'kaiju' ?
+            'downKaiju' // <- default to 'downKaiju' as idle anim for Kaiju pieces
+            :
+            `${dir}${anim}` // <- prepend 'idle' to direction, eg. 'idledown'
+          :
+        // - - - - - - - - - - 
+
+        // handle move-in-direction anim
+          avatar == 'kaiju' ?
+            `${dir}Kaiju` // <- append '-Kaiju'
+            :
+            dir
+        // - - - - - - - - - - -
+
+      );
+    }
   }, [dir]);
   useEffect(() => {
     if (isFirstLoad) {

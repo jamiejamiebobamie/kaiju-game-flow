@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { PlayerUI } from "./PlayerUI/PlayerUI";
 import { BlinkFadeEffect } from 'Components/AvatarSelection';
-import { FloatingEffect } from 'Game/Game';
+import { FloatingEffect } from 'Game/ReactComponents/Game';
 
 const Wrapper = styled.div`
 ${props => props.percentZoom ? `transform: scale(${props.percentZoom}) translate(${(1 - props.percentZoom) * 200 - 2.4}px, 0px);` : ''} // -2.4 for border radius

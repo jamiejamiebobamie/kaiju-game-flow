@@ -15,7 +15,6 @@ const PopInEffect = styled.div`
   zindex: ${props => props.zIndex};
   ${props => !props.isTutorial && "pointer-events: none;"}
   ${props => !props.isVisible ? 'filter: drop-shadow(0 0 2px #80EF80);' : ''}
-
   transition: transform;
   transition-duration: 2s;
 `;

@@ -1,6 +1,6 @@
 import { Bounds, PERIMETER_TILES_VALS, PENINSULA_TILE_LOOKUP, PENINSULA_TILE_LOOKUP_VALS, MAX_ROWS, MAX_COLS } from 'Utils/gameState';
 import { getRandomIntInRange, getDistanceToFrom, getNormVecFromDestAndOrigin, getDotProduct } from 'Game/utils'
-import { GameBoardTile } from 'Game/GameBoard/Tile/GameBoardTile'
+import { GameBoardTile } from 'Game/DataClasses/GameBoard/Tile/GameBoardTile'
 
 export class GameBoardManager {
     constructor({ scale, gameManagerProxy }) {
@@ -50,6 +50,10 @@ export class GameBoardManager {
 
     setClickedTileIndex = (clickedTileIndex) => {
         this.clickedTileIndex = clickedTileIndex;
+    }
+
+    clearClickedTileIndex = () => {
+        this.clickedTileIndex = undefined;
     }
 
     setHoveredTileIndex = (hoveredTileIndex) => {
@@ -284,14 +288,22 @@ export class GameBoardManager {
 
     getHighlightedTiles = () => {
         let highlightedTileIndices = [];
-        const lookup = new Set()
+        const lookup = new Set();
+
+        const player = this.gameManagerProxy.getPlayerPiece();
+        const moveToTiles = player.getMoveToTiles();
 
         const toTileIndex = this.hoveredTileIndex || this.clickedTileIndex;
         if (toTileIndex) {
-            const player = this.gameManagerProxy.getPlayerPiece();
+            // show clicked or hovered path
             const playerTileIndex = player.getTileIndex();
             highlightedTileIndices = this.findPathFromTo(playerTileIndex, toTileIndex);
             highlightedTileIndices.forEach(({ i, j }) => lookup.add(`${i} ${j}`));
+        } else if (!!moveToTiles.length) {
+            // show next tile from move with <WASD/arrow> keys
+            const nextTile = moveToTiles[0];
+            highlightedTileIndices = [nextTile];
+            lookup.add(`${nextTile.i} ${nextTile.j}`)
         }
 
         return { lookup, highlightedTileIndices };
@@ -616,7 +628,8 @@ export class GameBoardManager {
 
         const charLocation = Math.random() > 0.5 ? { x: randIntX, y: min_Y } : { x: Math.random() > 0.5 ? min_X : max_X, y: randIntY };
         const tileIndex = this.getClosestPerimeterTileFromLocation(charLocation);
-        const dir = this.getDirFromNormVec(getNormVecFromDestAndOrigin(charLocation, this.getTileXAndYFromTileIndex(tileIndex)));
+        const destXY = this.getTileXAndYFromTileIndex(tileIndex);
+        const dir = this.getDirFromNormVec(getNormVecFromDestAndOrigin(destXY, charLocation));
 
         return {
             charLocation,

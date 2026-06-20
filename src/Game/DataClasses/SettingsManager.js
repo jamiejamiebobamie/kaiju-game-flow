@@ -1,6 +1,6 @@
 import { Difficulty, GameMode, TILE_STATUSES_AND_ABILITY_DATA } from 'Utils/gameState';
-import { GameBoardTileStatusAndAbilityData } from 'Game/GameBoard/Tile/GameBoardTileStatusAndAbilityData';
-import { GameBoardPieceAbility } from 'Game/GameBoardPieceAbility';
+import { GameBoardTileStatusAndAbilityData } from 'Game/DataClasses/GameBoard/Tile/GameBoardTileStatusAndAbilityData';
+import { GameBoardPieceAbility } from 'Game/DataClasses/GameBoard/Pieces/GameBoardPieceAbility';
 import { getRandomIntInRange } from 'Game/utils'
 
 /*

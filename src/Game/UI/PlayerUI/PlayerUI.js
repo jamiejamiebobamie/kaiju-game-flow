@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Abilities } from "./Components/Abilities";
 import { HealthBar } from "./Components/HealthBar";
 import { PassiveAbilities } from "./Components/PassiveAbilities";
-import { FloatingEffect } from 'Game/Game';
+import { FloatingEffect } from 'Game/ReactComponents/Game';
 import { BlinkFadeEffect } from 'Components/AvatarSelection';
 
 const Wrapper = styled.div`

@@ -1,7 +1,6 @@
 import { PIECES_INFO } from 'Utils/gameState';
-import { GameBoardPieceBase } from './GameBoard/Pieces/GameBoardPieceBase';
+import { GameBoardPieceBase } from './GameBoardPieceBase';
 import { Team } from './Team';
-import { getRandomIntInRange, getDistanceToFrom, getNormVecFromDestAndOrigin, getDotProduct } from 'Game/utils'
 
 export class GameBoardPiecesManager {
     constructor({ gameManagerProxy }) {

@@ -3,9 +3,9 @@ import { TimeoutHandler } from './TimeoutHandler';
 import { GameManagerProxy } from './GameManagerProxy';
 import { PlayerInputHandler } from './PlayerInputHandler';
 import { SettingsManager } from './SettingsManager';
-import { GameBoardPiecesManager } from './GameBoardPiecesManager';
+import { GameBoardPiecesManager } from './GameBoard/Pieces/GameBoardPiecesManager';
 import { KaijuManager } from './KaijuManager';
-import { GameBoardManager } from './GameBoardManager';
+import { GameBoardManager } from './GameBoard/GameBoardManager';
 
 export class GameManager {
     constructor({ scale, settingsManager }) {
@@ -66,15 +66,15 @@ export class GameManager {
             GameMode.Story
         ]
         // - does player want a teammate?
-        // if (mandatoryTeammateGamemodes.includes(gameMode) || this.settingsManager.getIsTeammate()) {
-        //     const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy';
-        //     for (let i = 0; i < 10; i++) {
-        //         const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
+        if (mandatoryTeammateGamemodes.includes(gameMode) || this.settingsManager.getIsTeammate()) {
+            const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy';
+            for (let i = 0; i < 3; i++) {
+                const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
 
-        //         // add teammate
-        //         this.gameBoardPiecesManager.addTeammate({ teammateAvatar, teammateAbilities });
-        //     }
-        // }
+                // add teammate
+                this.gameBoardPiecesManager.addTeammate({ teammateAvatar, teammateAbilities });
+            }
+        }
 
         // must be set before calling updateBounds
         this.gameBoardManager.setUpdateProxyProps(this.updateProxyProps);
@@ -177,6 +177,7 @@ export class GameManager {
             findPathFromTo: this.gameBoardManager.findPathFromTo,
             getPathToSafeTileAndAvoidEnemies: this.gameBoardManager.getPathToSafeTileAndAvoidEnemies,
             getPathToSafeTile: this.gameBoardManager.getPathToSafeTile,
+            clearClickedTileIndex: this.gameBoardManager.clearClickedTileIndex,
             getPathToTeamLeader: this.gameBoardManager.getPathToTeamLeader,
             getPathFromTileToTile: this.gameBoardManager.getPathFromTileToTile,
             spawnDeathPieceAtLocation: this.gameBoardPiecesManager.spawnDeathPieceAtLocation,
@@ -189,7 +190,7 @@ export class GameManager {
             getTeamPieces: this.gameBoardPiecesManager.getTeamPieces,
             getPieceTeamIndex: this.gameBoardPiecesManager.getPieceTeamIndex,
             getOtherTeamsPieces: this.gameBoardPiecesManager.getOtherTeamsPieces,
-            getTeamLeaderPiece: this.gameBoardPiecesManager.getTeamLeaderPiece
+            getTeamLeaderPiece: this.gameBoardPiecesManager.getTeamLeaderPiece,
         });
     }
 

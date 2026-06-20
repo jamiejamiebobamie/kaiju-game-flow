@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext } from "react";
 import { MainMenu } from "./MainMenu";
-import { Game } from "./Game/Game";
+import { Game } from "./Game/ReactComponents/Game";
 import { Tutorial } from "./Tutorial/Tutorial";
 import { Settings } from "./Settings/Settings";
 

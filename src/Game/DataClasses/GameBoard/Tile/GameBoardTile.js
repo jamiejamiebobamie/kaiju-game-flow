@@ -1,4 +1,4 @@
-import { TileContender } from 'Game/GameBoard/Tile/TileContender';
+import { TileContender } from 'Game/DataClasses/GameBoard/Tile/TileContender';
 import {
     TILE_DIRS,
     TILE_DIR_NORM_VECS,

@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
-import { Player } from "./Pieces/PlayerPiece";
 import { DeadPlayer } from "./Pieces/DeadPlayerPiece";
 import { ExplodingKaiju } from "./Pieces/ExplodingKaijuPiece";
-import { Kaiju } from "./Pieces/KaijuPiece";
 import { PauseModal } from "./PauseModal";
 import { GameMap } from "../../Components/GameMap.js";
-import { initializeGameBoard, getFlattenedArrayIndex, getDistance, redrawTiles } from "../../Utils/utils";
 import { GameBoardPieceComponent } from 'Game/GameBoard/Pieces/GameBoardPieceComponent'
 import { GameBoardTileComponent } from 'Game/GameBoard/Tile/GameBoardTileComponent';
 import { getDistanceToFrom } from 'Game/utils'

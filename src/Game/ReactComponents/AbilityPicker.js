@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Abilities } from "Tutorial/Components/Abilities";
-import { DescriptionDisplay } from "./UI/DescriptionDisplay";
+import { DescriptionDisplay } from "../UI/DescriptionDisplay";
 import {
   ButtonsWrapper,
   Button,
   ButtonOutline
-} from "../Components/StyledComponents";
+} from "../../Components/StyledComponents";
 
 const Wrapper = styled.div`
   display: flex;

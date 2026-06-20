@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import styled from "styled-components";
 import { GlobalSettingsContext } from "Home";
-import { GameBoard } from "./GameBoard/GameBoard";
-import { UI } from "./UI/UI";
+import { GameBoard } from "../GameBoard/GameBoard";
+import { UI } from "../UI/UI";
 import { AbilityPicker } from "./AbilityPicker";
 import {
   useInterval,
@@ -16,7 +16,7 @@ import {
 } from "Utils/utils";
 import { FullscreenPage } from "Components/FullscreenPage.js";
 import { HolographGridBackground } from "Game/UI/HolographGridBackground";
-import { GameManager } from './GameManager';
+import { GameManager } from '../DataClasses/GameManager';
 
 const Wrapper = styled.div`
   position: relative;
@@ -203,7 +203,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
 
   const { MAX_TO_WIN } = determineKaijuQuantity(selectedDifficulty);
 
-  const TURN_DELAY = 50;//110;//75;//50;
+  const TURN_DELAY = 1;//50;//110;//75;//50;
 
   // 100%, "normal size":
   const SCALE = 0.3;
@@ -261,7 +261,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       const gm = new GameManager({ scale });
       gameManager.current = gm;
       gameManager.current.initGame();
-      // gameManager.current.startKaijuSpawner(0);
+      gameManager.current.startKaijuSpawner(0);
       inputHandler.current = gameManager.current.getPlayerInputHandler();
     }
   }, [intervalTime]);
@@ -311,7 +311,8 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     keyCodes: ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"],
     keyDownCallback: keyDown,
     keyUpCallback: keyUp,
-    isCharacterDead: isPlayerDead
+    isCharacterDead: isPlayerDead,
+    dependencies: [inputHandler.current]
   });
 
   useEffect(() => {
@@ -406,50 +407,51 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     );
   });
 
-  // tiles event tick
-  useInterval(() => {
-    // const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {};
-    // updateTileState({
-    //   playerData,
-    //   kaijuData,
-    //   setDmgArray,
-    //   setTileStatuses,
-    //   scale,
-    //   gameTime: accTime.current,
-    //   teleportTile: { i: teleportTile.h_i, j: teleportTile.h_j }
-    // });
+  // // tiles event tick
+  // useInterval(() => {
+  //   // const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {};
+  //   // updateTileState({
+  //   //   playerData,
+  //   //   kaijuData,
+  //   //   setDmgArray,
+  //   //   setTileStatuses,
+  //   //   scale,
+  //   //   gameTime: accTime.current,
+  //   //   teleportTile: { i: teleportTile.h_i, j: teleportTile.h_j }
+  //   // });
 
-    gameManager.current.updateTileState(accTime.current);
-    const tiles = gameManager.current.getTiles();
-    // console.log({ tiles, highlighted: tiles.filter(tile => tile.getIsVisible() && tile.getIsHighlighted()) })
-    setTiles(tiles);
+  //   gameManager.current.updateTileState(accTime.current);
+  //   // const tiles = gameManager.current.getTiles();
+  //   // console.log({ tiles, highlighted: tiles.filter(tile => tile.getIsVisible() && tile.getIsHighlighted()) })
+  //   // setTiles(tiles);
 
-    // redrawTiles({
-    //   highlightedTiles0,
-    //   setClickedTile,
-    //   setTiles,
-    //   playerData,
-    //   kaijuData,
-    //   tileStatuses,
-    //   setTileStatuses,
-    //   scale,
-    //   rowLength: ROW_LENGTH,
-    //   colLength: COL_LENGTH,
-    //   rowOffset: ROW_OFFSET,
-    //   colOffset: COL_OFFSET,
-    //   isMap: true,//isRenderCityMap,
-    //   isRenderTiles: !isPaused,
-    // });
-  }, intervalTime + 50);
+  //   // redrawTiles({
+  //   //   highlightedTiles0,
+  //   //   setClickedTile,
+  //   //   setTiles,
+  //   //   playerData,
+  //   //   kaijuData,
+  //   //   tileStatuses,
+  //   //   setTileStatuses,
+  //   //   scale,
+  //   //   rowLength: ROW_LENGTH,
+  //   //   colLength: COL_LENGTH,
+  //   //   rowOffset: ROW_OFFSET,
+  //   //   colOffset: COL_OFFSET,
+  //   //   isMap: true,//isRenderCityMap,
+  //   //   isRenderTiles: !isPaused,
+  //   // });
+  // }, intervalTime + 50);
 
   // pieces event tick
   useInterval(() => {
+    gameManager.current.updateTileState(accTime.current);
 
     gameManager.current.movePieces(accTime.current);
-    const pieces = gameManager.current.getPieces();
-    const piecesTilesColorLookup = gameManager.current.getPieceColorsLookup();
-    setColorLookup(piecesTilesColorLookup);
-    setPieces(pieces);
+    // const pieces = gameManager.current.getPieces();
+    // const piecesTilesColorLookup = gameManager.current.getPieceColorsLookup();
+    // setColorLookup(piecesTilesColorLookup);
+    // setPieces(pieces);
     // console.log({ pieces });
 
     // movePlayerPieces({
@@ -567,9 +569,9 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           <GameWrapper width={width} height={height}>
             <GameBoard
               isPaused={isPaused}
-              pieces={pieces}
-              tiles={tiles}
-              colorLookup={colorLookup}
+              pieces={!!gameManager.current ? gameManager.current.getPieces():[]}//pieces}
+              tiles={!!gameManager.current ? gameManager.current.getTiles():[]}//tiles}
+              colorLookup={!!gameManager.current ? gameManager.current.getPieceColorsLookup():{}}//colorLookup}
               inputHandler={inputHandler.current}
               // playerData={playerData}
               // kaijuData={kaijuData}

@@ -1,5 +1,5 @@
 import { Difficulty, PIECES_INFO } from 'Utils/gameState';
-import { GameBoardPieceKaiju } from './GameBoard/Pieces/GameBoardPieceKaiju';
+import { GameBoardPieceKaiju } from 'Game/DataClasses/GameBoard/Pieces/GameBoardPieceKaiju'//'../GameBoard/Pieces/GameBoardPieceKaiju';
 
 export class KaijuManager {
     constructor({

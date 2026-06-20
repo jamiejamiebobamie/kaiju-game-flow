@@ -19,7 +19,7 @@ export class PlayerInputHandler {
     getDirFromPlayerInput(tileIndex) {
         const keys = this.pressedKeys;
 
-        if (this.pressedKeys.length) return 'idle';
+        if (!this.pressedKeys.length) return 'idle';
 
         const sortLookup = {
             "KeyW": 0, "KeyS": 1, "KeyA": 2, "KeyD": 3,
@@ -64,7 +64,6 @@ export class PlayerInputHandler {
                 }
             }
         }
-        console.log({ keys });
         return dir;
     }
 

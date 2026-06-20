@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Player } from "Game/GameBoard/Pieces/PlayerPiece";
-import { Kaiju } from "Game/GameBoard/Pieces/KaijuPiece";
+// import { Player } from "Game/GameBoard/Pieces/PlayerPiece";
+// import { Kaiju } from "Game/GameBoard/Pieces/KaijuPiece";
 import { ExplodingKaiju } from "Game/GameBoard/Pieces/ExplodingKaijuPiece";
 import { Abilities, TutorialAbilitiesWrapper } from "Game/UI/PlayerUI/Components/Abilities";
 import { getFlattenedArrayIndex } from "Utils/utils";
@@ -54,48 +54,48 @@ export const TutorialGameBoard = ({
       setClickedTile({ i: -1, j: -1 });
     }
   }, [clickedTile]);
-  const kaiju = kaijuData.map((k, i) => (
-    <Kaiju
-      key={k.key}
-      dir={k.dir}
-      charLocation={k.charLocation}
-      color={k.color}
-      scale={scale}
-      lives={k.lives}
-      zIndex={getFlattenedArrayIndex(k.tile)}
-      isGoingToSpewFire={k.isGoingToSpewFire}
-    />
-  ));
-  const players = playerData.map(p => (
-    <Player
-      key={p.i}
-      i={p.i}
-      charLocation={p.charLocation}
-      color={p.color}
-      scale={scale}
-      lives={p.lives}
-      isHealed={p.isHealed}
-      isTeleported={p.isTeleported}
-      dir={p.dir}
-      zIndex={getFlattenedArrayIndex(p.tile)}
-      gender={p.gender}
-    />
-  ));
-    const kaijuRemains = deadKaijuLocations.map(k => (
-      <ExplodingKaiju
-        key={k.key}
-        charLocation={k.charLocation}
-        color={k.color}
-        zIndex={getFlattenedArrayIndex(k.tile)}
-      />
-    ));
+  // const kaiju = kaijuData.map((k, i) => (
+  //   <Kaiju
+  //     key={k.key}
+  //     dir={k.dir}
+  //     charLocation={k.charLocation}
+  //     color={k.color}
+  //     scale={scale}
+  //     lives={k.lives}
+  //     zIndex={getFlattenedArrayIndex(k.tile)}
+  //     isGoingToSpewFire={k.isGoingToSpewFire}
+  //   />
+  // ));
+  // const players = playerData.map(p => (
+  //   <Player
+  //     key={p.i}
+  //     i={p.i}
+  //     charLocation={p.charLocation}
+  //     color={p.color}
+  //     scale={scale}
+  //     lives={p.lives}
+  //     isHealed={p.isHealed}
+  //     isTeleported={p.isTeleported}
+  //     dir={p.dir}
+  //     zIndex={getFlattenedArrayIndex(p.tile)}
+  //     gender={p.gender}
+  //   />
+  // ));
+  //   const kaijuRemains = deadKaijuLocations.map(k => (
+  //     <ExplodingKaiju
+  //       key={k.key}
+  //       charLocation={k.charLocation}
+  //       color={k.color}
+  //       zIndex={getFlattenedArrayIndex(k.tile)}
+  //     />
+  //   ));
   return (
     <Board width={width} height={height} marginTop={marginTop}>
       <PiecesWrapper scale={scale}>
-        {tiles}
+        {/* {tiles}
         {kaiju}
         {kaijuRemains}
-        {players}
+        {players} */}
       </PiecesWrapper>
       <TutorialAbilitiesWrapper>
         {playerData.length &&

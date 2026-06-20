@@ -210,4 +210,8 @@ export class GameManagerProxy {
     getHighlightedTiles() {
         return this.props.getHighlightedTiles();
     }
+
+    clearClickedTileIndex(){
+        this.props.clearClickedTileIndex();
+    }
 }

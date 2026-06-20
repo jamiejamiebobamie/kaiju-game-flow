@@ -5,7 +5,7 @@ export class GameBoardPieceBase {
         avatar = 'guy',
         color = "#55AAff",
         maxLives = 4,
-        moveSpeed = 13,//7,
+        moveSpeed = 7,
         spriteSheetSrc = '',
         deadSpriteSrc = '',
         isVisible = true,
@@ -83,6 +83,10 @@ export class GameBoardPieceBase {
         this.enemyDistanceBias = 5; // in number of tiles.
     }
 
+    getIsMoveToTiles() {
+        return !!this.moveToTiles.length;
+    }
+
     getZIndex() {
         return this.gameManagerProxy.getFlattenedArrayIndex(this.tileIndex);
     }
@@ -148,7 +152,7 @@ export class GameBoardPieceBase {
 
             this.useAbilities(accTime, timeoutHandler);
         } else if (!this.isNpc) {
-            // TO-DO: re-implement move with WASD
+            // TO-DO: re-implement move with WASD... movement is slowed until player presses another key and releases it while moving in desired direction
             this.handlePlayerInput(playerInputHandler);
         }
 
@@ -161,11 +165,12 @@ export class GameBoardPieceBase {
         // MOVE PIECE
         this.move();
 
-        if (this.isThere && this.moveToTiles.length) {
-            this.getNextDestination();
-        } else {
-            // TO-DO: fix this...
-            // this.stopMoving();
+        if (this.isThere) {
+            if (this.getIsMoveToTiles()) {
+                this.getNextDestination();
+            } else if (!this.getIsMoveToTiles()) {
+                this.stopMoving();
+            }
         }
 
         // includes Kaiju tiles and dmg status tiles (includes 'Heals', ie. negative dmg)
@@ -173,10 +178,6 @@ export class GameBoardPieceBase {
         if (!!dmg) {
             this.decrementHealth(accTime, dmg);
         }
-    }
-
-    getIsMoving() {
-        return !this.isThere;
     }
 
     getMoveToTiles() {
@@ -215,7 +216,17 @@ export class GameBoardPieceBase {
         if (this.isThere && playerInputHandler.getIsPastPlayerInput() && !playerInputHandler.getIsCurrentPlayerInput()) {
             playerInputHandler.setIsPastPlayerInput(false);
             this.stopMoving();
-        } else if (playerInputHandler.getIsCurrentPlayerInput() && (!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex))) {
+        } else if (
+
+            playerInputHandler.getIsCurrentPlayerInput()
+            && (
+                !playerInputHandler.getIsPastPlayerInput()
+                ||
+                playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)
+            )
+
+        ) {
+
             playerInputHandler.setIsPastPlayerInput(true);
 
             const moveToTiles = [];
@@ -227,36 +238,49 @@ export class GameBoardPieceBase {
             // direction for tile offset used in pathing
             wasdDir = playerInputHandler.getDirFromPlayerInput(tileIndex);
 
-            console.log({ bool: 
-                playerInputHandler.getIsCurrentPlayerInput() && (!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)),
-                getIsCurrentPlayerInput: playerInputHandler.getIsCurrentPlayerInput(),
-                partialBool:(!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)),
-                getIsPastPlayerInput: !playerInputHandler.getIsPastPlayerInput(),
-                getIsChangeOfDirection: playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex),
-                wasdDir, tileIndex, playerInputHandler })
             let desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, tileIndex);
             let nextTileIndex = { i: tileIndex.i + desiredOffset.i, j: tileIndex.j + desiredOffset.j };
             let isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
             if (isValid) {
-                moveToTiles.push(this.tileIndex);
                 moveToTiles.push(nextTileIndex);
-                // while (isValid) {
-                //     const lastTileIndex = moveToTiles[moveToTiles.length - 1];
-                //     desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, lastTileIndex);
-                //     nextTileIndex = { i: lastTileIndex.i + desiredOffset.i, j: lastTileIndex.j + desiredOffset.j };
-                //     isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
-                //     console.log({ moveToTiles, isValid, nextTileIndex, desiredOffset, lastTileIndex });
-                //     if (isValid) {
-                //         moveToTiles.push(nextTileIndex);
-                //     }
-                // }
-
+                while (isValid) {
+                    const lastTileIndex = moveToTiles[moveToTiles.length - 1];
+                    desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, lastTileIndex);
+                    nextTileIndex = { i: lastTileIndex.i + desiredOffset.i, j: lastTileIndex.j + desiredOffset.j };
+                    isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
+                    console.log({ moveToTiles, isValid, nextTileIndex, desiredOffset, lastTileIndex });
+                    if (isValid) {
+                        moveToTiles.push(nextTileIndex);
+                    }
+                }
+                this.gameManagerProxy.clearClickedTileIndex();
                 /*
                  (1) set new movement path from WASD-arrow_key input
                  (2) and update animation direction
                 */
                 this.updateMovmement(moveToTiles);
 
+                console.log({
+                    bool: (
+                        playerInputHandler.getIsCurrentPlayerInput()
+                        && (
+                            !playerInputHandler.getIsPastPlayerInput()
+                            ||
+                            playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)
+                        )
+                    ),
+                    getIsCurrentPlayerInput: playerInputHandler.getIsCurrentPlayerInput(),
+                    partialBool: (!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)),
+                    getIsPastPlayerInput: playerInputHandler.getIsPastPlayerInput(),
+                    getIsChangeOfDirection: playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex),
+                    wasdDir,
+                    tileIndex,
+                    playerInputHandler,
+                    moveToTiles,
+                    desiredOffset,
+                    nextTileIndex,
+                    isValid
+                });
 
             } else {
                 // no valid tile

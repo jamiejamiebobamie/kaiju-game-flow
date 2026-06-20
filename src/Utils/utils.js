@@ -16,7 +16,7 @@ import {
   TILE_DIR_ROTATIONS_IN_DEGREES,
   TILE_STATUSES
 } from "./gameState";
-import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
+// import { HexagonTile } from "../Game/GameBoard/Tile/HexagonTile";
 import { StyledIcon } from "Tutorial/Components/StyledComponents";
 import { Difficulty } from "Home";
 
@@ -483,21 +483,21 @@ export const redrawTiles = ({
           playerGender,
           isKaiju
         }
-        _tiles.push(
-          <HexagonTile
-            key={key}
-            isVisible={isRenderTiles && isVisible}
-            tileLocation={tileLocation}
-            rowLength={rowLength}
-            scale={scale}
-            i={i}
-            j={j}
-            setClickedIndex={isVisible ? setClickedTile : () => { }}
-            isHighlighted0={isVisible && !tileStatus.isTeleportTile && highlightedTiles0.some(
-              ({ h_i, h_j }) => h_i === i && h_j === j
-            )}
-            status={isVisible ? tileStatus : {}}
-          />
+        _tiles.push(<></>
+          // <HexagonTile
+          //   key={key}
+          //   isVisible={isRenderTiles && isVisible}
+          //   tileLocation={tileLocation}
+          //   rowLength={rowLength}
+          //   scale={scale}
+          //   i={i}
+          //   j={j}
+          //   setClickedIndex={isVisible ? setClickedTile : () => { }}
+          //   isHighlighted0={isVisible && !tileStatus.isTeleportTile && highlightedTiles0.some(
+          //     ({ h_i, h_j }) => h_i === i && h_j === j
+          //   )}
+          //   status={isVisible ? tileStatus : {}}
+          // />
         );
       }
     }
@@ -2163,7 +2163,7 @@ export const useHover = () => {
   }, [ref.current]);
   return [saveRef, value];
 };
-export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isCharacterDead }) => {
+export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isCharacterDead, dependencies=[] }) => {
   useEffect(() => {
     const handler = ({ code, repeat }, callback) => {
       // Exit immediately if the key is just being held down
@@ -2181,7 +2181,7 @@ export const useKeyPress = ({ keyCodes, keyDownCallback, keyUpCallback, isCharac
       keyDownCallback && window.removeEventListener("keydown", isCharacterDead ? () => { } : e => handler(e, keyDownCallback));
       keyUpCallback && window.removeEventListener("keyup", isCharacterDead ? () => { } : e => handler(e, keyUpCallback));
     };
-  }, [isCharacterDead]);
+  }, [isCharacterDead, ...dependencies]);
 };
 const getRandomTileOnBoard = (scale, isTutorial) => {
   if (isTutorial) {
