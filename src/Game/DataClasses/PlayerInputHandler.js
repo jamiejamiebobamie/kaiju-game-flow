@@ -8,12 +8,12 @@ export class PlayerInputHandler {
 
     addKey(code) {
         this.pressedKeys = !this.pressedKeys.includes(code) ? [...this.pressedKeys, code] : this.pressedKeys;
-        console.log('addKey', { code, pressedKeys: this.pressedKeys });
+        // console.log('addKey', { code, pressedKeys: this.pressedKeys });
     }
 
     removeKey(code) {
         this.pressedKeys = this.pressedKeys.includes(code) ? this.pressedKeys.filter(k => k != code) : this.pressedKeys;
-        console.log('removeKey', { code, pressedKeys: this.pressedKeys });
+        // console.log('removeKey', { code, pressedKeys: this.pressedKeys });
     }
 
     getDirFromPlayerInput(tileIndex) {

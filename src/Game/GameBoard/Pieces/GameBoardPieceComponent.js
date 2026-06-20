@@ -71,7 +71,7 @@ const SpriteSheet = styled.div`
     background: url("spritesheet/kaiju_sprite_FIRE1.png");
     background-position: center;
 
-    ${props => `animation: ${props.anim} 1.25s steps(10) infinite;`};
+    ${props => `animation: ${props.anim} 1s steps(10) infinite;`};
 
     opacity: ${props => (props.isGoingToSpewFire ? 1 : 0)};
     transition: opacity 0.5s ease-in-out;

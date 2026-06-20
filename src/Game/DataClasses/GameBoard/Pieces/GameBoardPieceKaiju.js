@@ -9,7 +9,7 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
         this.isShowHealthBarOnComponent = true;
 
         this.pieceClass = 'Kaiju!';
-        this.pieceClassDescription = 'They come every night--from the sea!';
+        this.pieceClassDescription = 'They come every night from the sea!';
         this.elements = 'kaijuFire';
     }
 
@@ -44,7 +44,7 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
     }
 
     determineIfIsGoingToSpewFire(a, accTime) {
-        const { KAIJU_COOL_DOWN } = this.gameManagerProxy.determineKaijuDetailsFromDifficulty();
+        const { KAIJU_COOL_DOWN } = this.gameManagerProxy.determineKaijuDetails();
 
         const showFireTime = a.accTime // last game time the fire was spewed
             + KAIJU_COOL_DOWN // a.cooldownTimeAI // fire spew cooldown (12 seconds)
@@ -52,8 +52,14 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
         this.isGoingToSpewFire = !a.accTime || accTime > showFireTime;
     }
 
-    respawn(){
+    respawn() {
         super.respawn();
         this.initCharLocation(); // reset Kaiju position to off screen
+    }
+
+    moveWithEnemy(enemy) {
+        const moveToTilesToEnemy = this.gameManagerProxy.getPathFromTileToTile({ fromTile: this.tileIndex, toTile: enemy.tileIndex });
+        // run directly into enemy (Kaiju-behavior)
+        this.setMoveToTilesGivenIdealDistanceFromEnemy(moveToTilesToEnemy, 0);
     }
 }

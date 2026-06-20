@@ -157,9 +157,6 @@ const RotateInPlaceEffect = styled.div`
   ${props => !!props.styles && props.styles}
 `;
 
-
-
-
 const SwoopOutEffect = styled.div`
   position: absolute;
   ${props => !!props.styles && props.styles}
@@ -215,21 +212,20 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const width = WIDTH * percentZoom;
   const height = HEIGHT * percentZoom;
 
-  const [isPaused, setIsPaused] = useState(false);
-
-  // units = tiles
-  const ROW_OFFSET = 0;//isPaused ? 5 : 0;
-  const ROW_LENGTH = 36;//(isPaused ? 15 : 36) - ROW_OFFSET;
-
-  const COL_OFFSET = 0;//isPaused ? 3 : 0;
-  const COL_LENGTH = 24;//(isPaused ? 20 : 24) - COL_OFFSET;
-  // - - - - - - -
-
+  // const [isPaused, setIsPaused] = useState(false);
   const gameManager = useRef();
   const inputHandler = useRef();
+  const { settingsManager } = useContext(GlobalSettingsContext);
+
+  // const isPaused = !gameManager.current ? true : gameManager.current.getIsPaused();
 
   const accTime = useRef(0);
-  const [pieces, setPieces] = useState([])
+  const [isPaused, setIsPaused] = useState(false);
+
+  const [pieces, setPieces] = useState([]);
+  const [tiles, setTiles] = useState([]);
+  const [colorLookup, setColorLookup] = useState({});
+
   const [isTeammate, setIsTeammate] = useState(true);
   const [pickedAbilities, setPickedAbilities] = useState([]);
   const [isPlayingGame, setIsPlayingGame] = useState(false);
@@ -242,23 +238,18 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [kaijuData, setKaijuData] = useState([]);
   const [clickedTile, setClickedTile] = useState({ i: -1, j: -1 });
   const [highlightedTiles0, setHighlightedTiles0] = useState([]);
-  const [tiles, setTiles] = useState([]);
   const [playerMoveToTiles, setPlayerMoveToTiles] = useState(null);
   const [tileStatuses, setTileStatuses] = useState(null);
   const [hoverLookupString, setHoverLookupString] = useState('');
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
-  const [deadKaijuLocations, setDeadKaijuLocations] = useState([]);
   const [fullScreenPageData, setFullScreenPageData] = useState(DEFAULT_FULLSCREEN_PAGE_DATA);
   const [isPlayerDead, setIsPlayerDead] = useState(false);
-  const [keysPressed, setKeysPressed] = useState([]);
-  const isEndKeyPress = useRef(true);
   const pressedKeys = useRef([]);
-  const [colorLookup, setColorLookup] = useState({});
 
   useEffect(() => {
     if (intervalTime) {
-      const gm = new GameManager({ scale });
+      const gm = new GameManager({ scale, settingsManager });
       gameManager.current = gm;
       gameManager.current.initGame();
       gameManager.current.startKaijuSpawner(0);
@@ -266,16 +257,16 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     }
   }, [intervalTime]);
   // TESTING...
-  // useInterval(() => {
-  //   gameManager.current.testBounds();
-  //   console.log({ gameManager: gameManager.current })
-  // }, 10000);
+  useInterval(() => {
+    // gameManager.current.testBounds();
+    console.log({ gameManager: gameManager.current, isPaused })
+  }, 5000);
 
   const resetState = () => {
     setPickedAbilities([]);
     setIsPlayingGame(false);
     setWinner(null);
-    setIsPaused(false);
+    // setIsPaused(false);
     setDmgArray([]);
     setKaijuKillCount([]);
     setPlayerData([]);
@@ -290,11 +281,13 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setPath(null);
     setIntervalTime(null);
     setFullScreenPageData(DEFAULT_FULLSCREEN_PAGE_DATA);
-    setDeadKaijuLocations([]);
   };
   const handleClickPause = () => {
-    setIsPaused(_isPaused => !_isPaused);
-    setIntervalTime(_intervalTime => (_intervalTime === null ? TURN_DELAY : null));
+    // console.log("before", { gameManager, isPaused: gameManager.current.getIsPaused() });
+    gameManager.current.togglePauseGame();
+    // console.log("after", { gameManager, isPaused: gameManager.current.getIsPaused() });
+    setIsPaused(gameManager.current.getIsPaused());
+    // setIntervalTime(_intervalTime => (_intervalTime === null ? TURN_DELAY : null));
   };
 
   useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isCharacterDead: false });
@@ -334,24 +327,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   }, [kaijuKillCount, playerKillCount, MAX_TO_WIN]);
 
   useEffect(() => {
-    if (playerMoveToTiles !== null) {
-      setPlayerData(_playerData =>
-        _playerData.map((p, i) => {
-          if (i === 0) {
-            return {
-              ...p,
-              moveToTiles: playerMoveToTiles
-            };
-          } else {
-            return p;
-          }
-        })
-      );
-    }
-    setPlayerMoveToTiles(null);
-  }, [playerMoveToTiles]);
-
-  useEffect(() => {
     if (winner !== null && !fullScreenPageData) {
       let text, buttons, image = undefined;
       switch (winner) {
@@ -389,111 +364,22 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     }
   }, [kaijuData, winner, isPlayingGame]);
 
-  const resetHightlightedTiles = () => {
-    setHoverLookupString('');
-    setHighlightedTiles0([]);
-    setPath([]);
-  }
-
-  useInterval(() => {
-    updateHighlightedTiles(
-      setHighlightedTiles0,
-      playerData,
-      hoverLookupString,
-      path,
-      setPath,
-      scale,
-      0
-    );
-  });
-
-  // // tiles event tick
-  // useInterval(() => {
-  //   // const teleportTile = !!highlightedTiles0 && !!highlightedTiles0.length && !!teleportData && teleportData.includes(0) ? highlightedTiles0[highlightedTiles0.length - 1] : {};
-  //   // updateTileState({
-  //   //   playerData,
-  //   //   kaijuData,
-  //   //   setDmgArray,
-  //   //   setTileStatuses,
-  //   //   scale,
-  //   //   gameTime: accTime.current,
-  //   //   teleportTile: { i: teleportTile.h_i, j: teleportTile.h_j }
-  //   // });
-
-  //   gameManager.current.updateTileState(accTime.current);
-  //   // const tiles = gameManager.current.getTiles();
-  //   // console.log({ tiles, highlighted: tiles.filter(tile => tile.getIsVisible() && tile.getIsHighlighted()) })
-  //   // setTiles(tiles);
-
-  //   // redrawTiles({
-  //   //   highlightedTiles0,
-  //   //   setClickedTile,
-  //   //   setTiles,
-  //   //   playerData,
-  //   //   kaijuData,
-  //   //   tileStatuses,
-  //   //   setTileStatuses,
-  //   //   scale,
-  //   //   rowLength: ROW_LENGTH,
-  //   //   colLength: COL_LENGTH,
-  //   //   rowOffset: ROW_OFFSET,
-  //   //   colOffset: COL_OFFSET,
-  //   //   isMap: true,//isRenderCityMap,
-  //   //   isRenderTiles: !isPaused,
-  //   // });
-  // }, intervalTime + 50);
-
-  // pieces event tick
+  // event tick
   useInterval(() => {
     gameManager.current.updateTileState(accTime.current);
-
+    const tiles = gameManager.current.getTiles();
+    setTiles(tiles);
     gameManager.current.movePieces(accTime.current);
-    // const pieces = gameManager.current.getPieces();
-    // const piecesTilesColorLookup = gameManager.current.getPieceColorsLookup();
-    // setColorLookup(piecesTilesColorLookup);
-    // setPieces(pieces);
+    const pieces = gameManager.current.getPieces();
+    const piecesTilesColorLookup = gameManager.current.getPieceColorsLookup();
+    setColorLookup(piecesTilesColorLookup);
+    setPieces(pieces);
     // console.log({ pieces });
 
-    // movePlayerPieces({
-    //   data: playerData,
-    //   setData: setPlayerData,
-    //   tileStatuses,
-    //   setTileStatuses,
-    //   scale,
-    //   accTime: accTime.current,
-    //   enemyData: kaijuData,
-    //   dmgArray,
-    //   setPlayerKillCount,
-    //   teleportData,
-    //   setTeleportData,
-    //   isTutorial: false,
-    //   resetHightlightedTiles,
-    //   pressedKeys
-    // });
-    // const gameTime = accTime.current;
-    // if (gameTime > 3000) // delay Kaiju spawning at start
-    //   moveKaijuPieces({
-    //     data: kaijuData,
-    //     setData: setKaijuData,
-    //     tileStatuses,
-    //     setTileStatuses,
-    //     scale: scale,
-    //     accTime: accTime.current,
-    //     enemyData: playerData,
-    //     setEnemyData: setPlayerData,
-    //     dmgArray: dmgArray,
-    //     kaijuKillCount,
-    //     setKaijuKillCount,
-    //     isTutorial: false,
-    //     winner: winner,
-    //     setDeadKaijuLocations,
-    //     difficulty: selectedDifficulty,
-    //     TURN_DELAY
-    //   });
     // update accumulated time.
-    accTime.current =
+    accTime.current = isPaused ? accTime.current :
       accTime.current > Number.MAX_SAFE_INTEGER - 10000
-        ? 0
+        ? 0 // reset to 0 if overflow
         : accTime.current + intervalTime;
   }, intervalTime);
 
@@ -569,56 +455,18 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
           <GameWrapper width={width} height={height}>
             <GameBoard
               isPaused={isPaused}
-              pieces={!!gameManager.current ? gameManager.current.getPieces():[]}//pieces}
-              tiles={!!gameManager.current ? gameManager.current.getTiles():[]}//tiles}
-              colorLookup={!!gameManager.current ? gameManager.current.getPieceColorsLookup():{}}//colorLookup}
+              pieces={pieces}
+              tiles={tiles}
+              colorLookup={colorLookup}
+              // pieces={!!gameManager.current ? gameManager.current.getPieces() : []}//pieces}
+              // tiles={!!gameManager.current ? gameManager.current.getTiles() : []}//tiles}
+              // colorLookup={!!gameManager.current ? gameManager.current.getPieceColorsLookup() : {}}//colorLookup}
               inputHandler={inputHandler.current}
-              // playerData={playerData}
-              // kaijuData={kaijuData}
-              setPlayerMoveToTiles={setPlayerMoveToTiles}
-              tileStatuses={tileStatuses}
-              setTileStatuses={setTileStatuses}
-              clickedTile={clickedTile}
-              setClickedTile={setClickedTile}
-              path={path}
               width={width}
               height={height}
               scale={scale}
-              hoverLookupString={hoverLookupString}
-              setHoverLookupString={setHoverLookupString}
-              // deadKaijuLocations={deadKaijuLocations}
-              highlightedTiles0={highlightedTiles0}
-              setPath={setPath}
-              // setDmgArray={setDmgArray}
-              // setTiles={setTiles}
-              accTime={accTime}
-              GAME_PIECES_TURN_DELAY={TURN_DELAY}
-              ROW_LENGTH={ROW_LENGTH}
-              COL_LENGTH={COL_LENGTH}
-              ROW_OFFSET={ROW_OFFSET}
-              COL_OFFSET={COL_OFFSET}
-            // initializationProps={{
-            //   playerData,
-            //   setPlayerData,
-            //   pickedAbilities,
-            //   kaijuData,
-            //   width,
-            //   height,
-            //   scale,
-            //   setTiles,
-            //   setClickedTile,
-            //   tileStatuses,
-            //   setTileStatuses,
-            //   isTeammate,
-            //   selectedAvatar,
-            //   ROW_LENGTH,
-            //   COL_LENGTH,
-            //   ROW_OFFSET,
-            //   COL_OFFSET
-            // }}
-            // teleportData={teleportData}
             />
-            < UI
+            <UI
               playerData={playerData}
               setPlayerData={setPlayerData}
               kaijuKillCount={kaijuKillCount}

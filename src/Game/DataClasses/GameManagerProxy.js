@@ -57,8 +57,8 @@ export class GameManagerProxy {
         return this.props.getTeamPieces(teamIndex);
     }
 
-    determineKaijuDetailsFromDifficulty() {
-        return this.props.determineKaijuDetailsFromDifficulty();
+    determineKaijuDetails() {
+        return this.props.determineKaijuDetails();
     }
 
     getPathToClosestEnemy(pieceIndex) {
@@ -89,8 +89,8 @@ export class GameManagerProxy {
         return this.props.getAbilityAndTileStatusData(tileIndex);
     }
 
-    getKaijuAbilities(tileIndex) {
-        return this.props.getKaijuAbilities(tileIndex);
+    getKaijuAbilities(accTime) {
+        return this.props.getKaijuAbilities(accTime);
     }
 
     moveTo({

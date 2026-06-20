@@ -22,6 +22,10 @@ export class GameManager {
         this.kaijuManager = new KaijuManager({ gameManagerProxy: this.gameManagerProxy });
     }
 
+    getIsPaused = () => {
+        return this.isPaused;
+    }
+
     getPlayerInputHandler() {
         return this.playerInputHandler;
     }
@@ -130,13 +134,15 @@ export class GameManager {
         this.tutorialIndex = tutorialIndex;
     }
 
-    togglePauseGame(accTime) {
+    togglePauseGame = (accTime) => {
         this.isPaused = !this.isPaused;
-        if (this.isPaused) {
-            this.timeoutHandler.pauseTimeouts(accTime);
-        } else {
-            this.timeoutHandler.restartTimeouts(accTime);
-        }
+        // TO-DO: Fix!
+        
+        // if (this.isPaused) {
+        //     this.timeoutHandler.pauseTimeouts(accTime);
+        // } else {
+        //     this.timeoutHandler.restartTimeouts(accTime);
+        // }
     }
 
     resetGame() {
@@ -154,7 +160,7 @@ export class GameManager {
             unregisterTimeout: this.timeoutHandler.unregisterTimeout,
             getAbilityAndTileStatusData: this.settingsManager.getAbilityAndTileStatusData,
             getKaijuAbilities: this.settingsManager.getKaijuAbilities,
-            determineKaijuDetailsFromDifficulty: () => this.kaijuManager.determineKaijuDetailsFromDifficulty(this.settingsManager.getDifficulty()),
+            determineKaijuDetails: () => this.kaijuManager.determineKaijuDetailsFromDifficulty(this.settingsManager.getDifficulty()),
             getFlattenedArrayIndex: this.gameBoardManager.getFlattenedArrayIndex,
             getDmg: this.gameBoardManager.getDmg,
             getPathToClosestEnemy: this.gameBoardManager.getPathToClosestEnemy,

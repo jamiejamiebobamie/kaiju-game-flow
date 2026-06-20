@@ -479,8 +479,13 @@ export class GameBoardManager {
     getClosestEnemy = (pieceIndex) => {
         const otherTeamsPieces = this.gameManagerProxy.getOtherTeamsPieces(pieceIndex);
         const tileIndex = this.gameManagerProxy.getPieceTileIndex(pieceIndex);
-        const [_, enemyPieceIndex] = this.getClosestPieceFromTileIndex(otherTeamsPieces, tileIndex);
-        return enemyPieceIndex == -1 ? undefined : this.gameManagerProxy.getPiece(enemyPieceIndex);
+        const enemyPiece = this.getClosestPieceFromTileIndex(otherTeamsPieces, tileIndex);
+        // pieceIndex == 1 && console.log({
+        //     otherTeamsPieces,
+        //     tileIndex,
+        //     enemyPiece
+        // });
+        return enemyPiece;
     }
 
     getPathToClosestEnemy = (pieceIndex) => {
@@ -494,21 +499,20 @@ export class GameBoardManager {
         return this.findPathFromTo(fromTile, toTile)
     }
 
-    getClosestPieceFromTileIndex = (entityData, tileIndex) => {
-        /* returns pieceIndex and piece's tileIndex */
-        const { pieceIndex } = entityData
+    getClosestPieceFromTileIndex = (pieces, tileIndex) => {
+        const { piece } = pieces
             .filter(({ lives, isOnTiles }) => lives > 0 && !!isOnTiles)
-            .map(({ pieceIndex, charLocation }) => ({ distance: getDistanceToFrom(this.getCharXAndYFromTileIndex(tileIndex), charLocation), pieceIndex }))
             .reduce(
-                (maxDistanceData, { distance, pieceIndex }) => {
+                (maxDistanceData, piece) => {
+                    const distance = getDistanceToFrom(this.getCharXAndYFromTileIndex(tileIndex), piece.charLocation);
                     return maxDistanceData.distance > distance
-                        ? { pieceIndex, distance }
+                        ? { piece, distance }
                         : maxDistanceData;
                 },
-                { pieceIndex: undefined, distance: Number.MAX_SAFE_INTEGER }
+                { piece: undefined, distance: Number.MAX_SAFE_INTEGER }
             );
 
-        return !!pieceIndex && Array.isArray(entityData) && !!entityData[pieceIndex] ? [entityData[pieceIndex].tileIndex, pieceIndex] : [{ i: 0, j: 0 }, -1];
+        return piece;
     };
 
     getPathToTeamLeader = (pieceIndex) => {

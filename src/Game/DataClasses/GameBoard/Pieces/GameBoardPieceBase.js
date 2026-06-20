@@ -158,9 +158,9 @@ export class GameBoardPieceBase {
 
         // TO-DO: ensure 'this.shouldTeleport' is only true 
         // for the player if they have 'moveToTiles'.length
-        // if (this.shouldTeleport) {
-        //     this.teleportPiece();
-        // }
+        if (this.shouldTeleport) {
+            this.teleportPiece();
+        }
 
         // MOVE PIECE
         this.move();
@@ -248,7 +248,7 @@ export class GameBoardPieceBase {
                     desiredOffset = this.gameManagerProxy.getTileOffsetFromDir(wasdDir, lastTileIndex);
                     nextTileIndex = { i: lastTileIndex.i + desiredOffset.i, j: lastTileIndex.j + desiredOffset.j };
                     isValid = this.gameManagerProxy.getIsInBounds(nextTileIndex);
-                    console.log({ moveToTiles, isValid, nextTileIndex, desiredOffset, lastTileIndex });
+                    // console.log({ moveToTiles, isValid, nextTileIndex, desiredOffset, lastTileIndex });
                     if (isValid) {
                         moveToTiles.push(nextTileIndex);
                     }
@@ -260,27 +260,27 @@ export class GameBoardPieceBase {
                 */
                 this.updateMovmement(moveToTiles);
 
-                console.log({
-                    bool: (
-                        playerInputHandler.getIsCurrentPlayerInput()
-                        && (
-                            !playerInputHandler.getIsPastPlayerInput()
-                            ||
-                            playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)
-                        )
-                    ),
-                    getIsCurrentPlayerInput: playerInputHandler.getIsCurrentPlayerInput(),
-                    partialBool: (!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)),
-                    getIsPastPlayerInput: playerInputHandler.getIsPastPlayerInput(),
-                    getIsChangeOfDirection: playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex),
-                    wasdDir,
-                    tileIndex,
-                    playerInputHandler,
-                    moveToTiles,
-                    desiredOffset,
-                    nextTileIndex,
-                    isValid
-                });
+                // console.log({
+                //     bool: (
+                //         playerInputHandler.getIsCurrentPlayerInput()
+                //         && (
+                //             !playerInputHandler.getIsPastPlayerInput()
+                //             ||
+                //             playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)
+                //         )
+                //     ),
+                //     getIsCurrentPlayerInput: playerInputHandler.getIsCurrentPlayerInput(),
+                //     partialBool: (!playerInputHandler.getIsPastPlayerInput() || playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex)),
+                //     getIsPastPlayerInput: playerInputHandler.getIsPastPlayerInput(),
+                //     getIsChangeOfDirection: playerInputHandler.getIsChangeOfDirection(this.dir, this.tileIndex),
+                //     wasdDir,
+                //     tileIndex,
+                //     playerInputHandler,
+                //     moveToTiles,
+                //     desiredOffset,
+                //     nextTileIndex,
+                //     isValid
+                // });
 
             } else {
                 // no valid tile

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect, useRef, createContext } from "react";
 import { MainMenu } from "./MainMenu";
 import { Game } from "./Game/ReactComponents/Game";
 import { Tutorial } from "./Tutorial/Tutorial";
 import { Settings } from "./Settings/Settings";
+import { SettingsManager } from "Game/DataClasses/SettingsManager";
 
 const PAGES = Object.freeze({
   Home: 'Home',
@@ -28,10 +29,15 @@ export const GlobalSettingsContext = createContext({
 });
 
 export const Home = ({ triggerTransition }) => {
+  const settingsManager = useRef();
   const [selectedAvatar, setSelectedAvatar] = useState("guy");
   const [selectedDifficulty, setSelectedDifficulty] = useState(Difficulty.Hard);
   const [isAvatarChangedOnce, setIsAvatarChangedOnce] = useState(false);
   const [currPage, setCurrPage] = useState(PAGES.Home);
+
+  useEffect(()=>{
+    settingsManager.current = new SettingsManager();
+  },[])
   const handleClickHome = () => {
     setCurrPage(PAGES.Home)
     window.history.pushState({}, "Kaiju City", "/home");
@@ -68,6 +74,7 @@ export const Home = ({ triggerTransition }) => {
 
   return <GlobalSettingsContext.Provider 
             value={{ 
+              settingsManager: settingsManager.current,
               selectedAvatar, 
               setSelectedAvatar, 
               isAvatarChangedOnce, 

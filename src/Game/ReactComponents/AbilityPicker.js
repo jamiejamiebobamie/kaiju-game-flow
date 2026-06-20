@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
 import { Abilities } from "Tutorial/Components/Abilities";
 import { DescriptionDisplay } from "../UI/DescriptionDisplay";
@@ -7,6 +7,7 @@ import {
   Button,
   ButtonOutline
 } from "../../Components/StyledComponents";
+import { GlobalSettingsContext } from 'Home';
 
 const Wrapper = styled.div`
   display: flex;
@@ -131,19 +132,23 @@ export const AbilityPicker = ({
   isTeammate,
   setIsTeammate
 }) => {
+  const { settingsManager } = useContext(GlobalSettingsContext);
+
   const [displayString, setDisplayString] = useState(null);
   const handleChange = element => {
+    let _pickedAbilities;
     if (pickedAbilities.includes(element)) {
-      const _pickedAbilities = [...pickedAbilities, element]
+      _pickedAbilities = [...pickedAbilities, element]
         .filter(pickedElement => pickedElement !== element)
-        .splice((a1, a2) => a1.localeCompare(a2));
+        .sort((a1, a2) => a1.localeCompare(a2));
       setPickedAbilities(_pickedAbilities);
     } else if (pickedAbilities.length < numAbilitiesToPick) {
-      const _pickedAbilities = [...pickedAbilities, element].sort((a1, a2) =>
+      _pickedAbilities = [...pickedAbilities, element].sort((a1, a2) =>
         a1.localeCompare(a2)
       );
       setPickedAbilities(_pickedAbilities);
     }
+    settingsManager.setSortedPlayerChosenAbilityElementsString(_pickedAbilities);
   };
   const isPlayButtonDisabled = Array.isArray(pickedAbilities) && pickedAbilities.length < 3;
   return (
@@ -182,7 +187,7 @@ export const AbilityPicker = ({
         </CheckboxWrapper>
         <ButtonGroup margin={`60px 0px -10px 0px`}>
           <ButtonsWrapper>
-            <Button disabled={isPlayButtonDisabled} onClick={isPlayButtonDisabled ? () => {} : handleClickPlay}>
+            <Button disabled={isPlayButtonDisabled} onClick={isPlayButtonDisabled ? () => { } : handleClickPlay}>
               <ButtonOutline zIndex={1} />
               Play!
             </Button>

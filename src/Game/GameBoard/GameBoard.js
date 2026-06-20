@@ -51,68 +51,15 @@ export const GameBoard = ({
   tiles,
   colorLookup,
   inputHandler,
-  tilePiecesColorLookup,
-  // playerData,
-  // kaijuData,
-  setPlayerMoveToTiles,
-  clickedTile,
-  setClickedTile,
-  // tiles,
-  // path,
   width,
   height,
-  scale,
-  hoverLookupString,
-  setHoverLookupString,
-  // deadKaijuLocations,
-  highlightedTiles0,
-  // setTiles,
-  // tileStatuses,
-  // setTileStatuses,
-  ROW_LENGTH,
-  COL_LENGTH,
-  ROW_OFFSET,
-  COL_OFFSET,
-  // initializationProps,
+  scale
 }) => {
   const playerIndex = 0;
   const isPlayerDead = !!pieces[playerIndex] && pieces[playerIndex].isDead;
 
   const isRenderCityMap = !isPaused;
   const isRenderTiles = !isPaused;
-  // const isMap = true;
-
-  // useEffect(() => initializeGameBoard({ ...initializationProps, isMap: true, isRenderTiles: true }), []);
-
-  // useEffect(() => {
-  //   if (isPaused) {
-  //     // trigger tile redraw to see the scale down effect on pause
-  //     redrawTiles({
-  //       highlightedTiles0,
-  //       setClickedTile,
-  //       setTiles,
-  //       playerData,
-  //       kaijuData,
-  //       tileStatuses,
-  //       setTileStatuses,
-  //       scale,
-  //       rowLength: ROW_LENGTH,
-  //       colLength: COL_LENGTH,
-  //       rowOffset: ROW_OFFSET,
-  //       colOffset: COL_OFFSET,
-  //       isMap: isMap,
-  //       isRenderTiles: false
-  //     });
-  //   }
-  // }, [isPaused]);
-
-  // useEffect(() => {
-  //   const { i, _ } = clickedTile;
-  //   if (i !== -1) {
-  //     setPlayerMoveToTiles(path);
-  //     setClickedTile({ i: -1, j: -1 });
-  //   }
-  // }, [clickedTile]);
 
   const piecesComponents = pieces.map(p =>
     <GameBoardPieceComponent
@@ -150,34 +97,6 @@ export const GameBoard = ({
       pieceTileColor={colorLookup[`${t.tileIndex.i} ${t.tileIndex.j}`]}
     />
   )
-
-  // const kaiju = kaijuData.map(k => (
-  //   <Kaiju
-  //     key={k.key}
-  //     dir={k.dir}
-  //     charLocation={k.charLocation}
-  //     color={k.color}
-  //     scale={scale}
-  //     lives={k.lives}
-  //     zIndex={getFlattenedArrayIndex(k.tile)}
-  //     isGoingToSpewFire={k.isGoingToSpewFire}
-  //   />
-  // ));
-  // const players = playerData.map(p => (
-  //   <Player
-  //     key={p.i}
-  //     charLocation={p.charLocation}
-  //     color={p.color}
-  //     scale={scale}
-  //     lives={p.lives}
-  //     isDead={p.isDead}
-  //     isHealed={p.isHealed}
-  //     isTeleported={p.isTeleported}
-  //     dir={p.dir}
-  //     zIndex={getFlattenedArrayIndex(p.tile)}
-  //     gender={p.gender}
-  //   />
-  // ));
   // const deadPlayers = playerData.filter(({ isDead }) => isDead).map(p => (
   //   <DeadPlayer
   //     key={p.i}
@@ -216,13 +135,8 @@ export const GameBoard = ({
       height={height}>
       {isPaused && <PauseModal />}
       <ShiftContentOver>
-        {/* {tiles} */}
         {piecesComponents}
         {tilesComponents}
-        {/* {kaiju}
-        {players}
-        {deadPlayers}
-        {kaijuRemains} */}
       </ShiftContentOver>
       <GameMap isVisible={isRenderCityMap} width={width} height={height} />
     </Board>

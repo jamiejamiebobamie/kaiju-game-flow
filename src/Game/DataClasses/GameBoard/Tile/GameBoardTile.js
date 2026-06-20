@@ -5,7 +5,7 @@ import {
     TILE_DIR_ROTATIONS_IN_DEGREES,
     ICON_ROTATION_METHODS
 } from 'Utils/gameState';
-
+import { getRandomIntInRange } from 'Game/utils'
 
 export class GameBoardTile {
     constructor({
@@ -264,7 +264,7 @@ export class GameBoardTile {
         } else {
             if (winners.length > 1) {
                 // Pick random winner if more than one
-                i = this.gameManagerProxy.getRandomIntInRange({ max: winners.length - 1 });
+                i = getRandomIntInRange({ max: winners.length - 1 });
             }
             const [winningAppliedStatus, _] = winners[i];
             const winningContender = this.contenders[winningAppliedStatus];

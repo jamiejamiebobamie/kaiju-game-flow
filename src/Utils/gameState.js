@@ -3162,8 +3162,8 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
 
     // PASSIVE ability data
     isTriggerPassiveImmediately: false,
-    modifierVal: 2,
-    fieldToModify: 'numTilesModifier',
+    modifierVal: true, // TO-DO: make this work... activate power to begin "click teleport tile". on click, activate passive: shouldTeleport = true
+    fieldToModify: 'shouldTeleport',
     // - - - - - - - - - - -
 
     // UI data - - - - - - - - - -
