@@ -59,6 +59,9 @@ export class GameManager {
         // - what are player's chosen abilities?
         const playerAbilities = this.settingsManager.getPlayerChosenAbilities();
 
+        // player abilities to input handler to be triggered by keyboard keys
+        playerAbilities.forEach(a => this.playerInputHandler.addPlayerAbilities(a));
+
         // add player
         this.gameBoardPiecesManager.addPlayer({ playerAvatar, playerAbilities });
 
@@ -74,6 +77,9 @@ export class GameManager {
             const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy'; // TO-DO: hook this up to selection screen...
             for (let i = 0; i < 3; i++) {
                 const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
+
+                // add teammate abilities to input handler to be triggered by keyboard keys
+                teammateAbilities.forEach(a => this.playerInputHandler.addPlayerAbilities(a));
 
                 const cyberPunks = [
                     teammateAvatar,
@@ -120,7 +126,8 @@ export class GameManager {
         return isOnlyOneTeamStillAlive; // GAME OVER
     }
 
-    testBounds(){
+    // TEST
+    testBounds() {
         this.gameBoardManager.updateBounds({ newBounds: this.gameBoardManager.bounds == 2 ? 'Lookup' : 'Grid' });
         this.gameBoardManager.initTiles();
     }
@@ -143,7 +150,7 @@ export class GameManager {
     togglePauseGame = (accTime) => {
         this.isPaused = !this.isPaused;
         // TO-DO: Fix!
-        
+
         // if (this.isPaused) {
         //     this.timeoutHandler.pauseTimeouts(accTime);
         // } else {
@@ -157,6 +164,7 @@ export class GameManager {
         this.gameBoardPiecesManager.resetPieces();
         this.kaijuManager.setKaijuCount(0);
         this.gameBoardManager.resetTiles();
+        this.playerInputHandler.resetPlayerAbilities();
     }
 
     updateProxyProps = () => {

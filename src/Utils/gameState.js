@@ -2487,7 +2487,7 @@ export const PIECES_INFO = {
     avatar: 'guy'
   },
   'girl': {
-    color: "salmon",
+    color: "#fff755",
     spriteSheetSrc: 'spritesheet/teammate.png',
     deadSpriteSrc: 'dead_teammate.png',
     avatar: 'girl'
@@ -2542,7 +2542,7 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
 
     // TICK RANGES -
     isRotating: [{ tickFrom: 1, tickTo: 7 }],
-    isConserveDirections: [],
+    isConserveDirections: [{ tickFrom: 0, tickTo: 0 }],
     isTracking: [{ tickFrom: 8, tickTo: 25 }],
     // - - - - - - -
 
@@ -2619,7 +2619,7 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
 
     // TICK RANGES -
     isRotating: [],
-    isConserveDirections: [{ tickFrom: 0, tickTo: 20 }],
+    isConserveDirections: [{ tickFrom: 0, tickTo: 25 }],
     isTracking: [],
     // - - - - - - -
 
@@ -2688,7 +2688,7 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
 
     // TICK RANGES -
     isRotating: [],
-    isConserveDirections: [{ tickFrom: 0, tickTo: 15 }],
+    isConserveDirections: [{ tickFrom: 1, tickTo: 4 }, { tickFrom: 6, tickTo: 15 }],
     isTracking: [],
     // - - - - - - -
 
@@ -2770,8 +2770,8 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
     // TICK RANGES -
     isRotating: [],
     // shoot in all (6) directions at TICK 0
-    isConserveDirections: [{ tickFrom: 2, tickTo: 2 }], // at TICK 2, conserve single direction of each 6 tiles.
-    isTracking: [{ tickFrom: 3, tickTo: 25 }], // at TICK 3+ track enemy. 6 ivy trails condense to 1.
+    isConserveDirections: [{ tickFrom: 2, tickTo: 3 }], // at TICK 2, conserve single direction of each 6 tiles.
+    isTracking: [{ tickFrom: 4, tickTo: 25 }], // at TICK 3+ track enemy. 6 ivy trails condense to 1.
     // - - - - - - -
 
     // TICK EVENTS - 
@@ -3358,5 +3358,24 @@ export const TILE_STATUSES_AND_ABILITY_DATA = [
   }
 ]
 
+export const ABILITY_KEY_MAPPINGS = [
+  // PLAYER ABILITIES - - -
+  `Digit1`, // '1'
+  `Digit2`, // '2'
+  `Digit3`, // '3'
 
+  // TEAMMATE_1 ABILITIES - - -
+  `KeyQ`, // '4'
+  `KeyW`, // '5'
+  `KeyE`, // '6'
 
+  // TEAMMATE_2 ABILITIES - - -
+  `KeyA`, // '7'
+  `KeyS`, // '8'
+  `KeyD`, // '9'
+
+  // TEAMMATE_3 ABILITIES - - -
+  `KeyZ`, // '10'
+  `KeyX`, // '11'
+  `KeyC`, // '12'
+];

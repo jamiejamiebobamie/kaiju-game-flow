@@ -100,7 +100,7 @@ export class GameBoardTileStatusAndAbilityData {
         this.fieldToModify = fieldToModify;
     }
 
-    getColor(){
+    getColor() {
         return this.color;
     }
 
@@ -222,7 +222,7 @@ export class GameBoardTileStatusAndAbilityData {
 
         const i = dirs.indexOf(currDir);
 
-        if (i == -1) return currDir; // failure... do not reverse
+        if (i == -1) return [currDir]; // failure... do not reverse
 
         const newDir = dirs[(i + 3) % 6];
         return [newDir];
@@ -240,7 +240,7 @@ export class GameBoardTileStatusAndAbilityData {
 
         const i = dirs.indexOf(currDir);
 
-        if (i == -1) return currDir; // failure... do not reflect
+        if (i == -1) return [currDir]; // failure... do not reflect
 
         const ri = i > 2 ? i - 2 : i + 2; // TO-DO: use this.bounceLogic here...
         const rd = dirs[ri];
@@ -252,7 +252,20 @@ export class GameBoardTileStatusAndAbilityData {
         return Math.min(currCount, this.bounceCountResetVal);
     }
 
-    isInRange(range, currCount) { return currCount >= range.tickFrom && currCount <= range.tickTo; }
+    isInRange(range, currCount) {
+        const currTick = this.getCurrTick(currCount);
+        return currTick >= range.tickFrom && currTick <= range.tickTo;
+    }
+
+    getCurrTick(currCount) {
+        /*
+            'currCount,' counts down from maxCount
+            'range,' equals the maxCount
+            'tick,' counts from 0 up to maxCount, equals: maxCount - currCount
+        */
+        const tick = this.range - currCount;
+        return tick;
+    }
 
     // isRotating: [{ tickFrom: 1, tickTo: 7 }],
     getIsRotating(currCount) {
@@ -271,17 +284,20 @@ export class GameBoardTileStatusAndAbilityData {
 
     // isSpread: [{ tick: 1, area: 1 }], // example: at TICK 1, reduce directions to 1 tile. 
     getIsSpread(currCount) {
-        return this.isSpread.some(({ tick }) => tick == currCount);
+        const currTick = this.getCurrTick(currCount);
+        return this.isSpread.some(({ tick }) => tick == currTick);
     }
 
     // isReverseDirection: [0, 5], // example: send backward at tick 0, then reverse at tick 5 (like a building wave...)
     getIsReverseDirection(currCount) {
-        return this.isReverseDirection.includes(currCount);
+        const currTick = this.getCurrTick(currCount);
+        return this.isReverseDirection.includes(currTick);
     }
 
     // isSpread: [{ tick: 1, area: 1 }], // example: at TICK 1, reduce directions to 1 tile. 
     getSpreadArea(currCount) {
-        const spread = this.isSpread.find(({ tick }) => tick == currCount)
+        const currTick = this.getCurrTick(currCount);
+        const spread = this.isSpread.find(({ tick }) => tick == currTick)
         return !!spread ? spread.area : 0;
     }
 

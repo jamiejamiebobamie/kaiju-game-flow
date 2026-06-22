@@ -1,19 +1,21 @@
+import { ABILITY_KEY_MAPPINGS } from 'Utils/gameState';
+
 export class PlayerInputHandler {
     constructor({ gameManagerProxy }) {
         this.pressedKeys = [];
         this.isMovementKeyInput = false;
+
+        this.playerAbilities = [];
 
         this.gameManagerProxy = gameManagerProxy;
     }
 
     addKey(code) {
         this.pressedKeys = !this.pressedKeys.includes(code) ? [...this.pressedKeys, code] : this.pressedKeys;
-        // console.log('addKey', { code, pressedKeys: this.pressedKeys });
     }
 
     removeKey(code) {
         this.pressedKeys = this.pressedKeys.includes(code) ? this.pressedKeys.filter(k => k != code) : this.pressedKeys;
-        // console.log('removeKey', { code, pressedKeys: this.pressedKeys });
     }
 
     getDirFromPlayerInput(tileIndex) {
@@ -88,6 +90,40 @@ export class PlayerInputHandler {
     getIsChangeOfDirection(dir, tileIndex) {
         const isChangeOfDirection = dir != this.convertWasdDirToAnimationDir(this.getDirFromPlayerInput(tileIndex));
         return isChangeOfDirection;
+    }
+
+    addPlayerAbilities(ability) {
+        this.playerAbilities.push(ability);
+    }
+
+    resetPlayerAbilities() {
+        this.playerAbilities = [];
+    }
+
+    getPlayerAbilities = () => {
+        return this.playerAbilities;
+    }
+
+    getAbilityKeyInputMapping = i => {
+        return ABILITY_KEY_MAPPINGS[i];
+    }
+
+    /* player can use his abilities and command teammates to use theirs (if abilities are not on cooldown) */
+    usePlayerAbility = (keycode, accTime) => {
+        const i = ABILITY_KEY_MAPPINGS.indexOf(keycode);
+        if (i == -1) return;
+
+        const a = this.playerAbilities[i];
+        const pieceIndex = Math.floor(i / 3); // each player-team piece gets 3 abilities
+        const piece = this.gameManagerProxy.getPiece(pieceIndex);
+
+        const passiveAbility = a.useAbility({
+            accTime, // TO-DO: accTime is undefined
+            piece,
+            registerTimeout: this.gameManagerProxy.registerTimeout,
+            updateTileWithAbilityStatus: this.gameManagerProxy.updateTileWithAbilityStatus
+        });
+        piece.storePassive(passiveAbility);
     }
 
     updatePlayerDestinationAndClickedTileFromClick(clickedTileIndex) {

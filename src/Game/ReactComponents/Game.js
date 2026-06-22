@@ -142,6 +142,7 @@ const RotateInPlaceEffect = styled.div`
   // transform: scale(0.7) translate(328px, 107px);
   // filter: drop-shadow(-2px 2px 10px black);
 
+
   animation: rotate-in-place-animation ${props => props.duration}s linear forwards 1;
   animation-delay: ${props => props.delay ? props.delay : 0}s;
   @keyframes rotate-in-place-animation{
@@ -243,6 +244,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const [hoverLookupString, setHoverLookupString] = useState('');
   const [path, setPath] = useState(null);
   const [intervalTime, setIntervalTime] = useState(null);
+  const [isGameInitialized, setIsGameInitialized] = useState(false);
   const [fullScreenPageData, setFullScreenPageData] = useState(DEFAULT_FULLSCREEN_PAGE_DATA);
   const [isPlayerDead, setIsPlayerDead] = useState(false);
   const pressedKeys = useRef([]);
@@ -254,13 +256,14 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       gameManager.current.initGame();
       gameManager.current.startKaijuSpawner(0);
       inputHandler.current = gameManager.current.getPlayerInputHandler();
+      setIsGameInitialized(true); // updates callback closures
     }
   }, [intervalTime]);
   // TESTING...
-  useInterval(() => {
-    // gameManager.current.testBounds();
-    console.log({ gameManager: gameManager.current, isPaused })
-  }, 5000);
+  // useInterval(() => {
+  //   // gameManager.current.testBounds();
+  //   console.log({ gameManager: gameManager.current, isPaused })
+  // }, 5000);
 
   const resetState = () => {
     setPickedAbilities([]);
@@ -283,11 +286,9 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     setFullScreenPageData(DEFAULT_FULLSCREEN_PAGE_DATA);
   };
   const handleClickPause = () => {
-    // console.log("before", { gameManager, isPaused: gameManager.current.getIsPaused() });
     gameManager.current.togglePauseGame();
-    // console.log("after", { gameManager, isPaused: gameManager.current.getIsPaused() });
     setIsPaused(gameManager.current.getIsPaused());
-    // setIntervalTime(_intervalTime => (_intervalTime === null ? TURN_DELAY : null));
+    setIntervalTime(gameManager.current.getIsPaused() ? null : TURN_DELAY);
   };
 
   useKeyPress({ keyCodes: "Escape", keyUpCallback: handleClickPause, isCharacterDead: false });
@@ -301,12 +302,21 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   }
 
   useKeyPress({
-    keyCodes: ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"],
+    keyCodes: [
+      // "KeyW", "KeyA", "KeyS", "KeyD", // <-- WASD is now being used for ability keys...
+      "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"],
     keyDownCallback: keyDown,
     keyUpCallback: keyUp,
-    isCharacterDead: isPlayerDead,
-    dependencies: [inputHandler.current]
+    isCharacterDead: isPaused || isPlayerDead,
+    dependencies: [isGameInitialized]
   });
+
+    useKeyPress({
+      keyCodes: !inputHandler.current ? [] : inputHandler.current.getPlayerAbilities().map((_, i) => inputHandler.current.getAbilityKeyInputMapping(i)),
+      keyDownCallback: !inputHandler.current ? () => {} : keycode => inputHandler.current.usePlayerAbility(keycode, accTime.current),
+      isCharacterDead: isPaused || isPlayerDead,
+      dependencies: [isGameInitialized]
+    });
 
   useEffect(() => {
     if (kaijuKillCount.length >= MAX_TO_WIN) {
@@ -374,7 +384,6 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     const piecesTilesColorLookup = gameManager.current.getPieceColorsLookup();
     setColorLookup(piecesTilesColorLookup);
     setPieces(pieces);
-    // console.log({ pieces });
 
     // update accumulated time.
     accTime.current = isPaused ? accTime.current :

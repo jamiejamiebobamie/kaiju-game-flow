@@ -42,7 +42,7 @@ const determineBackgroundColor = props => {
     // case !!props.isHighlighted0 && props.selectedAvatar == 'girl':
     //   return "background-color: salmon; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as girl
     case !!props.isHighlighted0:
-      return "background-color: #d2d3b2; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as guy 
+      return "background-color: #96b8bb; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as guy 
     case !!props.color:
       return `background-color: ${props.color}; opacity: .2;` // status color
     default:

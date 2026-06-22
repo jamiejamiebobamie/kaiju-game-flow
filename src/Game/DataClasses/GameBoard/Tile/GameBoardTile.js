@@ -249,7 +249,7 @@ export class GameBoardTile {
                     for each contender status,
                     check which status (if any) is not cancelled-out by another contender status
 
-                    NOTE: this only works if a tile status never "beats" itself... otherwise it will cancel itself out always
+                    NOTE: this only works if a tile status never "beats" itself... otherwise it will always cancel out itself
                 */
                 if (otherStatus in contendersTracker) {
                     contendersTracker[otherStatus] = false;

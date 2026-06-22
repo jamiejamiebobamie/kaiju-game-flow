@@ -324,6 +324,10 @@ export class GameBoardPieceBase {
         }
     }
 
+    storePassive(passive){
+        this.storedPassive = passive;
+    }
+
     stopMoving() {
         this.dir = 'idle';
         this.moveToLocation = this.charLocation;

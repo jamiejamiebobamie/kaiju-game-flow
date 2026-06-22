@@ -92,17 +92,21 @@ export class GameBoardManager {
         const pieceTileIndex = this.gameManagerProxy.getPieceTileIndex(pieceIndex);
 
         // determine target of power
-        let target;
+        /*
+            set target as self as fail-safe so game doesn't crash
+            status will 'shoot' at self but will not impact.
+        */
+        const self = this.gameManagerProxy.getPiece(pieceIndex);
+        let target = self;
         if (appliedStatus == 'isHealing') {
-            target = this.gameManagerProxy.getMostDmgedTeammate(pieceIndex);
+            const teammate = this.gameManagerProxy.getMostDmgedTeammate(pieceIndex);
+            if (!!teammate) {
+                target = teammate;
+            }
         } else {
-            target = this.getClosestEnemy(pieceIndex);
-            if (!target) {
-                /*
-                    set target as self as fail-safe so game doesn't crash
-                    status will 'shoot' at self but will not impact.
-                */
-                target = this.gameManagerProxy.getPiece(pieceIndex);
+            const enemy = this.getClosestEnemy(pieceIndex);
+            if (!!enemy) {
+                target = enemy;
             }
         }
 
@@ -122,9 +126,32 @@ export class GameBoardManager {
 
         const teamIndex = this.gameManagerProxy.getPieceTeamIndex(pieceIndex);
         const { range } = tileStatus;
-        if (Array.isArray(this.tiles[tileIndex.i]) && !!this.tiles[tileIndex.i][tileIndex.j]) {
+
+        // TEST
+        if (pieceIndex == 0) {
+            console.log({
+                accTime,
+                pieceIndex,
+                appliedStatus,
+                pieceTileIndex,
+                self,
+                target,
+                abilityAndTileStatusData,
+                tileStatus,
+                targetTileIndex,
+                area,
+                tileIndex,
+                dirs,
+                targetIndex,
+                teamIndex,
+                range,
+                isInBounds: this.getIsInBounds(tileIndex)
+            })
+        }
+
+        if (this.getIsInBounds(tileIndex)) {
             // TO-DO: consider setting tile's 'contenders' with desired status
-            this.tiles[tileIndex.i][tileIndex.j].updateTileStatus({ updateKey: accTime, tileStatus, currCount: range, dirs, teamIndex, targetIndex })
+            this.tiles[tileIndex.i][tileIndex.j].updateTileStatus({ updateKey: accTime, tileStatus, currCount: range, dirs, teamIndex, targetIndex });
         }
     };
 
@@ -146,42 +173,53 @@ export class GameBoardManager {
  
             TO-DO: test if this is still necessary...
         */
-        for (let i = this.numTileColumns - 1; i > -1; i--) {
-            for (let j = this.numTileRows - 1; j > -1; j--) {
-                this.iterateThroughGameboardTilesAndCreateContenders({ i, j, accTime, iterCount });
-            }
-        }
+        // for (let i = this.numTileColumns - 1; i > -1; i--) {
+        //     for (let j = this.numTileRows - 1; j > -1; j--) {
+        //         this.iterateThroughGameboardTilesAndCreateContenders({ i, j, accTime, iterCount });
+        //     }
+        // }
 
         const { lookup } = this.getHighlightedTiles();
 
-        const checkedKeys = {};
+        // const checkedKeys = {};
         // A tile status is valid (and not an update bug) if it is present in a tile's 'contenders' lookup twice
         for (let i = 0; i < this.numTileColumns; i++) {
             for (let j = 0; j < this.numTileRows; j++) {
                 const tile = this.tiles[i][j];
                 const contenders = tile.getContenders();
-                const validContenders = Object.entries(contenders).reduce((acc, [k, v]) => {
-                    const kParts = k.split(" ");
-                    kParts.pop(); // remove 'iterCount' from key
-                    const key = kParts.join(" ");
-                    const isValid = contenders[`${key} ${1}`] && contenders[`${key} ${2}`];
-                    const isChecked = checkedKeys[key];
-                    checkedKeys[key] = true; // only add the contender once
-                    if (isValid && !isChecked) {
-                        const appliedStatus = v.getAppliedStatus()
-                        if (!!acc[appliedStatus]) {
-                            acc[appliedStatus].mergeSameStatusContenders(v)
-                        } else {
+                let count = 0;
+                // !!Object.keys(contenders).length && console.log({ tile, contenders });
+                const reducedContenders = Object.values(contenders).reduce((acc, v) => {
+                    // const kParts = k.split(" ");
+                    // kParts.pop(); // remove 'iterCount' from key
+                    // const key = kParts.join(" ");
+                    // const isValid = true;//contenders[`${key} ${1}`] && contenders[`${key} ${2}`];
+                    // const isChecked = checkedKeys[key];
+                    // checkedKeys[key] = true; // only add the contender once
+                    // if (isValid && !isChecked) {
+                    const appliedStatus = v.getAppliedStatus();
+
+                    if (!!acc[appliedStatus]) {
+                        if (v.getCurrCount() > acc[appliedStatus].getCurrCount()) {
                             acc[appliedStatus] = v;
+                            count++;
                         }
+                    } else {
+                        acc[appliedStatus] = v;
+                        count++;
                     }
+                    // }
                     return acc;
                 }, {});
 
-                if (!!Object.keys(validContenders).length) {
-                    // NOTE: 'validContenders' lookup uses 'appliedStatus' keys
-                    tile.setContenders(validContenders);
+                if (count > 0) {
+                    // NOTE: 'reducedContenders' lookup uses 'appliedStatus' keys
+                    console.log("before", { reducedContenders, tile });
+                    tile.setContenders(reducedContenders);
                     tile.resolveContendersAndSetNewTileStatus();
+                    console.log("after", { reducedContenders, tile });
+                } else {
+                    tile.clearTileStatus();
                 }
 
                 tile.clearContenders();
@@ -207,13 +245,8 @@ export class GameBoardManager {
 
                 const currCount = tile.getCurrCount();
 
-                // 1. clear curr tile's status
-                if (currCount == 0 && !tileStatus.getIsPersistent()) {
-                    tile.clearTileStatus();
-                }
-
-                // 2. persist curr tile's status on curr tile
-                else if (tileStatus.getIsPersistent() || (tileStatus.getIsLeaveTrail() && currCount != 0)) {
+                // 1. persist curr tile's status on curr tile
+                if (tileStatus.getIsPersistent() || (tileStatus.getIsLeaveTrail() && currCount != 0)) {
                     const contenderCount = 0;
 
                     const tileContender = tile.getTileContenderFromTile({ contenderCount });
@@ -222,14 +255,14 @@ export class GameBoardManager {
                     tile.addContender(key, tileContender);
                 }
 
-                // 3. move curr tile's status to adjacent tiles based on dirs
+                // 2. move curr tile's status to adjacent tiles based on dirs
                 if (currCount != 0) {
                     const dirs = tile.getDirs();
                     dirs.forEach(d => {
                         const tileIndexOffset = this.getTileOffsetFromDir(d, tileIndex);
                         const nextTileIndex = { i: tileIndex.i + tileIndexOffset.i, j: tileIndex.j + tileIndexOffset.j };
 
-                        let newDirs;
+                        let newDirs = [d];
                         if (this.getIsInBounds(nextTileIndex)) {
                             if (tileStatus.getIsRotating(currCount)) {
                                 newDirs = tileStatus.rotateStatus(currCount);
@@ -242,11 +275,12 @@ export class GameBoardManager {
                                 newDirs = dirs;
                             } else if (tileStatus.getIsSpread(currCount)) {
                                 const area = tileStatus.getSpreadArea(currCount);
-                                const [_, dirs] = this.getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex: tileIndex, toTileIndex: nextTileIndex, area });
+                                const [_, dirs] = this.getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex: tileIndex, toTileIndex: nextTileIndex, numTiles: area });
                                 newDirs = dirs;
                             } else if (tileStatus.getIsReverseDirection(currCount)) {
                                 newDirs = tileStatus.reverseDir(d);
                             }
+
 
                             // SIDE EFFECT: 'getTileContenderFromTile' decrements currCount for next tile update
                             // NOTE: count was being decremented by -1 or -2... (ie. removed randomness)
@@ -256,6 +290,17 @@ export class GameBoardManager {
                             const nextTile = this.tiles[nextTileIndex.i][nextTileIndex.j];
                             // add current tile status to next tile's contenders
                             nextTile.addContender(key, tileContender);
+
+                            // TEST
+                            tileStatus.getAppliedStatus() == 'isOnFire'
+                                && console.log("inBounds", {
+                                    tileContender,
+                                    key,
+                                    nextTile,
+                                    nextTileIndex,
+                                    newDirs, tileStatus, tile, currCount, d
+                                });
+
                         } else if (tileStatus.getIsBouncy()) {
                             /*
                                 next tile is not on game board,
@@ -273,6 +318,16 @@ export class GameBoardManager {
                                 const reflectedTile = this.tiles[reflectedTileIndex.i][reflectedTileIndex.j];
                                 // add current tile status to next tile's contenders
                                 reflectedTile.addContender(key, tileContender);
+
+                                // TEST
+                                tileStatus.getAppliedStatus() == 'isOnFire'
+                                    && console.log("reflected", {
+                                        tileContender,
+                                        key,
+                                        reflectedTile,
+                                        reflectedTileIndex,
+                                        rd, tileStatus, tile, currCount, d
+                                    });
                             }
                         }
                     })
@@ -480,11 +535,6 @@ export class GameBoardManager {
         const otherTeamsPieces = this.gameManagerProxy.getOtherTeamsPieces(pieceIndex);
         const tileIndex = this.gameManagerProxy.getPieceTileIndex(pieceIndex);
         const enemyPiece = this.getClosestPieceFromTileIndex(otherTeamsPieces, tileIndex);
-        // pieceIndex == 1 && console.log({
-        //     otherTeamsPieces,
-        //     tileIndex,
-        //     enemyPiece
-        // });
         return enemyPiece;
     }
 
@@ -798,26 +848,27 @@ export class GameBoardManager {
             { i: -1, j: currTile.i % 2 ? 0 : -1 } // up left
         ];
         const coords = directionMapping[0];
-        const dot = Math.MIN_SAFE_INTEGER;
+        // const dot = Math.MIN_SAFE_INTEGER;
+        const distance = Math.MAX_SAFE_INTEGER;
         const closest = directionMapping.reduce(
             (acc, item, i) => {
-                // const distance = this.getDistance(item, normVec);
+                const distance = getDistanceToFrom(item, normVec);
 
-                const dot = getDotProduct(item, normVec);
+                // const dot = getDotProduct(item, normVec);
                 if (
-                    // distance < acc.distance 
+                    distance < acc.distance 
 
-                    dot > acc.dot // TO-DO: TEST!
+                    // dot >= acc.dot // TO-DO: TEST!
                     && this.getIsInBounds({
                         i: currTile.i + tileIndexMapping[i].i,
                         j: currTile.j + tileIndexMapping[i].j
                     })) {
-                    return { i, coords: item, dot }
+                    return { i, coords: item, /*dot*/ distance }
                 } else {
                     return acc;
                 }
             },
-            { i: 0, coords, dot }
+            { i: 0, coords, /*dot*/ distance }
         );
         const tileDirMapping = [
             "up",

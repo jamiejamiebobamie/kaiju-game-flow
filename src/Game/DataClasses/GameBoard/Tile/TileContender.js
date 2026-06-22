@@ -25,18 +25,25 @@ export class TileContender {
         return this.tileStatus;
     }
 
+    getCurrCount(){
+        return this.currCount;
+    }
+
     getAppliedStatus() {
         return this.tileStatus.getAppliedStatus();
     }
 
+    // TO-DO: this is causing bug with statuses never clearing on amp perimeters
     mergeSameStatusContenders(tileContender) {
         // accumulate
-        this.currCount += tileContender.currCount;
-        this.dirs = Array.from(new Set(...this.dirs, ...tileContender.dirs));
+        // this.currCount += tileContender.currCount;
+        // this.dirs = Array.from(new Set(...this.dirs, ...tileContender.dirs));
         if (Math.random() > .5) {
             // overwrite...
             this.targetIndex = tileContender.targetIndex;
             this.teamIndex = tileContender.teamIndex;
+            this.currCount = tileContender.currCount;
+            this.dirs = tileContender.dirs;
         }
     }
 

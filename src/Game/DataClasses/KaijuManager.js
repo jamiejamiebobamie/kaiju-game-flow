@@ -26,16 +26,6 @@ export class KaijuManager {
             const isRespawn = this.kaijuCount >= MAX_AT_ONCE;
             const delay = this.kaijuCount + 1 >= MAX_AT_ONCE ? this.kaijuRespawnInterval : this.kaijuSpawnInterval;
 
-            // console.log({
-            //     accTime,
-            //     MAX_AT_ONCE,
-            //     isRespawn,
-            //     delay,
-            //     kaijuCount: this.kaijuCount,
-            //     kaijuRespawnInterval: this.kaijuRespawnInterval,
-            //     kaijuSpawnInterval: this.kaijuSpawnInterval
-            // })
-
             const newAccTime = accTime + delay;
             if (isRespawn) {
                 const isRespawnSuccess = this.respawnKaiju(accTime);

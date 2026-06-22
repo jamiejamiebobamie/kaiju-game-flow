@@ -21,8 +21,8 @@ export class GameManagerProxy {
         return this.props.getPieceTileIndex(pieceIndex);
     }
 
-    getMostDmgedTeammate() {
-        return this.props.getMostDmgedTeammate();
+    getMostDmgedTeammate(pieceIndex) {
+        return this.props.getMostDmgedTeammate(pieceIndex);
     }
 
     getPiece(pieceIndex) {

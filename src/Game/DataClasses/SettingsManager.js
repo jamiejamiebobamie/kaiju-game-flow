@@ -61,12 +61,10 @@ export class SettingsManager {
     }
 
     setSortedPlayerChosenAbilityElementsString(abilityElements) {
-        console.log({ abilityElements })
         this.playerChosenAbilityElements = abilityElements;
     }
 
     getPlayerChosenAbilities() {
-        console.log({ playerChosenAbilityElements: this.playerChosenAbilityElements });
         return this.playerChosenAbilityElements.map(element => {
             // I'm assuming the element is always found...
             const gameBoardPieceAbilityData = Object.values(this.abilityAndTileStatusData).find(ability => element == ability.getElementUppercase());
