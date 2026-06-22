@@ -31,16 +31,18 @@ const ImageWrapper = styled.div`
 
 const determineBackgroundColor = props => {
   switch(true){
-    case (props.playerGender == "guy" || props.playerGender == "girl"):
-      return props.playerGender == "guy"
-      ? "background-color: #55AAff; opacity: .4;" // guy
-      : "background-color: salmon; opacity: .4;" // girl
-    case !!props.isKaiju:
-      return "background-color: #BF40BF; opacity: .4;" // kaiju
-    case !!props.isHighlighted0 && props.selectedAvatar == 'guy':
-      return "background-color: #55AAff; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as guy
-    case !!props.isHighlighted0 && props.selectedAvatar == 'girl':
-      return "background-color: salmon; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as girl
+    // case (props.playerGender == "guy" || props.playerGender == "girl"):
+    //   return props.playerGender == "guy"
+    //   ? "background-color: #55AAff; opacity: .4;" // guy
+    //   : "background-color: salmon; opacity: .4;" // girl
+    // case !!props.isKaiju:
+    //   return "background-color: #BF40BF; opacity: .4;" // kaiju
+    // case !!props.isHighlighted0 && props.selectedAvatar == 'guy':
+    //   return "background-color: #55AAff; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as guy
+    // case !!props.isHighlighted0 && props.selectedAvatar == 'girl':
+    //   return "background-color: salmon; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as girl
+    case !!props.isHighlighted0:
+      return "background-color: #d2d3b2; opacity: .4; transition: background-color; transition-duration: 1s;" // player highlight as guy 
     case !!props.color:
       return `background-color: ${props.color}; opacity: .2;` // status color
     default:

@@ -345,8 +345,8 @@ export class GameBoardManager {
                     // filter-out adjacent tiles that have other team's pieces on them
                     if (enemyTiles.some(e => e.i === t.i && e.j === t.j)) return false;
 
-                    // // filter-out adjacent tiles that have adjacent tiles with other team's pieces on them
-                    const adjAdjTiles = this.getAdjacentTileIndices(t).flat();
+                    // filter-out adjacent tiles that have adjacent tiles with other team's pieces on them
+                    const adjAdjTiles = this.getAdjacentAdjacentTileIndices(t).flat();//getAdjacentTileIndices(t).flat();
                     return adjAdjTiles.every(at => !enemyTiles.some(e => e.i === at.i && e.j === at.j));
                 });
 
@@ -495,8 +495,8 @@ export class GameBoardManager {
         return path;  // aka: 'moveToTiles'
     }
 
-    getPathFromTileToTile = ({ fromTile, toTile }) => {
-        return this.findPathFromTo(fromTile, toTile)
+    getPathFromTileToTile = ({ fromTile, toTile, avoidTiles, isAlwaysAvoid }) => {
+        return this.findPathFromTo(fromTile, toTile, avoidTiles, isAlwaysAvoid);
     }
 
     getClosestPieceFromTileIndex = (pieces, tileIndex) => {

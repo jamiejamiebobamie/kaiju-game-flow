@@ -2492,8 +2492,18 @@ export const PIECES_INFO = {
     deadSpriteSrc: 'dead_teammate.png',
     avatar: 'girl'
   },
-  'punk1': {},
-  'punk2': {},
+  'rival_guy': {
+    color: "#68e33b",
+    spriteSheetSrc: 'spritesheet/rival_guy.png',
+    deadSpriteSrc: 'dead_teammate.png',
+    avatar: 'rival_guy'
+  },
+  'rival_girl': {
+    color: "#db1102",
+    spriteSheetSrc: 'spritesheet/rival_girl.png',
+    deadSpriteSrc: 'dead_teammate.png',
+    avatar: 'rival_girl'
+  },
   'kaiju': {
     color: "#bf40bf",
     spriteSheetSrc: 'spritesheet/kaiju_sprite2.png',

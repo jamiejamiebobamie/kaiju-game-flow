@@ -65,8 +65,8 @@ export class GameManagerProxy {
         return this.props.getPathToClosestEnemy(pieceIndex);
     }
 
-    getPathFromTileToTile({ fromTile, toTile }) {
-        return this.props.getPathFromTileToTile({ fromTile, toTile });
+    getPathFromTileToTile({ fromTile, toTile, avoidTiles, isAlwaysAvoid }) {
+        return this.props.getPathFromTileToTile({ fromTile, toTile, avoidTiles, isAlwaysAvoid });
     }
 
     getClosestEnemy(pieceIndex) {

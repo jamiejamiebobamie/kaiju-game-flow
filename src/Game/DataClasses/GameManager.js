@@ -71,12 +71,18 @@ export class GameManager {
         ]
         // - does player want a teammate?
         if (mandatoryTeammateGamemodes.includes(gameMode) || this.settingsManager.getIsTeammate()) {
-            const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy';
+            const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy'; // TO-DO: hook this up to selection screen...
             for (let i = 0; i < 3; i++) {
                 const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
 
+                const cyberPunks = [
+                    teammateAvatar,
+                    'rival_guy',
+                    'rival_girl'
+                ];
+
                 // add teammate
-                this.gameBoardPiecesManager.addTeammate({ teammateAvatar, teammateAbilities });
+                this.gameBoardPiecesManager.addTeammate({ teammateAvatar: cyberPunks[i], teammateAbilities });
             }
         }
 

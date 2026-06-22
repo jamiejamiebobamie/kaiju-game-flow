@@ -64,7 +64,7 @@ export const GameBoard = ({
   const piecesComponents = pieces.map(p =>
     <GameBoardPieceComponent
       key={p.pieceIndex}
-      zIndex={p.getZIndex()}
+      zIndex={p.getZIndex()} // TO-DO: fix. this is not working...
       charLocation={p.charLocation}
       avatar={p.avatar}
       color={p.color}
@@ -82,7 +82,7 @@ export const GameBoard = ({
 
   const tilesComponents = tiles.map(t =>
     <GameBoardTileComponent
-      key={t.getZIndex}
+      key={t.getZIndex()}
       zIndex={t.getZIndex()}
       isVisible={isRenderTiles && t.getIsVisible()}
       tileLocation={t.tileLocation}

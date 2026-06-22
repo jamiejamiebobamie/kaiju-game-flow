@@ -10,7 +10,7 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
 
         this.pieceClass = 'Kaiju!';
         this.pieceClassDescription = 'They come every night from the sea!';
-        this.elements = 'kaijuFire';
+        this.elements = 'kaijuFire';  
     }
 
     useAbilities(accTime) {
@@ -58,7 +58,10 @@ export class GameBoardPieceKaiju extends GameBoardPieceBase {
     }
 
     moveWithEnemy(enemy) {
-        const moveToTilesToEnemy = this.gameManagerProxy.getPathFromTileToTile({ fromTile: this.tileIndex, toTile: enemy.tileIndex });
+        const otherKaijuTileIndices = this.gameManagerProxy.getTeamPieces(this.teamIndex)
+                                                                .filter(({ isOnTiles }) => !!isOnTiles)
+                                                                .map(({ tileIndex }) => tileIndex);
+        const moveToTilesToEnemy = this.gameManagerProxy.getPathFromTileToTile({ fromTile: this.tileIndex, toTile: enemy.tileIndex, avoidTiles: otherKaijuTileIndices });
         // run directly into enemy (Kaiju-behavior)
         this.setMoveToTilesGivenIdealDistanceFromEnemy(moveToTilesToEnemy, 0);
     }
