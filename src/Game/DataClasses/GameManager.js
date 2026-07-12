@@ -75,16 +75,20 @@ export class GameManager {
         // - does player want a teammate?
         if (mandatoryTeammateGamemodes.includes(gameMode) || this.settingsManager.getIsTeammate()) {
             const teammateAvatar = playerAvatar == 'guy' ? 'girl' : 'guy'; // TO-DO: hook this up to selection screen...
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 4; i++) {
                 const teammateAbilities = this.settingsManager.getThreeRandomAbilities();
 
                 // add teammate abilities to input handler to be triggered by keyboard keys
                 teammateAbilities.forEach(a => this.playerInputHandler.addPlayerAbilities(a));
 
                 const cyberPunks = [
-                    teammateAvatar,
-                    'rival_guy',
-                    'rival_girl'
+                    // teammateAvatar,
+                    // 'rival_guy',
+                    // 'rival_girl',
+                    'agent',
+                    'agent',
+                    'agent',
+                    'agent'
                 ];
 
                 // add teammate

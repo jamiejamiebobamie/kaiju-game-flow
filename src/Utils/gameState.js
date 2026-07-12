@@ -2510,6 +2510,13 @@ export const PIECES_INFO = {
     deadSpriteSrc: 'spritesheet/burning_kaiju_sprite.png',
     avatar: 'kaiju'
   }
+  ,
+  'agent': {
+    color: "#bf40bf",
+    spriteSheetSrc: 'spritesheet/agent.png',
+    deadSpriteSrc:  'dead_teammate.png',
+    avatar: 'agent'
+  }
 };
 
 
