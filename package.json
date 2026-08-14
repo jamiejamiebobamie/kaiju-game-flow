@@ -63,7 +63,8 @@
   "scripts": {
     "build": "cmd /V /C \"set DISABLE_ESLINT_PLUGIN=true&& node scripts/build.js\"",
     "start": "nodemon app.js",
-    "test": "jest"
+    "test": "jest",
+    "test:unit": "node scripts/test.js"
   },
   "eslintConfig": {
     "extends": [
@@ -139,10 +140,11 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@typescript-eslint/eslint-plugin": "^8.67.0",
     "@typescript-eslint/parser": "^8.67.0",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
   }
 }
