@@ -254,7 +254,7 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
       const gm = new GameManager({ scale, settingsManager });
       gameManager.current = gm;
       gameManager.current.initGame();
-      gameManager.current.startKaijuSpawner(0);
+      // gameManager.current.startKaijuSpawner(0); // TESTING
       inputHandler.current = gameManager.current.getPlayerInputHandler();
       setIsGameInitialized(true); // updates callback closures
     }

@@ -128,26 +128,26 @@ export class GameBoardManager {
         const { range } = tileStatus;
 
         // TEST
-        if (pieceIndex == 0) {
-            console.log({
-                accTime,
-                pieceIndex,
-                appliedStatus,
-                pieceTileIndex,
-                self,
-                target,
-                abilityAndTileStatusData,
-                tileStatus,
-                targetTileIndex,
-                area,
-                tileIndex,
-                dirs,
-                targetIndex,
-                teamIndex,
-                range,
-                isInBounds: this.getIsInBounds(tileIndex)
-            })
-        }
+        // if (pieceIndex == 0) {
+        //     console.log({
+        //         accTime,
+        //         pieceIndex,
+        //         appliedStatus,
+        //         pieceTileIndex,
+        //         self,
+        //         target,
+        //         abilityAndTileStatusData,
+        //         tileStatus,
+        //         targetTileIndex,
+        //         area,
+        //         tileIndex,
+        //         dirs,
+        //         targetIndex,
+        //         teamIndex,
+        //         range,
+        //         isInBounds: this.getIsInBounds(tileIndex)
+        //     })
+        // }
 
         if (this.getIsInBounds(tileIndex)) {
             // TO-DO: consider setting tile's 'contenders' with desired status
@@ -214,10 +214,10 @@ export class GameBoardManager {
 
                 if (count > 0) {
                     // NOTE: 'reducedContenders' lookup uses 'appliedStatus' keys
-                    console.log("before", { reducedContenders, tile });
+                    // console.log("before", { reducedContenders, tile });
                     tile.setContenders(reducedContenders);
                     tile.resolveContendersAndSetNewTileStatus();
-                    console.log("after", { reducedContenders, tile });
+                    // console.log("after", { reducedContenders, tile });
                 } else {
                     tile.clearTileStatus();
                 }
@@ -273,6 +273,8 @@ export class GameBoardManager {
                                 const targetTileIndex = this.gameManagerProxy.getPieceTileIndex(pieceIndex);
                                 const [_, dirs] = this.getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex: tileIndex, toTileIndex: targetTileIndex });
                                 newDirs = dirs;
+                                // TESTING...
+                                console.log({ pieceIndex, i_j: { i, j }, tileIndex, targetTileIndex, newDirs, tileStatus })
                             } else if (tileStatus.getIsSpread(currCount)) {
                                 const area = tileStatus.getSpreadArea(currCount);
                                 const [_, dirs] = this.getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex: tileIndex, toTileIndex: nextTileIndex, numTiles: area });
@@ -292,14 +294,14 @@ export class GameBoardManager {
                             nextTile.addContender(key, tileContender);
 
                             // TEST
-                            tileStatus.getAppliedStatus() == 'isOnFire'
-                                && console.log("inBounds", {
-                                    tileContender,
-                                    key,
-                                    nextTile,
-                                    nextTileIndex,
-                                    newDirs, tileStatus, tile, currCount, d
-                                });
+                            // tileStatus.getAppliedStatus() == 'isOnFire'
+                            //     && console.log("inBounds", {
+                            //         tileContender,
+                            //         key,
+                            //         nextTile,
+                            //         nextTileIndex,
+                            //         newDirs, tileStatus, tile, currCount, d
+                            //     });
 
                         } else if (tileStatus.getIsBouncy()) {
                             /*
@@ -320,14 +322,14 @@ export class GameBoardManager {
                                 reflectedTile.addContender(key, tileContender);
 
                                 // TEST
-                                tileStatus.getAppliedStatus() == 'isOnFire'
-                                    && console.log("reflected", {
-                                        tileContender,
-                                        key,
-                                        reflectedTile,
-                                        reflectedTileIndex,
-                                        rd, tileStatus, tile, currCount, d
-                                    });
+                                // tileStatus.getAppliedStatus() == 'isOnFire'
+                                //     && console.log("reflected", {
+                                //         tileContender,
+                                //         key,
+                                //         reflectedTile,
+                                //         reflectedTileIndex,
+                                //         rd, tileStatus, tile, currCount, d
+                                //     });
                             }
                         }
                     })
@@ -499,6 +501,7 @@ export class GameBoardManager {
 
     getNumAdjacentTilesInDirectionFromTileToTile({ fromTileIndex, toTileIndex, numTiles = 1 }) {
         const normVec = this.getNormVecFromTileIndices({ fromTileIndex, toTileIndex });
+        console.log({ normVec }); // TESTING
         return this.getAdjacentTilesFromNormVec(fromTileIndex, normVec, numTiles);
     }
 

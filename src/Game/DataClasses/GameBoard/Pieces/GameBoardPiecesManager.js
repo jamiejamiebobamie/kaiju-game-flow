@@ -10,7 +10,6 @@ export class GameBoardPiecesManager {
         this.gameManagerProxy = gameManagerProxy;
     }
 
-    
     getPlayerPiece = () => {
         const player = this.pieces[0];
         return player;

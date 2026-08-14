@@ -319,11 +319,11 @@ const ModiferText = styled.p`
     ? `margin-left: ${Math.random() * 10}px`
     : `margin-right: ${Math.random() * 10}px`};
   color: ${props => props.color};
-  animation-timing-function: ease-in;
+  ${props => props.doNotAnimate ? 'opacity: 1;' : `animation-timing-function: ease-in;
   -webkit-animation-duration: 2s;
   animation-duration: 2s;
   -webkit-animation-name: textRise;
-  animation-name: textRise;
+  animation-name: textRise;`}
   @keyframes textRise {
     0% {
       opacity: 0;
@@ -355,7 +355,8 @@ export const GameBoardPieceComponent = ({
   spriteSheetSrc,
   lives,
   isGoingToSpewFire,
-  isShowHealthBarOnComponent
+  isShowHealthBarOnComponent,
+  tileIndex
 }) => {
   const [modifierText, setModifierText] = useState([]);
   const [isDamaged, setIsDamaged] = useState(null);
@@ -376,9 +377,9 @@ export const GameBoardPieceComponent = ({
             :
             `${dir}${anim}` // <- prepend 'idle' to direction, eg. 'idledown'
           :
-        // - - - - - - - - - - 
+          // - - - - - - - - - - 
 
-        // handle move-in-direction anim
+          // handle move-in-direction anim
           avatar == 'kaiju' ?
             `${dir}Kaiju` // <- append '-Kaiju'
             :
@@ -442,6 +443,9 @@ export const GameBoardPieceComponent = ({
   return (
     <Wrapper zIndex={zIndex} isVisible={isVisible} charLocation={charLocation}>
       {modifierText}
+      {!!tileIndex && tileIndex.i && <ModiferText doNotAnimate={true} color={"#557e61"}>
+        {`i: ${tileIndex.i} j: ${tileIndex.j}`}
+      </ModiferText>}
       <HealthBarWrapper lives={lives}>{bars}</HealthBarWrapper>
       <Character isDamaged={isDamaged}>
         <SpriteSheet

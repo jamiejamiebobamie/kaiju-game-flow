@@ -9,7 +9,7 @@ import { getRandomIntInRange } from 'Game/utils'
 export class SettingsManager {
     constructor() {
         this.abilityEdits = {};
-        this.playerAvatar = 'guy';
+        this.playerAvatar = 'agent';//'guy'; // TESTING...
         this.isTeammate = true;
         this.playerChosenAbilityElements = '';
         this.gameMode = GameMode.StoryPlusTutorial;
