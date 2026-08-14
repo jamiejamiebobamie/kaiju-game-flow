@@ -44,7 +44,7 @@ function getAdditionalModulePaths(options = {}) {
   throw new Error(
     chalk.red.bold(
       "Your project's `baseUrl` can only be set to `src` or `node_modules`." +
-        ' Create React App does not support other values at this time.'
+      ' Create React App does not support other values at this time.'
     )
   );
 }
@@ -108,10 +108,18 @@ function getModules() {
   // TypeScript project and set up the config
   // based on tsconfig.json
   if (hasTsConfig) {
-    const ts = require(resolve.sync('typescript', {
-      basedir: paths.appNodeModules,
-    }));
-    config = ts.readConfigFile(paths.appTsConfig, ts.sys.readFile).config;
+    
+      config = {}; // having issues... commenting-out for now...
+
+
+    // const ts = require(resolve.sync('typescript', {
+    //   basedir: paths.appNodeModules,
+    // }));
+    // let ts = require('typescript');
+    // if (ts && ts.default) {
+    //   ts = ts.default;
+    // }
+    // config = ts.readConfigFile(paths.appTsConfig, ts.sys.readFile).config;
     // Otherwise we'll check if there is jsconfig.json
     // for non TS projects.
   } else if (hasJsConfig) {

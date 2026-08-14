@@ -3,7 +3,7 @@ import { MainMenu } from "./MainMenu";
 import { Game } from "./Game/ReactComponents/Game";
 import { Tutorial } from "./Tutorial/Tutorial";
 import { Settings } from "./Settings/Settings";
-import { SettingsManager } from "Game/DataClasses/SettingsManager";
+import { SettingsManager } from "./Game/DataClasses/SettingsManager";
 
 const PAGES = Object.freeze({
   Home: 'Home',

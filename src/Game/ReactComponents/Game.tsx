@@ -17,6 +17,7 @@ import {
 import { FullscreenPage } from "Components/FullscreenPage.js";
 import { HolographGridBackground } from "Game/UI/HolographGridBackground";
 import { GameManager } from '../DataClasses/GameManager';
+import { damageKaiju, type KaijuState, WeatherCondition, GameDifficulty } from 'Utils/gameState'; // TESTING typescript ".ts" file import/export
 
 const Wrapper = styled.div`
   position: relative;
@@ -250,6 +251,12 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const pressedKeys = useRef([]);
 
   useEffect(() => {
+    console.log({
+      GameDifficulty,
+      // WeatherCondition,
+      // KaijuState,
+      damageKaiju
+    })
     if (intervalTime) {
       const gm = new GameManager({ scale, settingsManager });
       gameManager.current = gm;
@@ -311,12 +318,12 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
     dependencies: [isGameInitialized]
   });
 
-    useKeyPress({
-      keyCodes: !inputHandler.current ? [] : inputHandler.current.getPlayerAbilities().map((_, i) => inputHandler.current.getAbilityKeyInputMapping(i)),
-      keyDownCallback: !inputHandler.current ? () => {} : keycode => inputHandler.current.usePlayerAbility(keycode, accTime.current),
-      isCharacterDead: isPaused || isPlayerDead,
-      dependencies: [isGameInitialized]
-    });
+  useKeyPress({
+    keyCodes: !inputHandler.current ? [] : inputHandler.current.getPlayerAbilities().map((_, i) => inputHandler.current.getAbilityKeyInputMapping(i)),
+    keyDownCallback: !inputHandler.current ? () => { } : keycode => inputHandler.current.usePlayerAbility(keycode, accTime.current),
+    isCharacterDead: isPaused || isPlayerDead,
+    dependencies: [isGameInitialized]
+  });
 
   useEffect(() => {
     if (kaijuKillCount.length >= MAX_TO_WIN) {
@@ -395,34 +402,35 @@ export const Game = ({ handleClickHome, triggerTransition }) => {
   const swoopOutDuration = 3; //testing
 
   return (
-    !isPlayingGame ? <AbilityPicker
-      handleClickHome={handleClickHome}
-      pickedAbilities={pickedAbilities}
-      setPickedAbilities={setPickedAbilities}
-      handleClickPlay={() => {
-        setWinner(1);
-        triggerTransition(() => setIsPlayingGame(bool => !bool));
-      }}
-      isPaused={false}
-      powerUpData={[]}
-      playerData={playerData}
-      setPlayerData={setPlayerData}
-      setTeleportData={setTeleportData}
-      kaijuData={kaijuData}
-      setPlayerMoveToTiles={setPlayerMoveToTiles}
-      tileStatuses={tileStatuses}
-      setTileStatuses={setTileStatuses}
-      clickedTile={clickedTile}
-      setClickedTile={setClickedTile}
-      tiles={tiles}
-      path={path}
-      width={width}
-      height={height}
-      scale={scale}
-      numAbilitiesToPick={3}
-      isTeammate={isTeammate}
-      setIsTeammate={setIsTeammate}
-    />
+    !isPlayingGame ?
+      <AbilityPicker
+        handleClickHome={handleClickHome}
+        pickedAbilities={pickedAbilities}
+        setPickedAbilities={setPickedAbilities}
+        handleClickPlay={() => {
+          setWinner(1);
+          triggerTransition(() => setIsPlayingGame(bool => !bool));
+        }}
+        isPaused={false}
+        powerUpData={[]}
+        playerData={playerData}
+        setPlayerData={setPlayerData}
+        setTeleportData={setTeleportData}
+        kaijuData={kaijuData}
+        setPlayerMoveToTiles={setPlayerMoveToTiles}
+        tileStatuses={tileStatuses}
+        setTileStatuses={setTileStatuses}
+        clickedTile={clickedTile}
+        setClickedTile={setClickedTile}
+        tiles={tiles}
+        path={path}
+        width={width}
+        height={height}
+        scale={scale}
+        numAbilitiesToPick={3}
+        isTeammate={isTeammate}
+        setIsTeammate={setIsTeammate}
+      />
       : fullScreenPageData ?
         <FullscreenPage
           text={fullScreenPageData.text}
