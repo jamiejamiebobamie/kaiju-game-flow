@@ -1,5 +1,5 @@
 import { Bounds, PERIMETER_TILES_VALS, PENINSULA_TILE_LOOKUP, PENINSULA_TILE_LOOKUP_VALS, MAX_ROWS, MAX_COLS } from 'Utils/gameState';
-import { getRandomIntInRange, getDistanceToFrom, getNormVecFromDestAndOrigin, getDotProduct } from 'Game/utils'
+import { getRandomIntInRange, getDistanceToFrom, getNormVecFromDestAndOrigin, getDotProduct2D } from 'Game/utils'
 import { GameBoardTile } from 'Game/DataClasses/GameBoard/Tile/GameBoardTile'
 
 export class GameBoardManager {
@@ -857,7 +857,7 @@ export class GameBoardManager {
             (acc, item, i) => {
                 const distance = getDistanceToFrom(item, normVec);
 
-                // const dot = getDotProduct(item, normVec);
+                // const dot = getDotProduct2D(item, normVec);
                 if (
                     distance < acc.distance 
 
